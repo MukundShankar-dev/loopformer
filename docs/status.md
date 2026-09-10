@@ -20,7 +20,7 @@ The [training implementation](training_pointer.md) uses JSON configs under `conf
 
 The older [ordinary-Qwen generation smoke test](../scripts/smoke_test_qwen.py) and its recorded CPU example remain available. It was not rerun during Stage 0; the new CPU/MPS evidence concerns ordinary forward versus recurrent forward and backward, not generation.
 
-The [Windows/WSL2 CUDA handoff guide](windows_cuda_setup.md) covers the RTX 5070 Ti desktop setup, matching Python/direct dependency/model versions, deterministic CUDA checks, and data/history migration. The official Python 3.11 Linux torch 2.14.0+cu130 wheel was verified in the PyTorch index. Desktop installation and pretrained CUDA execution remain unverified; the standalone Stage 0 CLI still accepts CPU/MPS only, while the trainer performs its own gate on the selected CUDA device.
+The [Windows/WSL2 CUDA handoff guide](windows_cuda_setup.md) covers installation from a fresh desktop, VS Code's WSL connection and Python interpreter selection, Codex CLI setup and project handoff, matching Python/direct dependency/model versions, deterministic CUDA checks, and data/history migration for the RTX 5070 Ti desktop. The official Python 3.11 Linux torch 2.14.0+cu130 wheel was verified in the PyTorch index. Desktop installation and pretrained CUDA execution remain unverified; the standalone Stage 0 CLI still accepts CPU/MPS only, while the trainer performs its own gate on the selected CUDA device.
 
 ## Milestones
 

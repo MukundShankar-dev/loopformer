@@ -22,15 +22,32 @@ Matching means the same code, inputs, model revision, prompt, and experimental s
 
 ## 2. Prepare Windows and install WSL2
 
+### Install the editor on Windows
+
+WSL runs Ubuntu Linux inside Windows. VS Code is the Windows editor window; its WSL extension connects that window to the Linux files, terminal, and Python environment.
+
+| Install on Windows | Install inside Ubuntu later in this guide |
+| --- | --- |
+| VS Code, its WSL extension, and the NVIDIA driver | Git, Python, the project dependencies, and Codex CLI |
+| Windows Terminal, if it is not already installed | The repository at `~/src/loopformer` and its `.venv` |
+
+1. Download **VS Code for Windows, x64 User Installer** from the [official Windows setup page](https://code.visualstudio.com/docs/setup/windows). Run the downloaded installer, accept the defaults, and keep **Add to PATH** enabled. Reopen any terminals after installation.
+2. Open VS Code normally. Press **Ctrl+Shift+X** to open Extensions, search for **WSL**, and install the extension published by **Microsoft** (`ms-vscode-remote.remote-wsl`).
+3. Search the Windows Start menu for **Terminal**. If missing, install **Windows Terminal** from the Microsoft Store. Its tabs can run different shells: PowerShell manages the Windows setup; Ubuntu runs the project commands below.
+
+The editor is installed on Windows; the WSL extension sets up its Linux server automatically when connecting. [Microsoft's VS Code/WSL guide](https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode)
+
+### Install the driver and Ubuntu
+
 Use an up-to-date Windows 11 installation. Install the current compatible **Windows NVIDIA driver** for the 5070 Ti through the NVIDIA App or [NVIDIA driver downloads](https://www.nvidia.com/en-us/drivers/), then reboot if requested. NVIDIA's WSL support exposes the Windows driver to Linux; do not install a separate Linux NVIDIA display driver inside Ubuntu. This suite uses packaged PyTorch CUDA libraries and does not require a separate CUDA Toolkit or Docker installation. [NVIDIA CUDA on WSL](https://docs.nvidia.com/cuda/wsl-user-guide/)
 
-Open **PowerShell as Administrator**:
+Open Start, search for **PowerShell**, right-click it, and choose **Run as administrator**. Accept the Windows permission prompt, then run:
 
 ```powershell
 wsl --install -d Ubuntu-24.04
 ```
 
-Restart Windows when requested. Open Ubuntu from the Start menu and create its Linux username/password; the password is used for `sudo` and need not match your Windows password.
+Restart Windows when requested. Open Ubuntu from the Start menu and create its Linux username/password; the password is used for `sudo` and need not match your Windows password. Password entry displays no characters, which is normal; type it and press Enter.
 
 Back in **PowerShell**:
 
@@ -100,6 +117,21 @@ Compare `HEAD` with the commit reported by the Mac after the push. A fresh clone
 
 Keep the working repository at `~/src/loopformer`, rather than running it from `/mnt/c/...`. Microsoft recommends Linux filesystem storage for workloads run in WSL. To view it in Windows Explorer, run `explorer.exe .` from Ubuntu. [WSL filesystem guidance](https://learn.microsoft.com/en-us/windows/wsl/filesystems)
 
+### Open the project in VS Code
+
+From that Ubuntu terminal:
+
+```bash
+cd ~/src/loopformer
+code .
+```
+
+The dot means the current directory. On first launch, wait for VS Code's WSL server installation. If prompted about workspace trust, this is the repository you just cloned. Check that the bottom-left connection indicator says **WSL: Ubuntu-24.04** (or your installed distribution).
+
+In this connected window, open Extensions with **Ctrl+Shift+X**, install **Python** by Microsoft (`ms-python.python`), and choose **Install in WSL** when offered. This extension provides editor support; section 4 installs the actual Python interpreter. [VS Code WSL development](https://code.visualstudio.com/docs/remote/wsl)
+
+Choose **Terminal > New Terminal**. This should be an Ubuntu terminal inside the project. Run `pwd`: expect `/home/YOUR_LINUX_USER/src/loopformer`. You can run the remaining Bash commands here without leaving VS Code.
+
 ## 4. Install Python 3.11.8 and the CUDA environment
 
 Ubuntu's default Python may differ from the project version. Use uv only to install the matching interpreter and create the venv; the project's dependencies remain managed by pip and `requirements.txt`.
@@ -128,6 +160,24 @@ python -m pip check
 The [official CUDA 13.0 wheel index](https://download.pytorch.org/whl/cu130/torch/) lists `torch-2.14.0+cu130` for Python 3.11 Linux x86-64. The `+cu130` suffix is expected; it satisfies the repository's `torch==2.14.0` requirement. Do not replace repository pins with arbitrary latest versions. A recent compatible Windows driver is required; PyTorch's Blackwell guidance specifies CUDA 13.0+ wheels and Windows driver 580.88 or newer for that runtime. Prefer a current supported driver over installing that old minimum. [PyTorch CUDA/Blackwell guidance](https://pytorch.org/blog/pytorch-2-12-release-blog/)
 
 The seven direct versions should match the Mac: torch 2.14.0 (CUDA build), transformers 5.17.0, tokenizers 0.23.2, huggingface-hub 1.31.0, peft 0.20.0, rich 15.0.0, pytest 9.1.1. CUDA-specific dependencies will differ. No torchvision, torchaudio, or development CUDA toolkit is needed by this suite.
+
+In VS Code, press **Ctrl+Shift+P**, run **Python: Select Interpreter**, and select the project's `.venv/bin/python`. If it is missing, use **Enter interpreter path** and browse to `/home/YOUR_LINUX_USER/src/loopformer/.venv/bin/python`. [Python environments in VS Code](https://code.visualstudio.com/docs/python/environments)
+
+### Optional: install Codex CLI in Ubuntu
+
+Run the official Linux installer in the Ubuntu terminal:
+
+```bash
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+```
+
+Follow any PATH instructions printed by the installer, then run `codex` from `~/src/loopformer` and choose **Sign in with ChatGPT**. This standalone installation does not require Node.js. [Official OpenAI CLI documentation](https://learn.chatgpt.com/docs/codex/cli)
+
+For a new desktop session, give Codex this handoff:
+
+> Read AGENTS.md, docs/README.md, docs/project_plan.md, docs/status.md, and docs/windows_cuda_setup.md. We are moving this project from a 32 GB M1 Pro Mac to this Windows desktop with an RTX 5070 Ti and 32 GB RAM, using WSL2. Check the current environment and finish the documented installation and validation steps. Preserve the research design and dependency pins. The Mac baseline was 6% on 1,000 examples; pretrained recurrent training has not started. Leave pretrained training for me to launch manually. Report the next command for me to run.
+
+The repository provides code and durable project context, not this Mac conversation's transcript. `codex resume` selects saved local chats; do not assume signing into a fresh WSL installation transfers the Mac thread. OpenAI recommends keeping durable guidance in `AGENTS.md` and checked-in docs. [CLI session continuation](https://learn.chatgpt.com/docs/codex/cli), [project context](https://learn.chatgpt.com/docs/projects)
 
 ## 5. Verify real GPU computation and determinism
 
@@ -331,8 +381,19 @@ To bring a run back to the Mac, copy the entire run directory under `models/stag
 
 ## 11. Troubleshooting and completion check
 
+On later visits, open Ubuntu and run `cd ~/src/loopformer` followed by `code .`. In VS Code's Ubuntu terminal, prepare each new session with:
+
+```bash
+source .venv/bin/activate
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+```
+
+Then run the desired evaluation/training command, or `codex resume` to return to a saved desktop Codex chat. Installation, cloning, and model downloading are one-time setup steps.
+
 | Symptom | Action |
 | --- | --- |
+| `code .` is unavailable | Finish the Windows VS Code installation with Add to PATH enabled, reopen Ubuntu, and confirm the Microsoft WSL extension is installed |
+| VS Code terminal shows a Windows path or PowerShell | Reopen the folder with `code .` from Ubuntu and check the bottom-left WSL connection indicator |
 | `nvidia-smi` fails in Ubuntu | Check the Windows NVIDIA driver, WSL2 version, and `wsl --update`; use `/usr/lib/wsl/lib/nvidia-smi` if only PATH is missing |
 | `torch.cuda.is_available()` is false | Confirm Ubuntu `.venv` is active and the installed torch is the CUDA wheel, not a Windows/Mac/CPU environment |
 | `no kernel image` / unsupported `sm_120` | Recheck the official cu130 wheel and current compatible Windows driver; do not ignore the warning |
