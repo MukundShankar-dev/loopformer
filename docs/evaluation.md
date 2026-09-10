@@ -8,7 +8,7 @@ Status: research metric and logging conventions remain planned, derived from pro
 
 Record both step-specific intermediate targets and the fixed final answer. Intermediate accuracy measures execution at the corresponding step. Final-answer correctness supports repair, damage, and solution-survival analysis. Label the target basis explicitly rather than using an ambiguous `is_correct` field alone.
 
-Before implementation, settle program completion and early/repeated answer semantics in [decisions](decisions.md). Report nominal execution separately from post-completion trajectories.
+Stage 1 data uses explicit requested steps and a non-repeating nominal path, with targets only at steps 1..d. `scripts.dataset.pointer.check_predictions` checks decoded symbols against that nominal trajectory; no model metrics have been measured. Post-completion behavior and future cyclic-task semantics remain open in [decisions](decisions.md). Report nominal execution separately from post-completion trajectories; a valid additional pointer lookup must not automatically count as damage.
 
 ## Answer margins
 

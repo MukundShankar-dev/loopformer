@@ -1,6 +1,6 @@
 # Architecture and implementation boundaries
 
-Status: Stage 0 implemented. See the [validation report](experiments/stage0_validation.md) for device-specific evidence and limits. The research specification is [the project plan](project_plan.md).
+Status: Stage 0 and Stage 1 data implemented; training remains planned. See the [validation report](experiments/stage0_validation.md) for device-specific evidence and limits, and [data report](experiments/stage1_data_validation.md) for pointer validation. The research specification is [the project plan](project_plan.md).
 
 The [inference smoke test](../scripts/smoke_test_qwen.py) exercises ordinary Qwen. The [Stage 0 entry point](../scripts/validate_stage0.py) loads the checkpoint, constructs the recurrent model, attaches LoRA, and validates the architecture. Stage 0 defaults to cached files at an immutable revision. Usage is in [setup](setup.md).
 
@@ -57,8 +57,15 @@ Only current-stage modules exist; future locations below are not scaffolded requ
 | `scripts/recurrent_qwen/validation.py` | Stage 0 architecture checks and measurements |
 | `scripts/validate_stage0.py` | Loading, CLI configuration, Rich presentation, JSON evidence |
 | `tests/` | Focused scientific and implementation contracts |
-| Future `tasks/` | Symbols, task records, exact state trajectories, generation |
+| `scripts/dataset/pointer.py` | Pointer records, random tables, exact reference execution, decoded-symbol checking |
+| `scripts/dataset/symbols.py` | Pinned tokenizer identity and context-validated single-token vocabulary |
+| `scripts/dataset/dataset.py` | Seeded splits, JSONL/manifest persistence, independent verification |
+| `scripts/dataset/cli.py` | Cached tokenizer loading, dataset CLI, Rich dry run and summaries |
 | Future `training/` | Stage-specific objectives and training |
 | Future `eval/` | Metrics, sweeps, survival, transfer, plots |
 
 Scripts compose library functions. Task generation must remain separate from training, and loss functions must not own loading or artifact writing. See [Stage 0](phases/stage0_architecture.md) for commands and [decisions](decisions.md) for remaining research semantics.
+
+## Stage 1 data boundary
+
+Pointer generation has no dependency on the recurrent wrapper and loads no model. Logical state targets and actual answer-token IDs are saved together. A future trainer can construct labels `[B,T]` from `intermediate_token_ids` and the allowed answer set from the manifest; depth masking/reduction is still a training-stage decision. Saved answer positions apply to unpadded raw prompts; batching must account for padding. Only nominal steps 1..d are labeled, with no h_0 or post-completion supervision. The [Stage 1 guide](phases/stage1_pointer.md) owns the data format and reproduction commands.

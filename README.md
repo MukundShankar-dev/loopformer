@@ -72,6 +72,43 @@ Prompt: What color is the sky on a clear day?
 Answer: The sky appears blue on a clear day because it reflects sunlight directly into our eyes.
 ```
 
+## Pointer dataset: preview and reproduce
+
+All dataset code is packaged in [`scripts/dataset`](scripts/dataset/). Start with a Rich terminal preview; these commands write no dataset files:
+
+```bash
+.venv/bin/python -m scripts.dataset --seed 17 --dry-run
+.venv/bin/python -m scripts.dataset --seed 17 --dry-run 10
+```
+
+The five-example preview spans **1, 4, 8, 12, and 16 steps** and prints the full configured distribution. The previous preview took the first rows of each split, which overrepresented one-step examples; the saved dataset itself is balanced.
+
+The existing dataset is `data/pointer/seed-17/`, generated with **master seed 17**:
+
+| Split | Total examples | Steps | Examples at each step count |
+| --- | ---: | --- | ---: |
+| Training | 10,000 | 1–8 | 1,250 |
+| Validation | 1,000 | 1–8 | 125 |
+| Test | 1,000 | 1–8 | 125 |
+| Deeper test | 1,000 | 9–16 | 125 |
+
+There are 13,000 examples in total: **1,500 at each depth 1–8**, and **125 at each depth 9–16**. Every example has 26 shuffled rules over A–Z, a start symbol, a requested step count, exact per-step answers, answer-token IDs, and its own derived seed. For example, `(A,C) (C,D) (D,E)` from A with two steps has targets C, D and final answer D. Nominal paths have no repeated state.
+
+After reviewing the preview, this fully explicit command reproduces the **exact four JSONL files** in a new directory:
+
+```bash
+.venv/bin/python -m scripts.dataset \
+  --seed 17 \
+  --train-count 10000 \
+  --validation-count 1000 \
+  --test-count 1000 \
+  --depth-test-count 1000 \
+  --min-depth 1 \
+  --max-train-depth 8 \
+  --max-eval-depth 16 \
+  --output data/pointer/seed-17-reproduced
+```
+
 ## Project documentation
 
 *   [Documentation index](docs/README.md)

@@ -1,7 +1,10 @@
-# Qwen inference and Stage 0 validation; use Python 3.11. See docs/setup.md.
+# Qwen inference, Stage 0 validation, and Stage 1 data; use Python 3.11.
+# See docs/setup.md for environment and reproduction requirements.
 # Direct dependencies are pinned; transitive dependencies are resolved by pip.
 torch==2.14.0
 transformers==5.17.0
+# Pin tokenizer behavior used by the verified seed-17 pointer dataset.
+tokenizers==0.23.2
 huggingface-hub==1.31.0
 peft==0.20.0
 rich==15.0.0

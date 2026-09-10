@@ -12,7 +12,7 @@ python -m pip check
 
 Use `deactivate` to leave the environment, and `source .venv/bin/activate` to return. Both `.venv/` and `venv/` are gitignored. Commit dependency changes to [requirements.txt](../requirements.txt), not the environment directory.
 
-## Inference and Stage 0 dependencies
+## Inference, Stage 0, and Stage 1 data dependencies
 
 The initial target is [Qwen/Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct).
 
@@ -20,12 +20,13 @@ The initial target is [Qwen/Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Q
 | --- | --- |
 | `torch` | Tensor operations and model execution on CPU or Apple Silicon MPS |
 | `transformers` | Qwen model classes, tokenizer, and generation |
+| `tokenizers` | Explicitly pinned to 0.23.2 to reproduce the verified pointer dataset's tokenization |
 | `huggingface-hub` | Model/tokenizer downloads and explicit Hub access |
 | `peft` | LoRA injection into the shared recurrent layers |
 | `rich` | Readable terminal configuration, measurements, and pass/fail tables |
 | `pytest` | Focused architecture and metric contract tests |
 
-Transformers installs tokenizer and Safetensors dependencies automatically. PEFT installs Accelerate transitively; model placement remains explicit and does not use `device_map="auto"`.
+Transformers uses tokenizers; its version is now explicitly pinned in requirements rather than left to transitive resolution. Safetensors remains transitive. PEFT installs Accelerate transitively; model placement remains explicit and does not use `device_map="auto"`.
 
 ## Download and inference
 
@@ -62,6 +63,8 @@ The default revision is `main`, which can change. For repeatable runs, pass the 
 ## Version and validation status
 
 Direct dependencies are pinned to give collaborators a common starting point. This is not a full environment lock: transitive dependencies can vary. Record the resolved package versions and model revision for experiments.
+
+Stage 1 data reproduction also pins `tokenizers==0.23.2`, the version already installed when seed 17 was generated and verified. All seven requirement pins match the local Python 3.11.8 environment and `pip check` passes; adding this pin requires no local package changes. See the [README reproduction instructions](../README.md#pointer-dataset-preview-and-reproduce).
 
 Package versions and Python requirements were checked against PyPI metadata for [PyTorch](https://pypi.org/project/torch/2.14.0/), [Transformers](https://pypi.org/project/transformers/5.17.0/), and [Hugging Face Hub](https://pypi.org/project/huggingface-hub/1.31.0/). The pinned PyTorch release provides a Python 3.11 Apple Silicon wheel requiring macOS 14 or later.
 

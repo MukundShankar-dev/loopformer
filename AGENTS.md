@@ -25,6 +25,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 - Write modular, minimal, readable code. Give each module and function a clear responsibility; favor direct control flow and descriptive names.
 - Keep model mechanics, task generation, training objectives, evaluation, and command-line entry points separate. Scripts should compose library functions rather than contain the implementation.
 - Keep the current recurrent model implementation in `scripts/recurrent_qwen/`, with its composing CLI in `scripts/validate_stage0.py` and contract tests in `tests/`.
+- Keep dataset generation, symbol validation, reference execution, persistence, and the dataset CLI in `scripts/dataset/`; invoke it with `python -m scripts.dataset`. Dataset tests stay in `tests/`.
 - Implement only what the current phase needs. Introduce abstractions when they clarify a real shared interface; avoid speculative frameworks, unnecessary wrappers, and duplicated logic.
 - Make dependencies and configuration explicit. Avoid hidden global state, import-time model loading, implicit downloads, and silent device or dtype changes.
 - Use type hints on public interfaces. Document tensor shapes, loop indexing, target semantics, and non-obvious gradient behavior. Comments should explain reasons and constraints rather than restate code.

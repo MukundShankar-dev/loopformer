@@ -7,7 +7,7 @@
 3. [Architecture](architecture.md): implemented Stage 0 modules, recurrent execution, and gradient boundaries.
 4. The relevant phase guide below, together with [evaluation](evaluation.md) and [decisions](decisions.md).
 
-[Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Stage 0 is implemented and validated; later stages remain planned.
+[Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Stage 0 and Stage 1 data are implemented and validated; Stage 1 training and later stages remain planned.
 
 ## Phase guides
 
@@ -27,6 +27,8 @@ For collaborator onboarding, see [Python environment setup](setup.md) and the pi
 ## Keeping documentation current
 
 Recorded validation: [Stage 0 architecture on pretrained Qwen, CPU and MPS](experiments/stage0_validation.md).
+
+Recorded data validation: [Stage 1 seeded pointer dataset](experiments/stage1_data_validation.md). Preview and exact seed-17 reproduction commands are in the [root README](../README.md#pointer-dataset-preview-and-reproduce). Generator commands, schema, and programmatic prediction checking live in the [Stage 1 guide](phases/stage1_pointer.md). All current dataset code is packaged under `scripts/dataset/`.
 
 Put implementation explanations in the owning phase guide and shared architecture document. Put metric definitions in the evaluation guide, design decisions in the decision record, and current progress in status. Add verified setup and execution commands when the corresponding code exists.
 
