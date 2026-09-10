@@ -2,7 +2,7 @@
 
 Use Windows with Ubuntu in **WSL2**, and run the repository with Linux Python and CUDA inside Ubuntu. This guide targets the desktop RTX 5070 Ti with 16 GB VRAM and 32 GB system RAM. The current scripts use Unix resource logging, so native Windows Python is not the supported route here.
 
-This guide was checked against the repository and official installation documentation on 2026-09-10. It has not been executed on the desktop. The Mac's 87 passing tests and CPU/MPS results do not establish CUDA correctness on another device.
+This guide was checked against the repository and official installation documentation on 2026-09-10. Actual desktop installation, dataset reproduction, CUDA checks, and baseline evidence are recorded in the [WSL run report](experiments/wsl_cuda_baseline.md). The desktop suite has one exact-resume precision failure; the Mac's 87 passing tests and CPU/MPS results do not establish CUDA correctness on another device.
 
 ## 1. What matching the Mac means
 
@@ -96,7 +96,7 @@ All remaining commands are **Ubuntu Bash**, unless marked otherwise.
 
 ```bash
 sudo apt update
-sudo apt install -y git curl ca-certificates tmux
+sudo apt install -y git curl ca-certificates tmux build-essential
 nvidia-smi
 ```
 
@@ -160,6 +160,8 @@ python -m pip check
 The [official CUDA 13.0 wheel index](https://download.pytorch.org/whl/cu130/torch/) lists `torch-2.14.0+cu130` for Python 3.11 Linux x86-64. The `+cu130` suffix is expected; it satisfies the repository's `torch==2.14.0` requirement. Do not replace repository pins with arbitrary latest versions. A recent compatible Windows driver is required; PyTorch's Blackwell guidance specifies CUDA 13.0+ wheels and Windows driver 580.88 or newer for that runtime. Prefer a current supported driver over installing that old minimum. [PyTorch CUDA/Blackwell guidance](https://pytorch.org/blog/pytorch-2-12-release-blog/)
 
 The seven direct versions should match the Mac: torch 2.14.0 (CUDA build), transformers 5.17.0, tokenizers 0.23.2, huggingface-hub 1.31.0, peft 0.20.0, rich 15.0.0, pytest 9.1.1. CUDA-specific dependencies will differ. No torchvision, torchaudio, or development CUDA toolkit is needed by this suite.
+
+Keep Ubuntu `build-essential` installed: the observed Torch CUDA path uses Triton for a Qwen rotary-position operation and requires a C compiler. Without GCC, model loading and a basic CUDA matrix check can pass while generation fails with `Failed to find C compiler`. The [desktop report](experiments/wsl_cuda_baseline.md) records this failure and setup correction.
 
 In VS Code, press **Ctrl+Shift+P**, run **Python: Select Interpreter**, and select the project's `.venv/bin/python`. If it is missing, use **Enter interpreter path** and browse to `/home/YOUR_LINUX_USER/src/loopformer/.venv/bin/python`. [Python environments in VS Code](https://code.visualstudio.com/docs/python/environments)
 

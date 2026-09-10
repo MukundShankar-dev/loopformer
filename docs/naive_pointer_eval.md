@@ -2,6 +2,8 @@
 
 Status: implemented and tested with local random toy models. The user completed a full three-shot pretrained run with **6.00% accuracy (60/1,000)**; the saved results were audited without rerunning inference. See the [baseline report](experiments/naive_pointer_baseline.md) for evidence and limitations. This is a final-answer baseline, separate from recurrent execution and training.
 
+A subsequent [WSL CUDA run](experiments/wsl_cuda_baseline.md) completed all 1,000 examples in 84.27 seconds with the same 6.00% accuracy and the same predictions-CSV hash as the historical report. Its setup checks and separate training-resume test limitation are recorded there.
+
 ## Usage
 
 From the repository root with the configured environment and generated dataset:

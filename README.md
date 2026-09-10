@@ -127,6 +127,15 @@ Use `--test 2` for two examples. To run the final-answer baseline on the full 1,
 
 Add `--device mps` for Apple Silicon, or `--limit 8` for a short first run. Models load from local files/cache by default; add `--download` to allow downloads. A saved Hugging Face model directory also works with `--model path/to/model`.
 
+For the configured WSL/NVIDIA environment, run the full test with:
+
+```bash
+CUBLAS_WORKSPACE_CONFIG=:4096:8 .venv/bin/python -m scripts.eval.naive_test \
+  --model Qwen/Qwen2.5-0.5B-Instruct --device cuda
+```
+
+The [WSL run report](docs/experiments/wsl_cuda_baseline.md) records desktop setup and results. Ubuntu `build-essential` must be installed for the CUDA runtime's Triton compilation.
+
 The evaluation uses a **three-shot prompt**, with solved examples at depths 1, 2, and 3 before each question. Prompt templates live in [`prompts/`](prompts/); edit [pointer_task.txt](prompts/pointer_task.txt) to change the shared task instructions and examples.
 
 The terminal shows progress, accuracy, tokens/s, and questions/s. Results are saved under `eval/pointer_task/<run>/` as `predictions.csv` and `summary.json`. See [evaluation usage](docs/naive_pointer_eval.md) for standalone weight files, the deeper test set, and scoring details.

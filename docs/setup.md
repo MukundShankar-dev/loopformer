@@ -64,6 +64,8 @@ The default revision is `main`, which can change. For repeatable runs, pass the 
 
 ## Version and validation status
 
+The [WSL desktop report](experiments/wsl_cuda_baseline.md) records the new Python 3.11.8 / Torch 2.14.0+cu130 environment, successful GPU computation and 1,000-example baseline, exact dataset reproduction, and the one desktop training-resume precision test failure. The original environment audit below describes the Mac environment. On WSL, install Ubuntu `build-essential` for Triton compilation as described in the CUDA guide.
+
 Direct dependencies are pinned to give collaborators a common starting point. This is not a full environment lock: transitive dependencies can vary. Record the resolved package versions and model revision for experiments.
 
 Stage 1 data reproduction also pins `tokenizers==0.23.2`, the version already installed when seed 17 was generated and verified. All seven requirement pins match the local Python 3.11.8 environment and `pip check` passes; adding this pin requires no local package changes. See the [README reproduction instructions](../README.md#pointer-dataset-preview-and-reproduce).
