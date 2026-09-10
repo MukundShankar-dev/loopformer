@@ -12,6 +12,8 @@ This project studies recurrent dynamics in `Qwen/Qwen2.5-0.5B-Instruct`:
 
 Use Python 3.11, a local virtual environment, PyTorch, and Hugging Face Transformers. Run these commands from the repository root. See [environment setup](docs/setup.md) for dependency details and platform requirements.
 
+For a Windows desktop with an NVIDIA GPU, follow the [Windows / WSL2 / CUDA setup guide](docs/windows_cuda_setup.md), including dataset and experiment-state migration.
+
 ### Create virtual environment
 
 Create and activate the Python venv:
@@ -33,10 +35,10 @@ The environment is gitignored. In each new terminal, run `source .venv/bin/activ
 
 ### Download Qwen2.5-0.5B-Instruct
 
-The smoke test (next step) downloads the model and tokenizer automatically on its first run. To download them separately first:
+Download the model and tokenizer revision used by the dataset and evaluation scripts:
 
 ```
-hf download Qwen/Qwen2.5-0.5B-Instruct
+hf download Qwen/Qwen2.5-0.5B-Instruct --revision 7ae557604adf67be50417f59c2c2f167def9a775
 ```
 
 ### Test model inference (smoke test)
@@ -94,7 +96,7 @@ The existing dataset is `data/pointer/seed-17/`, generated with **master seed 17
 
 There are 13,000 examples in total: **1,500 at each depth 1–8**, and **125 at each depth 9–16**. Every example has 26 shuffled rules over A–Z, a start symbol, a requested step count, exact per-step answers, answer-token IDs, and its own derived seed. For example, `(A,C) (C,D) (D,E)` from A with two steps has targets C, D and final answer D. Nominal paths have no repeated state.
 
-After reviewing the preview, this fully explicit command reproduces the **exact four JSONL files** in a new directory:
+Generated data is not included in Git. After reviewing the preview, generate it at the location used by evaluation:
 
 ```bash
 .venv/bin/python -m scripts.dataset \
@@ -106,8 +108,47 @@ After reviewing the preview, this fully explicit command reproduces the **exact 
   --min-depth 1 \
   --max-train-depth 8 \
   --max-eval-depth 16 \
-  --output data/pointer/seed-17-reproduced
+  --output data/pointer/seed-17
 ```
+
+## Test a model on pointer tasks
+
+First inspect three examples, including the exact model input, response, expected answer, and right/wrong score:
+
+```bash
+.venv/bin/python -m scripts.eval.naive_test --model Qwen/Qwen2.5-0.5B-Instruct --test
+```
+
+Use `--test 2` for two examples. To run the final-answer baseline on the full 1,000-example test set:
+
+```bash
+.venv/bin/python -m scripts.eval.naive_test --model Qwen/Qwen2.5-0.5B-Instruct
+```
+
+Add `--device mps` for Apple Silicon, or `--limit 8` for a short first run. Models load from local files/cache by default; add `--download` to allow downloads. A saved Hugging Face model directory also works with `--model path/to/model`.
+
+The evaluation uses a **three-shot prompt**, with solved examples at depths 1, 2, and 3 before each question. Prompt templates live in [`prompts/`](prompts/); edit [pointer_task.txt](prompts/pointer_task.txt) to change the shared task instructions and examples.
+
+The terminal shows progress, accuracy, tokens/s, and questions/s. Results are saved under `eval/pointer_task/<run>/` as `predictions.csv` and `summary.json`. See [evaluation usage](docs/naive_pointer_eval.md) for standalone weight files, the deeper test set, and scoring details.
+
+## Train recurrent pointer execution
+
+Training configs live in [`configs/`](configs/). Preview the small overfit run first, then run it:
+
+```bash
+python -m scripts.training.train_pointer --config configs/stage1_pointer_overfit.json --dry-run
+python -m scripts.training.train_pointer --config configs/stage1_pointer_overfit.json
+```
+
+Add `--device mps` for Apple Silicon. The preview validates data and tokenization without loading model weights or writing files. The overfit config uses 32 examples at depths 1–4; `configs/stage1_pointer.json` configures the larger one-epoch run. Training uses raw dataset prompts and per-loop targets.
+
+A compact Rich dashboard shows progress, ETA, losses, accuracy, gradients, throughput, and memory. Checkpoints and detailed logs go under `models/stage1_pointer/<run>/`. Use a saved step directory with the existing evaluator:
+
+```bash
+python -m scripts.eval.naive_test --model models/stage1_pointer/<run>/step-000160 --test
+```
+
+See [training usage](docs/training_pointer.md) for configuration, metrics, checkpoint selection, and resume commands. Recurrent evaluation reads the A–Z prediction after the requested number of loops; the ordinary-model three-shot baseline still uses generation.
 
 ## Project documentation
 

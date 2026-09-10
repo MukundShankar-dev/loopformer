@@ -1,0 +1,30 @@
+Follow the pointer rules below. Each pair ( X, Y) means that the next state after X is Y.
+Begin at the Start state and apply exactly Steps transitions. One transition follows one pair.
+Return only the final state's single uppercase letter. Do not include an explanation, intermediate states, or punctuation.
+
+Here are three independent examples. Each example has its own rules; rule order does not indicate execution order.
+
+Example 1:
+Rules: ( C, D) ( A, F) ( F, B) ( D, E) ( B, C) ( E, A)
+Start: A
+Steps: 1
+Answer: F
+
+Example 2:
+Rules: ( D, E) ( F, C) ( A, D) ( C, B) ( B, F) ( E, A)
+Start: A
+Steps: 2
+Answer: E
+
+Example 3:
+Rules: ( D, E) ( B, A) ( F, D) ( C, F) ( A, C) ( E, B)
+Start: E
+Steps: 3
+Answer: C
+
+Now solve the following task using only its rules. Return only the final state's letter.
+
+Rules: {rules}
+Start: {start}
+Steps: {steps}
+Answer:

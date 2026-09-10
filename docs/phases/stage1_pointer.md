@@ -1,6 +1,6 @@
 # Stage 1: pointer data and stepwise execution
 
-Status: data milestone implemented and validated on 2026-09-10; training remains planned. Stage 0 has passed on CPU and MPS. Source: project plan sections 5, 7, and 32. See the [data validation report](../experiments/stage1_data_validation.md).
+Status: data milestone implemented and validated on 2026-09-10; training is implemented with toy-model tests; pretrained training remains unrun. Stage 0 has passed on CPU and MPS. Source: project plan sections 5, 7, and 32. See the [data validation report](../experiments/stage1_data_validation.md).
 
 ## Purpose
 
@@ -25,6 +25,8 @@ Implement the Stage 1 training loop using differentiable unrolls and intermediat
 Specify masking for mixed-depth batches and loss reduction explicitly. Choose the cross-entropy vocabulary convention and record it; symbolic evaluation is restricted to the validated answer set regardless. Document any supervision beyond nominal completion separately.
 
 Begin with tiny batches, short prompts, gradient accumulation, and recurrent depths around 4–8. Save reproducible configurations and checkpoints. Build the depth-by-loop evaluator alongside training using [evaluation conventions](../evaluation.md).
+
+The implementation is in `scripts/training/`, composed by `python -m scripts.training.train_pointer`. JSON configs live in `configs/`; checkpoint directories and metrics live in `models/`. See [training usage](../training_pointer.md) for preview/run/resume commands, the 32-example overfit configuration, the initial depth-1–4 epoch, and exact logging/selection semantics. Loss is 26-symbol CE, averaged over nominal loops per example and then examples, with no post-completion labels. Validation emits per-loop trajectories and a depth-by-loop final-readout matrix.
 
 ## Acceptance gate
 
@@ -62,15 +64,15 @@ The default output is `data/pointer/seed-<seed>/`; `--output` selects another ne
 
 | File | Default examples | Depths | Purpose |
 | --- | ---: | --- | --- |
-| `train.jsonl` | 10,000 | 1–8 | Future adapter training |
-| `validation.jsonl` | 1,000 | 1–8 | Future model selection |
+| `train.jsonl` | 10,000 | 1–8 | Adapter training (initial config filters depths 1–4) |
+| `validation.jsonl` | 1,000 | 1–8 | Validation and model selection |
 | `test.jsonl` | 1,000 | 1–8 | Unseen-instance evaluation |
 | `depth_test.jsonl` | 1,000 | 9–16 | Held-out-depth evaluation |
 | `manifest.json` | — | — | Configuration, tokenizer IDs/revision, provenance, counts, checksums |
 
 Counts are configurable with `--train-count`, `--validation-count`, `--test-count`, and `--depth-test-count`. Depth boundaries use `--min-depth`, `--max-train-depth`, and `--max-eval-depth`. Require `1 <= min_depth <= max_train_depth < max_eval_depth <= 25`, with positive split counts. Defaults are an initial data budget, not a measured training requirement or statistically justified gate threshold.
 
-Depths cycle in increasing order within each split; counts per depth differ by at most one. Future training must explicitly shuffle records. A SHA-256 derivation of master seed, split, and index produces an independent 64-bit example seed; local `random.Random(seed)` samples each table. Increasing a split count preserves its existing prefix and does not change the other splits. Changing depth configuration can change the examples. Python version and generator source hashes are recorded; seeds alone are not a promise of byte identity across future code or runtime changes.
+Depths cycle in increasing order within each split; counts per depth differ by at most one. Training explicitly shuffles selected records each epoch. A SHA-256 derivation of master seed, split, and index produces an independent 64-bit example seed; local `random.Random(seed)` samples each table. Increasing a split count preserves its existing prefix and does not change the other splits. Changing depth configuration can change the examples. Python version and generator source hashes are recorded; seeds alone are not a promise of byte identity across future code or runtime changes.
 
 The generator samples `d+1` distinct symbols for the nominal path and fills unused sources with independently random destinations. Every example contains exactly 26 rules (all A–Z sources) in shuffled order. This is a random mapping **conditioned on no repeat along the requested path**, not an unrestricted random-function distribution or a permutation. This avoids early/repeated final-state visits; random unused edges can still create cycles outside the nominal path. Depth is limited to 25 by the 26-symbol pool. Longer unique paths need a separately validated larger vocabulary.
 
@@ -120,4 +122,4 @@ The checker accepts a prediction prefix, strips surrounding whitespace, and requ
 
 Verification checks file hashes, counts and depth histograms, unique mappings, prompt/table consistency, all labels by reparsing and executing the prompt, actual token contexts, and exact per-record seed replay. Source hashes and runtime provenance live in the manifest; generated data is excluded from Git by `data/` in `.gitignore`. The [report](../experiments/stage1_data_validation.md) records the default artifact hashes as durable evidence.
 
-No training code, checkpoints, learning curves, or model-execution results exist yet. Passing data validation does not establish Gate 1.
+The separate [ordinary-model final-answer baseline](../naive_pointer_eval.md) is implemented and tested with toy models; the user's first full three-shot run reached 6.00% accuracy and is documented in the [baseline report](../experiments/naive_pointer_baseline.md). It shares the dataset and uses `prompts/pointer_task.txt` instructions, without changing the nominal targets or introducing recurrent training. Training code, resumable adapter checkpoints, and per-loop validation are implemented and tested on random tiny models. No pretrained research training, learning curves, or learned recurrent pointer-execution results have been established. Passing data validation or final-answer baseline tests does not establish Gate 1.

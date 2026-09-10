@@ -1,4 +1,4 @@
-# Qwen inference, Stage 0 validation, and Stage 1 data; use Python 3.11.
+# Qwen inference, recurrent validation, pointer data and training; use Python 3.11.
 # See docs/setup.md for environment and reproduction requirements.
 # Direct dependencies are pinned; transitive dependencies are resolved by pip.
 torch==2.14.0

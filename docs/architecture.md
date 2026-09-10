@@ -1,6 +1,6 @@
 # Architecture and implementation boundaries
 
-Status: Stage 0 and Stage 1 data implemented; training remains planned. See the [validation report](experiments/stage0_validation.md) for device-specific evidence and limits, and [data report](experiments/stage1_data_validation.md) for pointer validation. The research specification is [the project plan](project_plan.md).
+Status: Stage 0, pointer data, and Stage 1 training implemented; pretrained training remains unrun. See the [validation report](experiments/stage0_validation.md) for device-specific evidence and limits, and [data report](experiments/stage1_data_validation.md) for pointer validation. The research specification is [the project plan](project_plan.md).
 
 The [inference smoke test](../scripts/smoke_test_qwen.py) exercises ordinary Qwen. The [Stage 0 entry point](../scripts/validate_stage0.py) loads the checkpoint, constructs the recurrent model, attaches LoRA, and validates the architecture. Stage 0 defaults to cached files at an immutable revision. Usage is in [setup](setup.md).
 
@@ -30,7 +30,7 @@ Trainable names have the form `recurrent.layers.<relative-index>.self_attn.<proj
 
 Frozen operations remain differentiable. Gradients pass through C to the adapters and through earlier R iterations. There is no internal `no_grad` around those paths. Zero A gradients on the first backward are expected when B is zero; focused tests verify both factors after a diagnostic tiny-model update. No optimizer step is taken on the pretrained model during validation.
 
-Future Stage 1 uses differentiable unrolls; future Stage 3 needs explicitly detached rollouts. Neither training objective is implemented here.
+Stage 1 uses differentiable unrolls with masked intermediate 26-symbol CE in `scripts/training/objective.py`. Later losses retain gradients through earlier recurrent states. Future Stage 3 detached rollouts and asymmetric objectives remain unimplemented.
 
 ## Implemented forward interface
 
@@ -41,7 +41,7 @@ Future Stage 1 uses differentiable unrolls; future Stage 3 needs explicitly deta
 - `loop_logits` is a tuple of length T, with tensors `[B,V]` by default or `[B,S,V]` in `"all"` mode. `.logits` returns the final item. Every loop reads C; no final-only supervision is imposed.
 - With hidden capture enabled, `initial_hidden_state` is `h_0`, and `hidden_states[t-1]` is `h_t`, each `[B,S,H]`. Otherwise both fields are `None`; autograd can still retain the activations required for backward.
 - Optional labels are long `[B,T]` **token IDs**, with an explicit unique allowed set `[A]` of at least two tokens. `margins[B,T]` uses the target raw logit minus the largest other allowed logit. Labels can differ by loop. Repeating a final label is an explicit caller choice. This interface neither computes CE nor shifts labels.
-- Outputs retain gradients when autograd is enabled. Use caller-side `torch.no_grad()` for evaluation. No bridge, KV cache, generation API, detached-rollout training, or checkpoint save/load interface is implemented.
+- Outputs retain gradients when autograd is enabled. Use caller-side `torch.no_grad()` for evaluation. No bridge, KV cache, generation API, or detached-rollout training is implemented. Adapter save/load is provided separately by `scripts/recurrent_qwen/checkpoint.py`.
 
 The wrapper inherits model device/dtype without conversion or downloads. Stage 0 measures short inputs and small loop counts; its resource results do not establish a training budget for longer sequences or unrolls.
 
@@ -61,11 +61,19 @@ Only current-stage modules exist; future locations below are not scaffolded requ
 | `scripts/dataset/symbols.py` | Pinned tokenizer identity and context-validated single-token vocabulary |
 | `scripts/dataset/dataset.py` | Seeded splits, JSONL/manifest persistence, independent verification |
 | `scripts/dataset/cli.py` | Cached tokenizer loading, dataset CLI, Rich dry run and summaries |
-| Future `training/` | Stage-specific objectives and training |
-| Future `eval/` | Metrics, sweeps, survival, transfer, plots |
+| `scripts/eval/naive_test.py` | Ordinary-model final-answer evaluation CLI, progress, CSV/JSON artifacts |
+| `scripts/eval/pointer_task.py` and `loading.py` | Exact final-answer scoring, generation batches, and ordinary-model loading |
+| `scripts/training/config.py`, `data.py`, `objective.py` | Explicit configuration, validated subsets/batches, masked per-loop loss and metrics |
+| `scripts/training/gates.py`, `runner.py`, `evaluation.py` | Startup checks, optimizer/accumulation/resume, fixed per-loop validation |
+| `scripts/training/train_pointer.py` | Composing training CLI and compact Rich dashboard |
+| `scripts/recurrent_qwen/checkpoint.py` | Adapter/tokenizer/optimizer persistence and recurrent model reconstruction |
+| `scripts/eval/recurrent_pointer.py` | Saved recurrent final-answer readout through the naive-test CLI |
+| Future evaluation extensions | Repair/damage, survival, transfer, plots |
 
 Scripts compose library functions. Task generation must remain separate from training, and loss functions must not own loading or artifact writing. See [Stage 0](phases/stage0_architecture.md) for commands and [decisions](decisions.md) for remaining research semantics.
 
 ## Stage 1 data boundary
 
-Pointer generation has no dependency on the recurrent wrapper and loads no model. Logical state targets and actual answer-token IDs are saved together. A future trainer can construct labels `[B,T]` from `intermediate_token_ids` and the allowed answer set from the manifest; depth masking/reduction is still a training-stage decision. Saved answer positions apply to unpadded raw prompts; batching must account for padding. Only nominal steps 1..d are labeled, with no h_0 or post-completion supervision. The [Stage 1 guide](phases/stage1_pointer.md) owns the data format and reproduction commands.
+Pointer generation has no dependency on the recurrent wrapper and loads no model. Logical state targets and actual answer-token IDs are saved together. The trainer revalidates raw prompts with its tokenizer, derives class indices `[B,T]` from exact logical intermediate states, and selects the validated symbol-token logits. Right-padded batches mask nominal labels at `t > d`; CE is averaged within each example and then across examples. Saved answer positions apply to unpadded raw prompts; batching must account for padding. Only nominal steps 1..d are labeled, with no h_0 or post-completion supervision. The [Stage 1 guide](phases/stage1_pointer.md) owns the data format and reproduction commands.
+
+The [ordinary-model evaluator](naive_pointer_eval.md) loads `AutoModelForCausalLM` directly and does not use `RecurrentQwen`. It renders the shared `prompts/pointer_task.txt` instructions, tokenizes with the evaluated model's tokenizer, and scores generated final answers. Its chat-wrapped autoregressive output is distinct from frozen-coda readouts after recurrent loops; the CLI separately recognizes recurrent checkpoint directories and routes them to allowed-symbol readout at the requested depth. Training validation also records per-loop trajectories. See [training usage](training_pointer.md) for the checkpoint format and runtime boundaries.

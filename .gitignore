@@ -10,3 +10,9 @@ artifacts/
 
 # Generated datasets are reproducible from code + recorded seeds/configuration.
 data/
+
+# Model evaluation outputs; evaluation code lives under scripts/eval/.
+/eval/pointer_task/
+
+# Recurrent training runs, adapters, optimizer state, and metrics.
+/models/

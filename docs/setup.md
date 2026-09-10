@@ -1,5 +1,7 @@
 # Python environment
 
+For the Windows RTX 5070 Ti desktop, use the [WSL2/CUDA setup guide](windows_cuda_setup.md). It covers Linux Python 3.11.8, the matching CUDA PyTorch build, dataset/history migration, and checks before training.
+
 Use Python 3.11 and a repository-local virtual environment. From the repository root:
 
 ```sh
