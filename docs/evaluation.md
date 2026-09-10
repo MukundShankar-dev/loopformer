@@ -1,6 +1,6 @@
 # Evaluation and reproducibility
 
-Status: planned metric and logging conventions, derived from project plan sections 6–8 and 23–27. No measurements have been run.
+Status: research metric and logging conventions remain planned, derived from project plan sections 6–8 and 23–27. Allowed-token raw-logit margins are implemented and tested in [outputs](../scripts/recurrent_qwen/outputs.py). [Stage 0](experiments/stage0_validation.md) records architecture measurements only; no task-dynamics experiment has run.
 
 ## Targets and loop indexing
 
@@ -21,7 +21,7 @@ fragile correct: 0 < margin_t < gamma
 robust correct:  margin_t >= gamma
 ```
 
-Use a documented score convention consistently; raw logits are the planned default. Record `gamma`, answer vocabulary, and target basis. For margin-based correctness, ties are not correct; if also reporting argmax accuracy, document its tie convention separately.
+Use a documented score convention consistently; the implemented margin helper uses raw logits. Record `gamma`, answer vocabulary, and target basis. For margin-based correctness, ties are not correct; if also reporting argmax accuracy, document its tie convention separately.
 
 ## Transition metrics
 

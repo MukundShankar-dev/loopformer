@@ -1,5 +1,8 @@
-# Basic Qwen inference; use Python 3.11. See docs/setup.md.
+# Qwen inference and Stage 0 validation; use Python 3.11. See docs/setup.md.
 # Direct dependencies are pinned; transitive dependencies are resolved by pip.
 torch==2.14.0
 transformers==5.17.0
 huggingface-hub==1.31.0
+peft==0.20.0
+rich==15.0.0
+pytest==9.1.1

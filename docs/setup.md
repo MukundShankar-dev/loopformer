@@ -12,7 +12,7 @@ python -m pip check
 
 Use `deactivate` to leave the environment, and `source .venv/bin/activate` to return. Both `.venv/` and `venv/` are gitignored. Commit dependency changes to [requirements.txt](../requirements.txt), not the environment directory.
 
-## Inference dependencies
+## Inference and Stage 0 dependencies
 
 The initial target is [Qwen/Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct).
 
@@ -21,8 +21,11 @@ The initial target is [Qwen/Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Q
 | `torch` | Tensor operations and model execution on CPU or Apple Silicon MPS |
 | `transformers` | Qwen model classes, tokenizer, and generation |
 | `huggingface-hub` | Model/tokenizer downloads and explicit Hub access |
+| `peft` | LoRA injection into the shared recurrent layers |
+| `rich` | Readable terminal configuration, measurements, and pass/fail tables |
+| `pytest` | Focused architecture and metric contract tests |
 
-Transformers installs its tokenizer and Safetensors dependencies automatically. PEFT will be added when implementing recurrent LoRA. Accelerate is unnecessary for basic inference with explicit device placement; `device_map="auto"` is outside this minimal setup.
+Transformers installs tokenizer and Safetensors dependencies automatically. PEFT installs Accelerate transitively; model placement remains explicit and does not use `device_map="auto"`.
 
 ## Download and inference
 
@@ -62,4 +65,24 @@ Direct dependencies are pinned to give collaborators a common starting point. Th
 
 Package versions and Python requirements were checked against PyPI metadata for [PyTorch](https://pypi.org/project/torch/2.14.0/), [Transformers](https://pypi.org/project/transformers/5.17.0/), and [Hugging Face Hub](https://pypi.org/project/huggingface-hub/1.31.0/). The pinned PyTorch release provides a Python 3.11 Apple Silicon wheel requiring macOS 14 or later.
 
-The script's Python syntax, CLI help, and invalid-argument handling have been checked without loading ML dependencies. Setup and inference commands above are instructions, not completed runtime validation. Dependencies have not been installed for this project, and model download, inference, MPS behavior, and recurrent equivalence remain unverified. See [status](status.md) for the next milestone.
+Environment audit on 2026-09-10 confirmed `.venv` uses Python 3.11.8 with torch 2.14.0, transformers 5.17.0, and huggingface-hub 1.31.0, matching the direct pins. Running `.venv/bin/python -m pip check` returned `No broken requirements found.` The virtual environment is ignored and contains no Git-tracked files.
+
+The script's Python syntax, CLI help, and invalid-argument handling were checked previously. The [README](../README.md#test-model-inference-smoke-test) now includes CPU generation output showing model loading and a nonempty answer. This is recorded output, not an independently repeated inference run during this audit; the transcript does not capture an immutable model revision or complete environment. It also contains a warning about ignored generation settings, which remains undiagnosed. Treat the answer as a loading/generation example, not a factual-accuracy benchmark.
+
+Stage 0 added peft 0.20.0, rich 15.0.0, and pytest 9.1.1 to this venv and the direct pins. Installation from `requirements.txt` succeeds and `pip check` passes. The recurrent suite has 36 passing tests. Pretrained Stage 0 validation now passes on CPU and MPS; the ordinary generation smoke test itself was not rerun. See the [Stage 0 report](experiments/stage0_validation.md) for exact evidence, including the MPS deterministic-readout fix.
+
+## Recurrent surgery and validation
+
+From the repository root with the venv active:
+
+```sh
+python -m pytest -q
+python -m scripts.validate_stage0 --device cpu --output artifacts/stage0/cpu.json
+python -m scripts.validate_stage0 --device mps --output artifacts/stage0/mps.json
+```
+
+The [CLI](../scripts/validate_stage0.py) composes the implementation in `scripts/recurrent_qwen/`. It creates the configurable P/R/C split, freezes original parameters, attaches recurrent LoRA, and verifies the architecture. It prints Rich tables and saves JSON with exact inputs, all package versions, source hashes, model revision, gradient evidence, timing, and peak process RSS.
+
+Unlike the older smoke test, this command defaults to **local files only** at model revision `7ae557604adf67be50417f59c2c2f167def9a775`. Add `--download` explicitly when files are missing. No model was downloaded during the recorded Stage 0 validation. MPS may be hidden by an execution sandbox; the recorded MPS checks ran outside it. Device fallback is never automatic.
+
+See [Stage 0](phases/stage0_architecture.md) for options, contracts, and the stop boundary before pointer data and training.

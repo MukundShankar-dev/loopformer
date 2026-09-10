@@ -54,6 +54,7 @@ def main() -> None:
         return_dict=True,
         return_tensors="pt",
     ).to(args.device)
+    
     # Use greedy decoding without inheriting the checkpoint's sampling settings.
     generation_config = GenerationConfig(
         max_new_tokens=args.max_new_tokens,

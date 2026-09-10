@@ -1094,12 +1094,6 @@ Do not force this representation during training. Use it as evidence.
 Use a research-code layout, not a monolithic notebook.
 
 ```
-recurrent_qwen/
-    model.py
-    bridge.py
-    lora_utils.py
-    outputs.py
-
 tasks/
     base.py
     symbols.py
@@ -1143,6 +1137,12 @@ configs/
     stage5_holdout.yaml
 
 scripts/
+    recurrent_qwen/
+        model.py
+        bridge.py
+        lora_utils.py
+        outputs.py
+        validation.py
     validate_stage0.py
     train_pointer.py
     evaluate_overthinking.py

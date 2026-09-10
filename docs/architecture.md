@@ -1,63 +1,64 @@
 # Architecture and implementation boundaries
 
-Status: planned; model interfaces and environment have not been inspected. The research specification is [the project plan](project_plan.md).
+Status: Stage 0 implemented. See the [validation report](experiments/stage0_validation.md) for device-specific evidence and limits. The research specification is [the project plan](project_plan.md).
 
-The implemented [inference smoke test](../scripts/smoke_test_qwen.py) composes Transformers loading, chat templating, and generation directly, with explicit CPU/MPS selection, float32 weights, disabled gradients, and no KV cache. It exercises ordinary Qwen only; the recurrent modules below remain planned. Usage and validation limits are in [setup](setup.md).
+The [inference smoke test](../scripts/smoke_test_qwen.py) exercises ordinary Qwen. The [Stage 0 entry point](../scripts/validate_stage0.py) loads the checkpoint, constructs the recurrent model, attaches LoRA, and validates the architecture. Stage 0 defaults to cached files at an immutable revision. Usage is in [setup](setup.md).
 
 ## Recurrent computation
 
-Start with `Qwen/Qwen2.5-0.5B-Instruct`, PyTorch, Hugging Face Transformers, and PEFT/LoRA. Confirm the downloaded model configuration and installed decoder implementation before writing the wrapper.
+Inspection of Transformers 5.17.0 confirmed `Qwen2ForCausalLM`, `Qwen2Model`, and tensor-returning `Qwen2DecoderLayer.forward`. The Qwen2.5-0.5B-Instruct checkpoint has 24 layers, hidden size 896, 14 attention heads, two KV heads, full attention, default RoPE, and tied embedding/head weights.
 
-The initial configurable split is layers 0–5 for the prelude, 6–17 for recurrence, and 18–23 for the coda:
+The configurable default split is layers 0–5 for P, 6–17 for shared R, and 18–23 for C:
 
 ```text
-tokens -> embeddings -> prelude -> h_0
-h_0 -> shared R -> h_1 -> shared R -> h_2 -> ... -> h_T
-                       each h_t -> coda -> final norm -> LM head -> logits_t
+tokens -> embeddings -> P -> h_0
+h_0 -> R -> h_1 -> R -> h_2 -> ... -> h_T
+             each h_t -> C -> final norm -> LM head -> logits_t
 ```
 
-The next recurrent iteration consumes the recurrent state, not the coda output or a decoded token. The prompt is processed once by the prelude. There is one recurrent parameter set, reused for every iteration. Intermediate coda reads expose predictions without changing the recurrent trajectory.
+`RecurrentQwen` groups the original decoder objects into `prelude`, `recurrent`, and `coda` (`DecoderBlock` modules), without copying weights or retaining duplicate registered paths. Embeddings, RoPE, final RMSNorm, and the LM head are reused; tied weights remain tied. Construction freezes and clears gradients on the supplied base **in place**. Adapter injection subsequently mutates its shared middle layers, so compute unadapted reference logits first or load a separate reference.
 
-Preserve the base model's causal masks, positions, rotary embeddings, layer ordering, final normalization, and LM head behavior. Inspect the actual decoder forward arguments rather than assuming compatibility across Transformers versions. Initially set `use_cache=False`.
+The next iteration consumes the recurrent state, never the coda output or a decoded token. P runs once; intermediate C reads expose predictions without modifying the recurrent trajectory. There is no bridge: direct middle-to-middle recurrence passes Stage 0. This does not establish useful recurrent task execution or imply that `h_0` decodes to a start symbol.
 
-Before training, `T=1` must reproduce the ordinary Qwen forward pass within documented numerical tolerance. Start without a bridge where possible. If a bridge is necessary, document its placement, initialization, and effect on equivalence and the shared-transition interpretation. Do not assume `h_0` already decodes to the start symbol.
+Mask construction uses the installed `create_causal_mask`. Every decoder receives `attention_mask`, `position_ids`, `position_embeddings`, `past_key_values=None`, and `use_cache=False`. The mask and RoPE are prepared once and reused across loops. Position IDs default to `arange(sequence_length)` as in ordinary Qwen forward, including padding; callers can supply explicit positions. Only full attention and default RoPE are accepted in Stage 0. The validation CLI selects eager attention and float32 explicitly; tiny tests also cover SDPA. Compatibility with other Transformers versions is not promised.
 
 ## Trainability and autograd
 
-Freeze token embeddings, prelude, original middle weights, coda, final norm, and LM head. Train only LoRA adapters within the recurrent block and an optional bridge. Record the adapter targets and trainable parameter names/counts when implemented.
+All 494,032,768 original parameters are frozen: embeddings, P, original R weights, C, final norm, and LM head. `attach_recurrent_lora(model)` uses PEFT in-place injection on `model.recurrent` only. Defaults are q/v projections, rank 8, alpha 16, dropout 0, bias `none`, and standard random-A/zero-B initialization. This adds 270,336 trainable parameters in 48 tensors. Rank, alpha, and projection targets are configurable in the library; the CLI fixes q/v targets.
 
-Frozen parameters still participate in differentiable operations. During training, gradients must pass through the frozen coda to the recurrent adapters and through frozen operations inside the middle block. Do not disable autograd around these paths merely because their base parameters are frozen.
+Trainable names have the form `recurrent.layers.<relative-index>.self_attn.<projection>.lora_[A|B].default.weight`. Add `recurrent_start` to that relative layer index to recover the original Qwen layer number.
 
-Stage 1 uses differentiable recurrent unrolls. Stage 3 first generates a detached state without gradients, then differentiates one additional recurrent transition and its coda readout. No graph should connect that update to the detached prefix.
+Frozen operations remain differentiable. Gradients pass through C to the adapters and through earlier R iterations. There is no internal `no_grad` around those paths. Zero A gradients on the first backward are expected when B is zero; focused tests verify both factors after a diagnostic tiny-model update. No optimizer step is taken on the pretrained model during validation.
 
-## Planned module ownership
+Future Stage 1 uses differentiable unrolls; future Stage 3 needs explicitly detached rollouts. Neither training objective is implemented here.
 
-Create modules as needed by the current stage; this table is not a request to scaffold later-stage code.
+## Implemented forward interface
+
+`model(input_ids, attention_mask=None, *, num_loops=1, position_ids=None, answer_positions=None, labels=None, allowed_token_ids=None, return_hidden_states=False, logits_mode="answer")` returns `RecurrentOutput`.
+
+- Inputs are long `[B,S]` token IDs and a binary `[B,S]` mask. Each row needs an unmasked token. Positions are long `[1,S]` or `[B,S]`; loops do not append token positions.
+- Answer positions are long `[B]`, defaulting to the last unmasked token for either padding side. They select a next-token prediction location, not a token to insert into the prompt. Padding positions are rejected. Integer slices implement this readout because advanced indexing and gather backward fail under strict MPS determinism; indices synchronize to a Python list once per forward. This is appropriate for the intended tiny batches.
+- `loop_logits` is a tuple of length T, with tensors `[B,V]` by default or `[B,S,V]` in `"all"` mode. `.logits` returns the final item. Every loop reads C; no final-only supervision is imposed.
+- With hidden capture enabled, `initial_hidden_state` is `h_0`, and `hidden_states[t-1]` is `h_t`, each `[B,S,H]`. Otherwise both fields are `None`; autograd can still retain the activations required for backward.
+- Optional labels are long `[B,T]` **token IDs**, with an explicit unique allowed set `[A]` of at least two tokens. `margins[B,T]` uses the target raw logit minus the largest other allowed logit. Labels can differ by loop. Repeating a final label is an explicit caller choice. This interface neither computes CE nor shifts labels.
+- Outputs retain gradients when autograd is enabled. Use caller-side `torch.no_grad()` for evaluation. No bridge, KV cache, generation API, detached-rollout training, or checkpoint save/load interface is implemented.
+
+The wrapper inherits model device/dtype without conversion or downloads. Stage 0 measures short inputs and small loop counts; its resource results do not establish a training budget for longer sequences or unrolls.
+
+## Module ownership
+
+Only current-stage modules exist; future locations below are not scaffolded requirements.
 
 | Location | Responsibility |
 | --- | --- |
-| `recurrent_qwen/model.py` | Model partition, shared recurrence, and per-loop readout |
-| `recurrent_qwen/bridge.py` | Optional re-entry transformation, only if justified |
-| `recurrent_qwen/lora_utils.py` | Adapter placement, freezing, and trainability inspection |
-| `recurrent_qwen/outputs.py` | Explicit output structures and tensor/index conventions |
-| `tasks/` | Symbol validation, task records, prompt rendering, exact state trajectories, and generation |
-| `training/` | Stage-specific training, detached rollout, and objective computation |
-| `eval/` | Transition classification, aggregate metrics, depth sweeps, survival, transfer, and plots |
-| `configs/` | Reproducible stage configurations |
-| `scripts/` | Thin command-line entry points that compose library code |
-| `tests/` | Focused contract tests and necessary model integration checks |
+| `scripts/recurrent_qwen/model.py` | Model partition, shared recurrence, per-loop readout |
+| `scripts/recurrent_qwen/lora_utils.py` | Adapter placement and freezing configuration |
+| `scripts/recurrent_qwen/outputs.py` | Output shapes, loop conventions, allowed-answer margins |
+| `scripts/recurrent_qwen/validation.py` | Stage 0 architecture checks and measurements |
+| `scripts/validate_stage0.py` | Loading, CLI configuration, Rich presentation, JSON evidence |
+| `tests/` | Focused scientific and implementation contracts |
+| Future `tasks/` | Symbols, task records, exact state trajectories, generation |
+| Future `training/` | Stage-specific objectives and training |
+| Future `eval/` | Metrics, sweeps, survival, transfer, plots |
 
-Task generators should not depend on training loops. Loss functions should not own model loading or artifact writing. Evaluation should operate on explicit predictions/targets or trajectory records wherever practical.
-
-## Interface details to document during implementation
-
-- Input tensor shapes, attention masks, position handling, padding, and answer readout position.
-- Loop indexing (`h_0` follows the prelude; `h_t` follows `t` middle passes).
-- Which outputs are optional, their shapes, and whether they retain gradients.
-- Allowed answer token IDs and the distinction between intermediate and final targets.
-- Layer split, LoRA settings, optional bridge, device, dtype, and model revision.
-- Checkpoint contents and how they reconstruct the same frozen base plus adapters.
-
-Expose intermediate observability without requiring every evaluation run to retain all full-sequence hidden states. Start with short prompts and tiny batches on the target 32 GB Apple Silicon machine. Benchmark memory and runtime before extending training unrolls; use long trajectories mostly for evaluation without gradients.
-
-See [Stage 0](phases/stage0_architecture.md) for validation and [decisions](decisions.md) for unresolved semantics.
+Scripts compose library functions. Task generation must remain separate from training, and loss functions must not own loading or artifact writing. See [Stage 0](phases/stage0_architecture.md) for commands and [decisions](decisions.md) for remaining research semantics.

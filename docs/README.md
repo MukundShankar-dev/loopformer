@@ -4,14 +4,14 @@
 
 1. [Project plan](project_plan.md): research thesis, full stage sequence, constraints, and supported claims.
 2. [Status](status.md): what exists, what has been verified, and the next implementation milestone.
-3. [Architecture](architecture.md): planned module responsibilities, recurrent execution, and gradient boundaries.
+3. [Architecture](architecture.md): implemented Stage 0 modules, recurrent execution, and gradient boundaries.
 4. The relevant phase guide below, together with [evaluation](evaluation.md) and [decisions](decisions.md).
 
-[Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Designs below remain planned until implementation and validation evidence are recorded.
+[Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Stage 0 is implemented and validated; later stages remain planned.
 
 ## Phase guides
 
-For collaborator onboarding, see [Python environment setup](setup.md) and the pinned inference requirements.
+For collaborator onboarding, see [Python environment setup](setup.md) and the pinned Stage 0 requirements.
 
 | Phase | Purpose | Guide |
 | --- | --- | --- |
@@ -25,6 +25,8 @@ For collaborator onboarding, see [Python environment setup](setup.md) and the pi
 | 6 | Explore natural-language and real-task transfer | [Transfer](phases/stages4_6_transfer.md) |
 
 ## Keeping documentation current
+
+Recorded validation: [Stage 0 architecture on pretrained Qwen, CPU and MPS](experiments/stage0_validation.md).
 
 Put implementation explanations in the owning phase guide and shared architecture document. Put metric definitions in the evaluation guide, design decisions in the decision record, and current progress in status. Add verified setup and execution commands when the corresponding code exists.
 
