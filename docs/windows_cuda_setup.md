@@ -16,7 +16,7 @@ This guide was checked against the repository and official installation document
 | Baseline | Preserve the Mac's completed three-shot run: 60/1,000 correct, or 6.00% |
 | Training | Trainer implemented; no pretrained training has started and no trained research checkpoint needs migration |
 
-Git brings the code and Markdown reports. `data/`, `artifacts/`, `eval/pointer_task/`, `models/`, and `.venv/` are ignored. Data can be copied or reproduced; historical measurements must be copied to retain the original evidence. Create a fresh environment and download the pinned model on Linux. Do not copy the Mac `.venv` or install its entire transitive package list as a Linux lockfile.
+Git brings code, Markdown reports, and selected small run records under `artifacts/`, `eval/`, and `models/`. Generated `data/`, environments, binary weights/optimizer state, repeated tokenizer payloads, and archives remain ignored. Data can be reproduced; complete checkpoint payloads must be copied separately. Create a fresh environment and download the pinned model on Linux. Do not copy the Mac `.venv` or install its entire transitive package list as a Linux lockfile.
 
 Matching means the same code, inputs, model revision, prompt, and experimental settings. CPU/MPS/CUDA floating-point results and timings need not be bitwise identical. PyTorch also limits reproducibility guarantees across platforms and releases. [PyTorch reproducibility](https://docs.pytorch.org/docs/2.14/notes/randomness.html)
 
@@ -379,7 +379,7 @@ python -m scripts.training.train_pointer \
 
 A new output directory is created. The configured budget is the total budget, not additional epochs. Same-device resume checks model/data/tokenizer/optimization identity. Exact CPU/MPS-to-CUDA optimizer resume is intentionally rejected; evaluation of a checkpoint on another device is supported. There is currently no Mac-trained state to resume.
 
-To bring a run back to the Mac, copy the entire run directory under `models/stage1_pointer/` and relevant `eval/pointer_task/` outputs. The Mac needs the same code and cached pinned base model. Git carries code/config/docs changes; it does not carry generated weights or results. Avoid concurrent edits to the same files on both machines; commit and push a coherent change from one, then pull it on the other.
+To bring a run back to the Mac, copy the entire run directory under `models/stage1_pointer/` and relevant `eval/pointer_task/` outputs. The Mac needs the same code and cached pinned base model. Git can carry code/config/docs and small metric/result files; ignored weights and optimizer state must be transferred separately. Avoid concurrent edits to the same files on both machines; commit and push a coherent change from one, then pull it on the other.
 
 ## 11. Troubleshooting and completion check
 

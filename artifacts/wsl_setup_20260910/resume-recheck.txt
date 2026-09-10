@@ -1,0 +1,51 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_resume_matches_uninterrupted_updates_including_short_tail ________
+
+tiny_training = (RecurrentQwen(
+  (embed_tokens): Embedding(29, 16, padding_idx=0)
+  (rotary_emb): Qwen2RotaryEmbedding()
+  (prelude):....}, {'passed': True, 't1_max_logit_error': 1.5832483768463135e-08, 'shared_weights': True, 'frozen_gradients': 0, ...})
+tmp_path = PosixPath('/tmp/pytest-of-mukund/pytest-1/test_resume_matches_uninterrup0')
+
+    def test_resume_matches_uninterrupted_updates_including_short_tail(tiny_training, tmp_path):
+        model, tokenizer, config, items, spec, _ = tiny_training
+        initial = tmp_path / 'initial'
+        save_checkpoint(initial, model, tokenizer, spec, {})
+        identity = resume_identity(config, {'data': 'test'})
+        full = tmp_path / 'full'
+        full.mkdir()
+        frozen = {n: p.clone() for n, p in model.named_parameters() if not p.requires_grad}
+        result = train(model, tokenizer, items, items[:2], items[:2], config, full, spec, identity)
+        assert result['step'] == 6
+        expected = {n: p.clone() for n, p in model.named_parameters() if p.requires_grad}
+        assert all(torch.equal(p, frozen[n]) for n, p in model.named_parameters() if n in frozen)
+        split_model, _, _ = load_recurrent_checkpoint(initial)
+        first = tmp_path / 'first'
+        first.mkdir()
+        train(split_model, tokenizer, items, items[:2], items[:2], replace(config, max_steps=2), first, spec, identity)
+        saved = first / 'step-000002'
+        resume = torch.load(saved / 'training_state.pt', weights_only=True)
+        assert resume['next_offset'] == 4 and resume['next_epoch'] == 0
+        resumed_model, _, _ = load_recurrent_checkpoint(saved)
+        second = tmp_path / 'second'
+        second.mkdir()
+        resumed = train(resumed_model, tokenizer, items, items[:2], items[:2], config, second, spec, identity, resume=resume)
+        for name, p in resumed_model.named_parameters():
+            if name in expected:
+>               torch.testing.assert_close(p, expected[name], rtol=0, atol=0)
+E               AssertionError: Tensor-likes are not equal!
+E               
+E               Mismatched elements: 3 / 32 (9.4%)
+E               Greatest absolute difference: 1.4901161193847656e-08 at index (0, 8)
+E               Greatest relative difference: 2.1634789959534828e-07 at index (0, 15)
+
+tests/test_pointer_training.py:172: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 783.69it/s]
+----------------------------- Captured stderr call -----------------------------
+Loading weights:   0%|          | 0/38 [00:00<?, ?it/s]Loading weights: 100%|██████████| 38/38 [00:00<00:00, 2077.25it/s]
+Loading weights:   0%|          | 0/38 [00:00<?, ?it/s]Loading weights: 100%|██████████| 38/38 [00:00<00:00, 2147.74it/s]
+=========================== short test summary info ============================
+FAILED tests/test_pointer_training.py::test_resume_matches_uninterrupted_updates_including_short_tail
+1 failed in 0.42s

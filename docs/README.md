@@ -7,7 +7,7 @@
 3. [Architecture](architecture.md): implemented Stage 0 modules, recurrent execution, and gradient boundaries.
 4. The relevant phase guide below, together with [evaluation](evaluation.md) and [decisions](decisions.md).
 
-[Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Stage 0 and Stage 1 data are implemented and validated; Stage 1 training is implemented with toy-model checks; pretrained training and later stages remain unrun.
+[Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Stage 0 and Stage 1 data are implemented and validated; Stage 1 training has toy-model checks and a completed [first CUDA overfit run](experiments/stage1_cuda_overfit.md); Gate 1 and later stages remain unverified.
 
 ## Phase guides
 

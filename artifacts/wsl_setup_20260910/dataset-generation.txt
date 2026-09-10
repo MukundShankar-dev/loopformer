@@ -1,0 +1,22 @@
+Stage 1 · pointer data
+Cached tokenizer only: Qwen/Qwen2.5-0.5B-Instruct @ 
+7ae557604adf67be50417f59c2c2f167def9a775
+PASS 26 unique single-token symbols in rule, start, and answer contexts; seed 17
+Training/instance depths: 1–8; held-out depths: 9–16
+                           Validated pointer dataset                            
+┏━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Split      ┃ Examples ┃ Depths (count)                       ┃ Prompt tokens ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ train      │ 10,000   │ 1: 1250, 2: 1250, 3: 1250, 4: 1250,  │ 143–143       │
+│            │          │ 5: 1250, 6: 1250, 7: 1250, 8: 1250   │               │
+│ validation │ 1,000    │ 1: 125, 2: 125, 3: 125, 4: 125, 5:   │ 143–143       │
+│            │          │ 125, 6: 125, 7: 125, 8: 125          │               │
+│ test       │ 1,000    │ 1: 125, 2: 125, 3: 125, 4: 125, 5:   │ 143–143       │
+│            │          │ 125, 6: 125, 7: 125, 8: 125          │               │
+│ depth_test │ 1,000    │ 9: 125, 10: 125, 11: 125, 12: 125,   │ 143–144       │
+│            │          │ 13: 125, 14: 125, 15: 125, 16: 125   │               │
+└────────────┴──────────┴──────────────────────────────────────┴───────────────┘
+PASS Exact targets, tokenizer contexts, unique rule tables, split boundaries, 
+and seed replay
+Dataset and manifest: /home/mukund/loopformer/data/pointer/seed-17
+Data milestone complete. No training performed.

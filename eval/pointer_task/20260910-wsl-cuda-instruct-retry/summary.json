@@ -1,0 +1,205 @@
+{
+  "status": "complete",
+  "started_utc": "2026-09-10T21:30:22.492083+00:00",
+  "command": [
+    "/home/mukund/loopformer/.venv/bin/python",
+    "-m",
+    "scripts.eval.naive_test",
+    "--model",
+    "Qwen/Qwen2.5-0.5B-Instruct",
+    "--device",
+    "cuda",
+    "--output",
+    "eval/pointer_task/20260910-wsl-cuda-instruct-retry"
+  ],
+  "arguments": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "base_model": null,
+    "tokenizer": null,
+    "revision": null,
+    "download": false,
+    "data": "/home/mukund/loopformer/data/pointer/seed-17/test.jsonl",
+    "prompt": "/home/mukund/loopformer/prompts/pointer_task.txt",
+    "prompt_format": "chat",
+    "device": "cuda",
+    "dtype": "float32",
+    "batch_size": 1,
+    "max_new_tokens": 8,
+    "limit": null,
+    "test": null,
+    "seed": 17,
+    "threads": 4,
+    "output": "eval/pointer_task/20260910-wsl-cuda-instruct-retry"
+  },
+  "model": {
+    "source": "Qwen/Qwen2.5-0.5B-Instruct",
+    "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "requested_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "resolved_model_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "tokenizer_source": "Qwen/Qwen2.5-0.5B-Instruct",
+    "resolved_tokenizer_revision": null,
+    "pad_token_id": 151643
+  },
+  "model_config": {
+    "transformers_version": "5.17.0",
+    "architectures": [
+      "Qwen2ForCausalLM"
+    ],
+    "output_hidden_states": false,
+    "return_dict": true,
+    "dtype": "float32",
+    "chunk_size_feed_forward": 0,
+    "is_encoder_decoder": false,
+    "id2label": {
+      "0": "LABEL_0",
+      "1": "LABEL_1"
+    },
+    "label2id": {
+      "LABEL_0": 0,
+      "LABEL_1": 1
+    },
+    "problem_type": null,
+    "vocab_size": 151936,
+    "hidden_size": 896,
+    "intermediate_size": 4864,
+    "num_hidden_layers": 24,
+    "num_attention_heads": 14,
+    "num_key_value_heads": 2,
+    "hidden_act": "silu",
+    "max_position_embeddings": 32768,
+    "initializer_range": 0.02,
+    "rms_norm_eps": 1e-06,
+    "use_cache": false,
+    "tie_word_embeddings": true,
+    "rope_parameters": {
+      "rope_theta": 1000000.0,
+      "rope_type": "default"
+    },
+    "use_sliding_window": false,
+    "sliding_window": null,
+    "max_window_layers": 21,
+    "layer_types": [
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention"
+    ],
+    "attention_dropout": 0.0,
+    "pad_token_id": null,
+    "bos_token_id": 151643,
+    "eos_token_id": 151645,
+    "_name_or_path": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_type": "qwen2",
+    "output_attentions": false
+  },
+  "local_checkpoint_sha256": {},
+  "tokenizer_backend_sha256": "e360e6f6266884e6667874f3a7d158ca20c4639e2e1dc80427e1edc2c69a38c7",
+  "chat_template": "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- messages[0]['content'] }}\n    {%- else %}\n        {{- 'You are Qwen, created by Alibaba Cloud. You are a helpful assistant.' }}\n    {%- endif %}\n    {{- \"\\n\\n# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\\n<tool_call>\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n</tool_call><|im_end|>\\n\" }}\n{%- else %}\n    {%- if messages[0]['role'] == 'system' %}\n        {{- '<|im_start|>system\\n' + messages[0]['content'] + '<|im_end|>\\n' }}\n    {%- else %}\n        {{- '<|im_start|>system\\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- for message in messages %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) or (message.role == \"assistant\" and not message.tool_calls) %}\n        {{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {{- '<|im_start|>' + message.role }}\n        {%- if message.content %}\n            {{- '\\n' + message.content }}\n        {%- endif %}\n        {%- for tool_call in message.tool_calls %}\n            {%- if tool_call.function is defined %}\n                {%- set tool_call = tool_call.function %}\n            {%- endif %}\n            {{- '\\n<tool_call>\\n{\"name\": \"' }}\n            {{- tool_call.name }}\n            {{- '\", \"arguments\": ' }}\n            {{- tool_call.arguments | tojson }}\n            {{- '}\\n</tool_call>' }}\n        {%- endfor %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if (loop.index0 == 0) or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- message.content }}\n        {{- '\\n</tool_response>' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n{%- endif %}\n",
+  "prompt_template": "Follow the pointer rules below. Each pair ( X, Y) means that the next state after X is Y.\nBegin at the Start state and apply exactly Steps transitions. One transition follows one pair.\nReturn only the final state's single uppercase letter. Do not include an explanation, intermediate states, or punctuation.\n\nHere are three independent examples. Each example has its own rules; rule order does not indicate execution order.\n\nExample 1:\nRules: ( C, D) ( A, F) ( F, B) ( D, E) ( B, C) ( E, A)\nStart: A\nSteps: 1\nAnswer: F\n\nExample 2:\nRules: ( D, E) ( F, C) ( A, D) ( C, B) ( B, F) ( E, A)\nStart: A\nSteps: 2\nAnswer: E\n\nExample 3:\nRules: ( D, E) ( B, A) ( F, D) ( C, F) ( A, C) ( E, B)\nStart: E\nSteps: 3\nAnswer: C\n\nNow solve the following task using only its rules. Return only the final state's letter.\n\nRules: {rules}\nStart: {start}\nSteps: {steps}\nAnswer:\n",
+  "prompt_sha256": "b21beb6d6de45972329143ce2d7dcabe409da97641e691ff9984d6cc474e353f",
+  "data_sha256": "a0d70ada0374b3e0b84af5c65c8b14f6f745b04add7c5fe2fab14e76e5ecfac5",
+  "selected_examples": 1000,
+  "test_mode": false,
+  "source_sha256": {
+    "scripts/eval/__init__.py": "2b3a36b0c4ebdc498ce80610f0a43a3d2cfe8702d4d748d9a3a8b582eca3af66",
+    "scripts/eval/loading.py": "fccc8abd7bf6d4ee155c2d053c195ba7ebaa42d54656a24636527184fe02c6c7",
+    "scripts/eval/naive_test.py": "64e9cac4f1ac6ba4da7ac5393acbbe07e2ddb4f16644ac5b7df7fabef0baa798",
+    "scripts/eval/pointer_task.py": "46ba5361dcfb36295f612d6176d800393d5bc3bfd1e5f2769e970af7e5cf0cdf",
+    "scripts/eval/recurrent_pointer.py": "dfa83e892329a8bc4ee4a969e02a42fc95232a36d3abc751dbf5c8fed3503281",
+    "scripts/dataset/pointer.py": "e7030dcd9d4df329c95a640fe79c24e9358f1d828cda0f5306236229e882a08f"
+  },
+  "git_head": "8ff477a9bade8f6a83106da5fb635b48176d4595",
+  "git_status": " M docs/README.md\n M docs/status.md\n?? docs/experiments/wsl_cuda_baseline.md\n",
+  "python": "3.11.8",
+  "packages": {
+    "torch": "2.14.0+cu130",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2",
+    "huggingface-hub": "1.31.0",
+    "rich": "15.0.0"
+  },
+  "scoring": "unconstrained_generation_exact_uppercase_symbol_after_strip",
+  "use_cache": false,
+  "do_sample": false,
+  "deterministic_algorithms": true,
+  "max_new_tokens": 8,
+  "eos_token_id": [
+    151645,
+    151643
+  ],
+  "loading_seconds": 1.8013785660000394,
+  "throughput_definition": "generated_tokens/s uses synchronized model.generate time, including prefill and EOS but excluding batch padding; questions/s uses evaluation-loop wall time, excluding loading",
+  "total": 1000,
+  "correct": 60,
+  "accuracy": 0.06,
+  "invalid_answers": 3,
+  "token_budget_stops": 3,
+  "generated_tokens": 2018,
+  "prompt_tokens": 420000,
+  "generation_seconds": 83.0473599410011,
+  "evaluation_seconds": 84.27163674400026,
+  "generated_tokens_per_second": 24.299387740123674,
+  "questions_per_second": 11.866388723857263,
+  "by_depth": {
+    "1": {
+      "total": 125,
+      "correct": 22,
+      "accuracy": 0.176
+    },
+    "2": {
+      "total": 125,
+      "correct": 6,
+      "accuracy": 0.048
+    },
+    "3": {
+      "total": 125,
+      "correct": 5,
+      "accuracy": 0.04
+    },
+    "4": {
+      "total": 125,
+      "correct": 5,
+      "accuracy": 0.04
+    },
+    "5": {
+      "total": 125,
+      "correct": 5,
+      "accuracy": 0.04
+    },
+    "6": {
+      "total": 125,
+      "correct": 7,
+      "accuracy": 0.056
+    },
+    "7": {
+      "total": 125,
+      "correct": 5,
+      "accuracy": 0.04
+    },
+    "8": {
+      "total": 125,
+      "correct": 5,
+      "accuracy": 0.04
+    }
+  }
+}

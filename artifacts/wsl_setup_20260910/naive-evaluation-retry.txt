@@ -1,0 +1,26 @@
+Pointer task · ordinary-model final-answer baseline
+Qwen/Qwen2.5-0.5B-Instruct · cuda · float32 · batch 1 · 1,000 questions
+chat prompt · greedy · max 8 new tokens · cache disabled
+Results: 
+/home/mukund/loopformer/eval/pointer_task/20260910-wsl-cuda-instruct-retry
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:54,  5.30it/s]Loading weights:  80%|████████  | 232/290 [00:00<00:00, 988.35it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 842.85it/s]
+[transformers] The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Evaluating ━━━━━━━━━ 1000/1000 0:01:24 0:00:00 6.0% acc · 24.3 tok/s · 11.87 q/s
+    Final-answer accuracy by depth    
+┏━━━━━━━┳━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━┓
+┃ Steps ┃ Correct ┃ Total ┃ Accuracy ┃
+┡━━━━━━━╇━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━┩
+│ 1     │ 22      │ 125   │ 17.60%   │
+│ 2     │ 6       │ 125   │ 4.80%    │
+│ 3     │ 5       │ 125   │ 4.00%    │
+│ 4     │ 5       │ 125   │ 4.00%    │
+│ 5     │ 5       │ 125   │ 4.00%    │
+│ 6     │ 7       │ 125   │ 5.60%    │
+│ 7     │ 5       │ 125   │ 4.00%    │
+│ 8     │ 5       │ 125   │ 4.00%    │
+└───────┴─────────┴───────┴──────────┘
+Accuracy: 6.00% (60/1000)
+Invalid answers: 3 · token-budget stops: 3
+24.30 generated tok/s · 11.87 questions/s
+Saved predictions.csv and summary.json to 
+/home/mukund/loopformer/eval/pointer_task/20260910-wsl-cuda-instruct-retry

@@ -6,13 +6,32 @@ venv/
 __pycache__/
 *.py[cod]
 .pytest_cache/
-artifacts/
 
 # Generated datasets are reproducible from code + recorded seeds/configuration.
 data/
 
-# Model evaluation outputs; evaluation code lives under scripts/eval/.
-/eval/pointer_task/
+# Keep run metadata, JSON/JSONL metrics, CSV trajectories, and checkpoint
+# pointers trackable in models/, eval/, and artifacts/. Git has no size rules.
+# Exclude model/adapter tensors, optimizer state, and binary exports.
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.gguf
+*.onnx
 
-# Recurrent training runs, adapters, optimizer state, and metrics.
-/models/
+# Repeated pretrained tokenizer payloads; small checkpoint configs stay visible.
+/models/**/tokenizer.json
+/models/**/vocab.json
+/models/**/merges.txt
+/models/**/tokenizer.model
+/models/**/spiece.model
+
+# Download/build caches and artifact bundles.
+.cache/
+.triton/
+*.tar
+*.tar.gz
+*.tgz
+*.zip
