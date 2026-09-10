@@ -1,0 +1,765 @@
+{
+  "started_utc": "2026-09-10T16:15:23.780552+00:00",
+  "command": [
+    "/Users/mukunds/Desktop/loopformer/.venv/bin/python",
+    "-m",
+    "scripts.validate_stage0",
+    "--device",
+    "mps",
+    "--output",
+    "artifacts/stage0/mps.json"
+  ],
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "resolved_model_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+  "model_config": {
+    "transformers_version": "5.17.0",
+    "architectures": [
+      "Qwen2ForCausalLM"
+    ],
+    "output_hidden_states": false,
+    "return_dict": true,
+    "dtype": "float32",
+    "chunk_size_feed_forward": 0,
+    "is_encoder_decoder": false,
+    "id2label": {
+      "0": "LABEL_0",
+      "1": "LABEL_1"
+    },
+    "label2id": {
+      "LABEL_0": 0,
+      "LABEL_1": 1
+    },
+    "problem_type": null,
+    "vocab_size": 151936,
+    "hidden_size": 896,
+    "intermediate_size": 4864,
+    "num_hidden_layers": 24,
+    "num_attention_heads": 14,
+    "num_key_value_heads": 2,
+    "hidden_act": "silu",
+    "max_position_embeddings": 32768,
+    "initializer_range": 0.02,
+    "rms_norm_eps": 1e-06,
+    "use_cache": false,
+    "tie_word_embeddings": true,
+    "rope_parameters": {
+      "rope_theta": 1000000.0,
+      "rope_type": "default"
+    },
+    "use_sliding_window": false,
+    "sliding_window": null,
+    "max_window_layers": 21,
+    "layer_types": [
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention",
+      "full_attention"
+    ],
+    "attention_dropout": 0.0,
+    "pad_token_id": null,
+    "bos_token_id": 151643,
+    "eos_token_id": 151645,
+    "_name_or_path": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_type": "qwen2",
+    "output_attentions": false
+  },
+  "device": "mps",
+  "dtype": "float32",
+  "attention_implementation": "eager",
+  "use_cache": false,
+  "seed": 17,
+  "threads": 4,
+  "deterministic_algorithms": true,
+  "python": "3.11.8",
+  "platform": "macOS-26.3.1-arm64-arm-64bit",
+  "packages": {
+    "shellingham": "1.5.4",
+    "filelock": "3.32.6",
+    "click": "8.5.0",
+    "packaging": "26.3",
+    "accelerate": "1.15.0",
+    "iniconfig": "2.3.0",
+    "Pygments": "2.21.0",
+    "hf-xet": "1.6.0",
+    "rich": "15.0.0",
+    "huggingface_hub": "1.31.0",
+    "networkx": "3.6.1",
+    "torch": "2.14.0",
+    "numpy": "2.4.6",
+    "tokenizers": "0.23.2",
+    "httpcore": "1.0.9",
+    "sympy": "1.14.0",
+    "transformers": "5.17.0",
+    "fsspec": "2026.7.0",
+    "pip": "26.2.1",
+    "safetensors": "0.8.0",
+    "pytest": "9.1.1",
+    "setuptools": "84.0.0",
+    "h11": "0.16.0",
+    "mdurl": "0.1.2",
+    "mpmath": "1.3.0",
+    "PyYAML": "6.0.3",
+    "peft": "0.20.0",
+    "idna": "3.19",
+    "certifi": "2026.7.22",
+    "Jinja2": "3.1.6",
+    "markdown-it-py": "4.2.0",
+    "annotated-doc": "0.0.5",
+    "MarkupSafe": "3.0.3",
+    "tqdm": "4.70.0",
+    "pluggy": "1.6.0",
+    "httpx": "0.28.1",
+    "typing_extensions": "4.16.0",
+    "psutil": "7.2.2",
+    "regex": "2026.9.10",
+    "typer": "0.27.2",
+    "anyio": "4.15.1"
+  },
+  "git_head": "8af78e3bf8c24cdbf95e5fbb67c50d29667bf347",
+  "git_status": " M .gitignore\n M AGENTS.md\n M docs/README.md\n M docs/architecture.md\n M docs/decisions.md\n M docs/evaluation.md\n M docs/phases/stage0_architecture.md\n M docs/project_plan.md\n M docs/setup.md\n M docs/status.md\n M requirements.txt\n M scripts/smoke_test_qwen.py\n?? scripts/__init__.py\n?? scripts/recurrent_qwen/\n?? scripts/validate_stage0.py\n?? tests/\n",
+  "source_sha256": {
+    "requirements.txt": "25200b12beeb1481a8ca771e31e432603b111950748b9ace76284aa7846a5ff5",
+    "scripts/__init__.py": "179fb47639605f458a880c03631ca3b9c397380c0db910a9c5c3396dfae282b5",
+    "scripts/recurrent_qwen/__init__.py": "33bb24196ba9676312779e3e3afba580f37f0d354c2fff31fa598ab7903301b2",
+    "scripts/recurrent_qwen/lora_utils.py": "4f2baf46c9a57f9aa79bf41e50c5fc1cc5bd8020c8e066e5829cfb8284a9b803",
+    "scripts/recurrent_qwen/model.py": "9c2e945c056d28834ba5e4ef20dd5064c9951fa7f1cdc34b1ce61604b115ece1",
+    "scripts/recurrent_qwen/outputs.py": "e0f403d504eed13f89236e1dd9794b5039529573dfca3b09d2d62aa30b165064",
+    "scripts/recurrent_qwen/validation.py": "7aeb45730858b2bb5999ea18e36de70497de03564db99fd1bfa4599e0c36d511",
+    "scripts/smoke_test_qwen.py": "7e151b07c87be66fd7e84ecd6b9e3c0f23c7dc9688b84030faf39eff5648b6b4",
+    "scripts/validate_stage0.py": "fb378077f279c813d84818becc97547f7e26edbea5b5ce78526eb14b003b1751",
+    "tests/conftest.py": "a459c5f9e7da0fc66332091be9da0ff9200f46bcdbedc79e12ef38dc079145e6",
+    "tests/test_gradient_scope.py": "a892fcfd6eb1cf35f6586f9e05af2f4d0701100b57d39c368d096279c9142802",
+    "tests/test_observability.py": "02358acaf8ead2c7ef2d00ba593c20bf3aef5f995892835decece13daa27fb44",
+    "tests/test_shared_weights.py": "e3ae70c44e7e90b612f0d1677541fcdb9383397b5ada30af4ee729e2787619fc",
+    "tests/test_t1_equivalence.py": "1f5af35e2a54bfde5857590c03b042ae8c66acb0480c91d17d51034350ae55b9",
+    "tests/test_validation.py": "380b7d042cfac5306faf4cc30b94b2b18e6de003e08144c33b94a0af1bb496a4"
+  },
+  "prompts": [
+    "The sky is blue.",
+    "What is two plus two? Answer briefly."
+  ],
+  "inputs": {
+    "left_padded": {
+      "input_ids": [
+        [
+          151643,
+          151643,
+          151643,
+          151643,
+          785,
+          12884,
+          374,
+          6303,
+          13
+        ],
+        [
+          3838,
+          374,
+          1378,
+          5519,
+          1378,
+          30,
+          21806,
+          26753,
+          13
+        ]
+      ],
+      "attention_mask": [
+        [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ]
+    },
+    "right_padded": {
+      "input_ids": [
+        [
+          785,
+          12884,
+          374,
+          6303,
+          13,
+          151643,
+          151643,
+          151643,
+          151643
+        ],
+        [
+          3838,
+          374,
+          1378,
+          5519,
+          1378,
+          30,
+          21806,
+          26753,
+          13
+        ]
+      ],
+      "attention_mask": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ]
+    },
+    "unpadded": {
+      "input_ids": [
+        [
+          785,
+          12884,
+          374,
+          6303,
+          13
+        ]
+      ],
+      "attention_mask": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ]
+    }
+  },
+  "gate_passed": true,
+  "checks": {
+    "t1_equivalence": "PASS",
+    "shared_weights": "PASS",
+    "gradient_scope": "PASS",
+    "observability": "PASS",
+    "configurable_depth": "PASS"
+  },
+  "split": {
+    "prelude": [
+      0,
+      6
+    ],
+    "recurrent": [
+      6,
+      18
+    ],
+    "coda": [
+      18,
+      24
+    ],
+    "end_indices_exclusive": true
+  },
+  "lora": {
+    "rank": 8,
+    "alpha": 16,
+    "targets": [
+      "q_proj",
+      "v_proj"
+    ],
+    "dropout": 0.0
+  },
+  "bridge": null,
+  "tolerance": {
+    "atol": 1e-05,
+    "rtol": 1e-05
+  },
+  "equivalence": [
+    {
+      "case": "left_padded",
+      "lora": false,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "logits_shape": [
+        2,
+        9,
+        151936
+      ]
+    },
+    {
+      "case": "right_padded",
+      "lora": false,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "logits_shape": [
+        2,
+        9,
+        151936
+      ]
+    },
+    {
+      "case": "unpadded",
+      "lora": false,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "logits_shape": [
+        1,
+        5,
+        151936
+      ]
+    },
+    {
+      "case": "left_padded",
+      "lora": true,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "logits_shape": [
+        2,
+        9,
+        151936
+      ]
+    },
+    {
+      "case": "right_padded",
+      "lora": true,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "logits_shape": [
+        2,
+        9,
+        151936
+      ]
+    },
+    {
+      "case": "unpadded",
+      "lora": true,
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0,
+      "logits_shape": [
+        1,
+        5,
+        151936
+      ]
+    }
+  ],
+  "trajectories": [
+    {
+      "num_loops": 1,
+      "seconds": 0.034521832945756614,
+      "recurrent_calls": 1,
+      "recurrent_layer_calls": 12,
+      "prelude_calls": 1,
+      "coda_calls": 1,
+      "predicted_token_ids": [
+        [
+          576,
+          9043
+        ]
+      ],
+      "diagnostic_labels": [
+        [
+          13
+        ],
+        [
+          13
+        ]
+      ],
+      "allowed_token_ids": [
+        13,
+        30,
+        374,
+        785,
+        1378,
+        3838,
+        5519,
+        6303,
+        12884,
+        21806,
+        26753,
+        151643
+      ],
+      "margins": [
+        [
+          -14.52219295501709
+        ],
+        [
+          -17.67061424255371
+        ]
+      ]
+    },
+    {
+      "num_loops": 2,
+      "seconds": 0.0582919999724254,
+      "recurrent_calls": 2,
+      "recurrent_layer_calls": 24,
+      "prelude_calls": 1,
+      "coda_calls": 2,
+      "predicted_token_ids": [
+        [
+          576,
+          9043
+        ],
+        [
+          576,
+          220
+        ]
+      ],
+      "diagnostic_labels": [
+        [
+          13,
+          30
+        ],
+        [
+          13,
+          30
+        ]
+      ],
+      "allowed_token_ids": [
+        13,
+        30,
+        374,
+        785,
+        1378,
+        3838,
+        5519,
+        6303,
+        12884,
+        21806,
+        26753,
+        151643
+      ],
+      "margins": [
+        [
+          -14.52219295501709,
+          -7.0900726318359375
+        ],
+        [
+          -17.67061424255371,
+          -9.294625282287598
+        ]
+      ]
+    },
+    {
+      "num_loops": 4,
+      "seconds": 0.11042016698047519,
+      "recurrent_calls": 4,
+      "recurrent_layer_calls": 48,
+      "prelude_calls": 1,
+      "coda_calls": 4,
+      "predicted_token_ids": [
+        [
+          576,
+          9043
+        ],
+        [
+          576,
+          220
+        ],
+        [
+          576,
+          220
+        ],
+        [
+          576,
+          220
+        ]
+      ],
+      "diagnostic_labels": [
+        [
+          13,
+          30,
+          374,
+          785
+        ],
+        [
+          13,
+          30,
+          374,
+          785
+        ]
+      ],
+      "allowed_token_ids": [
+        13,
+        30,
+        374,
+        785,
+        1378,
+        3838,
+        5519,
+        6303,
+        12884,
+        21806,
+        26753,
+        151643
+      ],
+      "margins": [
+        [
+          -14.52219295501709,
+          -7.0900726318359375,
+          3.1115760803222656,
+          -8.214132308959961
+        ],
+        [
+          -17.67061424255371,
+          -9.294625282287598,
+          -3.2057266235351562,
+          -9.783949851989746
+        ]
+      ]
+    }
+  ],
+  "parameters": {
+    "original": 494032768,
+    "trainable": 270336,
+    "trainable_tensors": 48
+  },
+  "gradient_check": {
+    "loss": 13.51192855834961,
+    "forward_backward_seconds": 0.14785341697279364,
+    "hidden_gradient_l2": [
+      1.2771409749984741,
+      1.5297317504882812
+    ],
+    "parameters": {
+      "recurrent.layers.0.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.0.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 1.1945722103118896
+      },
+      "recurrent.layers.0.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.0.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 5.448922634124756
+      },
+      "recurrent.layers.1.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.1.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 1.259366750717163
+      },
+      "recurrent.layers.1.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.1.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 2.9223997592926025
+      },
+      "recurrent.layers.2.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.2.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 1.3454407453536987
+      },
+      "recurrent.layers.2.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.2.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 4.610950469970703
+      },
+      "recurrent.layers.3.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.3.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 1.099894404411316
+      },
+      "recurrent.layers.3.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.3.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 2.2763707637786865
+      },
+      "recurrent.layers.4.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.4.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 1.4092074632644653
+      },
+      "recurrent.layers.4.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.4.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 6.765661239624023
+      },
+      "recurrent.layers.5.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.5.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 1.096136212348938
+      },
+      "recurrent.layers.5.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.5.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 4.220367431640625
+      },
+      "recurrent.layers.6.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.6.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 1.1021010875701904
+      },
+      "recurrent.layers.6.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.6.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 6.2390923500061035
+      },
+      "recurrent.layers.7.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.7.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 1.3089632987976074
+      },
+      "recurrent.layers.7.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.7.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 4.434993743896484
+      },
+      "recurrent.layers.8.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.8.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 2.0318925380706787
+      },
+      "recurrent.layers.8.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.8.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 4.96732234954834
+      },
+      "recurrent.layers.9.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.9.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 1.0116490125656128
+      },
+      "recurrent.layers.9.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.9.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 2.235337257385254
+      },
+      "recurrent.layers.10.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.10.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.5618833899497986
+      },
+      "recurrent.layers.10.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.10.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 8.078879356384277
+      },
+      "recurrent.layers.11.self_attn.q_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.11.self_attn.q_proj.lora_B.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.9362304210662842
+      },
+      "recurrent.layers.11.self_attn.v_proj.lora_A.default.weight": {
+        "elements": 7168,
+        "gradient_l2": 0.0
+      },
+      "recurrent.layers.11.self_attn.v_proj.lora_B.default.weight": {
+        "elements": 1024,
+        "gradient_l2": 5.637068748474121
+      }
+    },
+    "frozen_parameters_with_grad": 0,
+    "optimizer_steps": 0
+  },
+  "total_seconds": 2.1798414590302855,
+  "peak_process_rss_bytes": 3424387072
+}
