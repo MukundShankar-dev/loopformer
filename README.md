@@ -159,6 +159,14 @@ python -m scripts.eval.naive_test --model models/stage1_pointer/<run>/step-00016
 
 See [training usage](docs/training_pointer.md) for configuration, metrics, checkpoint selection, and resume commands. Recurrent evaluation reads the A–Z prediction after the requested number of loops; the ordinary-model three-shot baseline still uses generation.
 
+To evaluate every loop of a saved recurrent checkpoint:
+
+```bash
+python -m scripts.eval.loop_test --model models/stage1_pointer/<run>/step-000625 --device cuda --loops 8
+```
+
+Add `--test` to inspect three examples first. Results go to `eval/pointer_loops/`. See [full-loop evaluation](docs/loop_pointer_eval.md) for exact checkpoint commands, per-loop losses, trajectory scoring, and output files.
+
 ## Project documentation
 
 *   [Documentation index](docs/README.md)

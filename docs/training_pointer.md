@@ -1,6 +1,6 @@
 # Train recurrent pointer execution
 
-Status: implemented and tested with random tiny Qwen models. Pretrained training, learning quality, and training memory on the target machine have not been measured. See [implementation validation](experiments/stage1_training_implementation.md) for the checks performed. The [Stage 1 guide](phases/stage1_pointer.md) owns the research objective and acceptance gate.
+Status: implemented and tested with random tiny Qwen models; pretrained CUDA training and resource measurements are recorded in the [5,000-mapping report](experiments/stage1_cuda_5k.md). Full-test intermediate execution remains to be measured with the [loop evaluator](loop_pointer_eval.md). See [implementation validation](experiments/stage1_training_implementation.md) for the checks performed. The [Stage 1 guide](phases/stage1_pointer.md) owns the research objective and acceptance gate.
 
 ## Preview, then run
 

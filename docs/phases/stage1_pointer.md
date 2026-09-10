@@ -1,6 +1,6 @@
 # Stage 1: pointer data and stepwise execution
 
-Status: data milestone implemented and validated on 2026-09-10; training is implemented with toy-model tests; pretrained training remains unrun. Stage 0 has passed on CPU and MPS. Source: project plan sections 5, 7, and 32. See the [data validation report](../experiments/stage1_data_validation.md).
+Status: data milestone implemented and validated on 2026-09-10; pretrained CUDA training and final-answer checkpoint evaluation have run. The [full-loop CLI](../loop_pointer_eval.md) is implemented; pretrained full-dataset per-loop evaluation remains pending. Gate 1 is not established. Source: project plan sections 5, 7, and 32. See [current evidence](../status.md) and the [data validation report](../experiments/stage1_data_validation.md).
 
 ## Purpose
 
@@ -27,6 +27,8 @@ Specify masking for mixed-depth batches and loss reduction explicitly. Choose th
 Begin with tiny batches, short prompts, gradient accumulation, and recurrent depths around 4–8. Save reproducible configurations and checkpoints. Build the depth-by-loop evaluator alongside training using [evaluation conventions](../evaluation.md).
 
 The implementation is in `scripts/training/`, composed by `python -m scripts.training.train_pointer`. JSON configs live in `configs/`; checkpoint directories and metrics live in `models/`. See [training usage](../training_pointer.md) for preview/run/resume commands, the 32-example overfit configuration, the initial depth-1–4 epoch, and exact logging/selection semantics. Loss is 26-symbol CE, averaged over nominal loops per example and then examples, with no post-completion labels. Validation emits per-loop trajectories and a depth-by-loop final-readout matrix.
+
+Evaluate complete datasets from saved checkpoints with `python -m scripts.eval.loop_test`. It reuses training's evaluation path and adds per-example first-error summaries and an exportable depth-by-loop matrix. See [full-loop commands](../loop_pointer_eval.md); no retraining or optimizer state is required.
 
 ## Acceptance gate
 
@@ -122,4 +124,4 @@ The checker accepts a prediction prefix, strips surrounding whitespace, and requ
 
 Verification checks file hashes, counts and depth histograms, unique mappings, prompt/table consistency, all labels by reparsing and executing the prompt, actual token contexts, and exact per-record seed replay. Source hashes and runtime provenance live in the manifest; generated data is excluded from Git by `data/` in `.gitignore`. The [report](../experiments/stage1_data_validation.md) records the default artifact hashes as durable evidence.
 
-The separate [ordinary-model final-answer baseline](../naive_pointer_eval.md) is implemented and tested with toy models; the user's first full three-shot run reached 6.00% accuracy and is documented in the [baseline report](../experiments/naive_pointer_baseline.md). It shares the dataset and uses `prompts/pointer_task.txt` instructions, without changing the nominal targets or introducing recurrent training. Training code, resumable adapter checkpoints, and per-loop validation are implemented and tested on random tiny models. No pretrained research training, learning curves, or learned recurrent pointer-execution results have been established. Passing data validation or final-answer baseline tests does not establish Gate 1.
+The separate [ordinary-model final-answer baseline](../naive_pointer_eval.md) is implemented and tested with toy models; the user's first full three-shot run reached 6.00% accuracy and is documented in the [baseline report](../experiments/naive_pointer_baseline.md). It shares the dataset and uses `prompts/pointer_task.txt` instructions, without changing the nominal targets or introducing recurrent training. Training code, resumable adapter checkpoints, and per-loop validation are implemented and tested on random tiny models. Pretrained CUDA training and checkpoint final-answer results are recorded in the [5,000-mapping report](../experiments/stage1_cuda_5k.md); full-test per-loop evaluation is pending. Passing data validation or final-answer baseline tests does not establish Gate 1.

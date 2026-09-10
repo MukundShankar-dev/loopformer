@@ -1,6 +1,6 @@
 # Evaluation and reproducibility
 
-Status: research metric and logging conventions remain planned, derived from project plan sections 6–8 and 23–27. Allowed-token raw-logit margins are implemented and tested in [outputs](../scripts/recurrent_qwen/outputs.py). [Stage 0](experiments/stage0_validation.md) records architecture measurements only; no task-dynamics experiment has run.
+Status: nominal per-loop evaluation is implemented through the [full-loop checkpoint CLI](loop_pointer_eval.md) and training monitoring. Repair/damage and survival conventions below remain planned, derived from project plan sections 6–8 and 23–27. Allowed-token raw-logit margins are implemented and tested in [outputs](../scripts/recurrent_qwen/outputs.py). [Stage 0](experiments/stage0_validation.md) records architecture measurements only.
 
 The [ordinary-model final-answer baseline](naive_pointer_eval.md) is implemented separately with unconstrained greedy generation, strict decoded-symbol accuracy, per-depth summaries, and CSV/JSON artifacts. Its toy-model tests verify evaluation mechanics; the [first full pretrained run](experiments/naive_pointer_baseline.md) achieved 60/1,000 correct and has been audited. The restricted-logit and recurrent-transition conventions below apply to the later recurrent evaluation, not automatically to this generation baseline.
 
@@ -10,7 +10,7 @@ The [ordinary-model final-answer baseline](naive_pointer_eval.md) is implemented
 
 Record both step-specific intermediate targets and the fixed final answer. Intermediate accuracy measures execution at the corresponding step. Final-answer correctness supports repair, damage, and solution-survival analysis. Label the target basis explicitly rather than using an ambiguous `is_correct` field alone.
 
-Stage 1 data uses explicit requested steps and a non-repeating nominal path, with targets only at steps 1..d. `scripts.dataset.pointer.check_predictions` checks decoded symbols against that nominal trajectory; no recurrent per-loop model metrics have been measured. Post-completion behavior and future cyclic-task semantics remain open in [decisions](decisions.md). Report nominal execution separately from post-completion trajectories; a valid additional pointer lookup must not automatically count as damage.
+Stage 1 data uses explicit requested steps and a non-repeating nominal path, with targets only at steps 1..d. `scripts.dataset.pointer.check_predictions` checks decoded symbols against that nominal trajectory; training monitoring records recurrent per-loop metrics. Post-completion behavior and future cyclic-task semantics remain open in [decisions](decisions.md). Report nominal execution separately from post-completion trajectories; a valid additional pointer lookup must not automatically count as damage.
 
 ## Answer margins
 
@@ -79,3 +79,5 @@ Write human-readable reports in `docs/experiments/` as Markdown. Keep machine-re
 [Training usage](training_pointer.md#progress-and-saved-signals) documents the current per-loop loss/accuracy, whole-trajectory accuracy, fixed train/validation subsets, depth-by-loop final readouts, and CSV margins. Only nominal steps contribute to supervised metrics. Post-completion predictions are recorded without retention labels or repair/damage claims. The best checkpoint minimizes validation loss on trained depths; deeper monitored depths are excluded from selection.
 
 `naive_test --model <recurrent step directory>` evaluates the final allowed-symbol readout at each task's requested loop count. It uses raw dataset prompts and reports example-loops/s; ordinary model paths retain three-shot unconstrained generation and tokens/s. These are distinct evaluation conditions, even though both write final-answer CSV/JSON under `eval/pointer_task/`.
+
+`python -m scripts.eval.loop_test --model <step directory>` evaluates every example through a common loop budget, exporting nominal losses/accuracies, full trajectories, first-error and correct-prefix diagnostics, and the depth-by-loop matrix under `eval/pointer_loops/`. See [commands and metric definitions](loop_pointer_eval.md). Its full final-target sweep is observational; repair/damage and survival are not computed under unresolved completion semantics.

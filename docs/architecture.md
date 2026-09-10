@@ -1,6 +1,6 @@
 # Architecture and implementation boundaries
 
-Status: Stage 0, pointer data, and Stage 1 training implemented; pretrained training remains unrun. See the [validation report](experiments/stage0_validation.md) for device-specific evidence and limits, and [data report](experiments/stage1_data_validation.md) for pointer validation. The research specification is [the project plan](project_plan.md).
+Status: Stage 0, pointer data, Stage 1 training, and saved-checkpoint full-loop evaluation implemented. Pretrained CUDA training and final-answer runs are recorded in [status](status.md); the new full-loop CLI awaits pretrained execution. See the [validation report](experiments/stage0_validation.md) for architecture evidence and limits, and [data report](experiments/stage1_data_validation.md) for pointer validation. The research specification is [the project plan](project_plan.md).
 
 The [inference smoke test](../scripts/smoke_test_qwen.py) exercises ordinary Qwen. The [Stage 0 entry point](../scripts/validate_stage0.py) loads the checkpoint, constructs the recurrent model, attaches LoRA, and validates the architecture. Stage 0 defaults to cached files at an immutable revision. Usage is in [setup](setup.md).
 
@@ -68,6 +68,7 @@ Only current-stage modules exist; future locations below are not scaffolded requ
 | `scripts/training/train_pointer.py` | Composing training CLI and compact Rich dashboard |
 | `scripts/recurrent_qwen/checkpoint.py` | Adapter/tokenizer/optimizer persistence and recurrent model reconstruction |
 | `scripts/eval/recurrent_pointer.py` | Saved recurrent final-answer readout through the naive-test CLI |
+| `scripts/eval/loop_test.py`, `loop_metrics.py` | Full-loop checkpoint CLI, per-example first-error diagnostics, and depth-by-loop CSV export, reusing `scripts/training/evaluation.py` |
 | Future evaluation extensions | Repair/damage, survival, transfer, plots |
 
 Scripts compose library functions. Task generation must remain separate from training, and loss functions must not own loading or artifact writing. See [Stage 0](phases/stage0_architecture.md) for commands and [decisions](decisions.md) for remaining research semantics.
@@ -77,3 +78,5 @@ Scripts compose library functions. Task generation must remain separate from tra
 Pointer generation has no dependency on the recurrent wrapper and loads no model. Logical state targets and actual answer-token IDs are saved together. The trainer revalidates raw prompts with its tokenizer, derives class indices `[B,T]` from exact logical intermediate states, and selects the validated symbol-token logits. Right-padded batches mask nominal labels at `t > d`; CE is averaged within each example and then across examples. Saved answer positions apply to unpadded raw prompts; batching must account for padding. Only nominal steps 1..d are labeled, with no h_0 or post-completion supervision. The [Stage 1 guide](phases/stage1_pointer.md) owns the data format and reproduction commands.
 
 The [ordinary-model evaluator](naive_pointer_eval.md) loads `AutoModelForCausalLM` directly and does not use `RecurrentQwen`. It renders the shared `prompts/pointer_task.txt` instructions, tokenizes with the evaluated model's tokenizer, and scores generated final answers. Its chat-wrapped autoregressive output is distinct from frozen-coda readouts after recurrent loops; the CLI separately recognizes recurrent checkpoint directories and routes them to allowed-symbol readout at the requested depth. Training validation also records per-loop trajectories. See [training usage](training_pointer.md) for the checkpoint format and runtime boundaries.
+
+The [full-loop CLI](loop_pointer_eval.md) restores the same saved model/tokenizer and uses training's `encode_tasks` and `evaluate` under `no_grad`. Each example runs the full requested sweep; nominal masking and loss reduction are shared with training. CSV rows additionally expose intermediate CE and intermediate margins, without changing training objectives or forward behavior. Diagnostic aggregation reads those rows to locate first errors and decoded repeats; it does not introduce hidden-state probes or post-completion targets.

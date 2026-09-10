@@ -20,6 +20,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | Multi-family execution, preservation, and transfer | [Stages 4–6](docs/phases/stages4_6_transfer.md) |
 | Metrics, trajectories, figures, and reproducibility | [Evaluation](docs/evaluation.md) |
 | Ordinary-model final-answer pointer baseline | [Naive pointer evaluation](docs/naive_pointer_eval.md) |
+| Saved-checkpoint per-loop pointer evaluation | [Full-loop evaluation](docs/loop_pointer_eval.md) |
 | Unresolved choices and recorded design decisions | [Decisions](docs/decisions.md) |
 | Implemented work, validation evidence, and next milestone | [Status](docs/status.md) |
 

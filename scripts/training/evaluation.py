@@ -41,17 +41,21 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
                     ))
                 predictions = scores.argmax(-1).cpu().tolist()
                 values = scores.cpu().tolist()
-                for item, predicted, logits in zip(items, predictions, values):
+                for row_index, (item, predicted, logits) in enumerate(zip(items, predictions, values)):
                     final = item.targets[-1]
                     for t, (prediction, scores_t) in enumerate(zip(predicted, logits), 1):
                         target = item.targets[t - 1] if t <= len(item.targets) else None
                         rows.append({
                             "example_id": item.task.example_id, "task_depth": len(item.targets), "loop": t,
+                            "split": item.task.split, "seed": item.task.seed, "family": item.task.family,
+                            "initial_state": item.task.initial_state,
                             "prediction": SYMBOLS[prediction],
                             "intermediate_target": SYMBOLS[target] if target is not None else "",
                             "intermediate_correct": prediction == target if target is not None else "",
                             "final_target": SYMBOLS[final], "final_correct": prediction == final,
                             "post_completion": t > len(item.targets),
+                            "intermediate_loss": losses[row_index, t - 1].item() if target is not None else "",
+                            "intermediate_margin": (scores_t[target] - max(value for j, value in enumerate(scores_t) if j != target)) if target is not None else "",
                             "final_margin": scores_t[final] - max(value for j, value in enumerate(scores_t) if j != final),
                         })
                 if progress:

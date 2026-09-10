@@ -48,6 +48,8 @@ Use Python 3.11 with a local `venv` and pinned direct dependencies in [requireme
 
 ## Remaining implementation and research choices
 
+**Full-loop checkpoint evaluation — 2026-09-10.** Reuse training's nominal CE/readout path for saved-checkpoint evaluation. Run a common loop budget across selected examples (default their maximum depth) and reject insufficient budgets. Preserve blank intermediate labels/losses/margins after nominal completion. Export first-error indices, correct-prefix lengths, and observed final-target matches without declaring repair/damage or a gate result. The user will run pretrained evaluation; implementation checks use random tiny models and prescribed logits. This adds observability without changing recurrence, training, or completion semantics. See [full-loop evaluation](loop_pointer_eval.md).
+
 | ID | Resolve before | Question and consequence |
 | --- | --- | --- |
 | D03 | Stage 2/3 post-completion evaluation/training | Nominal Stage 1 labels are settled above. Define required behavior beyond requested depth before interpreting continued pointer moves as damage. |
