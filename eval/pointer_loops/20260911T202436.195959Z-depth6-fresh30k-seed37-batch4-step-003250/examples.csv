@@ -1,0 +1,1001 @@
+example_id,split,seed,task_depth,initial_state,targets,predictions,executed_loops,trajectory_correct,nominal_final_correct,first_error_loop,correct_prefix_length,first_final_correct_loop,nominal_repeated_predictions
+validation-000000-44a3a8e15b4fe090,validation,4945982501636006032,1,O,Y,Y Y Y Y Y Y Y Y,8,True,True,,1,1,0
+validation-000001-bcd1fad8b169949a,validation,13605931757859345562,2,P,R U,R U E W P R U E,8,True,True,,2,2,0
+validation-000002-b08f149f9aa37ed5,validation,12722410148071702229,3,K,O R E,O R E F Q C G Q,8,True,True,,3,3,0
+validation-000003-ee63654d4400d10e,validation,17177684786248995086,4,V,K O G D,K O G D I T Y W,8,True,True,,4,4,0
+validation-000004-be347ef6cc6858f2,validation,13705719164451707122,5,V,T Q B H P,T Q B H P H P H,8,True,True,,5,5,0
+validation-000005-f03c660decf2b2bd,validation,17310823277701280445,6,O,X H F I P E,X H F I P E T K,8,True,True,,6,6,0
+validation-000006-a6e441149aba0044,validation,12025808461737099332,7,I,H S U T Y N W,H S U T Y N W R,8,True,True,,7,7,0
+validation-000007-7d4d438bcaad515d,validation,9028947095627583837,8,Q,V F K L A U N I,V F K L A U N S,8,False,False,8,7,,0
+validation-000008-26bbd517902715c2,validation,2791058691265598914,1,V,H,H W G S R V H W,8,True,True,,1,1,0
+validation-000009-a4ff25768b201a11,validation,11889262732351904273,2,Q,X F,X F S Q X F S Q,8,True,True,,2,2,0
+validation-000010-b428f2c085e967b3,validation,12981892834589763507,3,G,H U S,H U S U S U S U,8,True,True,,3,3,0
+validation-000011-fa233c48809f2210,validation,18024316415760081424,4,K,S C M A,S C M A T I S C,8,True,True,,4,4,0
+validation-000012-e2f4a057e2875346,validation,16353872446212232006,5,Q,C U Y W E,C U Y W E J K L,8,True,True,,5,5,0
+validation-000013-4d733abda971964d,validation,5580868949508200013,6,A,H O K G U T,H O K G U T M X,8,True,True,,6,6,0
+validation-000014-f5b2ab5ccc56bb71,validation,17704401500200418161,7,G,S P I K U N X,S P I K U N X I,8,True,True,,7,7,0
+validation-000015-1c87bbda5f60bba9,validation,2055818301495360425,8,B,V O J C F R T M,V O J C F R T M,8,True,True,,8,8,0
+validation-000016-7624c0bfaa93b852,validation,8513141125070174290,1,I,B,B I B I B I B I,8,True,True,,1,1,0
+validation-000017-391c267293facdca,validation,4115206433060605386,2,B,J S,J S T S T S T S,8,True,True,,2,2,0
+validation-000018-41dd6fd43974df6c,validation,4746072539606081388,3,J,K W O,K W O L P W O L,8,True,True,,3,3,0
+validation-000019-d17e9c1f747e149d,validation,15095674659904820381,4,J,N P I M,N P I M M M M M,8,True,True,,4,4,0
+validation-000020-fafb179cc6cc2b81,validation,18085074690753964929,5,N,I K D Z P,I K D Z P A B H,8,True,True,,5,5,0
+validation-000021-2f5bbacfb012b7e5,validation,3412526543838296037,6,K,U H Y A I X,U H Y A I X U U,8,True,True,,6,6,0
+validation-000022-3fad179539e7a16e,validation,4588349525049450862,7,R,W I X Q P A J,W I X Q P A J Z,8,True,True,,7,7,0
+validation-000023-daa87323515f8ff9,validation,15755969891881947129,8,S,O T G B E W C K,O T G B E W C E,8,False,False,8,7,,0
+validation-000024-b636b0a377002802,validation,13129875979767916546,1,S,V,V G T C N F H I,8,True,True,,1,1,0
+validation-000025-4f1614d3853c02e9,validation,5698765277189898985,2,C,H U,H U V G V G V G,8,True,True,,2,2,0
+validation-000026-6a84339f681e7846,validation,7675316424685811782,3,O,T B W,T B W Z C M R Z,8,True,True,,3,3,0
+validation-000027-6a66b9da2a8537e2,validation,7667019762312230882,4,T,V D X Q,V D X Q J J J J,8,True,True,,4,4,0
+validation-000028-76d75e52450d2a4e,validation,8563416923907107406,5,Q,M K H P X,M K H P X B M K,8,True,True,,5,5,0
+validation-000029-c6c8daa7e61a4960,validation,14323939029506738528,6,O,Y W R S V K,Y W R S V K Q D,8,True,True,,6,6,0
+validation-000030-166d0df58e937775,validation,1615963189606053749,7,P,Z M E S O C N,Z M E S O C N B,8,True,True,,7,7,0
+validation-000031-63fbd012f4dd2445,validation,7204580808745362501,8,Z,C F T S O I X M,C F T S O I X M,8,True,True,,8,8,0
+validation-000032-11b5907d21624cf4,validation,1276084936534805748,1,C,P,P A G S G S G S,8,True,True,,1,1,0
+validation-000033-4922e6ebcaa3f96a,validation,5270028414368348522,2,C,L Q,L Q Z U I V X T,8,True,True,,2,2,0
+validation-000034-0981e4c5a21c25f8,validation,685080155816470008,3,E,H J G,H J G Q T I B Z,8,True,True,,3,3,0
+validation-000035-f334c692c3207d62,validation,17524850383646653794,4,A,N M Y B,N M Y B D O G X,8,True,True,,4,4,0
+validation-000036-08d479af2fbfcd13,validation,636267240693419283,5,M,H U N Y I,H U N Y I Y I Y,8,True,True,,5,5,0
+validation-000037-8dda1803e360d5f9,validation,10221508709249504761,6,V,Z Y A C Q M,Z Y A C Q M L Z,8,True,True,,6,6,0
+validation-000038-2ce4de4c1670f4db,validation,3234954850734240987,7,B,M E Q N S L T,M E Q N S L T W,8,True,True,,7,7,0
+validation-000039-bcd018b9b60a7394,validation,13605401660188423060,8,G,V R Y H N A S U,V R Y H N A S U,8,True,True,,8,8,0
+validation-000040-b997521fc3960fd8,validation,13373247914878832600,1,P,L,L V W M X S S F,8,True,True,,1,1,0
+validation-000041-70b3a8bb14c18a3e,validation,8121020074539715134,2,R,G B,G B S O S O S O,8,True,True,,2,2,0
+validation-000042-dee1b6aaadfe11d8,validation,16060318590359704024,3,F,R V Q,R V Q P R V Q P,8,True,True,,3,3,0
+validation-000043-463c62180ecfb94c,validation,5061027936724826444,4,N,J T K P,J T K P M V G Y,8,True,True,,4,4,0
+validation-000044-58b8cd97550023e0,validation,6393085720902247392,5,A,E I V L D,E I V L D B M R,8,True,True,,5,5,0
+validation-000045-80517b31209af834,validation,9246306960898979892,6,D,N G Y Q K H,N G Y Q K H N G,8,True,True,,6,6,0
+validation-000046-41e1da52f4934913,validation,4747315532050680083,7,B,S F Z I A M D,S F Z I A M D W,8,True,True,,7,7,0
+validation-000047-8cefdd5a971426a3,validation,10155579065895233187,8,M,A I F Q X Y D T,A Y Q Y Y X X X,8,False,False,2,1,,3
+validation-000048-8f5f1149256d09d8,validation,10330995076069394904,1,C,O,O Z G O Z G O Z,8,True,True,,1,1,0
+validation-000049-ccd4dc3e467ed41f,validation,14759664038828758047,2,G,J D,J D R I I I I I,8,True,True,,2,2,0
+validation-000050-cb94766bd589015f,validation,14669480091768652127,3,P,U Z C,U Z C E O E O E,8,True,True,,3,3,0
+validation-000051-1e33db28f82b32f6,validation,2176324013958836982,4,J,C P Q I,C P Q I G N B L,8,True,True,,4,4,0
+validation-000052-dd865f95456b1eab,validation,15962551023980715691,5,Q,D P Y L I,D P Y L I Y L I,8,True,True,,5,5,0
+validation-000053-f2e5913a49e576a4,validation,17502555206379206308,6,H,P V A S Y D,P V A S Y D C K,8,True,True,,6,6,0
+validation-000054-66c8ee3a5ca93358,validation,7406431521640887128,7,D,Q T W V U R S,Q T W V U R S E,8,True,True,,7,7,0
+validation-000055-029d7157c2614773,validation,188431381156677491,8,R,U H C W E M P L,U H C W E M P L,8,True,True,,8,8,0
+validation-000056-9973982589704ab7,validation,11057348797111749303,1,B,A,A Z Z Z Z Z Z Z,8,True,True,,1,1,0
+validation-000057-4abe48f17638cc4d,validation,5385822406289443917,2,R,N W,N W Z N W Z N W,8,True,True,,2,2,0
+validation-000058-0aa84caee25f8b32,validation,767948050472602418,3,W,X S R,X S R C E P L L,8,True,True,,3,3,0
+validation-000059-1842dd17fe00bdd1,validation,1748202700488621521,4,O,C T P I,C T P I P I R I,8,True,True,,4,4,0
+validation-000060-68f9d5e9ee013b7a,validation,7564312249842613114,5,Y,X T N J C,X T N J C S R Y,8,True,True,,5,5,0
+validation-000061-57c2e70093a3b618,validation,6323870816444593688,6,V,Z N K S B D,Z N K S B D X I,8,True,True,,6,6,0
+validation-000062-28e1c80b88c48163,validation,2945855583141790051,7,L,Q A E K H Y W,Q A E K H Y W N,8,True,True,,7,7,0
+validation-000063-44af1d3a50b91767,validation,4949206651803080551,8,J,A P W O E M I K,A P W O E M I K,8,True,True,,8,8,0
+validation-000064-41a2b21207af8ac0,validation,4729538349200542400,1,X,V,V K Q S N L V K,8,True,True,,1,1,0
+validation-000065-857de9e1e8cc4fb9,validation,9619101535615864761,2,R,J U,J U Z K V F L B,8,True,True,,2,2,0
+validation-000066-fdd7f6cfa852ff80,validation,18291359783331233664,3,H,X W J,X W J M S L X W,8,True,True,,3,3,0
+validation-000067-5eeb79a8ddc0cdd0,validation,6839694225274097104,4,P,Z N X E,Z N X E C E C E,8,True,True,,4,4,0
+validation-000068-14255701ef8439b3,validation,1451662120721856947,5,P,W H T K L,W H T K L S A C,8,True,True,,5,5,0
+validation-000069-5a91f4b14c2482b4,validation,6526266377360409268,6,K,B D J G O W,B D J G O W T F,8,True,True,,6,6,0
+validation-000070-fd463eaf94ef8615,validation,18250343463804438037,7,L,N E U W T F M,N E U W T F M N,8,True,True,,7,7,0
+validation-000071-bad8b95b9f7ebcae,validation,13463714889193143470,8,S,I A C L O K F G,I A C L O K F G,8,True,True,,8,8,0
+validation-000072-04122f870bb12f64,validation,293349182795755364,1,G,T,T T T T T T T T,8,True,True,,1,1,0
+validation-000073-eda4ccfe1b5ef30b,validation,17124037074922435339,2,R,E U,E U B V D J K L,8,True,True,,2,2,0
+validation-000074-d37e4ee9d2c4f08a,validation,15239704955238805642,3,B,O U N,O U N L H F I O,8,True,True,,3,3,0
+validation-000075-7fa553d45fc52e87,validation,9197849985579036295,4,U,P S Q H,P S Q H X V K M,8,True,True,,4,4,0
+validation-000076-d6e153cb1f35b781,validation,15483749125743556481,5,Z,V E J H K,V E J H K L Z V,8,True,True,,5,5,0
+validation-000077-ee11dad22038a0fa,validation,17154733051649499386,6,G,V K N U Y Q,V K N U Y Q M V,8,True,True,,6,6,0
+validation-000078-254a5da4e63c839d,validation,2687063090498667421,7,V,T H N K G Q P,T H N K G Q P Z,8,True,True,,7,7,0
+validation-000079-1dd85826fb120302,validation,2150565746513675010,8,I,R T G N D C Q H,R T G N D C Q H,8,True,True,,8,8,0
+validation-000080-3d66821aae539e11,validation,4424366735043567121,1,G,S,S P J G S P J G,8,True,True,,1,1,0
+validation-000081-76070193c485c538,validation,8504768155481392440,2,B,Q Z,Q Z D X O L Z D,8,True,True,,2,2,0
+validation-000082-f254c3aef0f9a61d,validation,17461796811356874269,3,X,N M V,N M V V V V T L,8,True,True,,3,3,0
+validation-000083-bdc3d443f696c6e4,validation,13674006281991931620,4,E,G V C N,G V C N K T T Q,8,True,True,,4,4,0
+validation-000084-3d9612f51d8c4a4c,validation,4437755326792223308,5,O,Z P K F I,Z P K F I B H G,8,True,True,,5,5,0
+validation-000085-87bc7632ac9e5aea,validation,9780822450758376170,6,C,J A V D H T,J A V D H T K D,8,True,True,,6,6,0
+validation-000086-d0480e153f3330f2,validation,15008261242629599474,7,W,Q D A M X Y Z,Q D A M X Y Z X,8,True,True,,7,7,0
+validation-000087-6df57fd95c9f13a4,validation,7923379690966815652,8,O,D A K M V I E N,D A K M V I E N,8,True,True,,8,8,0
+validation-000088-e14a6640ba78f606,validation,16233900235002803718,1,Q,J,J M W W W W W W,8,True,True,,1,1,0
+validation-000089-76f05b80c717287b,validation,8570450699540179067,2,U,A L,A L V W Z D S M,8,True,True,,2,2,0
+validation-000090-57eb7dec22b537e5,validation,6335295753974790117,3,I,T U P,T U P C X L Q G,8,True,True,,3,3,0
+validation-000091-327c4bc459356cd8,validation,3637865905690864856,4,R,S P U H,S P U H S P U H,8,True,True,,4,4,0
+validation-000092-acd13f4225977e17,validation,12452803997987208727,5,D,B W Z G U,B W Z G U W Z G,8,True,True,,5,5,0
+validation-000093-8de94f228442308b,validation,10225791438587834507,6,B,A W Z Q F V,A W Z Q F V T H,8,True,True,,6,6,0
+validation-000094-ec53f5ccf2624f72,validation,17029224876606639986,7,V,P D J X I B Y,P D J X I B Y O,8,True,True,,7,7,0
+validation-000095-e8be8ccde8736a54,validation,16770996878370368084,8,Z,Q A J O S D E F,Q A J O S D E F,8,True,True,,8,8,0
+validation-000096-15f23d1068f6d87a,validation,1581393559850244218,1,K,D,D L P G X F U S,8,True,True,,1,1,0
+validation-000097-6538745df9528979,validation,7293707543490234745,2,I,J U,J U L H X Y W T,8,True,True,,2,2,0
+validation-000098-a72454e2aa2f8640,validation,12043844635990132288,3,Z,S D L,S D L S D L S D,8,True,True,,3,3,0
+validation-000099-30bbc5dbcc1accd2,validation,3511617882278251730,4,K,G O V D,G O V D Y I Q F,8,True,True,,4,4,0
+validation-000100-d2a8f012078b5f97,validation,15179646504278908823,5,P,J G F Q K,J G F Q K D H P,8,True,True,,5,5,0
+validation-000101-d407be643181f3a2,validation,15278389598414304162,6,I,O R M K C L,O R M K C L T I,8,True,True,,6,6,0
+validation-000102-cc0a27ee3ac991be,validation,14702607837646393790,7,W,M U R T I A P,M U R T I A P R,8,True,True,,7,7,0
+validation-000103-7eea8f3395139ec3,validation,9145279445036408515,8,I,T P S U L Z B X,T P S U L Z B X,8,True,True,,8,8,0
+validation-000104-6c243df23a263048,validation,7792421365824761928,1,U,V,V Y A P Y A P P,8,True,True,,1,1,0
+validation-000105-fa2380ba6b83c506,validation,18024391671822927110,2,K,S Y,S Y J O L B Q V,8,True,True,,2,2,0
+validation-000106-bf59091566bb22fe,validation,13788061721693987582,3,H,U Y T,U Y T A W B C C,8,True,True,,3,3,0
+validation-000107-9e23e5e8346602f4,validation,11395204267651760884,4,H,S V O Q,S V O Q X Z H S,8,True,True,,4,4,0
+validation-000108-6c89efd8433cdd88,validation,7821045940025613704,5,X,T J F E A,T J F E A A A A,8,True,True,,5,5,0
+validation-000109-ad947f72b9accd8d,validation,12507762195832819085,6,U,X J K O S G,X J K O S G V N,8,True,True,,6,6,0
+validation-000110-8d6fb4953f00457f,validation,10191563034862830975,7,H,Z A M L S E G,Z A M L S E G I,8,True,True,,7,7,0
+validation-000111-1c3ec0b14aaba421,validation,2035275949312549921,8,B,U K X Q C L N H,U K X Q C L N K,8,False,False,8,7,,0
+validation-000112-345dc7872b1213eb,validation,3773391446163461099,1,T,U,U L D Z I H Q A,8,True,True,,1,1,0
+validation-000113-2db6ebc0a14b7af1,validation,3294079390040423153,2,U,F A,F A A A A A A A,8,True,True,,2,2,0
+validation-000114-9382834963ea7a72,validation,10629202421779954290,3,E,P R G,P R G T P R G T,8,True,True,,3,3,0
+validation-000115-6139bbcec06f250d,validation,7005837192017683725,4,G,V K X H,V K X H H H R N,8,True,True,,4,4,0
+validation-000116-1f5840224815d03a,validation,2258625729108758586,5,U,J Z H O K,J Z H O K Z H H,8,True,True,,5,5,0
+validation-000117-6c2b54ae4e2026b1,validation,7794416687706547889,6,Y,L Z S W X K,L Z S W X H R T,8,False,False,6,5,,0
+validation-000118-9486ce7494347f48,validation,10702468564590559048,7,M,U X O J A K T,U X O J A K T O,8,True,True,,7,7,0
+validation-000119-de23c8a4588f9b74,validation,16006858108790872948,8,Z,Q H R G B O E V,Q H R G B O E V,8,True,True,,8,8,0
+validation-000120-a86d99ae22e547a4,validation,12136525544022165412,1,M,V,V I U B R V I U,8,True,True,,1,1,0
+validation-000121-72ab2e21c76c4190,validation,8262748663955866000,2,I,V F,V F Q S O G I V,8,True,True,,2,2,0
+validation-000122-f69d536d690884f6,validation,17770451434052551926,3,U,Y G J,Y G J J J J J J,8,True,True,,3,3,0
+validation-000123-c6abae455be22fcb,validation,14315727453444779979,4,F,Q M Y V,Q M Y V O G Y V,8,True,True,,4,4,0
+validation-000124-98eb3fdae592478c,validation,11018971122679039884,5,Z,T U P J E,T U P J E T U P,8,True,True,,5,5,0
+validation-000125-c2f612c496421102,validation,14048436723172643074,6,U,H Y F T A O,H Y F T A O S F,8,True,True,,6,6,0
+validation-000126-0d7219d786af63a9,validation,968865283306382249,7,L,Z P K X S H N,Z P K X S H N R,8,True,True,,7,7,0
+validation-000127-7600757d8d4a90db,validation,8502925278577332443,8,B,Z K L W H G I E,Z K L W H G E T,8,False,False,7,6,7,0
+validation-000128-55e059ade74c4adf,validation,6188044491451812575,1,M,H,H F P F P F P F,8,True,True,,1,1,0
+validation-000129-8292409c53884e2c,validation,9408653611690905132,2,S,D C,D C V P Y F M J,8,True,True,,2,2,0
+validation-000130-da98da5342a46f0c,validation,15751579747863523084,3,T,Y O P,Y O P N R X V L,8,True,True,,3,3,0
+validation-000131-8b8d693c28553472,validation,10055809250083812466,4,F,U S P X,U S P X M X M X,8,True,True,,4,4,0
+validation-000132-ee40dc25b876a568,validation,17167963834103014760,5,N,L X U Y Z,L X U Y Z L X U,8,True,True,,5,5,0
+validation-000133-7a60692abdecec36,validation,8818163702687394870,6,G,C K U F Z H,C K U F Z H B Y,8,True,True,,6,6,0
+validation-000134-e0b7c971d2c6a26e,validation,16192632475938628206,7,U,H A X E Y C O,H A X E Y C O T,8,True,True,,7,7,0
+validation-000135-b2f7f438b0880751,validation,12896044582315755345,8,S,U P V F Y K H R,U P V F Y K Y K,8,False,False,7,6,,0
+validation-000136-19776a2f1470e10d,validation,1835052123615715597,1,T,Z,Z I B B B B B B,8,True,True,,1,1,0
+validation-000137-28c43610c27d2ca7,validation,2937532302562765991,2,R,Y W,Y W D Q N X D D,8,True,True,,2,2,0
+validation-000138-fc4806b428319053,validation,18178787266719223891,3,L,G I P,G I P Y O L G I,8,True,True,,3,3,0
+validation-000139-5181c0cd584f6071,validation,5873187377250263153,4,Q,Y L N O,Y L N O W Y L N,8,True,True,,4,4,0
+validation-000140-c13ca92169b78ded,validation,13924190108895383021,5,E,G L V T J,G L V T J E G L,8,True,True,,5,5,0
+validation-000141-9aba654221a48742,validation,11149335162215761730,6,X,D C Q J Y W,D C Q J Y W D C,8,True,True,,6,6,0
+validation-000142-48149d43d96dcb79,validation,5193949185001245561,7,A,O Y P K J V T,O Y P K J V T Z,8,True,True,,7,7,0
+validation-000143-490defb387a1b8f3,validation,5264127093819685107,8,O,D R Z U A F W N,D R Z U A F W N,8,True,True,,8,8,0
+validation-000144-14f26118ddd9d3ee,validation,1509375584551687150,1,S,T,T K A H M V H M,8,True,True,,1,1,0
+validation-000145-177cc02820872774,validation,1692438838561417076,2,U,E L,E L Y Z L Y Z L,8,True,True,,2,2,0
+validation-000146-2077acb4e5d4cca2,validation,2339528424392281250,3,Q,N Y F,N Y F R D C M N,8,True,True,,3,3,0
+validation-000147-63023f85c6bd5183,validation,7134334603505783171,4,M,Q N J V,Q N J V W I N J,8,True,True,,4,4,0
+validation-000148-011f491f75e7cc0d,validation,80863717786897421,5,T,F D E H V,F D E H V X C I,8,True,True,,5,5,0
+validation-000149-0d79ee5bab9b67fb,validation,971069272163575803,6,M,E F I T U P,E F I T U P W Z,8,True,True,,6,6,0
+validation-000150-29388a63298e84b8,validation,2970276112754443448,7,B,I A D F G Y N,I A D F G Y N K,8,True,True,,7,7,0
+validation-000151-56900311771bfb71,validation,6237488857455786865,8,Q,Z R Y L W M S B,Z R Y L W M S B,8,True,True,,8,8,0
+validation-000152-c93e3d7c6c4c1e95,validation,14501095454781742741,1,M,U,U K Z X C U K Z,8,True,True,,1,1,0
+validation-000153-e6e18697077a2290,validation,16636726481706951312,2,B,S O,S O F A V X X X,8,True,True,,2,2,0
+validation-000154-4fa6fac52b6abdec,validation,5739550499874192876,3,T,Y J R,Y J R D L H L H,8,True,True,,3,3,0
+validation-000155-e9d74c162ed14a9e,validation,16850020188988459678,4,L,A T D Z,A T D Z Q E Y B,8,True,True,,4,4,0
+validation-000156-28aa130473578f19,validation,2930175417393843993,5,O,L V F H T,L V F H T L V H,8,True,True,,5,5,0
+validation-000157-568ef0c51588214d,validation,6237187263215182157,6,V,E X L H Z S,E X L H Z S T Y,8,True,True,,6,6,0
+validation-000158-37f43eb8a8eae96f,validation,4031916529232308591,7,S,A J N Q R G B,A J N Q R G B A,8,True,True,,7,7,0
+validation-000159-4cbd24417a834cae,validation,5529615781127736494,8,H,A B L X W Z K D,A B L X W Z K D,8,True,True,,8,8,0
+validation-000160-0d477333edc297f4,validation,956860112708999156,1,K,U,U W J T W J T W,8,True,True,,1,1,0
+validation-000161-020438fabfee1652,validation,145303737595729490,2,L,A I,A I W P H W P H,8,True,True,,2,2,0
+validation-000162-41085513f3d3d933,validation,4686088956462487859,3,P,U Y E,U Y E R U Y O C,8,True,True,,3,3,0
+validation-000163-2d7b8efc65a8d194,validation,3277370368530633108,4,D,K A S M,K A S M V X T Y,8,True,True,,4,4,0
+validation-000164-88ea4dae8d3b05c2,validation,9865783345797596610,5,L,R A C T K,R A C T K W T K,8,True,True,,5,5,0
+validation-000165-d0d05460b182cb15,validation,15046619129316559637,6,I,N Y P U M A,N Y P U M A G Z,8,True,True,,6,6,0
+validation-000166-1fa5e3a85e974193,validation,2280479098614006163,7,X,M E N Z L F G,M E N Z L F G D,8,True,True,,7,7,0
+validation-000167-34db7b5ba1e9d46f,validation,3808773543360582767,8,H,X S N P K I B C,X S N P K I B C,8,True,True,,8,8,0
+validation-000168-bbd5f80a0ac4a3e6,validation,13534996977145914342,1,B,Q,Q J Y A G B Q J,8,True,True,,1,1,0
+validation-000169-916deb7519ddf40c,validation,10479290796138689548,2,Y,B U,B U E Z M Q W C,8,True,True,,2,2,0
+validation-000170-e69faf7474e93840,validation,16618194064732928064,3,J,A Y U,A Y U W Y U W Y,8,True,True,,3,3,0
+validation-000171-9bad7f5691efdcaf,validation,11217762256642104495,4,O,D H R M,D H R M Y E C V,8,True,True,,4,4,0
+validation-000172-006ee886bd27d96d,validation,31217912834939245,5,L,O Y S E X,O Y S E X I Z K,8,True,True,,5,5,0
+validation-000173-308b38b2646882a5,validation,3497951874423227045,6,X,O J P E R G,O J P E R G I X,8,True,True,,6,6,0
+validation-000174-587d53c89f832e3d,validation,6376344768561229373,7,C,B H F W N Z K,B H F W N K D K,8,False,False,6,5,6,0
+validation-000175-1e1934d7badc185d,validation,2168822796713203805,8,H,U N P I L B M K,U N P I L B M K,8,True,True,,8,8,0
+validation-000176-166900e3069cc004,validation,1614822916457545732,1,F,O,O X W P Z Q I Q,8,True,True,,1,1,0
+validation-000177-9b585ac6e213513b,validation,11193796684072309051,2,Z,X K,X K N E W C D A,8,True,True,,2,2,0
+validation-000178-cc4c987534ca2b30,validation,14721308911131568944,3,D,V H P,V H P T R F F F,8,True,True,,3,3,0
+validation-000179-7c54298867a7fd04,validation,8958831224578112772,4,A,P B S C,P B S C G V I I,8,True,True,,4,4,0
+validation-000180-835a56d9808dc5fe,validation,9464973059037185534,5,U,P L H C X,P L H C X B N H,8,True,True,,5,5,0
+validation-000181-68a20428b3fc1704,validation,7539593299036477188,6,O,X P M I L S,X P M I L S P M,8,True,True,,6,6,0
+validation-000182-3ed58c60e206f333,validation,4527679348127757107,7,O,D S U B Q I G,D S U B Q I G N,8,True,True,,7,7,0
+validation-000183-ac2ecd753d29f2d7,validation,12407079926873322199,8,E,Y X Q R B J A N,Y X Q R B J A N,8,True,True,,8,8,0
+validation-000184-7960f676cc59d977,validation,8746261466448517495,1,M,P,P O X D A Z R J,8,True,True,,1,1,0
+validation-000185-7cd1a75a8d5fffa5,validation,8994153938196365221,2,L,Z M,Z M M M M M M M,8,True,True,,2,2,0
+validation-000186-0227043a10cedec4,validation,155097359604178628,3,I,W E F,W E F C E F C E,8,True,True,,3,3,0
+validation-000187-1dff2391537e0c38,validation,2161485453239127096,4,R,D A X K,D A X K U I V C,8,True,True,,4,4,0
+validation-000188-25ff6ee1f8d413c5,validation,2738029015285896133,5,Y,I Q S R F,I Q S R F Q S R,8,True,True,,5,5,0
+validation-000189-2dceca2f39239486,validation,3300797881080059014,6,N,L E W C V O,L E W C V O J M,8,True,True,,6,6,0
+validation-000190-dd7222d93c488444,validation,15956854746141721668,7,E,Z H V U G X R,Z H V U G X R Z,8,True,True,,7,7,0
+validation-000191-690278b80f422277,validation,7566743055861162615,8,G,W V R N B S K F,W V R N B S K F,8,True,True,,8,8,0
+validation-000192-fbba589bac0a3de6,validation,18138907874817621478,1,G,E,E N E N E N E N,8,True,True,,1,1,0
+validation-000193-a86cac2e1e960a6a,validation,12136264409938266730,2,O,K P,K P H S L J N R,8,True,True,,2,2,0
+validation-000194-fb18cafc70a343b6,validation,18093434688531284918,3,Q,V J X,V J X N E M P G,8,True,True,,3,3,0
+validation-000195-917b2e3562d62a2b,validation,10483023364461308459,4,L,V X A C,V X A C J K D O,8,True,True,,4,4,0
+validation-000196-cf2acf0b476ccd3f,validation,14927971562222832959,5,C,B K L O Q,B K L O Q I P T,8,True,True,,5,5,0
+validation-000197-a94df45850f43682,validation,12199675625769023106,6,G,B K A J C V,B K A J C V M V,8,True,True,,6,6,0
+validation-000198-0a196ee189c46cdf,validation,727734729755094239,7,W,R J O U A K N,R J O U A I J Y,8,False,False,6,5,,0
+validation-000199-52aedda2014b7742,validation,5957943044933908290,8,S,F L N I V D Q P,F L N I V D Q P,8,True,True,,8,8,0
+validation-000200-d425883f5eabaa03,validation,15286774315931642371,1,D,Z,Z B X I Z B X I,8,True,True,,1,1,0
+validation-000201-78c8f6742a060ba0,validation,8703477258675162016,2,A,D F,D F T S O W C N,8,True,True,,2,2,0
+validation-000202-dc659cd58bdc6408,validation,15881272101980365832,3,N,S Z K,S Z K R S Z C J,8,True,True,,3,3,0
+validation-000203-c88fc2f01196d4d9,validation,14451984065598248153,4,T,G U Z D,G U Z D A N V C,8,True,True,,4,4,0
+validation-000204-3c6a5f424d66dfa0,validation,4353396728178073504,5,J,F M S Y R,F U S Y R Z M C,8,False,True,2,1,5,0
+validation-000205-f1978ad97b32009c,validation,17408535551303352476,6,X,O V B R J I,O V B R J I Q Z,8,True,True,,6,6,0
+validation-000206-2cacb0eac0d64634,validation,3219142355967166004,7,U,W V L O Q F J,W V L O Q F J L,8,True,True,,7,7,0
+validation-000207-0650ae46e42c8ac2,validation,455055181863488194,8,Z,U X A J Y H T P,U X A J Y H T P,8,True,True,,8,8,0
+validation-000208-5f1f6e3ac4eae0e4,validation,6854318356572070116,1,T,N,N E S N E S N E,8,True,True,,1,1,0
+validation-000209-62457b08cc0f7624,validation,7081201266823493156,2,I,N J,N J S Z N J S Z,8,True,True,,2,2,0
+validation-000210-b627c607e78c425c,validation,13125677376246399580,3,K,M O Z,M O Z N O Z N O,8,True,True,,3,3,0
+validation-000211-b0aaf850ce98644f,validation,12730260322663294031,4,U,Q V Y W,Q V Y W T Y W T,8,True,True,,4,4,0
+validation-000212-fba7a3bde1690f7c,validation,18133642460556496764,5,C,L T X Y Z,L T X Y Z C L T,8,True,True,,5,5,0
+validation-000213-364610b0f344c1b2,validation,3910831678599512498,6,M,Y T N D A P,Y T N D A P T N,8,True,True,,6,6,0
+validation-000214-f197b9eb826d70e7,validation,17408587305780605159,7,N,K E Y X I P W,K E Y X I P W E,8,True,True,,7,7,0
+validation-000215-9762502e1af36b14,validation,10908369406395640596,8,E,C O L A I G D P,C O L A I G D P,8,True,True,,8,8,0
+validation-000216-e321e2467232572d,validation,16366611313032582957,1,I,K,K L D P U E S L,8,True,True,,1,1,0
+validation-000217-dfd9e532063d9fd2,validation,16130175543419969490,2,O,D U,D U X M B T I Q,8,True,True,,2,2,0
+validation-000218-106f356f3354edd7,validation,1184223978740575703,3,E,B A T,B A T A T A T A,8,True,True,,3,3,0
+validation-000219-d2b3bce87a15ed8c,validation,15182686475462765964,4,A,B K W D,B K W D V B K W,8,True,True,,4,4,0
+validation-000220-38a2ec220e7e2ade,validation,4081083843367283422,5,T,E Z X I N,E Z X I N K F S,8,True,True,,5,5,0
+validation-000221-619f319f4ed53965,validation,7034395703268161893,6,X,L A N W V Q,L A N W V Q X L,8,True,True,,6,6,0
+validation-000222-624f1784359004cb,validation,7083906595478832331,7,K,J E S F Q N Y,J E S F Q N Y T,8,True,True,,7,7,0
+validation-000223-b3b32e4221bfb9f3,validation,12948744215189240307,8,K,L D M R Z E X S,L D M R Z E X S,8,True,True,,8,8,0
+validation-000224-700423711d7c9dd9,validation,8071615400887754201,1,Q,K,K J M W E O L W,8,True,True,,1,1,0
+validation-000225-f23c302db458dd16,validation,17454879228638584086,2,Z,X T,X T D O P U M K,8,True,True,,2,2,0
+validation-000226-ebca28af8d4d8bfe,validation,16990437278663674878,3,C,K Q R,K Q R Y T M Y T,8,True,True,,3,3,0
+validation-000227-25eb915122c7fbd9,validation,2732437376592247769,4,A,J M L E,J M L E F Y E F,8,True,True,,4,4,0
+validation-000228-fb6c61a4942016ce,validation,18116962760492324558,5,P,O M D T F,O M D T F V E P,8,True,True,,5,5,0
+validation-000229-03db876ba798a02b,validation,277964698456465451,6,G,U S Q B A L,U S Q B A L W R,8,True,True,,6,6,0
+validation-000230-a9b8d4ac024a3c1d,validation,12229758623362464797,7,Q,X T A S K F B,X T A S K F B H,8,True,True,,7,7,0
+validation-000231-6981447a0deea65d,validation,7602432936988550749,8,H,N T Y Z U V P X,N T Y Z U V D X,8,False,True,7,6,8,0
+validation-000232-506dce636bc5de49,validation,5795515221900910153,1,Q,U,U S H B B B B B,8,True,True,,1,1,0
+validation-000233-c3d2f08e9fe13be4,validation,14110605077863545828,2,O,Z M,Z M P X V A R F,8,True,True,,2,2,0
+validation-000234-eecb168782c62f74,validation,17206871572569534324,3,B,Y A P,Y A P J F R I H,8,True,True,,3,3,0
+validation-000235-5852e20f1dc6109e,validation,6364397777979838622,4,I,R B Z N,R B Z N C X N N,8,True,True,,4,4,0
+validation-000236-d0d1b94e762a8dea,validation,15047011576662625770,5,Q,G D R I L,G D R I L V L V,8,True,True,,5,5,0
+validation-000237-427db4192eee1eab,validation,4791183598846615211,6,J,S V O D P A,S V O D P A Z Z,8,True,True,,6,6,0
+validation-000238-77f2fe99d13c66d5,validation,8643250571471251157,7,F,Y S P M X W E,Y S P M X W E M,8,True,True,,7,7,0
+validation-000239-9b365a4d2d56d761,validation,11184226012140853089,8,M,D K X V I U E C,D K X V I U E C,8,True,True,,8,8,0
+validation-000240-81a092e07224d991,validation,9340627119851755921,1,P,X,X I H S G O O O,8,True,True,,1,1,0
+validation-000241-95906b369f7047f9,validation,10777231790644938745,2,T,R N,R N U M X K M K,8,True,True,,2,2,0
+validation-000242-11c6fd1edcd57efa,validation,1280989453029310202,3,P,C R V,C R V Z O J C R,8,True,True,,3,3,0
+validation-000243-76d39fea7bcce71b,validation,8562363146009634587,4,D,V J O F,V J O F W F W F,8,True,True,,4,4,0
+validation-000244-921482674f23d6c8,validation,10526181609292682952,5,V,R K Y P U,R K Y P U X H J,8,True,True,,5,5,0
+validation-000245-0aa003a13f411d1b,validation,765615927738834203,6,C,F I W Y L X,F I W Y L X U N,8,True,True,,6,6,0
+validation-000246-a84065be0d0f2c41,validation,12123802063818665025,7,G,M J L E H S Y,M J L E H S Y Z,8,True,True,,7,7,0
+validation-000247-e9ec83f2fabef18e,validation,16855992584953065870,8,Q,Z E A N V T B F,Z E A N V T B F,8,True,True,,8,8,0
+validation-000248-1d0edc6300e481a7,validation,2093853194548707751,1,K,X,X Y I D J H H U,8,True,True,,1,1,0
+validation-000249-a9b71e54dcc8bf38,validation,12229276662978101048,2,A,W X,W X R E D R E D,8,True,True,,2,2,0
+validation-000250-7e3e34031a4f9dcc,validation,9096765485265952204,3,I,P L M,P L M P L M P L,8,True,True,,3,3,0
+validation-000251-daa4af8e7e6c984f,validation,15754910422990100559,4,V,R N G J,R N G J Y B S U,8,True,True,,4,4,0
+validation-000252-9d24c6d509d45841,validation,11323393981411514433,5,X,D L H R O,D L H R O F J L,8,True,True,,5,5,0
+validation-000253-bee33eaf03a5587d,validation,13754906608320993405,6,C,V E K G H D,V E K G H D A X,8,True,True,,6,6,0
+validation-000254-82e5a5db64bbffbf,validation,9432127356303835071,7,K,C A T B S L Y,C A T B S L Y O,8,True,True,,7,7,0
+validation-000255-e066f7d14adf3fa6,validation,16169883990396714918,8,T,G V S O J M U A,G V S O J M U A,8,True,True,,8,8,0
+validation-000256-47172a9eea174f8c,validation,5122609963177824140,1,K,N,N X E V T K N X,8,True,True,,1,1,0
+validation-000257-5542a420be8e24bc,validation,6143653302229673148,2,G,E X,E X X X X X X X,8,True,True,,2,2,0
+validation-000258-4f085a6c302e6a63,validation,5694901149521308259,3,F,O K J,O K J R D C P P,8,True,True,,3,3,0
+validation-000259-d94d319b48f67b4d,validation,15658226022450887501,4,O,A T D G,A T D G T D G T,8,True,True,,4,4,0
+validation-000260-f639c0166c38a458,validation,17742423409540244568,5,M,V I Z U W,V I Z U W O J L,8,True,True,,5,5,0
+validation-000261-bda3e0a1f7b76097,validation,13665012680622563479,6,F,M Q G V R U,M Q G V R U V R,8,True,True,,6,6,0
+validation-000262-4e8681f7cf11b3db,validation,5658352883168555995,7,T,Z W M D E I Y,Z W M D E I Y A,8,True,True,,7,7,0
+validation-000263-30950a0cd3ff1c93,validation,3500715335563025555,8,W,V M T C E F X H,V M T C E F X H,8,True,True,,8,8,0
+validation-000264-4025548c95832f72,validation,4622193555346239346,1,S,A,A A A A A A A A,8,True,True,,1,1,0
+validation-000265-a4a52b48ce2875b7,validation,11863936385073837495,2,F,A E,A E X J F A E X,8,True,True,,2,2,0
+validation-000266-331d0f20cdfa108d,validation,3683116703828021389,3,A,R F S,R F S T F S T F,8,True,True,,3,3,0
+validation-000267-c6db6356498f953c,validation,14329155861661848892,4,W,J X N O,J X N O R T I O,8,True,True,,4,4,0
+validation-000268-09eb538bd10ff504,validation,714756825841399044,5,O,Z U W F N,Z U W F N A C T,8,True,True,,5,5,0
+validation-000269-620980c253a6a5be,validation,7064319062622774718,6,Y,H E F J U B,H E F J U B R J,8,True,True,,6,6,0
+validation-000270-2a26b89979013db7,validation,3037317968007609783,7,P,M U V I Z D S,M U V I Z D S N,8,True,True,,7,7,0
+validation-000271-af8eb3254bb6eefd,validation,12650245376095743741,8,B,N R W F M L Y C,N R W F M L Y C,8,True,True,,8,8,0
+validation-000272-7f031ad6e9b94e26,validation,9152188378093538854,1,H,S,S N W U Y B N O,8,True,True,,1,1,0
+validation-000273-2839e882b30f103d,validation,2898603483237126205,2,A,W E,W E Y C J E Y C,8,True,True,,2,2,0
+validation-000274-8c6fb38ea5dc9613,validation,10119504312974218771,3,N,L W R,L W R K N L W R,8,True,True,,3,3,0
+validation-000275-ce6742a427a11def,validation,14872929567221292527,4,D,I E J N,I E J N L T T T,8,True,True,,4,4,0
+validation-000276-26275da785803e92,validation,2749269071613673106,5,S,N G T V L,N G T V L G T V,8,True,True,,5,5,0
+validation-000277-c236fcda1ccc6ac7,validation,13994650905816623815,6,Y,O Q V G Z I,O Q V G Z I G K,8,True,True,,6,6,0
+validation-000278-7b992e2c7bbf6955,validation,8906200506691447125,7,Z,C I E T Y D J,C I E T Y D J L,8,True,True,,7,7,0
+validation-000279-5d246509c38a6adc,validation,6711600437298621148,8,M,P U J Y Q R S L,P U J Y Q R S L,8,True,True,,8,8,0
+validation-000280-126398a81a4d33e9,validation,1325070563140252649,1,U,V,V S L Z N A Y S,8,True,True,,1,1,0
+validation-000281-a0343d1f8353b0f3,validation,11543918950414004467,2,G,T Y,T Y C Z N I N I,8,True,True,,2,2,0
+validation-000282-94f29ed7f8fef573,validation,10732815512409929075,3,B,W N F,W N F N F N F N,8,True,True,,3,3,0
+validation-000283-96404b2dadcf14cf,validation,10826736163760313551,4,V,N S Y C,N S Y C H W L Z,8,True,True,,4,4,0
+validation-000284-f75f3e0182e21e3d,validation,17825034026367458877,5,W,V I P U D,V I P U D W V I,8,True,True,,5,5,0
+validation-000285-8ef5874aa84fd753,validation,10301288477401012051,6,W,F M E A Z L,F M E A Z L G E,8,True,True,,6,6,0
+validation-000286-42b2280ed98b8d89,validation,4805947796602195337,7,A,G P S H Z U X,G P S H Z U X X,8,True,True,,7,7,0
+validation-000287-fda7f54ca8b680d8,validation,18277847322303299800,8,S,B F V A X J G T,B F V A X J G T,8,True,True,,8,8,0
+validation-000288-f38c8949661452ae,validation,17549552796294206126,1,B,J,J P F A Y G W Y,8,True,True,,1,1,0
+validation-000289-ed2f26bb46fbc8e5,validation,17090921696685967589,2,I,X B,X B W O B W O B,8,True,True,,2,2,0
+validation-000290-6dee76461d4f092d,validation,7921398838102788397,3,T,L O W,L O W J R J R J,8,True,True,,3,3,0
+validation-000291-0cc7eed3add6d9ef,validation,920967241742604783,4,K,R S T Q,R S T Q I B U C,8,True,True,,4,4,0
+validation-000292-8a505b2910a0519e,validation,9966566207301636510,5,Q,L K B R I,L K B R I H P Y,8,True,True,,5,5,0
+validation-000293-73b764db9e737b81,validation,8338244129518746497,6,F,C Y B R Z Q,C Y B R Z Q R Z,8,True,True,,6,6,0
+validation-000294-70cf9da96d0548a4,validation,8128889203431131300,7,D,C Y Z T G J H,C Y Z T G J H Y,8,True,True,,7,7,0
+validation-000295-a246c0596ef2d478,validation,11693244972860101752,8,S,I B U L V M C F,I B U L V M C F,8,True,True,,8,8,0
+validation-000296-7f8da0db23a01877,validation,9191179277589026935,1,B,Z,Z J M C A I O N,8,True,True,,1,1,0
+validation-000297-f49257acda14e1c8,validation,17623244691758965192,2,M,D W,D W N E P W N L,8,True,True,,2,2,0
+validation-000298-abc5513d9c90703a,validation,12377388475959242810,3,I,Z X V,Z X V I Z X V U,8,True,True,,3,3,0
+validation-000299-c145cd82233d7c03,validation,13926763381533801475,4,F,M G N I,M G N I B U U C,8,True,True,,4,4,0
+validation-000300-c96deacdcfca15d5,validation,14514515343760299477,5,Y,S V M Q X,S V M Q X J I W,8,True,True,,5,5,0
+validation-000301-cdd9a101c68d11c0,validation,14833063876719612352,6,E,Z X J O V L,Z X J O V L Z X,8,True,True,,6,6,0
+validation-000302-209d461a64b0f5ee,validation,2350111659729679854,7,K,C G D Q A F V,C G D Q A F V D,8,True,True,,7,7,0
+validation-000303-990715b768ce0765,validation,11026806090121480037,8,Y,X V L M J I Q F,X V L M J I Q F,8,True,True,,8,8,0
+validation-000304-9dc5e412c16611f0,validation,11368743603571921392,1,A,G,G P J Q Q I T R,8,True,True,,1,1,0
+validation-000305-e2c53542c2096960,validation,16340525383823223136,2,V,A D,A D M I L C E Z,8,True,True,,2,2,0
+validation-000306-f3a7adb972e71708,validation,17557192684335470344,3,H,A B F,A B F C B F C C,8,True,True,,3,3,0
+validation-000307-ebe14dc17f7cbd17,validation,16996951962135870743,4,T,G N C Q,G N C Q L F G N,8,True,True,,4,4,0
+validation-000308-5a71b0842975f530,validation,6517184217459586352,5,F,P Y T Z X,P Y T Z X T Z X,8,True,True,,5,5,0
+validation-000309-be5f46fe4e5790d1,validation,13717761048043819217,6,F,Q H I S C D,Q H I S C D Q H,8,True,True,,6,6,0
+validation-000310-cea82ae5d23ff1ed,validation,14891199334463828461,7,F,S G U C D X B,S G U C D X B U,8,True,True,,7,7,0
+validation-000311-02d2b6b97d76b828,validation,203425840975231016,8,Q,K O W D S G U F,K O W D S G U F,8,True,True,,8,8,0
+validation-000312-6c12feb985123cef,validation,7787566778431978735,1,X,G,G B G B K V I N,8,True,True,,1,1,0
+validation-000313-c6ee269e8b8fd2a2,validation,14334437126355014306,2,H,I S,I S Y W W W W W,8,True,True,,2,2,0
+validation-000314-4c28ac011bb168ae,validation,5487825266710505646,3,C,R B Y,R B Y E G Z N V,8,True,True,,3,3,0
+validation-000315-c319a91c8aabdb95,validation,14058453651864411029,4,C,W K D H,W K D H Z J S N,8,True,True,,4,4,0
+validation-000316-0e220e53995014ee,validation,1018392217956390126,5,I,H B N Q P,H B N Q P J K R,8,True,True,,5,5,0
+validation-000317-7ed23a8b1dc54846,validation,9138430963062491206,6,Q,X N C V Z M,X N C V Z M K T,8,True,True,,6,6,0
+validation-000318-89c90493e9d826d1,validation,9928471886844929745,7,H,J S I G P N V,J S I G P N V F,8,True,True,,7,7,0
+validation-000319-6ecbd251cb509f84,validation,7983706013189578628,8,H,Y C T O P B N X,Y C T O P B N X,8,True,True,,8,8,0
+validation-000320-3694ab34f0936d03,validation,3932956618464128259,1,H,V,V N H V N H V A,8,True,True,,1,1,0
+validation-000321-2e845e9c657d2b49,validation,3351908048481102665,2,F,G M,G M X J K K K K,8,True,True,,2,2,0
+validation-000322-5637f1d36d8322e4,validation,6212700101358592740,3,R,X C Z,X C Z X C Z X C,8,True,True,,3,3,0
+validation-000323-0446e90b60dd29e2,validation,308189859600476642,4,T,P L B I,P L B I H P L X,8,True,True,,4,4,0
+validation-000324-6f0f1652af1945c0,validation,8002639607241459136,5,J,G D S U K,G D S U K K K K,8,True,True,,5,5,0
+validation-000325-3181134fd049547f,validation,3567153613371954303,6,J,Q D T A S I,Q D T A S I U B,8,True,True,,6,6,0
+validation-000326-3c1eef942ab3e68e,validation,4332163311227627150,7,Y,Z O B X N E U,Z O B X N E U C,8,True,True,,7,7,0
+validation-000327-13c8ef055d826812,validation,1425652088385464338,8,F,Y E Q X I T R C,Y E Q X I T R C,8,True,True,,8,8,0
+validation-000328-f64171245c6a9deb,validation,17744588407799717355,1,H,W,W I M N U K Q L,8,True,True,,1,1,0
+validation-000329-c552076d9fc05941,validation,14218435140975089985,2,F,O I,O I T Q I T Q I,8,True,True,,2,2,0
+validation-000330-bf4946ec732f4835,validation,13783626115902818357,3,L,Q K M,Q K M K M K M K,8,True,True,,3,3,0
+validation-000331-41b39aa23c28ac61,validation,4734297654881201249,4,E,V F I R,V F I R B A E V,8,True,True,,4,4,0
+validation-000332-c36f49f5238f2023,validation,14082555877023227939,5,U,L Z W C G,L Z W C G D B K,8,True,True,,5,5,0
+validation-000333-d2a7d91c1884096b,validation,15179339783769164139,6,Y,G D Z U C X,G D Z U C X G D,8,True,True,,6,6,0
+validation-000334-6ac0bfd22e57d136,validation,7692359072990351670,7,Y,I D C T E X S,I D C T E X S S,8,True,True,,7,7,0
+validation-000335-f6304a163dc78b50,validation,17739760391598607184,8,J,C E G N D L T I,C E G N D L T T,8,False,False,8,7,,1
+validation-000336-92f69cf869178011,validation,10589824164537270289,1,T,E,E J K W F C G Q,8,True,True,,1,1,0
+validation-000337-9faeda95c21c3e4e,validation,11506374434719809102,2,Q,J I,J I D V U U U H,8,True,True,,2,2,0
+validation-000338-5c0c8b3d660c819d,validation,6632829447031259549,3,S,T K X,T K X A O Q Z O,8,True,True,,3,3,0
+validation-000339-c3b18e5cc007a2fc,validation,14101208437283595004,4,F,E Y H U,E Y H U C P V V,8,True,True,,4,4,0
+validation-000340-d0372c5d3771a1d3,validation,15003509462481871315,5,S,M N J U Y,M N J U Y S M N,8,True,True,,5,5,0
+validation-000341-7d75212e546d1e21,validation,9040168309884788257,6,M,S Y B N L P,S Y B N L P A L,8,True,True,,6,6,0
+validation-000342-f3b1cee67b7ab442,validation,17560043911403713602,7,N,B O L Q E K S,B O L Q E K S C,8,True,True,,7,7,0
+validation-000343-47cd18a37482b575,validation,5173818637232026997,8,Y,B R Z H C J D W,B R Z H C J D W,8,True,True,,8,8,0
+validation-000344-687e89562c1ef632,validation,7529606630210467378,1,E,I,I Y S L N A Y Y,8,True,True,,1,1,0
+validation-000345-c04c729f0df78420,validation,13856576180971865120,2,E,C B,C B W Q J R X P,8,True,True,,2,2,0
+validation-000346-906efda930a819ea,validation,10407534692007418346,3,N,Y B M,Y B M S L X K I,8,True,True,,3,3,0
+validation-000347-0152b4451e0170a2,validation,95336751077355682,4,O,L X N M,L X N M Q Q R D,8,True,True,,4,4,0
+validation-000348-d66c925af307feb0,validation,15450885340923428528,5,K,Y I C P Q,Y I C P Q S L D,8,True,True,,5,5,0
+validation-000349-42258c9dfba98f40,validation,4766370390801485632,6,L,P S R U O X,P S R U O X O X,8,True,True,,6,6,0
+validation-000350-b62953c9c1ec928f,validation,13126114714955059855,7,Q,C V E U I M B,C V E U I M B P,8,True,True,,7,7,0
+validation-000351-b7902173f987f6d7,validation,13227108887578539735,8,N,D U T P W H Y C,D U T P W H Y C,8,True,True,,8,8,0
+validation-000352-eb836e8edca47868,validation,16970529380728338536,1,E,T,T J G J G J G J,8,True,True,,1,1,0
+validation-000353-01d673c1a33fbc4f,validation,132420514558753871,2,D,R A,R A O N Z A O N,8,True,True,,2,2,0
+validation-000354-7db4ddbe222d8505,validation,9058108559235843333,3,T,V Y W,V Y W P D E H W,8,True,True,,3,3,0
+validation-000355-19ca3a302fef3f41,validation,1858361774880800577,4,U,S G X K,S G X K Z U S G,8,True,True,,4,4,0
+validation-000356-f97f63b0d951338a,validation,17978197848697680778,5,Y,M B E T H,M B E T H Y M B,8,True,True,,5,5,0
+validation-000357-f9fe26e1f4c7e448,validation,18013878311444800584,6,S,X J K D N P,X J K D N P N J,8,True,True,,6,6,0
+validation-000358-f7521f0d42051711,validation,17821340817261139729,7,A,L K B V E I G,L K B V E I G M,8,True,True,,7,7,0
+validation-000359-05f885d819ea3dec,validation,430240927608094188,8,N,U L C P V A O B,U L C P V A O B,8,True,True,,8,8,0
+validation-000360-6a946a555b4fa925,validation,7679880179410250021,1,Q,X,X D X D X D X D,8,True,True,,1,1,0
+validation-000361-c136fbfec4e67179,validation,13922592369706168697,2,L,N T,N T X S B D W U,8,True,True,,2,2,0
+validation-000362-5745848283d1969d,validation,6288578150784931485,3,B,A S R,A S R F Q X G J,8,True,True,,3,3,0
+validation-000363-94eaeca8c50d0236,validation,10730649271768252982,4,A,E Q C I,E Q C I K X C I,8,True,True,,4,4,0
+validation-000364-7575c2c7e919ba5c,validation,8463885238577773148,5,J,T H D P M,T H D P M O P M,8,True,True,,5,5,0
+validation-000365-97d743ef999bd38a,validation,10941288516073280394,6,T,J G N K F L,J G N K F L X V,8,True,True,,6,6,0
+validation-000366-5e474d1b03612108,validation,6793483341327835400,7,R,L A E V X P O,L A E V X P O H,8,True,True,,7,7,0
+validation-000367-8c43a43a623f8fdd,validation,10107102559412916189,8,Z,P R S K L O G I,P R S K L O G I,8,True,True,,8,8,0
+validation-000368-c491e2420a7df20e,validation,14164351076328665614,1,T,F,F M P A K M P A,8,True,True,,1,1,0
+validation-000369-f82fcbe7c1612754,validation,17883736841553782612,2,V,I S,I S V I S V I S,8,True,True,,2,2,0
+validation-000370-845c7fae1af4c601,validation,9537638496617154049,3,E,R A M,R A M G I Q P T,8,True,True,,3,3,0
+validation-000371-1f0b5d675be2f47b,validation,2236984338424198267,4,Z,D B P F,D B P F C Q U W,8,True,True,,4,4,0
+validation-000372-da5e1816119ccb4c,validation,15735040631142927180,5,J,T G E K F,T G E K F S U R,8,True,True,,5,5,0
+validation-000373-b4ce599a461ba76f,validation,13028449291165476719,6,K,I Y Q Z J N,I Y Q Z J N F S,8,True,True,,6,6,0
+validation-000374-600ca9fe1f142d13,validation,6921093636269813011,7,D,Z Y I L G O F,Z Y I L G O F I,8,True,True,,7,7,0
+validation-000375-79596aeef3d07a02,validation,8744137726041815554,8,G,U D L B Q J V M,U D L B Q J V M,8,True,True,,8,8,0
+validation-000376-fc89825165442cf2,validation,18197219055470128370,1,R,J,J V X Z Y H A N,8,True,True,,1,1,0
+validation-000377-d8e0ed067403ac3e,validation,15627751318947605566,2,B,V M,V M D Z E A Y X,8,True,True,,2,2,0
+validation-000378-5ddfd0c92ebc24f7,validation,6764354727824860407,3,K,C Y J,C Y J O G T Z Y,8,True,True,,3,3,0
+validation-000379-758638796d0d9c24,validation,8468518243488603172,4,A,E T J Q,E T J Q X C V Y,8,True,True,,4,4,0
+validation-000380-0876673c3c881b0b,validation,609788307966532363,5,Y,K D T N Z,K D T N Z E B I,8,True,True,,5,5,0
+validation-000381-a1eb3b0ecface07c,validation,11667484194433196156,6,S,U A Q Z E H,U A Q Z E H M E,8,True,True,,6,6,0
+validation-000382-e5459c697784eddb,validation,16520782784869232091,7,J,L X K F O I W,L X K F O I W S,8,True,True,,7,7,0
+validation-000383-db11416f02f4aa96,validation,15785470113957063318,8,W,P Q Z K E H N O,P Q Z K E H N O,8,True,True,,8,8,0
+validation-000384-c85c84fc0e7fc3aa,validation,14437560723552846762,1,V,C,C Z L S J Y Y A,8,True,True,,1,1,0
+validation-000385-2c53fa99503b13e4,validation,3194172097118802916,2,W,R H,R H I G D B G D,8,True,True,,2,2,0
+validation-000386-ad746c664c5f86c0,validation,12498734052483761856,3,P,L C V,L C V X P L C C,8,True,True,,3,3,0
+validation-000387-c5937c36891a3902,validation,14236859420718545154,4,S,O L W R,O L W R X R X X,8,True,True,,4,4,0
+validation-000388-e69130db8550608c,validation,16614114219739078796,5,X,Q A K V E,Q A K V E J C M,8,True,True,,5,5,0
+validation-000389-7ed4dbea832efa2a,validation,9139171344111303210,6,X,V N Q Y E U,V N Q Y E U T C,8,True,True,,6,6,0
+validation-000390-2636f1500ba28d9d,validation,2753653548278517149,7,H,P M V Y S L R,P M V Y S L R J,8,True,True,,7,7,0
+validation-000391-4df7083e839aafc1,validation,5617968124756930497,8,M,G Y S W A F B Q,G Y S W A F B Q,8,True,True,,8,8,0
+validation-000392-43b6927292b18d43,validation,4879248267087547715,1,V,K,K B F N W E I H,8,True,True,,1,1,0
+validation-000393-3f79b180943c22db,validation,4573882062372348635,2,J,L I,L I N C W G L I,8,True,True,,2,2,0
+validation-000394-733103505e3f3961,validation,8300419231934003553,3,X,P M F,P M F G R F G R,8,True,True,,3,3,0
+validation-000395-bd34bd07f6f35207,validation,13633729813862896135,4,O,M K H C,M K H C M K H C,8,True,True,,4,4,0
+validation-000396-683152603e11396a,validation,7507872627114981738,5,G,S Q Z Y T,S Q Z Y T F T F,8,True,True,,5,5,0
+validation-000397-28069fd4bfd19915,validation,2884168347477448981,6,G,U F S E M X,U F S E M X Q C,8,True,True,,6,6,0
+validation-000398-d882448eeee82b87,validation,15601107439849057159,7,B,H N Q L U F G,H N Q L U F G X,8,True,True,,7,7,0
+validation-000399-0d0f08f26a3d0b34,validation,940980684401216308,8,Z,Y D J T P G I F,Y D J T P G I F,8,True,True,,8,8,0
+validation-000400-ec97682cf59e741e,validation,17048209456742954014,1,G,E,E C A X E C A X,8,True,True,,1,1,0
+validation-000401-09411132d82b8ef1,validation,666833129900314353,2,I,A Q,A Q O R D A Q O,8,True,True,,2,2,0
+validation-000402-2e147ab0f13912de,validation,3320413725658780382,3,T,C R I,C R I D B G B G,8,True,True,,3,3,0
+validation-000403-51687181654ff7f2,validation,5866063315214530546,4,D,N J G Y,N J G Y T S P L,8,True,True,,4,4,0
+validation-000404-da5b5a0de9e756d6,validation,15734268738954286806,5,K,F G I Z M,F G I Z M A R Y,8,True,True,,5,5,0
+validation-000405-60df63e4668a301c,validation,6980407780071583772,6,G,J L U C D Z,J L U C D Z T F,8,True,True,,6,6,0
+validation-000406-8fcf5445fb7fe257,validation,10362593927151739479,7,S,E T D L U M H,E T D L U M H T,8,True,True,,7,7,0
+validation-000407-3fbed978fc2b4b59,validation,4593347783614483289,8,M,O Z H S Y G R F,O Z H S Y G R F,8,True,True,,8,8,0
+validation-000408-ce00b88640db5530,validation,14844067258566399280,1,D,T,T J D T J D T J,8,True,True,,1,1,0
+validation-000409-7539a543bd762e85,validation,8446964286470106757,2,Q,L E,L E K U T U T U,8,True,True,,2,2,0
+validation-000410-3af242ce72b99ac0,validation,4247530853019261632,3,D,I U H,I U H S M P G G,8,True,True,,3,3,0
+validation-000411-4f97b211778282dd,validation,5735248438568846045,4,K,W P O L,W P O L H H H H,8,True,True,,4,4,0
+validation-000412-e6c5b33e50e2bdad,validation,16628894279361805741,5,N,G L X H T,G L X H T F P W,8,True,True,,5,5,0
+validation-000413-49d90cb5fbd092ec,validation,5321298410468315884,6,U,I O W A C Y,I O W A C Y P L,8,True,True,,6,6,0
+validation-000414-f0e3eea9c53b3f2e,validation,17357979801741901614,7,R,K N T A H M Q,K N T A H M Q E,8,True,True,,7,7,0
+validation-000415-87af4af75652992d,validation,9777115742210267437,8,J,B U M E T F P V,B U M E T F P V,8,True,True,,8,8,0
+validation-000416-73fe863dd71c6cc9,validation,8358265558606310601,1,C,W,W Z J K W Z J K,8,True,True,,1,1,0
+validation-000417-533fe23280b27979,validation,5998761935216212345,2,J,E F,E F K S B P X L,8,True,True,,2,2,0
+validation-000418-f5b0b1f5bc64c6fb,validation,17703845804179244795,3,P,X M N,X M N E L E L E,8,True,True,,3,3,0
+validation-000419-8a07ea5840bb019b,validation,9946175966835048859,4,U,D H B X,D H B X N S L M,8,True,True,,4,4,0
+validation-000420-1b350818d5037126,validation,1960482115535728934,5,O,Z N D I S,Z N D I S T P Y,8,True,True,,5,5,0
+validation-000421-6fa2876a965d6957,validation,8044140776296114519,6,I,G C N F O W,G C N F O W J G,8,True,True,,6,6,0
+validation-000422-4036333af2e6420e,validation,4626941995446059534,7,V,Z X O W P B N,Z X O W P B N N,8,True,True,,7,7,0
+validation-000423-0f3e4f29e4ccdcb2,validation,1098402400475864242,8,H,D P S I V C X B,D P S I V C X B,8,True,True,,8,8,0
+validation-000424-de6b05d536b34879,validation,16026910112231934073,1,P,E,E X Z C K B X Z,8,True,True,,1,1,0
+validation-000425-9fccefbc39a57278,validation,11514841938979549816,2,V,Z X,Z X E O H J T O,8,True,True,,2,2,0
+validation-000426-a915e7d4024f1b54,validation,12183899264678566740,3,Q,Y O L,Y O L A D Q Y O,8,True,True,,3,3,0
+validation-000427-9566a90821b625b6,validation,10765477811666167222,4,V,Z A Y C,Z A Y C C C C C,8,True,True,,4,4,0
+validation-000428-9d93f176f6cc25cc,validation,11354684578780161484,5,S,P Z O I H,P Z O I H G B R,8,True,True,,5,5,0
+validation-000429-df3288473cb876b8,validation,16083067058836240056,6,D,J H K R L P,J H K R L P S S,8,True,True,,6,6,0
+validation-000430-0039d7d017d73c9e,validation,16281362425658526,7,Q,P W J O T U A,P W J O T U Y T,8,False,False,7,6,,0
+validation-000431-b6080b13aa7736eb,validation,13116746093808793323,8,L,I Y P S G U B O,I Y P S G U B O,8,True,True,,8,8,0
+validation-000432-b1c1088bab6f3e68,validation,12808528211188072040,1,K,R,R A B Z B Z B Z,8,True,True,,1,1,0
+validation-000433-484416d22e3b83cf,validation,5207312161121731535,2,K,F B,F B V T Y T Y T,8,True,True,,2,2,0
+validation-000434-29d5601a53c6cc09,validation,3014421191785368585,3,S,D R E,D R E O T I B F,8,True,True,,3,3,0
+validation-000435-289676667733a2f6,validation,2924655190482330358,4,Z,O F T L,O F T L T L T L,8,True,True,,4,4,0
+validation-000436-2d228b1e1e4cbf56,validation,3252314842388545366,5,T,P W K S Y,P W K S Y V D N,8,True,True,,5,5,0
+validation-000437-e8030e77ac0a2b8e,validation,16718222148879657870,6,O,P F N W E C,P F N W E C X R,8,True,True,,6,6,0
+validation-000438-6c519919e4bf2233,validation,7805187965700743731,7,B,H Z V F L X A,H Z V F L X A T,8,True,True,,7,7,0
+validation-000439-280b1e6425dc40b4,validation,2885433401741689012,8,E,D P T F S H N Z,D P T F S H N Z,8,True,True,,8,8,0
+validation-000440-9468f11132932a9f,validation,10694062371356486303,1,Z,Q,Q M U N W H X H,8,True,True,,1,1,0
+validation-000441-483cc1b97ac1db2d,validation,5205248271706086189,2,B,I D,I D W Z J P O B,8,True,True,,2,2,0
+validation-000442-627200ec9ad2549e,validation,7093733379271709854,3,E,X J G,X J G Q N U G Q,8,True,True,,3,3,0
+validation-000443-2b25abfa53e056e7,validation,3109080209406580455,4,B,V S N L,V S N L Q C Q C,8,True,True,,4,4,0
+validation-000444-ffe20741f085e768,validation,18438307804197807976,5,F,J Q S O D,J Q S O D B Z N,8,True,True,,5,5,0
+validation-000445-22dc935218a673f7,validation,2512044672976057335,6,G,Z E B X D C,Z E B X D C Q C,8,True,True,,6,6,0
+validation-000446-2d38a574a72e647b,validation,3258536250842178683,7,D,G I A H C R X,G I A H C R X C,8,True,True,,7,7,0
+validation-000447-3c7c5a0c43a30768,validation,4358457548108662632,8,D,Q P W U K Y L S,Q P W U K Y L S,8,True,True,,8,8,0
+validation-000448-e378c4a91e0f2ff2,validation,16391067074447749106,1,F,L,L L L L L L L L,8,True,True,,1,1,0
+validation-000449-4afc6a401e5a40c0,validation,5403310476557435072,2,W,G V,G V O Z M U A T,8,True,True,,2,2,0
+validation-000450-dcfc81fe3b503b51,validation,15923745311392021329,3,E,X I Z,X I Z U I Z U I,8,True,True,,3,3,0
+validation-000451-03dfcee94e8da4a9,validation,279169203360867497,4,I,M O S Z,M O S Z P I M Z,8,True,True,,4,4,0
+validation-000452-79f1ad4d1375b7e8,validation,8786994894527117288,5,O,K J I S X,K J I S X B Q O,8,True,True,,5,5,0
+validation-000453-4a885f900ebe669a,validation,5370647627966604954,6,W,H A B P K L,H A B P K L J F,8,True,True,,6,6,0
+validation-000454-cd167066c457bfe8,validation,14778122813945921512,7,G,C O E L U I B,C O E L U I B G,8,True,True,,7,7,0
+validation-000455-0492a4ab868f8588,validation,329506779355383176,8,C,Z J M T I L A E,Z J M T I L A E,8,True,True,,8,8,0
+validation-000456-03a74a1ef20cd0f7,validation,263260599994863863,1,S,H,H N K C J T C J,8,True,True,,1,1,0
+validation-000457-471cd940fc4994da,validation,5124209349174596826,2,W,T L,T L V A D H I Y,8,True,True,,2,2,0
+validation-000458-9b7040b4ab247092,validation,11200523417980006546,3,D,E C T,E C T J D E C T,8,True,True,,3,3,0
+validation-000459-3dd69f60c4332de7,validation,4455924119287049703,4,T,U G Y N,U G Y N G Y N G,8,True,True,,4,4,0
+validation-000460-a3e1b59f7b0a7389,validation,11808919394510861193,5,U,F I W D J,F I W D J G D J,8,True,True,,5,5,0
+validation-000461-dbb87ed1ae691f1a,validation,15832543929060368154,6,E,C U S Z R T,C U S Z R T A T,8,True,True,,6,6,0
+validation-000462-a545e79968b37687,validation,11909179435723748999,7,A,O N G D E F P,O N G D E F P L,8,True,True,,7,7,0
+validation-000463-97951c57e19f2ac1,validation,10922667635030043329,8,Y,X W E U R G C I,X W E U R G C I,8,True,True,,8,8,0
+validation-000464-f27b4c0468563eab,validation,17472642761128033963,1,V,Q,Q I E S S S S S,8,True,True,,1,1,0
+validation-000465-fc68eb604f82c9d0,validation,18188045894019107280,2,K,E P,E P Z A O L W M,8,True,True,,2,2,0
+validation-000466-306f8d416e277bca,validation,3490163548395895754,3,H,B T F,B T F I B T F I,8,True,True,,3,3,0
+validation-000467-a822a996153e5f22,validation,12115432409646653218,4,Q,O G N Y,O G N Y O G N B,8,True,True,,4,4,0
+validation-000468-424b3a79f424b850,validation,4776976125218043984,5,S,V W M T Q,V W M T Q V W M,8,True,True,,5,5,0
+validation-000469-3968c59b22e3701d,validation,4136773527835734045,6,C,R T W D N A,R T W D N A M R,8,True,True,,6,6,0
+validation-000470-f7f9ab0b1a6201af,validation,17868501060744774063,7,M,U H G P E J S,U H G J E J S R,8,False,True,4,3,7,0
+validation-000471-79171bfdb9ee97bb,validation,8725473579613722555,8,I,M Y H F T R G A,M Y H F T R G A,8,True,True,,8,8,0
+validation-000472-4af05cd2dfe2d256,validation,5399918013986296406,1,I,P,P Q A Y I P Q A,8,True,True,,1,1,0
+validation-000473-36f41256c0ef20b6,validation,3959810136178892982,2,H,M O,M O O O O O O O,8,True,True,,2,2,0
+validation-000474-137f0a85b3e56380,validation,1404853178127967104,3,L,A R M,A R M M M M D M,8,True,True,,3,3,0
+validation-000475-2b734d600eba854b,validation,3130931240911930699,4,I,K S D J,K S D J Y V U R,8,True,True,,4,4,0
+validation-000476-061ea4ba113142f2,validation,440970932588200690,5,L,E V Z B M,E V Z B M U F L,8,True,True,,5,5,0
+validation-000477-98594f9dbae23fb5,validation,10977893105556144053,6,O,B K L Y S I,B K L Y S I H M,8,True,True,,6,6,0
+validation-000478-d0a46ca4f910ec77,validation,15034260911878630519,7,K,B P A E C R D,B P A E C R D Q,8,True,True,,7,7,0
+validation-000479-2cb8c973fcd5c514,validation,3222547033383879956,8,P,A I U O C K S G,A I U O C K S G,8,True,True,,8,8,0
+validation-000480-b9f5dbb77ac8caf3,validation,13399857847396256499,1,B,D,D M O K T P M O,8,True,True,,1,1,0
+validation-000481-0faa3dce99998f27,validation,1128782614159265575,2,G,H M,H M U F L B Q L,8,True,True,,2,2,0
+validation-000482-d42464fdd1ebbb46,validation,15286454076513696582,3,O,G N Q,G N Q V W S S S,8,True,True,,3,3,0
+validation-000483-4d28447af5901a35,validation,5559769034885438005,4,G,Y N M C,Y N M C Q N M N,8,True,True,,4,4,0
+validation-000484-394aa203980466d1,validation,4128290144757507793,5,N,V X Y L O,V X Y L O L O L,8,True,True,,5,5,0
+validation-000485-a3b82afef21931c0,validation,11797226498368811456,6,D,O G U H K T,O G U H K T I I,8,True,True,,6,6,0
+validation-000486-2e6a4cdfd12b8d2d,validation,3344570197446724909,7,C,D T U R P A B,D T U R P A B Y,8,True,True,,7,7,0
+validation-000487-90376c8362d8381d,validation,10391893976735561757,8,H,C B X F V Y D M,C B X F V Y D M,8,True,True,,8,8,0
+validation-000488-a20095dbdc8bac37,validation,11673495005674843191,1,V,Y,Y Z I Q U C N N,8,True,True,,1,1,0
+validation-000489-eb0d2050c937adf4,validation,16937229304955645428,2,C,K H,K H C K H C K H,8,True,True,,2,2,0
+validation-000490-ebb869680a4d18c4,validation,16985441890198165700,3,O,H G B,H G B L W J N S,8,True,True,,3,3,0
+validation-000491-01d3c19f049516a6,validation,131661702844716710,4,X,S K G B,S K G B M D N K,8,True,True,,4,4,0
+validation-000492-28170744ecd214a3,validation,2888785678593823907,5,I,G P W V L,G P W V L K F C,8,True,True,,5,5,0
+validation-000493-8b62ec833aec68b0,validation,10043850167363070128,6,Q,T X B Y S L,T X B Y S L R D,8,True,True,,6,6,0
+validation-000494-ca272fdde66f5708,validation,14566664149853493000,7,O,U Z N S A V C,U Z N S A V C A,8,True,True,,7,7,0
+validation-000495-8da48411fc8b8c4a,validation,10206427868314700874,8,W,O Y Z L I T E D,O Y Z L I T E D,8,True,True,,8,8,0
+validation-000496-2e9f3a578b219afb,validation,3359467994712480507,1,P,G,G S X Y M Y M Y,8,True,True,,1,1,0
+validation-000497-04af4358821f6af7,validation,337562544495356663,2,Z,S G,S G C K X T N T,8,True,True,,2,2,0
+validation-000498-70817e2815222d36,validation,8106899514861956406,3,O,F I L,F I L E C Y E C,8,True,True,,3,3,0
+validation-000499-090675ca2afb67cf,validation,650336707366578127,4,M,I Q B G,I Q B G N F P Q,8,True,True,,4,4,0
+validation-000500-b817ae2ee306812a,validation,13265262743843668266,5,T,I G W R P,I G W R P A O B,8,True,True,,5,5,0
+validation-000501-9460991d10826343,validation,10691713865487639363,6,O,V M Q L E R,V M Q L E R H B,8,True,True,,6,6,0
+validation-000502-e2f4b1db56562817,validation,16353891702493554711,7,E,T J V P N F U,T J V P N F U Z,8,True,True,,7,7,0
+validation-000503-1fe9715443eb3696,validation,2299493691480028822,8,D,Q R C V N K T X,Q R C V N N R C,8,False,False,6,5,,1
+validation-000504-a21758cdde69dc72,validation,11679901799831690354,1,R,N,N Y K E D H Y K,8,True,True,,1,1,0
+validation-000505-3fdd1ca68177fc80,validation,4601865895704788096,2,X,Y C,Y C G R S Q G R,8,True,True,,2,2,0
+validation-000506-783167cace04a68a,validation,8660817679147640458,3,L,F S Z,F S Z Q L F S Z,8,True,True,,3,3,0
+validation-000507-4c94e326f92e17ef,validation,5518285199964510191,4,M,F K Z S,F K Z S R Q V Q,8,True,True,,4,4,0
+validation-000508-7a990430f2685ee0,validation,8834096752335806176,5,Q,A V C T L,A V C T L T L T,8,True,True,,5,5,0
+validation-000509-9c46fe11675cb85a,validation,11260967268988532826,6,A,L S V Z E R,L S V Z E R M F,8,True,True,,6,6,0
+validation-000510-0f7774cd891329e3,validation,1114487858914339299,7,T,Y R H M Z I K,Y R H M Z I K L,8,True,True,,7,7,0
+validation-000511-b54b2f72a2ceae1d,validation,13063587313522486813,8,H,A Q I R E U K P,A Q I R E U K P,8,True,True,,8,8,0
+validation-000512-47951da7a997ab2d,validation,5158061554164804397,1,B,M,M B M B M B M B,8,True,True,,1,1,0
+validation-000513-32ab1b27f8c8c930,validation,3651041781405501744,2,L,E Q,E Q M T X U G F,8,True,True,,2,2,0
+validation-000514-698ea8436efe1e1e,validation,7606201828253769246,3,W,I Z M,I Z M H A T F I,8,True,True,,3,3,0
+validation-000515-303eb14cf3c2fcf5,validation,3476410906441874677,4,U,C V M J,C V M J N J N J,8,True,True,,4,4,0
+validation-000516-5c2b8e6df0c06b86,validation,6641558678329650054,5,Y,U W O S K,U W O S K T X M,8,True,True,,5,5,0
+validation-000517-aab61c1f9884aeb7,validation,12301050354237484727,6,Y,P V C L Z J,P V C L Z J Q V,8,True,True,,6,6,0
+validation-000518-72dec69717501e79,validation,8277271517387038329,7,W,Z I E S V Q H,Z I E S V Q H A,8,True,True,,7,7,0
+validation-000519-a24063a10c4932f8,validation,11691454176000815864,8,Q,T X B R U C V P,T X B R U C V P,8,True,True,,8,8,0
+validation-000520-ba4fc747d24ec63a,validation,13425168125499721274,1,P,D,D R G U H D R G,8,True,True,,1,1,0
+validation-000521-6bbc92fad274833d,validation,7763241463650222909,2,Y,G W,G W E J N T U B,8,True,True,,2,2,0
+validation-000522-1eee71dd0f5b7e82,validation,2228844059854339714,3,D,U X B,U X B K C K C K,8,True,True,,3,3,0
+validation-000523-22de260a714f9bbb,validation,2512487468411886523,4,U,P S K M,P S K M F F F F,8,True,True,,4,4,0
+validation-000524-72791c4f0b2061f4,validation,8248655318320439796,5,S,E I Y V P,E I Y V P I Y V,8,True,True,,5,5,0
+validation-000525-dcb71a6be648f82f,validation,15904209659809560623,6,E,U M S L T H,U M S L T H U M,8,True,True,,6,6,0
+validation-000526-4be29b2af711d5dd,validation,5468103506417276381,7,F,C G Y R T D V,C G Y R T D V Q,8,True,True,,7,7,0
+validation-000527-3aa760fc0aba312f,validation,4226453410938499375,8,F,X B P N M C V W,X B P N M C V W,8,True,True,,8,8,0
+validation-000528-517c1feb96cc0e69,validation,5871603110892015209,1,V,U,U R V U R V U R,8,True,True,,1,1,0
+validation-000529-70cbf788d95e6984,validation,8127862119654648196,2,V,B W,B W T W T W T W,8,True,True,,2,2,0
+validation-000530-97b06e12bfd394c2,validation,10930357322434974914,3,U,Z W M,Z W M I E W M I,8,True,True,,3,3,0
+validation-000531-0d614db34da13730,validation,964137227730892592,4,T,B Z K X,B Z K X N Q P C,8,True,True,,4,4,0
+validation-000532-2852183b4f0160f4,validation,2905411352615018740,5,A,B N O Z W,B N O Z W C S B,8,True,True,,5,5,0
+validation-000533-fd52fced64a5fe5e,validation,18253930336212090462,6,K,L N P Y Q E,L N P Y Q E B T,8,True,True,,6,6,0
+validation-000534-0cbad3c18b5a7981,validation,917278302343428481,7,L,R F B P W S Z,R F B P W S Z X,8,True,True,,7,7,0
+validation-000535-17ea0f3ea1952bd5,validation,1723206569095932885,8,U,H L Z D O Q J C,H L Z D O Q J C,8,True,True,,8,8,0
+validation-000536-e42c429d456327ad,validation,16441589582864263085,1,X,Y,Y O E H X Y O E,8,True,True,,1,1,0
+validation-000537-e9621b5ea7670a44,validation,16817034051904277060,2,F,S V,S V C X T X T X,8,True,True,,2,2,0
+validation-000538-84c94d2d3d7b3997,validation,9568263740025682327,3,Y,P U R,P U R X U R X U,8,True,True,,3,3,0
+validation-000539-ff5e86f13767b9c9,validation,18401293498057210313,4,V,L M Y Q,L M Y Q A Q A Q,8,True,True,,4,4,0
+validation-000540-00eb7f2c3ace7f3b,validation,66286447468904251,5,Z,J E T D P,J E T D P S N I,8,True,True,,5,5,0
+validation-000541-6414c0e9c62ec3ab,validation,7211601013611873195,6,C,J K W R F Y,J K W R F Y V L,8,True,True,,6,6,0
+validation-000542-9a16b4a69d09fd27,validation,11103260559020784935,7,G,N I M C O E U,N I M C O E U P,8,True,True,,7,7,0
+validation-000543-178a7e50cc031d97,validation,1696307095143652759,8,P,U S D M Y V G F,U S D M Y V G F,8,True,True,,8,8,0
+validation-000544-a301e1798471ce4b,validation,11745917215188307531,1,E,M,M G L N D I I T,8,True,True,,1,1,0
+validation-000545-bd1ae17024987e4e,validation,13626451494329417294,2,M,Z W,Z W N T Y T Y T,8,True,True,,2,2,0
+validation-000546-07db1b7427b16c86,validation,566076363861224582,3,X,O E P,O E P S J L B D,8,True,True,,3,3,0
+validation-000547-2f7efe74bead9a59,validation,3422452544216865369,4,H,B A O U,B A O U U U U U,8,True,True,,4,4,0
+validation-000548-7892cb23c592c6ec,validation,8688229985650132716,5,E,J Z M P L,J Z M P L X A A,8,True,True,,5,5,0
+validation-000549-9f26c651865737eb,validation,11468071554594060267,6,S,K V A T B D,K V A T B D C P,8,True,True,,6,6,0
+validation-000550-6642592d399ee5a2,validation,7368549991106667938,7,U,S Z R P F T K,S Z R P F T K I,8,True,True,,7,7,0
+validation-000551-8ac284d0d0e7c561,validation,9998700155108836705,8,W,X Q D S F Z K C,X Q D S F Z K C,8,True,True,,8,8,0
+validation-000552-d945de1164cf71c5,validation,15656163845910524357,1,R,L,L S Y Z G X U J,8,True,True,,1,1,0
+validation-000553-1ef14684c4da41c9,validation,2229640826577371593,2,B,D X,D X D X D X D X,8,True,True,,2,2,0
+validation-000554-4ecebb83a5d50cdf,validation,5678682354258087135,3,D,F L R,F L R G I L R G,8,True,True,,3,3,0
+validation-000555-a63b5c6cb4d0d6fb,validation,11978269255881774843,4,T,P W Q G,P W Q G U Y Y Y,8,True,True,,4,4,0
+validation-000556-a19eb832d39e7647,validation,11645948214864934471,5,N,H Q U K M,H Q U K M Y W F,8,True,True,,5,5,0
+validation-000557-b8fd7ac963f08e03,validation,13329945477470260739,6,G,Q H L V U A,Q H L V U S L K,8,False,False,6,5,,0
+validation-000558-ba975e9e923c8176,validation,13445319247689187702,7,L,C O R A M B J,C O R A M B J Z,8,True,True,,7,7,0
+validation-000559-5ab624ef45b2dc88,validation,6536452519259987080,8,K,E O J S R H C I,E O J S R H C I,8,True,True,,8,8,0
+validation-000560-ec756ed1b0e70727,validation,17038646612121290535,1,C,H,H N B M N B M N,8,True,True,,1,1,0
+validation-000561-229c351e5e739414,validation,2493926698206336020,2,Y,Q X,Q X S D X S D X,8,True,True,,2,2,0
+validation-000562-e7eb9bf355d5ccf4,validation,16711622311707790580,3,H,D E B,D E B P H D E B,8,True,True,,3,3,0
+validation-000563-8ae0cd4a5e08bd95,validation,10007224091306147221,4,N,B L S C,B L S C I F C I,8,True,True,,4,4,0
+validation-000564-716378ffd811cfaf,validation,8170507189217251247,5,H,W V F U K,W V F U K E L I,8,True,True,,5,5,0
+validation-000565-87ff7b2cb0293523,validation,9799686746045756707,6,H,N T L P S R,N T L P S R M R,8,True,True,,6,6,0
+validation-000566-1dbae9492d3e646d,validation,2142281073269040237,7,C,P I D J R N Q,P I D J R N Q E,8,True,True,,7,7,0
+validation-000567-8df1bf5b15b706cd,validation,10228166626662352589,8,N,C Z B O T D A R,C Z B O T D A R,8,True,True,,8,8,0
+validation-000568-eeb7e7f6b9500429,validation,17201472348621898793,1,M,E,E L V N T C B C,8,True,True,,1,1,0
+validation-000569-9381ac8763a80f68,validation,10628966293063602024,2,Y,H E,H E L X P I I I,8,True,True,,2,2,0
+validation-000570-663be64174cbdf86,validation,7366734784301358982,3,M,C D J,C D J A X R Z P,8,True,True,,3,3,0
+validation-000571-16320d0a2ed60db9,validation,1599355155056561593,4,G,B I R K,B I R K P C B I,8,True,True,,4,4,0
+validation-000572-782166f29e79bef3,validation,8656313151009701619,5,L,Q C D F M,Q C D F M E B J,8,True,True,,5,5,0
+validation-000573-8112b1734b19bed2,validation,9300691289212829394,6,V,Y C E Q X S,Y C E Q X S S S,8,True,True,,6,6,0
+validation-000574-3589a73b79a87e26,validation,3857798429705535014,7,X,F G B K S T R,F G B K S T R O,8,True,True,,7,7,0
+validation-000575-21542a2c2381e34a,validation,2401590870357959498,8,J,C I K V M S N D,C I K V M S N D,8,True,True,,8,8,0
+validation-000576-6d3c2e5764da7a3e,validation,7871217201625856574,1,J,Z,Z C H J Z C H C,8,True,True,,1,1,0
+validation-000577-ffb279613d1a141d,validation,18424922484070028317,2,F,H G,H G S D O X I U,8,True,True,,2,2,0
+validation-000578-d30316e050f6e863,validation,15205021919619770467,3,N,O V C,O V C O V C O V,8,True,True,,3,3,0
+validation-000579-6bb8ee43558f76cb,validation,7762215930738734795,4,Y,S I W N,S I W N X T B K,8,True,True,,4,4,0
+validation-000580-b0914075d856e57f,validation,12723021297183286655,5,F,E Z B T L,E Z B T L J D I,8,True,True,,5,5,0
+validation-000581-83c63f6acf105b94,validation,9495346592330308500,6,H,C V R P D B,C V R P D B H C,8,True,True,,6,6,0
+validation-000582-2483a858153f81fe,validation,2631131703581573630,7,V,R E W K N J G,R E W K N J G Q,8,True,True,,7,7,0
+validation-000583-edc592075c029f53,validation,17133260917707022163,8,C,U T N H J Q R K,U T N H J Q R K,8,True,True,,8,8,0
+validation-000584-b63aea513b57980d,validation,13131065298160949261,1,L,M,M E J Y X J Y X,8,True,True,,1,1,0
+validation-000585-5385fd53d644adb2,validation,6018495013569473970,2,I,G H,G H N R I G H N,8,True,True,,2,2,0
+validation-000586-814060c1d872e316,validation,9313550415078548246,3,T,Y V J,Y V J R A H A H,8,True,True,,3,3,0
+validation-000587-809a757482451b91,validation,9266848326530440081,4,K,X F G P,X F G P F G P F,8,True,True,,4,4,0
+validation-000588-dc995357a7f3c421,validation,15895827995725906977,5,F,B H J O T,B H J O T Z P H,8,True,True,,5,5,0
+validation-000589-71b7bc895f8d2ced,validation,8194225345223535853,6,L,N Q W Y E A,N Q W Y E A D N,8,True,True,,6,6,0
+validation-000590-c2d91b7418af725b,validation,14040283498748539483,7,J,I V D C P S Z,I V D C P S Z S,8,True,True,,7,7,0
+validation-000591-a148da93372cddf3,validation,11621779164250299891,8,S,G M H O I P T U,G M H O I P T U,8,True,True,,8,8,0
+validation-000592-d216ab80ec184703,validation,15138475767657678595,1,I,C,C P D Z J H V J,8,True,True,,1,1,0
+validation-000593-dd76d8aef45fede3,validation,15958180575569767907,2,P,B M,B M P B M P B M,8,True,True,,2,2,0
+validation-000594-8937725ba625e80d,validation,9887497244870305805,3,B,L E G,L E G E G E G E,8,True,True,,3,3,0
+validation-000595-ef9eeff97f8a7d42,validation,17266501876250737986,4,Z,T A V M,T A V M D D D D,8,True,True,,4,4,0
+validation-000596-dfb4e4da809a561b,validation,16119760593377449499,5,Q,Y H F X E,Y H F X E B W U,8,True,True,,5,5,0
+validation-000597-fdf22f7cf7587cae,validation,18298740449731968174,6,N,I T A G E L,I T A G E L D K,8,True,True,,6,6,0
+validation-000598-095e20f5a2e95ffc,validation,675013233524432892,7,J,T K W B R Y I,T K W B R Y I F,8,True,True,,7,7,0
+validation-000599-f104568c5b0c9b89,validation,17367101223870438281,8,Z,R H S W K G B U,R H S W K G B U,8,True,True,,8,8,0
+validation-000600-422ffa1259078ed4,validation,4769305487118667476,1,Q,B,B H T N D X L Z,8,True,True,,1,1,0
+validation-000601-dacc6c44e6e2b454,validation,15766095438704456788,2,W,K X,K X I H D I H D,8,True,True,,2,2,0
+validation-000602-ae432f2ac850ea39,validation,12556932046834952761,3,Y,R O F,R O F D S A T L,8,True,True,,3,3,0
+validation-000603-7bb37c6b5170df4a,validation,8913604887866040138,4,H,L T J N,L T J N N N N N,8,True,True,,4,4,0
+validation-000604-9a8edac0fd6c0d0d,validation,11137079450954108173,5,U,S X M N H,S X M N H H H H,8,True,True,,5,5,0
+validation-000605-ac4dfa276b3b374e,validation,12415854794940036942,6,A,R G Y H K L,R G Y H K L N N,8,True,True,,6,6,0
+validation-000606-c3547c9763b9231b,validation,14075011725094626075,7,B,W S E H N P C,W S E H N P C N,8,True,True,,7,7,0
+validation-000607-ddd4af9b8a6ca220,validation,15984594060021899808,8,H,F O W A M T D E,F O W A M T D E,8,True,True,,8,8,0
+validation-000608-6b4676e286ac9acd,validation,7729996525722180301,1,N,Q,Q W I M Y Q W I,8,True,True,,1,1,0
+validation-000609-a0fb6af25b6b3c66,validation,11599982854371228774,2,D,W C,W C Z T O H W C,8,True,True,,2,2,0
+validation-000610-33ab15e2f8e3db21,validation,3723093581534321441,3,E,X M F,X M F T X M F T,8,True,True,,3,3,0
+validation-000611-7c0ec5626813464a,validation,8939299336820573770,4,E,L P Y G,L P Y G F G F G,8,True,True,,4,4,0
+validation-000612-c489331d70be0f34,validation,14161906704781807412,5,M,K G U J L,K G U J L U J L,8,True,True,,5,5,0
+validation-000613-9b052490c561b41d,validation,11170374654967788573,6,L,M W C H V Q,M W C H V Q U T,8,True,True,,6,6,0
+validation-000614-3cc3f162dfa1dcc3,validation,4378608669695270083,7,X,V I G Y U F W,V I G Y U F W L,8,True,True,,7,7,0
+validation-000615-72ab53dc58daa282,validation,8262790147189940866,8,J,L O G D A X C W,L O G D A X C W,8,True,True,,8,8,0
+validation-000616-a60f050912c2b335,validation,11965788271474291509,1,W,J,J Y Z J Y U O Z,8,True,True,,1,1,0
+validation-000617-38058cf3198abe69,validation,4036787616740982377,2,W,Z B,Z B Y X U B Y X,8,True,True,,2,2,0
+validation-000618-8cb970c93373813d,validation,10140260045455327549,3,A,P E F,P E F D K L G J,8,True,True,,3,3,0
+validation-000619-e557b995d43f73e6,validation,16525881410821518310,4,Z,J H V D,J H V D J H V D,8,True,True,,4,4,0
+validation-000620-1f58b251ef3402a1,validation,2258751278101562017,5,D,N C T A B,N C T A B C T A,8,True,True,,5,5,0
+validation-000621-f126df43d1eddc18,validation,17376821694633466904,6,X,S I H V W P,S I H V W P T Z,8,True,True,,6,6,0
+validation-000622-d3e9bb96de3d2f5a,validation,15269942268224417626,7,R,I F H V O Y G,I F H V O Y G L,8,True,True,,7,7,0
+validation-000623-7b3c4a1947860ae0,validation,8880054037702380256,8,O,K X V A F B W L,K X V A F B W L,8,True,True,,8,8,0
+validation-000624-07419fda952f2e25,validation,522874792906272293,1,J,N,N V G M Z G M Z,8,True,True,,1,1,0
+validation-000625-5d16659f346c708a,validation,6707660429468659850,2,N,H E,H E E E E E E E,8,True,True,,2,2,0
+validation-000626-fba168ca7975d4aa,validation,18131888793600775338,3,D,L X K,L X K U Q U Q U,8,True,True,,3,3,0
+validation-000627-8aec9600162dbd33,validation,10010540998854032691,4,Z,J A Q U,J A Q U C G J A,8,True,True,,4,4,0
+validation-000628-d9d33bd7920fe5fa,validation,15695954923370833402,5,W,S T E D A,S T E D A G Y A,8,True,True,,5,5,0
+validation-000629-d98f1db45ff2fde5,validation,15676781488441064933,6,A,Q O B X V F,Q O B X V F J N,8,True,True,,6,6,0
+validation-000630-a8e3b2a66a2c7a9b,validation,12169767045900827291,7,T,W M Z S E A X,W M Z S E A X B,8,True,True,,7,7,0
+validation-000631-4730a3fb714ae51d,validation,5129780275907847453,8,E,G M K Y Q P R J,G M K Y Q P R J,8,True,True,,8,8,0
+validation-000632-4ae16066ffc95f78,validation,5395699824060882808,1,S,Y,Y G I F A A A A,8,True,True,,1,1,0
+validation-000633-5f7ac158af787d6e,validation,6880023967407045998,2,E,Y Q,Y Q C T B S E Y,8,True,True,,2,2,0
+validation-000634-51da7e623ed9c817,validation,5898165622421440535,3,R,N C K,N C K L C K L C,8,True,True,,3,3,0
+validation-000635-392697452aee0f2c,validation,4118145232605679404,4,X,B W J L,B W J L T U T U,8,True,True,,4,4,0
+validation-000636-772387b330d5df06,validation,8584854518386515718,5,R,L T F Q A,L T F Q A U T F,8,True,True,,5,5,0
+validation-000637-e244f6444caa0c4d,validation,16304427324192459853,6,F,B R G Z V J,B R G Z V J P N,8,True,True,,6,6,0
+validation-000638-15c8c20d04a73fa2,validation,1569717831307050914,7,E,X J S M F U K,X J S M F U K P,8,True,True,,7,7,0
+validation-000639-377916d64061872b,validation,3997251253726971691,8,J,Y U W Q O A X R,Y U W Q O A X R,8,True,True,,8,8,0
+validation-000640-5565a7facd7e9ac8,validation,6153509161502939848,1,W,A,A U W A U W A N,8,True,True,,1,1,0
+validation-000641-33cc25b1aadb45f8,validation,3732399636189234680,2,N,M C,M C F G U O C F,8,True,True,,2,2,0
+validation-000642-c846a65e4d5cf1e3,validation,14431404979910406627,3,G,J V P,J V P Z G J V P,8,True,True,,3,3,0
+validation-000643-2ba34b723fb124e5,validation,3144439918901667045,4,A,U I Q T,U I Q T P K Y L,8,True,True,,4,4,0
+validation-000644-ee358be5b188c410,validation,17164779373434815504,5,B,M I P R Z,M I P R Z K Y M,8,True,True,,5,5,0
+validation-000645-76b7fb98a43cf27e,validation,8554582650222604926,6,M,N P D V B E,N P D V B E L K,8,True,True,,6,6,0
+validation-000646-cad1ee61d7928c49,validation,14614724369789914185,7,O,Y N Z B R F M,Y N Z B R F M Z,8,True,True,,7,7,0
+validation-000647-a925f21d059ee84f,validation,12188414173010389071,8,B,P W O G C T I R,P W O G C T I R,8,True,True,,8,8,0
+validation-000648-3ea35fb4a5f9d24c,validation,4513556481038733900,1,V,J,J U C G O V J U,8,True,True,,1,1,0
+validation-000649-a86bdc58b0899509,validation,12136035894356972809,2,S,J L,J L W T X H B D,8,True,True,,2,2,0
+validation-000650-4f44600cebd481d6,validation,5711795836025078230,3,B,V O X,V O X D S I D V,8,True,True,,3,3,0
+validation-000651-a5920fc00b5a48c3,validation,11930615680356468931,4,S,D R F B,D R F B E O L C,8,True,True,,4,4,0
+validation-000652-32971c7db1f063f1,validation,3645413749561517041,5,W,C Q K Y G,C Q K Y G P V Z,8,True,True,,5,5,0
+validation-000653-0750d95160e3f7ea,validation,527160099943479274,6,C,A G Y P H I,A G Y P H I E L,8,True,True,,6,6,0
+validation-000654-a09ae7887bffcde1,validation,11572816765863841249,7,E,X W I O J F Y,X W I O J F Y K,8,True,True,,7,7,0
+validation-000655-85690a14d703e76f,validation,9613225964222015343,8,K,X J M N V S F G,X J M N V S F G,8,True,True,,8,8,0
+validation-000656-85f71acc0620dc15,validation,9653213789870414869,1,Z,K,K R D G T V U U,8,True,True,,1,1,0
+validation-000657-29fe785bd9375f5d,validation,3025988335521193821,2,L,F P,F P G R D R D R,8,True,True,,2,2,0
+validation-000658-84a2a00693130aa0,validation,9557377309331360416,3,W,U X S,U X S L B J R X,8,True,True,,3,3,0
+validation-000659-5eb4eabfa8069d25,validation,6824337444251802917,4,D,J C U B,J C U B U B U B,8,True,True,,4,4,0
+validation-000660-f895c3ce8a34a453,validation,17912438384785400915,5,I,M Z N P B,M Z N P B B B B,8,True,True,,5,5,0
+validation-000661-710f2f9e1bf6afae,validation,8146782607057006510,6,K,W O J N U I,W O J N U I F A,8,True,True,,6,6,0
+validation-000662-ca6914eb11fe79ae,validation,14585211868067821998,7,M,Q P B U D A J,Q P B U D A J S,8,True,True,,7,7,0
+validation-000663-d1c79317ac5ef91f,validation,15116212404177795359,8,N,L T V J C A G Q,L T V J C A N Q,8,False,True,7,6,8,0
+validation-000664-452d91d2b549c67c,validation,4984800696739677820,1,I,Z,Z U D B C L T R,8,True,True,,1,1,0
+validation-000665-7851a89ec07db51b,validation,8669896157452678427,2,Y,B R,B R P S C R P S,8,True,True,,2,2,0
+validation-000666-45086a582711e0e2,validation,4974342715275862242,3,V,Z P C,Z P C U N V Z P,8,True,True,,3,3,0
+validation-000667-6a8ec7de92bf5655,validation,7678294173471954517,4,P,D Z R O,D Z R O P D Z R,8,True,True,,4,4,0
+validation-000668-cb5eb00c3de443c3,validation,14654343804134638531,5,E,F O L V A,F O L V A D K Y,8,True,True,,5,5,0
+validation-000669-365b1a3d9c2b202b,validation,3916753152844177451,6,B,U M Q G V T,U M Q G V T N X,8,True,True,,6,6,0
+validation-000670-ad887a17d352d368,validation,12504378608142439272,7,X,E Z P H F J W,E Z P H F J F P,8,False,False,7,6,,0
+validation-000671-e116a8469a1755d3,validation,16219336129207817683,8,J,V N H M G A C Q,V N H M G A C Q,8,True,True,,8,8,0
+validation-000672-df63327f4fd6a9fb,validation,16096765015533988347,1,A,B,B Z W A B Z W U,8,True,True,,1,1,0
+validation-000673-0f4bf3bffc760607,validation,1102242539722114567,2,H,T O,T O X O X O X O,8,True,True,,2,2,0
+validation-000674-e462a7565c7d0dd1,validation,16456899977725939153,3,C,V P O,V P O X G W O X,8,True,True,,3,3,0
+validation-000675-c6f56e78a682427f,validation,14336486453272527487,4,G,C A B T,C A B T F R B T,8,True,True,,4,4,0
+validation-000676-5cb3421fe5f75e28,validation,6679755377090190888,5,N,O K X G B,O K X G B R I I,8,True,True,,5,5,0
+validation-000677-4125ee2f4d4fca5e,validation,4694420073531558494,6,I,T H W X M F,T H W X M F H W,8,True,True,,6,6,0
+validation-000678-db72bebe37bbb52b,validation,15812910965839344939,7,B,G D Y J I E S,G D Y J I E S L,8,True,True,,7,7,0
+validation-000679-6b5bc4d10f3b91ea,validation,7735993187121730026,8,L,S Y M T G R F P,S Y M T G R F P,8,True,True,,8,8,0
+validation-000680-98d04cf6a1dcc158,validation,11011385711082127704,1,N,L,L W G E E E E E,8,True,True,,1,1,0
+validation-000681-cea4c33d951ce583,validation,14890240937255822723,2,T,G Z,G Z Z Z Z Z Z Z,8,True,True,,2,2,0
+validation-000682-7eecee1e1a47e898,validation,9145946756339984536,3,P,D A X,D A X R M E E E,8,True,True,,3,3,0
+validation-000683-7a8748005f02e13c,validation,8829104760914370876,4,A,I N L V,I N L V S S S V,8,True,True,,4,4,0
+validation-000684-1a0ff4f291f27b71,validation,1877988892304636785,5,F,X V P N Z,X V P N Z V P N,8,True,True,,5,5,0
+validation-000685-ebdc22d4eb88b5ad,validation,16995497391669425581,6,M,C N B D W Y,C N B D W Y W Y,8,True,True,,6,6,0
+validation-000686-2ea3e93d6ed144fe,validation,3360786197010007294,7,M,G H D A W E J,G H D A W E J G,8,True,True,,7,7,0
+validation-000687-7a62c0ea5401ea4d,validation,8818823133009144397,8,T,C S A B D E I J,C S A B D E I J,8,True,True,,8,8,0
+validation-000688-67dc609070ce221f,validation,7483962854267036191,1,P,F,F T G F T G F T,8,True,True,,1,1,0
+validation-000689-265da08de7ada4ce,validation,2764542277613102286,2,F,M R,M R T Q K U W J,8,True,True,,2,2,0
+validation-000690-54433fe2f0a28958,validation,6071766966557903192,3,F,P C I,P C I S U E J Q,8,True,True,,3,3,0
+validation-000691-2877c73228296240,validation,2916018301981778496,4,A,C N I R,C N I R W P F C,8,True,True,,4,4,0
+validation-000692-210099e8b6423d81,validation,2378069828020878721,5,O,C S M W J,C S M W J E J E,8,True,True,,5,5,0
+validation-000693-732eb93cefcbbae8,validation,8299774834662685416,6,G,N Z I E S A,N Z I E S A S A,8,True,True,,6,6,0
+validation-000694-058b127a1b91fa51,validation,399433307610282577,7,V,D G O R P H M,D G O R P H M H,8,True,True,,7,7,0
+validation-000695-aff4ebdafaaf15eb,validation,12679018176695965163,8,K,Q J Z B S F V Y,Q J Z B S F V Y,8,True,True,,8,8,0
+validation-000696-82120d759401faec,validation,9372568573156915948,1,G,F,F C P P P P P P,8,True,True,,1,1,0
+validation-000697-b758454b3b3134fc,validation,13211385696309294332,2,P,S A,S A S A S A S A,8,True,True,,2,2,0
+validation-000698-f709c1478fe83223,validation,17800971515259793955,3,P,U T F,U T F W D S C L,8,True,True,,3,3,0
+validation-000699-c1f370f3e902f38e,validation,13975638261549429646,4,M,X V U O,X V U O F N H K,8,True,True,,4,4,0
+validation-000700-8578dc65cecf71c8,validation,9617679334069203400,5,I,E C K Z T,E C K Z T T T T,8,True,True,,5,5,0
+validation-000701-75ba8d7f9c554153,validation,8483248427328946515,6,C,E V D U N S,E V D U N S Z L,8,True,True,,6,6,0
+validation-000702-1c84b6b7389f98f3,validation,2054968228033042675,7,E,N G R B J L T,N G R B J L T Q,8,True,True,,7,7,0
+validation-000703-a424694573785770,validation,11827694268392691568,8,I,O S W U X R H J,O S W U X R H J,8,True,True,,8,8,0
+validation-000704-d3d1b112d58520b6,validation,15263175306585120950,1,P,V,V N U P V N U M,8,True,True,,1,1,0
+validation-000705-1a45089ff825384b,validation,1892928701535172683,2,P,E K,E K T U P E K T,8,True,True,,2,2,0
+validation-000706-c40cc91bd8b61974,validation,14126887252591516020,3,C,S Q D,S Q D H Q D H Q,8,True,True,,3,3,0
+validation-000707-6bb8bedbb9bd57d4,validation,7762163808696358868,4,X,Y C S R,Y C S R G L F X,8,True,True,,4,4,0
+validation-000708-478bd569eb2cd592,validation,5155448849349531026,5,K,J Y S G B,J Y S G B X Q U,8,True,True,,5,5,0
+validation-000709-8758a1c52b1f2160,validation,9752722861274898784,6,J,P N T X K O,P N T X K O U U,8,True,True,,6,6,0
+validation-000710-2739069db1cc5a17,validation,2826297515514288663,7,L,X E Q W N K F,X E Q W N K F T,8,True,True,,7,7,0
+validation-000711-6e270c5434c5e52e,validation,7937326424065959214,8,L,C B Q F V G A O,C B Q F V G A O,8,True,True,,8,8,0
+validation-000712-aae09c53e287f099,validation,12313013265327714457,1,T,H,H K F G U S L L,8,True,True,,1,1,0
+validation-000713-54d57c2f7cb34ed8,validation,6112928612622749400,2,Z,G J,G J N U Y O Z G,8,True,True,,2,2,0
+validation-000714-d0ed151faeef53e1,validation,15054712355192525793,3,K,Y Z S,Y Z S A O H X B,8,True,True,,3,3,0
+validation-000715-161a07d9a70516f2,validation,1592594049620317938,4,X,C U R H,C U R H F J N I,8,True,True,,4,4,0
+validation-000716-a9fde65168b86ca9,validation,12249199798841273513,5,P,V W E R F,V W E R F I Y N,8,True,True,,5,5,0
+validation-000717-e2d0d8df8eac8a0f,validation,16343801502410508815,6,H,V R N I S Z,V R N I S Z U F,8,True,True,,6,6,0
+validation-000718-7e6eceb79e6bd835,validation,9110446384249296949,7,L,E I K W V M J,E I K W V M J L,8,True,True,,7,7,0
+validation-000719-242c0f9a9a9de874,validation,2606475441034094708,8,V,X L H I E J S T,X L H B V X L H,8,False,False,4,3,,0
+validation-000720-253a0fcc63036e3e,validation,2682473898561465918,1,Y,Q,Q H J L B C T L,8,True,True,,1,1,0
+validation-000721-c512e4aa612f0ef5,validation,14200663995478642421,2,J,E C,E C Y Z M V R P,8,True,True,,2,2,0
+validation-000722-8e54ca18c5b7349e,validation,10256044459174605982,3,J,A N X,A N X V B A N X,8,True,True,,3,3,0
+validation-000723-aa9f3c7292487ef5,validation,12294611970522906357,4,Z,W M B Y,W M B Y A P H B,8,True,True,,4,4,0
+validation-000724-c2ffacf44c4663f2,validation,14051139527670916082,5,M,B J X H F,B J X H F N C M,8,True,True,,5,5,0
+validation-000725-f11e114ae589e4e4,validation,17374343425818223844,6,N,T F J O W Z,T F J O W Z W Z,8,True,True,,6,6,0
+validation-000726-4167cd4e25e8595c,validation,4712961270593640796,7,E,N F S W L C H,N F S W L C H R,8,True,True,,7,7,0
+validation-000727-5a5c46dbdff4e4b4,validation,6511157071440045236,8,G,E Q L W O K T U,E Q L W O K T U,8,True,True,,8,8,0
+validation-000728-b7a09fc2a8c4891c,validation,13231751363618441500,1,E,L,L B Y M P X K J,8,True,True,,1,1,0
+validation-000729-324d98f227c950b6,validation,3624721440920129718,2,F,Z J,Z J T M U K P O,8,True,True,,2,2,0
+validation-000730-e70901ea0e994dbe,validation,16647839602330652094,3,D,J I R,J I R Z M V C E,8,True,True,,3,3,0
+validation-000731-2080cb2063b5cc91,validation,2342095146204908689,4,P,L A R T,L A R T R T R T,8,True,True,,4,4,0
+validation-000732-3ece77cab0235bcf,validation,4525686387976133583,5,S,L O C K P,L O C K P I J O,8,True,True,,5,5,0
+validation-000733-da0ab7f39ef94782,validation,15711572507007469442,6,H,Z Q J L M T,Z Q J L M T T T,8,True,True,,6,6,0
+validation-000734-a28497b2a7035396,validation,11710651724632118166,7,V,Q F D L A R G,Q F D L A R G A,8,True,True,,7,7,0
+validation-000735-be5b678daececb39,validation,13716670948307815225,8,W,V P Y N I G J F,V P Y N I G J J,8,False,False,8,7,,1
+validation-000736-491268f7b3977b18,validation,5265386327428791064,1,M,C,C C C C C C C C,8,True,True,,1,1,0
+validation-000737-1d4c421d18aeeec4,validation,2111135018065522372,2,N,K V,K V E K V E K K,8,True,True,,2,2,0
+validation-000738-738303b506de5242,validation,8323500612350005826,3,V,M Q J,M Q J K D A R E,8,True,True,,3,3,0
+validation-000739-967ae4c4efd10212,validation,10843230587336065554,4,F,G H B P,G H B P V J H B,8,True,True,,4,4,0
+validation-000740-a8b6d6e9ee7d2b91,validation,12157140544350137233,5,H,T O D A V,T O D A V T O D,8,True,True,,5,5,0
+validation-000741-96e752d7ede8c221,validation,10873750912672252449,6,J,H L Q C K U,H L Q C K U K U,8,True,True,,6,6,0
+validation-000742-03ca1ca2cd0e92d6,validation,273062212959900374,7,M,J R P I G L C,J R P I G L C M,8,True,True,,7,7,0
+validation-000743-5cb6bdb0f1bafd8a,validation,6680735664918166922,8,I,K V P N E M Z Y,K V P N E M Z C,8,False,False,8,7,,0
+validation-000744-1f973f9f4ed47652,validation,2276358090113971794,1,U,I,I G Z M Y S S S,8,True,True,,1,1,0
+validation-000745-8d2d67c721fbf4ae,validation,10172901238266131630,2,P,I J,I J R E Y L E Y,8,True,True,,2,2,0
+validation-000746-dfcb37f69e46d9c3,validation,16126044423087118787,3,Y,K U E,K U E N A Y K U,8,True,True,,3,3,0
+validation-000747-b8eb444be5e15a90,validation,13324819015275731600,4,U,Y D V B,Y D V B F D V B,8,True,True,,4,4,0
+validation-000748-bac51e1419e054a2,validation,13458196133148906658,5,K,I A N J L,I A N J L R R R,8,True,True,,5,5,0
+validation-000749-509b793e5ad4aa6d,validation,5808369453143206509,6,H,R F D E K L,R F D E K L N Y,8,True,True,,6,6,0
+validation-000750-daaf2fd4cc4268a4,validation,15757866212199131300,7,N,Z I G D S W A,Z I G D S W A W,8,True,True,,7,7,0
+validation-000751-c52c549a776c9151,validation,14207823946852372817,8,Y,N J H A M D B U,N J H A M D B U,8,True,True,,8,8,0
+validation-000752-d82277e46b1784f5,validation,15574142284333548789,1,V,Q,Q Y F Q Y F Q Y,8,True,True,,1,1,0
+validation-000753-4a370095bce18c60,validation,5347743725644778592,2,K,U W,U W B R T I F H,8,True,True,,2,2,0
+validation-000754-eb67d99abf3ab4ff,validation,16962765780170749183,3,I,K U F,K U F X Q I K U,8,True,True,,3,3,0
+validation-000755-e2ed24a5f611e258,validation,16351766117268709976,4,M,T C O H,T C O H Q S Z S,8,True,True,,4,4,0
+validation-000756-860fda70276d9ea9,validation,9660179900965691049,5,E,V U L O D,V U L O D J P D,8,True,True,,5,5,0
+validation-000757-9c515fd5dd062d54,validation,11263889515171163476,6,S,Q G B T P Z,Q G B T P Z S Q,8,True,True,,6,6,0
+validation-000758-523a7c4754fa3277,validation,5925184905569514103,7,E,C W Y I Z K U,C W Y I Z K U V,8,True,True,,7,7,0
+validation-000759-eac68efea2793fee,validation,16917366274562539502,8,C,R G N F S K I P,R G N F S K I P,8,True,True,,8,8,0
+validation-000760-caf5d47732bcb208,validation,14624828973372977672,1,X,K,K C T K C T K C,8,True,True,,1,1,0
+validation-000761-964eeb0db7758596,validation,10830852598017656214,2,V,B F,B F T P H Q S A,8,True,True,,2,2,0
+validation-000762-17a7bff839c6de36,validation,1704542056825151030,3,U,N O L,N O L K Z Z Z Z,8,True,True,,3,3,0
+validation-000763-3dab90f733b88f94,validation,4443804848730181524,4,L,K G F M,K G F M M M M M,8,True,True,,4,4,0
+validation-000764-d24f837ff47ed008,validation,15154475856711045128,5,L,X C I H V,X C I H V T M R,8,True,True,,5,5,0
+validation-000765-8165b64ec6ebc29b,validation,9324059053001523867,6,O,G X P S Y H,G X P S Y H T M,8,True,True,,6,6,0
+validation-000766-6f80da8657d7c8d4,validation,8034662005763197140,7,O,H Q K C D A M,H Q K C D A M N,8,True,True,,7,7,0
+validation-000767-3f8dd467d5450dd6,validation,4579549938530454998,8,F,W S N Y P G X H,W S N Y P G X H,8,True,True,,8,8,0
+validation-000768-790103153489de2b,validation,8719253743176637995,1,D,T,T W V I S A O K,8,True,True,,1,1,0
+validation-000769-ab04fab3b7a7be6f,validation,12323250130179833455,2,I,H B,H B O Y U N G U,8,True,True,,2,2,0
+validation-000770-bad922f447eb944d,validation,13463830993574794317,3,U,R D M,R D M N S U R D,8,True,True,,3,3,0
+validation-000771-f9f0eb78d0e48bf6,validation,18010153813987855350,4,A,Z L S Y,Z L S Y E A Z L,8,True,True,,4,4,0
+validation-000772-029dc4d31eedf9db,validation,188523170455484891,5,H,Q S G L K,Q S G L K E Q S,8,True,True,,5,5,0
+validation-000773-e765d2d953b2d682,validation,16673965026263094914,6,T,L F S Y J X,L F S Y J X K P,8,True,True,,6,6,0
+validation-000774-3b13ffa188c02d70,validation,4257027142044364144,7,B,U F K O Q E J,U F K O Q E J Q,8,True,True,,7,7,0
+validation-000775-531f6eec4d9816c1,validation,5989627990619199169,8,M,Z J U F S C D G,Z J U F S C D G,8,True,True,,8,8,0
+validation-000776-db203f92fd050f9f,validation,15789690194103701407,1,L,V,V O Q W N V O Q,8,True,True,,1,1,0
+validation-000777-04d937f5228fd8f7,validation,349371972084291831,2,K,I H,I H A I H A I H,8,True,True,,2,2,0
+validation-000778-bfc2d60fb1a268bf,validation,13817841969619167423,3,H,V J Q,V J Q H V J Q H,8,True,True,,3,3,0
+validation-000779-0b6a590ae2eb6790,validation,822567785240160144,4,Z,U C G R,U C G R D Y B P,8,True,True,,4,4,0
+validation-000780-ed1b4d82108a42d7,validation,17085334832378692311,5,Q,T P F W U,T P F W U V U V,8,True,True,,5,5,0
+validation-000781-5985200a001fe50d,validation,6450597268601955597,6,S,Q L E D J U,Q L E D J U A K,8,True,True,,6,6,0
+validation-000782-91a04259bac97e50,validation,10493460084926545488,7,N,E P I Y S Q W,E P I Y S Q W E,8,True,True,,7,7,0
+validation-000783-fb4a9aad42b9fe80,validation,18107455320736005760,8,A,B Y J X H S L N,B Y J X H S L N,8,True,True,,8,8,0
+validation-000784-ac32813f05d49065,validation,12408122031039877221,1,O,R,R W G E N T Y W,8,True,True,,1,1,0
+validation-000785-2b889cd37ab80018,validation,3136929572574461976,2,H,C B,C B G R Z A Q V,8,True,True,,2,2,0
+validation-000786-f46d28899a519cac,validation,17612778289180548268,3,T,E R U,E R U W H E R R,8,True,True,,3,3,0
+validation-000787-5619d426d619ad02,validation,6204223224945421570,4,D,T S I K,T S I K G T S I,8,True,True,,4,4,0
+validation-000788-b17bddabbe57b39a,validation,12789059296551220122,5,L,R S I K A,R S I K A Z X F,8,True,True,,5,5,0
+validation-000789-a4298bffaf075fb9,validation,11829139826534735801,6,E,B W Y K S M,B W Y K S M K S,8,True,True,,6,6,0
+validation-000790-00b7b4c42669a054,validation,51708675289096276,7,W,X M V S T U F,X M V S T U F C,8,True,True,,7,7,0
+validation-000791-c4a867598e0c2697,validation,14170689861854176919,8,U,Z E D H Y T P K,Z E D H Y T P K,8,True,True,,8,8,0
+validation-000792-2e219063d1c2c5cf,validation,3324096758371501519,1,Z,V,V U X N P Y J T,8,True,True,,1,1,0
+validation-000793-d8717a5f8a621f1e,validation,15596381535322906398,2,X,R W,R W Z B C X R W,8,True,True,,2,2,0
+validation-000794-ef7d6f7437d56b55,validation,17257071892097231701,3,Q,P Z N,P Z N M Q P Z N,8,True,True,,3,3,0
+validation-000795-4e545e84863bb930,validation,5644240156282829104,4,P,B W E L,B W E L Y C X I,8,True,True,,4,4,0
+validation-000796-5d2987db49984093,validation,6713046095474737299,5,C,W G Y D K,W G Y D K G Y W,8,True,True,,5,5,0
+validation-000797-868f377b47eae779,validation,9696029525379049337,6,G,V F A U E S,V F A U E S Q P,8,True,True,,6,6,0
+validation-000798-99617cedb84284f1,validation,11052252320984368369,7,Z,Q E D B A N L,Q E D B A N L S,8,True,True,,7,7,0
+validation-000799-dc8b726abd8ccfff,validation,15891921512879149055,8,T,W Q I B Z P F Y,W Q I B Z P F Y,8,True,True,,8,8,0
+validation-000800-d9ca284fea5b5838,validation,15693400175225296952,1,S,M,M A U C D P E H,8,True,True,,1,1,0
+validation-000801-ded5eccf3cee45bb,validation,16057000421284005307,2,J,P S,P S W D C E L K,8,True,True,,2,2,0
+validation-000802-f8f654dbf0e02c09,validation,17939619469292743689,3,X,H S B,H S B T W O Q I,8,True,True,,3,3,0
+validation-000803-7ebf3d46668ceb73,validation,9133085941908171635,4,L,Q G B V,Q G B V C C C C,8,True,True,,4,4,0
+validation-000804-73df43a37bba6816,validation,8349466603602733078,5,S,V Y G F I,V Y G F I A P Y,8,True,True,,5,5,0
+validation-000805-1c46b1ab6aa3735b,validation,2037511231218348891,6,A,T S Q V W H,T S Q V W H O W,8,True,True,,6,6,0
+validation-000806-ad912f255bd706f6,validation,12506829477685692150,7,X,Y G F H E Q J,Y G F H E Q J R,8,True,True,,7,7,0
+validation-000807-97ce20c2c9dac13d,validation,10938716565911814461,8,U,K N H A Y D E I,K N H A Y D E I,8,True,True,,8,8,0
+validation-000808-2925cdaed91299c0,validation,2965002080543218112,1,K,R,R K R K R K R K,8,True,True,,1,1,0
+validation-000809-05c28013e00772ec,validation,415034938522825452,2,B,N D,N D T W M J L O,8,True,True,,2,2,0
+validation-000810-8fcc6c7296798c35,validation,10361776082079288373,3,L,H J F,H J F V F V F V,8,True,True,,3,3,0
+validation-000811-5def2a7a64f56bbc,validation,6768675470129327036,4,Z,F K L X,F K L X C B C B,8,True,True,,4,4,0
+validation-000812-b922c594c38285fe,validation,13340442288950773246,5,F,T U N C S,T U N C S C S C,8,True,True,,5,5,0
+validation-000813-f21c03bf26f11cbf,validation,17445823176053431487,6,Z,K I T N G J,K I T N G J P U,8,True,True,,6,6,0
+validation-000814-7b54a025bc9d89a1,validation,8886904048647506337,7,B,F W C Q Z X U,F W C Q Z X X X,8,False,False,7,6,,1
+validation-000815-66c8d0a662ee7702,validation,7406399000253724418,8,W,D Q J C H E V L,D Q J C H E V L,8,True,True,,8,8,0
+validation-000816-cc21068f21551a49,validation,14709045069778065993,1,L,G,G B Z G B Z G B,8,True,True,,1,1,0
+validation-000817-a8ee391c338d82ff,validation,12172729636115809023,2,Z,Y B,Y B W D E S O U,8,True,True,,2,2,0
+validation-000818-e5aca58e074beb14,validation,16549784760106085140,3,P,W K S,W K S X I H M T,8,True,True,,3,3,0
+validation-000819-e5470119ce8882e1,validation,16521174968382816993,4,R,D U O I,D U O I E C O I,8,True,True,,4,4,0
+validation-000820-e65ee6b3ddb83aab,validation,16599958936727599787,5,E,T K O F N,T K O F N R F N,8,True,True,,5,5,0
+validation-000821-0320467856599536,validation,225257464027256118,6,F,W I O B Z P,W I O B Z P Y Y,8,True,True,,6,6,0
+validation-000822-de7517edfb71bd72,validation,16029744759588371826,7,Y,K D I B F G R,K D I B F G R B,8,True,True,,7,7,0
+validation-000823-2b887bfab4ab10f9,validation,3136893457166700793,8,H,V O Q W N R T X,V O Q W N R T T,8,False,False,8,7,,1
+validation-000824-6c853f805b2504cb,validation,7819726148516250827,1,Q,V,V B C J U R G M,8,True,True,,1,1,0
+validation-000825-7dcf91573af1e593,validation,9065624378757211539,2,V,O B,O B X J K O B D,8,True,True,,2,2,0
+validation-000826-e7d81eb9dbc8a45a,validation,16706136601335997530,3,Q,S P M,S P M V W J W J,8,True,True,,3,3,0
+validation-000827-47d6ec22f681af5a,validation,5176584456617701210,4,J,U E I A,U I K N P Y N P,8,False,False,2,1,,0
+validation-000828-22141bb5b37043d1,validation,2455618164037272529,5,B,A T H O K,A T H O K V G X,8,True,True,,5,5,0
+validation-000829-2976c266bded48a5,validation,2987789149335799973,6,B,P D G U C V,P D G U C V K D,8,True,True,,6,6,0
+validation-000830-f9ff3b244de9c643,validation,18014182061617301059,7,Y,O S R Z I K J,O S R Z I K J P,8,True,True,,7,7,0
+validation-000831-1f03e9327afaadde,validation,2234886243126783454,8,C,G M Z A T F Q E,G M Z A T F Q E,8,True,True,,8,8,0
+validation-000832-d2677107bca6b0d0,validation,15161210948609814736,1,M,O,O L M O L M O L,8,True,True,,1,1,0
+validation-000833-074bfd1fa92b12e8,validation,525792093942780648,2,V,T P,T P I H Q T P I,8,True,True,,2,2,0
+validation-000834-cf99bf1ffd5b45ea,validation,14959197781403321834,3,A,H W S,H W S D Q B H W,8,True,True,,3,3,0
+validation-000835-b5581e79d93ca25f,validation,13067227827499999839,4,V,I T M N,I T M D O I T M,8,False,False,4,3,,0
+validation-000836-6d63d21a9091247f,validation,7882374784364913791,5,N,H O S L T,H O S L T A T A,8,True,True,,5,5,0
+validation-000837-d7891174647e2a13,validation,15530963981563734547,6,M,X R D W G K,X R D W G K I H,8,True,True,,6,6,0
+validation-000838-cc45d058a30f974d,validation,14719400036241741645,7,F,X H E S V Y J,X H E S V Y J L,8,True,True,,7,7,0
+validation-000839-ca2f9be9c5f0a406,validation,14569034747917411334,8,M,F O L X W S Q B,F O L X W S Q B,8,True,True,,8,8,0
+validation-000840-d52c0b3e97489fad,validation,15360664792507916205,1,G,E,E R W Q G E R W,8,True,True,,1,1,0
+validation-000841-ccc9ed15c663316c,validation,14756586331834626412,2,R,U E,U E Z N F T R U,8,True,True,,2,2,0
+validation-000842-bcd7a7c569bd5437,validation,13607529265447654455,3,M,G I B,G I B W M G I B,8,True,True,,3,3,0
+validation-000843-1e7b8fc8241e2c8f,validation,2196507333035437199,4,Y,L D B T,L D B T H A T H,8,True,True,,4,4,0
+validation-000844-94b9f3c69418f32f,validation,10716864822518543151,5,D,L Q T X Z,L Q T X Z A D Z,8,True,True,,5,5,0
+validation-000845-f140e5a3f9d11897,validation,17384147054083774615,6,R,U K B E H Q,U K B E H Q S C,8,True,True,,6,6,0
+validation-000846-48b3ed904a24362d,validation,5238791995536979501,7,C,O U N B W Q Y,O U N B W Q Y Y,8,True,True,,7,7,0
+validation-000847-d5573b0f9d9f8efb,validation,15372820791307505403,8,N,Y G M F D L J Q,Y G M F D L J Q,8,True,True,,8,8,0
+validation-000848-38507b4410388ce9,validation,4057878796520951017,1,S,F,F E F E F E F E,8,True,True,,1,1,0
+validation-000849-7dddcfafc8576bf4,validation,9069633578481445876,2,C,H A,H A T F J A T F,8,True,True,,2,2,0
+validation-000850-41a4f76e5d3ee6de,validation,4730177562028730078,3,Q,S V C,S V C W C W C W,8,True,True,,3,3,0
+validation-000851-acf663e09ffc3165,validation,12463258835202355557,4,H,J U X O,J U X O W L K P,8,True,True,,4,4,0
+validation-000852-9f7b4de67b205f65,validation,11491864526469488485,5,L,V Q A C Z,V Q A C Z F I W,8,True,True,,5,5,0
+validation-000853-09e3a82c1c2a463a,validation,712598073459230266,6,N,Y B A I D O,Y B A I D O Y B,8,True,True,,6,6,0
+validation-000854-621060e79e9d033e,validation,7066254363259110206,7,P,I J Q D U R L,I J Q D U R L G,8,True,True,,7,7,0
+validation-000855-1478a38a9d34622f,validation,1475108693702107695,8,C,I N M Y J Q X R,I N M Y J Q X R,8,True,True,,8,8,0
+validation-000856-e8000b0d8aa07f73,validation,16717373969587535731,1,X,A,A L J G Q Q Q Q,8,True,True,,1,1,0
+validation-000857-4a8edf4dba08f2c9,validation,5372476930426204873,2,M,X R,X R W R W R W R,8,True,True,,2,2,0
+validation-000858-794c6b0150192145,validation,8740478630202253637,3,W,G T X,G T X Z Y V S C,8,True,True,,3,3,0
+validation-000859-d2d6f3df6597725c,validation,15192598533788627548,4,B,U Q L I,U Q L I K Z B U,8,True,True,,4,4,0
+validation-000860-59aa7d0a15ff0826,validation,6461114097688578086,5,V,H T J X A,H T J X A A A A,8,True,True,,5,5,0
+validation-000861-eac2dafddf0bae63,validation,16916323934260670051,6,C,O T H V L W,O T H V L W F B,8,True,True,,6,6,0
+validation-000862-4a9d64a029252c49,validation,5376564169198087241,7,X,P Z I R N E Y,P Z I R N E Y H,8,True,True,,7,7,0
+validation-000863-721aa47f73e25ade,validation,8222064937030277854,8,I,L Q D Y J Z O P,L Q D Y J Z O O,8,False,False,8,7,,1
+validation-000864-810ace64796505b1,validation,9298471311588525489,1,L,J,J M X H R H R H,8,True,True,,1,1,0
+validation-000865-5cb0bc0612531dfe,validation,6679044981653708286,2,S,Q E,Q E M V O Y I Y,8,True,True,,2,2,0
+validation-000866-e09ce60906e4e69b,validation,16185064087307478683,3,B,G S I,G S I Q E K A Q,8,True,True,,3,3,0
+validation-000867-ccdd63fb49b121ac,validation,14762065084514640300,4,Y,P S O W,P S O W Q A T D,8,True,True,,4,4,0
+validation-000868-0c9c0e6851c6b43d,validation,908617066033361981,5,B,T Y U G V,T Y U G V B T Y,8,True,True,,5,5,0
+validation-000869-e82c239d47f737a1,validation,16729785874198771617,6,R,M S H Q W I,M S H Q W I R M,8,True,True,,6,6,0
+validation-000870-423343921f998a04,validation,4770230725189929476,7,K,F H X E J O L,F H X E J O L Y,8,True,True,,7,7,0
+validation-000871-2bfa8198f2ee685f,validation,3168987781719287903,8,E,R Z F S H O C N,R Z F S H O C N,8,True,True,,8,8,0
+validation-000872-6392a2b3cb7130d0,validation,7174976049450660048,1,E,Z,Z T G M C S K K,8,True,True,,1,1,0
+validation-000873-9a5173285c7ee923,validation,11119795572142172451,2,I,W V,W V Z W V Z W V,8,True,True,,2,2,0
+validation-000874-774d10dcb086ff79,validation,8596545803760631673,3,P,T R K,T R K V C C C C,8,True,True,,3,3,0
+validation-000875-be5e2c2b50caafd6,validation,13717450079567785942,4,B,Y X K U,Y X K U G C O T,8,True,True,,4,4,0
+validation-000876-78b51d618dad0cc7,validation,8697890560161942727,5,S,Z Y V D U,Z Y V D U T Q Y,8,True,True,,5,5,0
+validation-000877-262a6ff9cf912c6e,validation,2750133641183046766,6,V,E O G P M B,E O G P M B N H,8,True,True,,6,6,0
+validation-000878-b422e336906a3a18,validation,12980186899525810712,7,G,M Y C S L W T,M Y C S L W T H,8,True,True,,7,7,0
+validation-000879-ffa13918c76497bc,validation,18420066729509296060,8,Z,P R M T U K S Y,P R M T U K S Y,8,True,True,,8,8,0
+validation-000880-7d9f1ea0dd5e0c88,validation,9051987452295515272,1,X,I,I D R E W X I D,8,True,True,,1,1,0
+validation-000881-d3a262b04d51101a,validation,15249859797580845082,2,I,Y F,Y F J C Z I Y F,8,True,True,,2,2,0
+validation-000882-b1f9a6f885282780,validation,12824465000230299520,3,J,V S F,V S F W J V S F,8,True,True,,3,3,0
+validation-000883-8123d578d9c88598,validation,9305515970104165784,4,U,I C K T,I C K T T T T T,8,True,True,,4,4,0
+validation-000884-87b74646daa941c7,validation,9779362385988501959,5,R,S U E P Q,S U E P Q P Q P,8,True,True,,5,5,0
+validation-000885-16db4da116faf31e,validation,1646995443004666654,6,Y,W R L G P O,W R L G P O A Q,8,True,True,,6,6,0
+validation-000886-5e743ac37b35cd56,validation,6806129548123819350,7,I,P S C K A X Q,P S C K A X Q A,8,True,True,,7,7,0
+validation-000887-3dfd64a4c69ccf21,validation,4466837064290979617,8,Y,X T W R B U I O,X T W R B U I O,8,True,True,,8,8,0
+validation-000888-8dbfbb4f6666327b,validation,10214088429594358395,1,Q,T,T C Q T C Q T C,8,True,True,,1,1,0
+validation-000889-c685b129fc8826a3,validation,14305034585300805283,2,H,F G,F G T B A H F G,8,True,True,,2,2,0
+validation-000890-3348c478fa77a1da,validation,3695419518134755802,3,A,C P I,C P I N S D Y X,8,True,True,,3,3,0
+validation-000891-ad177263bee90727,validation,12472563465756149543,4,E,O X S C,O X S C M I T K,8,True,True,,4,4,0
+validation-000892-5905f866ea1ddfb6,validation,6414806365157318582,5,I,G A H S Z,G A H S Z M K L,8,True,True,,5,5,0
+validation-000893-bf526741bea4ba2c,validation,13786194941403511340,6,C,K G D Z I F,K G D Z I F Q B,8,True,True,,6,6,0
+validation-000894-85b27b6e8e473553,validation,9633898267662562643,7,Q,S B H L F K C,S B H L F K C V,8,True,True,,7,7,0
+validation-000895-ae99a8ce94f48414,validation,12581272639251973140,8,L,I U P T D Y S Q,I U P T D Y S Q,8,True,True,,8,8,0
+validation-000896-16b32ff22d219199,validation,1635703806851387801,1,B,L,L X O Z D H G N,8,True,True,,1,1,0
+validation-000897-a814b21a8a92343f,validation,12111501124969837631,2,U,B N,B N W I A F Z X,8,True,True,,2,2,0
+validation-000898-55805574caa05e41,validation,6161018250346913345,3,K,R V O,R V O X V O X O,8,True,True,,3,3,0
+validation-000899-93f2ae69023c29cc,validation,10660775033971681740,4,F,I W V D,I W V D S Y F I,8,True,True,,4,4,0
+validation-000900-7905730aab9327f4,validation,8720502743138248692,5,A,D E O U C,D E O U C I I P,8,True,True,,5,5,0
+validation-000901-d8a5dace17965f48,validation,15611124262043541320,6,S,G B W F J Q,G B W F J Q V V,8,True,True,,6,6,0
+validation-000902-02740e8c9fa492d3,validation,176782282510865107,7,E,O D C G W N I,O D C G W N R I,8,False,False,7,6,8,0
+validation-000903-3dd9ca292e92be20,validation,4456815584483655200,8,Y,I T M X V K N Z,I T M X V K N Z,8,True,True,,8,8,0
+validation-000904-820eb19b4fefcca6,validation,9371623155223743654,1,G,D,D Y N V J C I I,8,True,True,,1,1,0
+validation-000905-cbdebab8b6b698e3,validation,14690384337031305443,2,T,P X,P X B D F I B D,8,True,True,,2,2,0
+validation-000906-b1cc6d0e7fa3a376,validation,12811734949000618870,3,S,I Z P,I Z P P P P P P,8,True,True,,3,3,0
+validation-000907-0d6751fd3c85e2ad,validation,965830793178243757,4,Q,Z R F P,Z R F P S Z R R,8,True,True,,4,4,0
+validation-000908-d95657d1cac0e31b,validation,15660801312788898587,5,A,K F H G S,K F H G S Z E R,8,True,True,,5,5,0
+validation-000909-5d77aa52c3fbc4c3,validation,6735039040207963331,6,H,B Z O U N A,B Z O U N A B Z,8,True,True,,6,6,0
+validation-000910-ce0eed5556c0cf02,validation,14848065972270583554,7,T,G L V Y F K I,G L V Y F K I J,8,True,True,,7,7,0
+validation-000911-ba9e67bda721f2c6,validation,13447299601625379526,8,I,N C X E O B T V,N C X E O B T V,8,True,True,,8,8,0
+validation-000912-99908a69c5bfa6ed,validation,11065496471343179501,1,A,U,U E H G M H G M,8,True,True,,1,1,0
+validation-000913-7e0a2995828df6b4,validation,9082117320663234228,2,R,I Z,I Z N D R I Z N,8,True,True,,2,2,0
+validation-000914-62c6f512fa0d3da5,validation,7117645722959035813,3,U,A T Z,A T Z B Q S R P,8,True,True,,3,3,0
+validation-000915-b531fce6ba6a18a1,validation,13056494862623971489,4,D,Z U F E,Z U F E J H E J,8,True,True,,4,4,0
+validation-000916-a53a86e89c2818a8,validation,11905976898517735592,5,I,N V Y L T,N V Y L T D W P,8,True,True,,5,5,0
+validation-000917-5e982aafbe7f34e7,validation,6816244970328896743,6,N,W D H S Y L,W D H S Y L O B,8,True,True,,6,6,0
+validation-000918-3bde1eaa63c529ae,validation,4313919210234653102,7,P,I G U F E J L,I G U F E J R J,8,False,False,7,6,,0
+validation-000919-f083d90e3f5ce780,validation,17330934446267623296,8,M,S B I O K A Y C,S B I O K A Y C,8,True,True,,8,8,0
+validation-000920-eadd9c621bbf4acc,validation,16923854919914441420,1,J,K,K A U R U R U R,8,True,True,,1,1,0
+validation-000921-a908f41779fa9675,validation,12180253573891397237,2,F,R P,R P R P R P R P,8,True,True,,2,2,0
+validation-000922-7938172e87e36e54,validation,8734756965900840532,3,Z,Q U D,Q U D K R S O G,8,True,True,,3,3,0
+validation-000923-71e2de35ea4b05f0,validation,8206365794167883248,4,U,S Y O E,S Y O E S Y O E,8,True,True,,4,4,0
+validation-000924-b9a0c1c2563fd7e5,validation,13375903933705213925,5,C,Z M Q D O,Z M Q D O S C Z,8,True,True,,5,5,0
+validation-000925-97a217648b4c3f26,validation,10926321366555442982,6,Q,R P C V K U,R P C V K U C V,8,True,True,,6,6,0
+validation-000926-049a0da473d11e13,validation,331592522534034963,7,Q,G O L J Y E T,G O L J Y E T Y,8,True,True,,7,7,0
+validation-000927-bc377a2b15829b6c,validation,13562443128312601452,8,N,H Y Z D V Q W R,H Y Z D V Q W R,8,True,True,,8,8,0
+validation-000928-bcc61862c3cf4bc8,validation,13602586536990165960,1,A,B,B Z I P K P K P,8,True,True,,1,1,0
+validation-000929-344d7e8bf2f83332,validation,3768807602720879410,2,E,K Z,K Z M X K Z M X,8,True,True,,2,2,0
+validation-000930-dfdc860a90bbbe53,validation,16130915345270292051,3,E,L U X,L U X V T Q K A,8,True,True,,3,3,0
+validation-000931-1b98923c65768f8d,validation,1988500023582035853,4,S,I M W E,I M W E W E W E,8,True,True,,4,4,0
+validation-000932-758150aeb05cb4bb,validation,8467137485646640315,5,B,N V L T A,N V L T A I J I,8,True,True,,5,5,0
+validation-000933-467269496d553469,validation,5076235494087799913,6,H,C Z F D O G,C Z F D O G S C,8,True,True,,6,6,0
+validation-000934-ba7878dc3a4730d8,validation,13436622375525757144,7,H,U Q S Z E A F,U Q S Z E A F W,8,True,True,,7,7,0
+validation-000935-c500978d553e1843,validation,14195512658748119107,8,Z,C P O A J H V T,C P O A J H V T,8,True,True,,8,8,0
+validation-000936-4fcfa0c3032aba1e,validation,5750992008607611422,1,Q,W,W R V Q W R V V,8,True,True,,1,1,0
+validation-000937-cd3359e47258f34b,validation,14786260839293317963,2,X,N P,N P Q F M H Q F,8,True,True,,2,2,0
+validation-000938-9b4105ed0df66a24,validation,11187229465064663588,3,J,I E B,I E B W Z R B B,8,True,True,,3,3,0
+validation-000939-e083a5e899f60339,validation,16177956704878986041,4,L,E F X T,E F X T C G B G,8,True,True,,4,4,0
+validation-000940-e2ea5819b66a560f,validation,16350978264579855887,5,O,R Z A P B,R Z A P B G S A,8,True,True,,5,5,0
+validation-000941-2c2462bcebf79b8f,validation,3180775800382659471,6,C,X E Y O F P,X E Y O F O E Y,8,False,False,6,5,,0
+validation-000942-bcf918d88cf89ad9,validation,13616942266688510681,7,C,Y W H K E N Z,Y W H K E N Z V,8,True,True,,7,7,0
+validation-000943-b4edaa57aabece3c,validation,13037263789810961980,8,N,J I Z H R W L C,J I Z H R W L C,8,True,True,,8,8,0
+validation-000944-b6fe695987a59552,validation,13186092592236172626,1,K,T,T X G S Y E B Q,8,True,True,,1,1,0
+validation-000945-1dc3fd5ca192f4a3,validation,2144836421848069283,2,Y,V H,V H D K H D K H,8,True,True,,2,2,0
+validation-000946-1ac6ca13205e8ef1,validation,1929451673871093489,3,C,O H R,O H R Y E E E E,8,True,True,,3,3,0
+validation-000947-622f63ff158fce86,validation,7074983486851894918,4,E,R Q M J,R Q M J W P A J,8,True,True,,4,4,0
+validation-000948-e665e883d34e9555,validation,16601931254254703957,5,E,Q I V W H,Q I V W H K O B,8,True,True,,5,5,0
+validation-000949-8d40c211dac5ccc5,validation,10178348539797949637,6,U,V N L O C B,V N L O C B Z I,8,True,True,,6,6,0
+validation-000950-2d463e0dcb8eda00,validation,3262363209047136768,7,O,Z J C X F M W,Z J C X F M W R,8,True,True,,7,7,0
+validation-000951-d0490452a6ad3a58,validation,15008531986219088472,8,X,M G F D B I T N,M G F D B I T I,8,False,False,8,7,,0
+validation-000952-5caf4b8cf6adeedf,validation,6678639841219833567,1,T,Q,Q L T Q L T Q L,8,True,True,,1,1,0
+validation-000953-ce75570ffc58f26f,validation,14876892670258115183,2,R,K A,K A Z M D Z M D,8,True,True,,2,2,0
+validation-000954-652252dd3011aa42,validation,7287478256986597954,3,J,K N B,K N B N B W R E,8,True,True,,3,3,0
+validation-000955-1f7e25a67c2752e8,validation,2269292659219059432,4,J,D F L E,D F L E U W S I,8,True,True,,4,4,0
+validation-000956-1b6da0c3ad5019c2,validation,1976412573772290498,5,K,Z X R W A,Z X R W A Q N Z,8,True,True,,5,5,0
+validation-000957-5f59d8c426f63f3f,validation,6870761043509264191,6,D,Y T J C L K,Y T J C L K L K,8,True,True,,6,6,0
+validation-000958-b8717ff96d714875,validation,13290544684606769269,7,T,Q M K O Z R G,Q M K O Z R G T,8,True,True,,7,7,0
+validation-000959-c3041fa20e9d5525,validation,14052391518193145125,8,E,K X O J T S P Q,K X O J T S P Q,8,True,True,,8,8,0
+validation-000960-8ec6100aa7d3575b,validation,10287928036725839707,1,M,P,P A Y G P A Y G,8,True,True,,1,1,0
+validation-000961-2f54f09eef45fe4f,validation,3410615383236148815,2,K,F B,F B A S C J R O,8,True,True,,2,2,0
+validation-000962-1d00788b0a06300f,validation,2089802765663875087,3,Z,M Q W,M Q W G F D L V,8,True,True,,3,3,0
+validation-000963-0ef06c228d000ab5,validation,1076479206591826613,4,X,M N H G,M N H G U K G N,8,True,True,,4,4,0
+validation-000964-4e395b0ac2713f3c,validation,5636636510400888636,5,J,Z B H S U,Z B H S U I Z B,8,True,True,,5,5,0
+validation-000965-d8f284f927a7330f,validation,15632703462203405071,6,S,F Z C Q Y G,F Z C Q Y G Q Y,8,True,True,,6,6,0
+validation-000966-5e00f8c73c58bc66,validation,6773687374159854694,7,Z,N Y S R V G D,N Y S R V G D G,8,True,True,,7,7,0
+validation-000967-b9c3855010b0f6c1,validation,13385689096399156929,8,F,I Y P R T D Q B,I Y P R T D Q R,8,False,False,8,7,,0
+validation-000968-6aec9322204834ca,validation,7704694837303850186,1,L,U,U U U U U U U F,8,True,True,,1,1,0
+validation-000969-186fe4a832ae6826,validation,1760877390381082662,2,K,H J,H J L W O B Y S,8,True,True,,2,2,0
+validation-000970-fc7b314625b641a0,validation,18193189297043423648,3,U,I L A,I L A C B K P R,8,True,True,,3,3,0
+validation-000971-45ab43b4d6b01fd0,validation,5020180653609590736,4,E,C P G W,C P G W X U Y H,8,True,True,,4,4,0
+validation-000972-93b349c3d3e2163f,validation,10642931449828873791,5,R,H Q O Z T,H Q O Z T T T T,8,True,True,,5,5,0
+validation-000973-dd7daaa2568aca6e,validation,15960100268684266094,6,F,N M U E A H,N M U E A H X V,8,True,True,,6,6,0
+validation-000974-5cfeaf47b635b3d9,validation,6700986018108388313,7,J,O K R Q S U D,O K R Q S U D M,8,True,True,,7,7,0
+validation-000975-9be46782006f2f6a,validation,11233217178619555690,8,F,N V L R W E T P,N V L R W E T P,8,True,True,,8,8,0
+validation-000976-6125007da61adf6f,validation,7000001735474995055,1,C,D,D R E P C D R E,8,True,True,,1,1,0
+validation-000977-7706bb19d6f623b4,validation,8576748260028720052,2,R,P G,P G R P G R P G,8,True,True,,2,2,0
+validation-000978-ed833c8e91396391,validation,17114589591957496721,3,I,C R D,C R D I C R D I,8,True,True,,3,3,0
+validation-000979-c26bf7ba738f1ef8,validation,14009563446040796920,4,L,N C Q W,N C Q W R H I X,8,True,True,,4,4,0
+validation-000980-427fadd9a2e4859b,validation,4791739678797890971,5,O,A U T H P,A U T H P W H P,8,True,True,,5,5,0
+validation-000981-2b1de7bd53c9f254,validation,3106894118296089172,6,C,Z R M H F I,Z R M H F I U U,8,True,True,,6,6,0
+validation-000982-3c5c87ee6adeded1,validation,4349500798198013649,7,B,Y X C D U N S,Y X C D U N S N,8,True,True,,7,7,0
+validation-000983-120f742c8485e1e2,validation,1301386551884112354,8,T,N Z X Y A H K L,N Z X Y A H K L,8,True,True,,8,8,0
+validation-000984-e8f633ccbcd66ff3,validation,16786661615504617459,1,L,G,G D X T K Q N M,8,True,True,,1,1,0
+validation-000985-73fc86bc5c5a0bd0,validation,8357703152054176720,2,G,P W,P W W W W W W W,8,True,True,,2,2,0
+validation-000986-d6f7ff89987068ec,validation,15490130409797216492,3,P,L S C,L S C B B B B B,8,True,True,,3,3,0
+validation-000987-92a42db82456c248,validation,10566620894624924232,4,C,F L E B,F L E B X Z V Z,8,True,True,,4,4,0
+validation-000988-cce58d17ce889248,validation,14764362086792860232,5,R,V M E O Z,V M E O Z U U U,8,True,True,,5,5,0
+validation-000989-8a344eb7074f1916,validation,9958671224031615254,6,O,I Z T P V C,I Z T P V C G T,8,True,True,,6,6,0
+validation-000990-ef95b204f138117e,validation,17263900480891261310,7,U,I J M G B Q Y,I J M G B Q Y H,8,True,True,,7,7,0
+validation-000991-6ce5d8702d2c7ca4,validation,7846915902068784292,8,X,W U K Y V L E T,W U K Y V L E T,8,True,True,,8,8,0
+validation-000992-ea536de47dc2a9b9,validation,16884960256072001977,1,N,A,A Q Y R T G Z X,8,True,True,,1,1,0
+validation-000993-089fa91168e48e1d,validation,621401165839765021,2,Z,I H,I H Z I H Z I H,8,True,True,,2,2,0
+validation-000994-abc4a54b452c868f,validation,12377199418622641807,3,K,L D C,L D C Y J Q H C,8,True,True,,3,3,0
+validation-000995-b715da0da6b9eaaa,validation,13192690435618368170,4,Q,I N Y H,I N Y H G P U Z,8,True,True,,4,4,0
+validation-000996-9dcdd21905f09b95,validation,11370975639096040341,5,B,U P N G H,U P N G H Z G H,8,True,True,,5,5,0
+validation-000997-7ffc660f1a5342f2,validation,9222358352000140018,6,U,A D E P K X,A D E P K X N T,8,True,True,,6,6,0
+validation-000998-6c105a1d5ac93312,validation,7786822837847274258,7,H,S A N C Y Z X,S A N C Y Z X Y,8,True,True,,7,7,0
+validation-000999-97598edc8ac8081b,validation,10905905050526681115,8,Y,W J H R O V L B,W J H R O V L B,8,True,True,,8,8,0
