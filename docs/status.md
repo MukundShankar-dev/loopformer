@@ -10,6 +10,8 @@ The depth-4 continuation has completed three total epochs / update 1875. Its ful
 
 **Next: [train through depth 6 and move OOD evaluation outward through depth 16](depth_generalization.md).** The new config uses one epoch over 7,500 depth-1–6 mappings (938 new updates), initialized from update 1875's adapters with fresh optimizer/RNG/counters. Both the depth-4 reference and new checkpoint will be evaluated on identical development datasets, reporting absolute depth and steps beyond the training maximum. This is additional training, not an equal-compute depth ablation. Seed 29 is reserved for confirmation after choices are frozen; it has not been generated or evaluated. No pretrained depth-6 training or paired sweep has been launched by the assistant.
 
+Dataset coverage rechecked: seed-17 training/validation/test cover depths 1–8, and the existing `depth_test.jsonl` covers 9–16 with 125 examples per depth. All four file hashes match their manifest. No regeneration is required. Training-time validation remains at 1–8; the separate paired evaluator reads both evaluation files through depth 16. See [data coverage and verification](depth_generalization.md#existing-data-no-regeneration-required).
+
 ## Implemented and verified
 
 | Area | Current evidence |

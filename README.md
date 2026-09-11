@@ -59,7 +59,16 @@ python -m scripts.dataset \
 python -m scripts.dataset --verify data/pointer/seed-17
 ```
 
-Generated datasets are excluded from Git. Training, validation, and test files balance depths 1–8; the deeper test balances depths 9–16. The initial training config selects only depths 1–4. See [dataset details](docs/phases/stage1_pointer.md) for counts, exact intermediate targets, and reproducibility checks.
+The existing seed-17 dataset **already reaches depth 16; no regeneration is needed for depth-6 training**. Generated files are excluded from Git, so use the reproduction command above only if the dataset is missing on a new machine.
+
+| File under `data/pointer/seed-17/` | Examples | Depths | Examples per depth |
+| --- | ---: | --- | ---: |
+| `train.jsonl` | 10,000 | 1–8 | 1,250 |
+| `validation.jsonl` | 1,000 | 1–8 | 125 |
+| `test.jsonl` | 1,000 | 1–8 | 125 |
+| `depth_test.jsonl` | 1,000 | 9–16 | 125 |
+
+The depth-6 training config selects only depths 1–6 from `train.jsonl`. Its `validation_max_depth: 8` controls training-time monitoring; the paired depth evaluator separately reads `depth_test.jsonl` and runs through depth 16. See [dataset details](docs/phases/stage1_pointer.md) and [paired evaluation](docs/depth_generalization.md).
 
 ## Evaluate a model
 

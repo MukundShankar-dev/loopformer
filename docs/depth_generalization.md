@@ -17,6 +17,20 @@ Report absolute depth and `steps_beyond_training = task_depth - train_max_depth`
 
 The reference is the existing checkpoint, not an equal-compute control. The candidate receives additional training examples, updates, and recurrent computation, and resets its optimizer. This is a curriculum extension experiment; it does not isolate training depth as the sole cause. Record the extra budget rather than attributing every improvement to depth alone.
 
+## Existing data: no regeneration required
+
+The seed-17 files already contain the required depths. `train.jsonl` has 1,250 examples per depth at 1–8; `validation.jsonl` and `test.jsonl` each have 125 per depth at 1–8; `depth_test.jsonl` has 125 per depth at 9–16. A local read-only inventory confirmed these counts and all four manifest hashes. No examples or seeds were changed.
+
+The new training config deliberately keeps `train_max_depth: 6` and `validation_max_depth: 8`. The latter controls the small training-time monitoring subset, not the paired evaluator's maximum depth. Do not change it to 16 while pointing at the existing depth-1–8 validation file. After training, `depth_generalization` defaults to both validation and deeper files; each `loop_test` child automatically uses its file's maximum depth (8 or 16).
+
+To verify your local desktop copy without generating data:
+
+```bash
+python -m scripts.dataset --verify data/pointer/seed-17
+```
+
+If the dataset is absent on a new machine, use the [README's complete seed-17 reproduction command](../README.md#pointer-dataset-preview-and-reproduce). Existing output directories are never overwritten. Seed 29 remains reserved; do not regenerate with a different seed merely to enable depth-16 evaluation.
+
 ## Preview, then train on the desktop
 
 From the repository root, with complete checkpoint files still present:
