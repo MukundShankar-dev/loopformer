@@ -172,6 +172,46 @@ The config passes schema validation. The new dataset is absent on the Mac, so it
 
 Startup troubleshooting: the desktop fresh run reported one vocabulary logit just outside the T=1 tolerance (approximately `1.3e-5` absolute difference). The startup reference now projects only the answer position, matching the recurrent readout's matrix shape, with the original tolerance unchanged. Transfer the updated `scripts/training/gates.py` and rerun the same training command. This failure occurs before the run directory is created or any optimizer update. The CUDA retry remains unverified; if the comparison still fails, retain the complete traceback rather than bypassing the gate.
 
+## Resume with larger microbatches
+
+The dashboard's process/host RAM peak is not GPU memory. CUDA runs now display current and peak allocated tensor memory separately; these exclude CUDA context and other non-tensor allocations. Use `nvidia-smi` for device-wide memory usage and utilization. GPU speedup and peak memory for larger batches must be measured on the desktop.
+
+[stage1_pointer_depth6_fresh30k_batch2.json](../configs/stage1_pointer_depth6_fresh30k_batch2.json) changes only batch size to 2 and accumulation to 4. It retains eight examples per optimizer update and the 3,750-update budget. Mixed-depth batches execute to their maximum depth, with shorter examples' extra losses masked; batching can add unused computation, so more occupied memory does not guarantee higher throughput.
+
+Changing batch size on resume requires explicit `--allow-batch-change`. It permits only batch/accumulation changes with an unchanged product, while retaining strict dataset, selection, model, seed, optimizer-hyperparameter, validation, and device identities. Optimizer state, RNG state, epoch, next-example offset, and update count are restored. The existing budget/reporting-cadence exceptions still apply. `run.json` records the change and parent checkpoint, and subsequent checkpoints carry the new identity. The objective and example groups per update stay the same, but batching and floating-point accumulation can change the numerical trajectory; this is not bitwise-equivalent resume.
+
+Transfer the updated code and config before switching. Wait until a checkpoint save finishes and training resumes, then interrupt the old process with Ctrl+C. Any work after the last saved checkpoint will be repeated. Keep the old run directory. In the repository root with `.venv` active:
+
+```bash
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+CHECKPOINT=$(python - <<'PY'
+import json
+from pathlib import Path
+run = Path("models/stage1_pointer/depth6-fresh30k-seed37")
+print(run / json.loads((run / "last_checkpoint.json").read_text())["path"])
+PY
+)
+
+python -m scripts.training.train_pointer \
+  --config configs/stage1_pointer_depth6_fresh30k_batch2.json --device cuda \
+  --resume "$CHECKPOINT" --allow-batch-change \
+  --output models/stage1_pointer/depth6-fresh30k-seed37-batch2
+```
+
+The new output directory must not exist. Do not use `--init-from`: that resets optimizer and sample progress. A dry-run still checks data/config/tokenization only; actual resume validates the saved state. Compare examples/s over several updates and watch GPU memory before increasing the batch further. The original batch-1 run can still be resumed from its original checkpoint with its original config if the new batch is slower or does not fit.
+
+### Keep training in tmux on WSL
+
+In a separate Ubuntu terminal, install tmux if needed and start a session:
+
+```bash
+sudo apt update && sudo apt install -y tmux
+cd ~/loopformer
+tmux new -s pointer
+```
+
+Inside tmux, activate `.venv` and run the resume command above. To add a GPU monitor, press Ctrl+B, release, then `%`; run `watch -n 1 nvidia-smi` in the new pane. Ctrl+B then `o` switches panes; Ctrl+B then `z` zooms the selected pane. Ctrl+B then `d` detaches while training continues. Reattach with `tmux attach -t pointer`; list sessions with `tmux ls`. Ctrl+B then `[` enters scrollback (press `q` to leave in the default key mode). These are [standard tmux bindings](https://man.openbsd.org/tmux). Ctrl+C interrupts the foreground process in the selected pane; it does not detach. Keep Windows awake and do not shut down WSL. An already-running ordinary terminal process does not automatically move into tmux; resume it from a checkpoint inside the new session.
+
 ## Earlier depth stage: adapter-only initialization
 
 The three-epoch depth-4 run and full validation evaluation are complete. The next [depth-6 experiment](depth_generalization.md) expands OOD evaluation through depths 9–16, keeps the depth-4 checkpoint as a paired reference, and reserves seed 29 for later confirmation.

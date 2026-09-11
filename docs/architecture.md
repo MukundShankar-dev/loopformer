@@ -32,6 +32,8 @@ Frozen operations remain differentiable. Gradients pass through C to the adapter
 
 Stage 1 uses differentiable unrolls with masked intermediate 26-symbol CE in `scripts/training/objective.py`. Later losses retain gradients through earlier recurrent states. Future Stage 3 detached rollouts and asymmetric objectives remain unimplemented.
 
+Batching changes only execution grouping: an optimizer update uses `batch_size * gradient_accumulation` examples, each with equal total nominal-loss weight. Mixed-depth microbatches unroll to their deepest task and mask later labels for shorter tasks. Explicit `--resume --allow-batch-change` permits repartitioning the same update group while retaining optimizer/RNG/cursor state; all other resume identities remain strict. Floating-point results need not be identical. Run metadata records the change; see [batching and resume](training_pointer.md#resume-with-larger-microbatches).
+
 The training startup gate compares ordinary-Qwen and fresh-adapter T=1 logits over the full vocabulary at the answer position. Its reference uses `logits_to_keep` to project only that position, matching the wrapper's compact LM-head readout instead of projecting the whole prompt and slicing afterward. This removes a matrix-shape difference from the numerical comparison; `atol=rtol=1e-5` remains unchanged. Full-sequence equivalence remains covered separately by Stage 0. The change does not alter recurrent forward behavior, the training objective, or saved-checkpoint evaluation.
 
 ## Implemented forward interface

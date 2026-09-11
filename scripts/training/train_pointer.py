@@ -21,9 +21,12 @@ def main() -> None:
     initialization = parser.add_mutually_exclusive_group()
     initialization.add_argument("--resume", type=Path, help="Resume optimizer/RNG/cursor with matching config")
     initialization.add_argument("--init-from", type=Path, help="Initialize adapters only; new optimizer/RNG/counter, compatible architecture required")
+    parser.add_argument("--allow-batch-change", action="store_true", help="With --resume, allow batch/accumulation changes only when examples per optimizer update stay equal")
     parser.add_argument("--download", action="store_true", help="Allow missing base model/tokenizer files to download")
     parser.add_argument("--dry-run", action="store_true", help="Validate config/data/tokenizer and print the budget; do not load model weights or write output")
     args = parser.parse_args()
+    if args.allow_batch_change and not args.resume:
+        parser.error("--allow-batch-change requires --resume")
 
     import torch
     from rich.console import Console, Group
@@ -41,7 +44,7 @@ def main() -> None:
     from scripts.training.data import collate, encode_tasks, read_tasks, select_tasks
     from scripts.training.gates import initialize
     from scripts.training.initialization import validate_initialization
-    from scripts.training.runner import resume_identity, train
+    from scripts.training.runner import resume_identity, train, validate_resume_identity
 
     config = read_config(args.config)
     if args.device:
@@ -141,19 +144,22 @@ def main() -> None:
                      "spec": spec, "tokenizer_sha256": hashlib.sha256(tokenizer.backend_tokenizer.to_str().encode()).hexdigest()}
     identity = resume_identity(config, data_identity)
     resume = None
+    batch_change = None
     if args.resume:
         if not (args.resume / "recurrent_config.json").is_file():
             raise ValueError("Resume directory is not a completed recurrent checkpoint")
         resume = torch.load(args.resume / "training_state.pt", map_location="cpu", weights_only=True)
-        if resume["identity"] != identity:
-            raise ValueError("Resume identity differs; use the matching config, data, tokenizer, and device")
+        batch_change = validate_resume_identity(resume["identity"], identity, allow_batch_change=args.allow_batch_change)
         restore_adapters(model, args.resume)
+        if batch_change:
+            console.print("[yellow]Resuming with changed microbatches; optimizer and data cursor retained. "
+                          "Floating-point results may differ.[/yellow]")
     output.mkdir(parents=True, exist_ok=False)
     (output / "config.json").write_text(json.dumps(config.to_dict(), indent=2) + "\n")
     sources = [*root.glob("scripts/training/*.py"), *root.glob("scripts/recurrent_qwen/*.py"), *root.glob("scripts/dataset/*.py"), root / "scripts/eval/pointer_task.py"]
     metadata = {"status": "running", "command": [sys.executable, "-m", "scripts.training.train_pointer", *sys.argv[1:]],
                 "gate": gate, "identity": identity, "resume": str(args.resume) if args.resume else None,
-                "initialization": initialization_metadata,
+                "initialization": initialization_metadata, "batch_change": batch_change,
                 "python": platform.python_version(), "packages": {name: version(name) for name in ("torch", "transformers", "tokenizers", "peft", "rich")},
                 "source_sha256": {str(path.relative_to(root)): sha256_file(path) for path in sources},
                 "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
@@ -179,7 +185,9 @@ def main() -> None:
             dashboard.add_row("Fixed train probe", f"trajectory {state['train_probe']['trajectory_accuracy']:.1%}")
         if "gradient_norm_before_clip" in state:
             dashboard.add_row("Optimization", f"grad norm {state['gradient_norm_before_clip']:.3g} · lr {state['learning_rate']:.3g}")
-            dashboard.add_row("Resources", f"{state['examples_per_second']:.2f} examples/s · process peak {state['peak_process_rss_bytes'] / 2**30:.2f} GiB")
+            dashboard.add_row("Resources", f"{state['examples_per_second']:.2f} examples/s · host RAM peak {state['peak_process_rss_bytes'] / 2**30:.2f} GiB")
+            if "cuda_peak_bytes" in state:
+                dashboard.add_row("CUDA tensors", f"allocated {state['cuda_allocated_bytes'] / 2**30:.2f} GiB · peak {state['cuda_peak_bytes'] / 2**30:.2f} GiB")
             dashboard.add_row("Estimated remaining", str(timedelta(seconds=round(state["eta_seconds"]))))
         return Group(Panel(dashboard, title="Stage 1 training"), bar)
 
@@ -188,7 +196,8 @@ def main() -> None:
             state.update(event)
             bar.update(task, completed=state["step"], total=state["total_steps"])
             live.update(render())
-        result = train(model, tokenizer, train_items, validation_items, probe_items, config, output, spec, identity, resume=resume, progress=progress)
+        result = train(model, tokenizer, train_items, validation_items, probe_items, config, output, spec, identity,
+                       resume=resume, allow_batch_change=args.allow_batch_change, progress=progress)
         progress({"phase": "Complete", "step": result["step"]})
     (output / "run.json").write_text(json.dumps({**metadata, "status": "complete"}, indent=2) + "\n")
     console.print(f"[green]Run complete.[/green] Last checkpoint: {result['last_checkpoint']}")

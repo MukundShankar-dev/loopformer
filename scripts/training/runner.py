@@ -56,10 +56,31 @@ def resume_identity(config: TrainingConfig, data_identity: dict) -> dict:
     return {"config": settings, "data": data_identity}
 
 
+def validate_resume_identity(saved: dict, current: dict, *, allow_batch_change: bool = False) -> dict | None:
+    """Allow an explicit microbatch repartition, preserving examples per update.
+
+    All other identity fields stay strict. Returns the change for provenance;
+    matching effective batches preserve update groups, not bitwise numerics.
+    """
+    if saved == current:
+        return None
+    if allow_batch_change:
+        previous, requested = dict(saved["config"]), dict(current["config"])
+        old_batch = {name: previous.pop(name) for name in ("batch_size", "gradient_accumulation")}
+        new_batch = {name: requested.pop(name) for name in ("batch_size", "gradient_accumulation")}
+        valid = all(type(value) is int and value > 0 for value in (*old_batch.values(), *new_batch.values()))
+        if (valid and {**saved, "config": previous} == {**current, "config": requested}
+                and math.prod(old_batch.values()) == math.prod(new_batch.values())):
+            return {"previous": old_batch, "current": new_batch,
+                    "effective_batch": math.prod(new_batch.values()), "bitwise_equivalent": False}
+    raise ValueError("Resume identity differs. --allow-batch-change permits only batch_size/"
+                     "gradient_accumulation changes with the same product; all other identity fields must match.")
+
+
 def train(
     model: RecurrentQwen, tokenizer: Any, train_items: list[EncodedExample], validation: list[EncodedExample],
     train_probe: list[EncodedExample], config: TrainingConfig, output: Path, spec: dict,
-    identity: dict, *, resume: dict | None = None,
+    identity: dict, *, resume: dict | None = None, allow_batch_change: bool = False,
     progress: Callable[[dict], None] = lambda event: None,
 ) -> dict:
     """Accumulate equal-example gradients; checkpoint only completed updates."""
@@ -69,8 +90,7 @@ def train(
     optimizer = torch.optim.AdamW(parameters, lr=config.learning_rate, weight_decay=config.weight_decay, foreach=False)
     step, epoch, offset, best_loss = 0, 0, 0, float("inf")
     if resume:
-        if resume["identity"] != identity:
-            raise ValueError("Resume config, device, tokenizer, or dataset identity differs from the checkpoint")
+        validate_resume_identity(resume["identity"], identity, allow_batch_change=allow_batch_change)
         optimizer.load_state_dict(resume["optimizer"])
         step, epoch, offset, best_loss = (resume[key] for key in ("step", "next_epoch", "next_offset", "best_loss"))
         restore_rng(resume["rng"], config.device)

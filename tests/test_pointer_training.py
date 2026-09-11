@@ -18,7 +18,7 @@ from scripts.training.data import EncodedExample, collate, select_tasks
 from scripts.training.evaluation import evaluate
 from scripts.training.gates import initialize
 from scripts.training.objective import batch_metrics, combine_metrics, step_loss, symbolic_scores
-from scripts.training.runner import resume_identity, train
+from scripts.training.runner import resume_identity, train, validate_resume_identity
 from scripts.eval.recurrent_pointer import evaluate_recurrent_batches
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -197,6 +197,58 @@ def test_saved_recurrent_checkpoint_runs_through_naive_cli(tiny_training, tmp_pa
     assert rejected.returncode != 0 and 'Recurrent checkpoints fix' in rejected.stderr
 
 
+def test_batch_change_resume_requires_opt_in_and_preserves_other_settings():
+    original = TrainingConfig()
+    changed = replace(original, batch_size=2, gradient_accumulation=4)
+    saved = resume_identity(original, {'dataset': 'same'})
+    requested = resume_identity(changed, {'dataset': 'same'})
+    with pytest.raises(ValueError, match='Resume identity differs'):
+        validate_resume_identity(saved, requested)
+    change = validate_resume_identity(saved, requested, allow_batch_change=True)
+    assert change['effective_batch'] == 8 and not change['bitwise_equivalent']
+    assert validate_resume_identity(saved, saved) is None
+    for config in (replace(changed, gradient_accumulation=8), replace(changed, seed=18),
+                   replace(changed, learning_rate=.001), replace(changed, validation_per_depth=16)):
+        with pytest.raises(ValueError, match='Resume identity differs'):
+            validate_resume_identity(saved, resume_identity(config, {'dataset': 'same'}), allow_batch_change=True)
+    with pytest.raises(ValueError, match='Resume identity differs'):
+        validate_resume_identity(saved, resume_identity(changed, {'dataset': 'different'}), allow_batch_change=True)
+
+
+def test_batch_change_resume_retains_optimizer_cursor_and_update_groups(tiny_training, tmp_path):
+    model, tokenizer, config, items, spec, _ = tiny_training
+    # Resume after one update, leaving both a full update and a short tail.
+    first = tmp_path / 'first'
+    first.mkdir()
+    identity = resume_identity(config, {'dataset': 'same'})
+    train(model, tokenizer, items, items[:2], items[:2], replace(config, max_steps=1), first, spec, identity)
+    source = first / 'step-000001'
+    saved = torch.load(source / 'training_state.pt', weights_only=True)
+    changed = replace(config, batch_size=2, gradient_accumulation=1, max_steps=3)
+    new_identity = resume_identity(changed, {'dataset': 'same'})
+    restored, _, _ = load_recurrent_checkpoint(source)
+    output = tmp_path / 'batched'
+    output.mkdir()
+    train(restored, tokenizer, items, items[:2], items[:2], changed, output, spec, new_identity,
+          resume=saved, allow_batch_change=True)
+    # AdamW may retain references to loaded tensors and mutate them in memory.
+    saved = torch.load(source / 'training_state.pt', weights_only=True)
+    initial = torch.load(output / 'step-000001/training_state.pt', weights_only=True)
+    assert initial['next_offset'] == saved['next_offset'] == 2
+    assert initial['next_epoch'] == saved['next_epoch'] == 0
+    for index, state in saved['optimizer']['state'].items():
+        for key, value in state.items():
+            assert torch.equal(initial['optimizer']['state'][index][key], value)
+    expected = torch.load(source / 'adapter_model.pt', weights_only=True)
+    actual = torch.load(output / 'step-000001/adapter_model.pt', weights_only=True)
+    assert all(torch.equal(actual[key], value) for key, value in expected.items())
+    final = torch.load(output / 'step-000003/training_state.pt', weights_only=True)
+    assert final['identity'] == new_identity
+    assert final['next_epoch'] == 1 and final['next_offset'] == 0
+    events = [json.loads(line) for line in (output / 'metrics.jsonl').read_text().splitlines()]
+    assert [(e['step'], e['train']['examples']) for e in events if e['event'] == 'train'] == [(2, 2), (3, 1)]
+
+
 def test_training_cli_dry_run_and_toy_update(tmp_path):
     """Real cached tokenizer + random weights; exercise the complete CLI wiring."""
     import hashlib
@@ -241,6 +293,17 @@ def test_training_cli_dry_run_and_toy_update(tmp_path):
     assert metadata['status'] == 'complete' and metadata['gate']['passed']
     state = torch.load(output / 'step-000001/training_state.pt', weights_only=True)
     assert state['step'] == 1 and state['next_offset'] == 2
+    config_path.write_text(json.dumps(replace(config, max_steps=2, batch_size=2, gradient_accumulation=1).to_dict()))
+    batched = tmp_path / 'batch_resume'
+    batch_command = [*command, '--output', str(batched), '--resume', str(output / 'step-000001')]
+    rejected = subprocess.run(batch_command, cwd=ROOT, capture_output=True, text=True)
+    assert rejected.returncode != 0 and 'Resume identity differs' in rejected.stderr and not batched.exists()
+    subprocess.run([*batch_command, '--allow-batch-change'], cwd=ROOT, capture_output=True, text=True, check=True)
+    batch_metadata = json.loads((batched / 'run.json').read_text())
+    assert batch_metadata['batch_change']['effective_batch'] == 2
+    assert batch_metadata['batch_change']['current'] == {'batch_size': 2, 'gradient_accumulation': 1}
+    batch_state = torch.load(batched / 'step-000002/training_state.pt', weights_only=True)
+    assert batch_state['step'] == 2 and batch_state['next_epoch'] == 1
     config_path.write_text(json.dumps(replace(config, max_steps=2).to_dict()))
     continuation = tmp_path / 'resumed'
     subprocess.run([*command, '--output', str(continuation), '--resume', str(output / 'step-000001')], cwd=ROOT, capture_output=True, text=True, check=True)
