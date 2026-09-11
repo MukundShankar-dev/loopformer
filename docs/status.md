@@ -1,6 +1,12 @@
 # Project status
 
-Last updated: 2026-09-10.
+Last updated: 2026-09-11.
+
+## Latest experiment update
+
+The depth-6 stage and checkpoint evaluations are complete. Full-validation complete-trajectory accuracy at trained depths 1–6 is 99.1% for step 500, 97.9% for 800, and 97.3% for final 938. At depths 7–8 combined these score 79.2%, 78.8%, and 64.8%. Step 500 is the provisional working checkpoint; its complete trajectories fall to 33.6% at depth 9, 5.6% at depth 10, and zero at 11–16. Six runs under `eval/pointer_loops/*depth6-seed17*` contain 72,000 audited loop rows; reference targets, scoring, aggregates, and dataset/source hashes agree.
+
+The next authorized run is [fresh depth-6 training on 30,000 mappings](training_pointer.md#fresh-depth-6-run-with-30000-mappings), using new adapters on pretrained Qwen rather than initialization from a pointer checkpoint. The config is implemented and schema-validated; the user reports dataset generation on the desktop. The dataset is absent on the Mac, so the full dry-run and training remain unverified here. Training stays at depths 1–6, with seed-17 development evaluation through depth 16 and seed 29 reserved. Overscaling and shortcut diagnostics remain deferred. Earlier setup and validation evidence below describe the preceding stages.
 
 ## Current priority
 
@@ -36,7 +42,7 @@ The current Mac suite passes **94 tests in 64.94 seconds**. The nine focused ini
 
 The WSL desktop uses an RTX 5070 Ti with 16 GB VRAM, 32 GB host RAM, Python 3.11.8, and CUDA Torch. The pinned model is cached, deterministic CUDA operations and trainer startup checks passed, and regenerated data matches the Mac hashes. A toy exact-resume test has a small reproducible precision discrepancy on WSL; **bitwise CUDA resume equivalence remains unverified**. The uninterrupted training and successful checkpoint inference do not resolve that issue. See [desktop evidence](experiments/wsl_cuda_baseline.md) and [setup](windows_cuda_setup.md).
 
-## Next bounded milestone
+## Previous depth-stage milestone (completed; superseded above)
 
 1. Preview [depth-6 adapter-only initialization](depth_generalization.md), then let the user launch its bounded one-epoch stage on the desktop. The three-epoch depth-4 continuation is already complete.
 2. Use the new stage's validation-selected checkpoint and reference update 1875 in the paired evaluator on depths 1–8 and 9–16. Keep in-range, +1/+2, and farther OOD results separate; do not select checkpoints by test scores.

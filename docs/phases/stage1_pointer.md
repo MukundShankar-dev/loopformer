@@ -127,6 +127,10 @@ Verification checks file hashes, counts and depth histograms, unique mappings, p
 The separate [ordinary-model final-answer baseline](../naive_pointer_eval.md) is implemented and tested with toy models; the user's first full three-shot run reached 6.00% accuracy and is documented in the [baseline report](../experiments/naive_pointer_baseline.md). It shares the dataset and uses `prompts/pointer_task.txt` instructions, without changing the nominal targets or introducing recurrent training. Training code, resumable adapter checkpoints, and per-loop validation are implemented and tested on random tiny models. Pretrained CUDA training and checkpoint final-answer results are recorded in the [5,000-mapping report](../experiments/stage1_cuda_5k.md); full-test per-loop evaluation is now complete and audited. The next bounded experiment is [continued depth-1–4 training](../training_pointer.md#continue-the-current-desktop-run), while terminal overscaling execution is deferred. Passing data validation or final-answer baseline tests does not establish Gate 1.
 
 
-## Next depth experiment
+## Current training experiment
+
+The depth-6 curriculum and full-loop evaluations are complete. The next run uses [fresh adapters and 30,000 new mappings at depths 1–6](../training_pointer.md#fresh-depth-6-run-with-30000-mappings). Original weights remain frozen, per-loop targets are unchanged, and OOD evaluation stays at depths 7–16. The user generated the desktop dataset; the config is implemented, but this new run has not been trained or evaluated. See [current status](../status.md).
+
+## Earlier depth extension
 
 The depth-4 continuation reached update 1875 and full validation now shows 99.4% trained-depth complete trajectories, 82.4% at depth 5, and 20.8% at depth 6. The next authorized setup is [depth-6 adapter-only initialization with OOD evaluation expanded through depth 16](../depth_generalization.md). It keeps intermediate supervision, evaluates the depth-4 reference on the same data, reports extrapolation distance, and reserves a new confirmation seed. Extending the training range does not turn depth-5/6 results into OOD evidence. Overscaling execution stays deferred.

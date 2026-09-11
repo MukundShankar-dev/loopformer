@@ -135,7 +135,42 @@ The desktop has a recorded tiny exact-resume discrepancy in a toy test; byte-for
 Validation of the continuation config on the Mac: data/tokenizer-only dry run passed with 5,000 training examples, 64 validation examples, 16 probe examples, and 1,875 total planned updates. No checkpoint restoration or pretrained training was performed.
 
 
-## New depth stage: adapter-only initialization
+## Fresh depth-6 run with 30,000 mappings
+
+The current experiment uses [stage1_pointer_depth6_fresh30k.json](../configs/stage1_pointer_depth6_fresh30k.json): fresh recurrent adapters on the pinned pretrained Qwen base, with no `--init-from` or `--resume`. All original weights stay frozen and intermediate supervision is unchanged. This directly trains depths 1–6 without the earlier depth-4 curriculum; comparison with that curriculum does not isolate data diversity alone.
+
+The user generated the new dataset on the desktop. Its reproduction command is below; run it only when that directory is absent (append `--dry-run 5` to preview without writing):
+
+```bash
+python -m scripts.dataset \
+  --seed 37 --train-count 30000 --validation-count 600 \
+  --test-count 600 --depth-test-count 1000 \
+  --min-depth 1 --max-train-depth 6 --max-eval-depth 16 \
+  --output data/pointer/seed-37-depth6-30k
+```
+
+Training uses all 30,000 new mappings (5,000 per depth). Monitoring uses the existing seed-17 validation file, with 32 examples per depth at 1–8 (256 total), plus 24 training probes. The generator seed is 37; adapter initialization and training order use seed 17. Seed 29 remains reserved. The trainer checks train/validation rule-table overlap before loading weights. The new dataset's own evaluation files are not used by this config.
+
+From the repository root in WSL:
+
+```bash
+source .venv/bin/activate
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+
+python -m scripts.training.train_pointer \
+  --config configs/stage1_pointer_depth6_fresh30k.json --device cuda \
+  --output models/stage1_pointer/depth6-fresh30k-seed37 --dry-run
+
+python -m scripts.training.train_pointer \
+  --config configs/stage1_pointer_depth6_fresh30k.json --device cuda \
+  --output models/stage1_pointer/depth6-fresh30k-seed37
+```
+
+Budget: one epoch, 3,750 updates, batch 1 with accumulation 8, float32, learning rate 0.0002 with ten warmup updates. Validation and checkpoint saving occur every 250 updates; the Rich dashboard provides progress and ETA. Automatic best-checkpoint selection still uses trained-depth validation loss; inspect trajectory metrics before full evaluation. Evaluate generalization at depths 7–16 separately from trained depths 1–6. Overscaling and shortcut diagnostics remain deferred.
+
+The config passes schema validation. The new dataset is absent on the Mac, so its training dry-run and pretrained training have not been run by the assistant; preview on the desktop before launching.
+
+## Earlier depth stage: adapter-only initialization
 
 The three-epoch depth-4 run and full validation evaluation are complete. The next [depth-6 experiment](depth_generalization.md) expands OOD evaluation through depths 9–16, keeps the depth-4 checkpoint as a paired reference, and reserves seed 29 for later confirmation.
 

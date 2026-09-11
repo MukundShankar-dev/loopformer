@@ -2,7 +2,7 @@
 
 This project studies whether a recurrent block in `Qwen/Qwen2.5-0.5B-Instruct` can learn one pointer transition per loop, generalize to deeper tasks, and eventually repair mistakes while preserving correct answers.
 
-The current focus is **further pointer training and depth generalization**. Full-loop tests show useful execution on unseen mappings at trained depths 1–4, with weak extension beyond them. Overscaling tools are prepared for later; those experiments have not run. See [current status](docs/status.md) and the [research plan](docs/project_plan.md).
+The current focus is **further pointer training and depth generalization**. Full-loop tests show strong execution on unseen mappings at trained depths 1–6, with limited extension beyond them. Overscaling tools are prepared for later; those experiments have not run. See [current status](docs/status.md) and the [research plan](docs/project_plan.md).
 
 ## Setup
 
@@ -94,7 +94,7 @@ python -m scripts.training.train_pointer --config configs/stage1_pointer.json --
 
 Configs live in [`configs/`](configs/). The trainer uses raw dataset prompts and exact per-loop supervision. A compact Rich dashboard shows progress, ETA, losses, accuracy, and memory. Checkpoints and logs go to `models/stage1_pointer/`; model binaries are excluded from Git.
 
-The three-epoch depth-4 run is complete. The next experiment uses `configs/stage1_pointer_depth6.json` and adapter-only initialization, with OOD evaluation moved outward through depth 16. Follow the [depth-6 setup and paired evaluation commands](docs/depth_generalization.md), starting with its dry-run. The [training guide](docs/training_pointer.md) covers checkpoint selection and resume.
+The current experiment uses `configs/stage1_pointer_depth6_fresh30k.json`: fresh adapters, 30,000 new mappings at depths 1–6, and evaluation through depth 16. Follow the [fresh-run commands](docs/training_pointer.md#fresh-depth-6-run-with-30000-mappings), starting with the dry-run. The [training guide](docs/training_pointer.md) also covers checkpoint selection and resume.
 
 ## Inspect recurrent checkpoints
 
