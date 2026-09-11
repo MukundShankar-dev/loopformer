@@ -2,7 +2,7 @@
 
 ## Start here
 
-This project studies recurrent depth dymanics with Qwen~2.5~0.5B first, then transfer across in-context algorithms. Prioritize scientific interpretability, correctness, reproducibility, then optimization.
+This project studies recurrent depth dynamics with Qwen2.5-0.5B first, then transfer across in-context algorithms. Prioritize scientific interpretability, correctness, reproducibility, then optimization.
 
 Before working, read [the documentation index](docs/README.md), [the research plan](docs/project_plan.md), and [current status](docs/status.md). Then read the documents relevant to the task below. Explicit user instructions determine the current scope; a documented future phase is not an instruction to implement it now.
 
@@ -15,12 +15,13 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | Symbol vocabulary, pointer data, and intermediate training | [Stage 1](docs/phases/stage1_pointer.md) |
 | Training commands, logging, checkpoints, and resume | [Pointer training](docs/training_pointer.md) |
 | Windows desktop setup, CUDA dependencies, and state migration | [WSL2/CUDA guide](docs/windows_cuda_setup.md) |
-| Untreated overscaling and failure analysis | [Stage 2](docs/phases/stage2_overthinking.md) |
+| Untreated overscaling and failure analysis | [Stage 2](docs/phases/stage2_overthinking.md) and [terminal evaluation usage](docs/overscaling_eval.md) |
 | Detached rollouts, asymmetric losses, and baselines | [Stage 3](docs/phases/stage3_asymmetric.md) |
 | Multi-family execution, preservation, and transfer | [Stages 4–6](docs/phases/stages4_6_transfer.md) |
 | Metrics, trajectories, figures, and reproducibility | [Evaluation](docs/evaluation.md) |
 | Ordinary-model final-answer pointer baseline | [Naive pointer evaluation](docs/naive_pointer_eval.md) |
 | Saved-checkpoint per-loop pointer evaluation | [Full-loop evaluation](docs/loop_pointer_eval.md) |
+| Latest pointer training and full-loop evidence | [CUDA experiment report](docs/experiments/stage1_cuda_5k.md) |
 | Unresolved choices and recorded design decisions | [Decisions](docs/decisions.md) |
 | Implemented work, validation evidence, and next milestone | [Status](docs/status.md) |
 

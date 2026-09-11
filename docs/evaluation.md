@@ -1,6 +1,6 @@
 # Evaluation and reproducibility
 
-Status: nominal per-loop evaluation is implemented through the [full-loop checkpoint CLI](loop_pointer_eval.md) and training monitoring. Repair/damage and survival conventions below remain planned, derived from project plan sections 6–8 and 23–27. Allowed-token raw-logit margins are implemented and tested in [outputs](../scripts/recurrent_qwen/outputs.py). [Stage 0](experiments/stage0_validation.md) records architecture measurements only.
+Status: nominal per-loop evaluation is implemented through the [full-loop checkpoint CLI](loop_pointer_eval.md) and training monitoring. Repair/damage and censored survival are implemented for the separate [absorbing-terminal diagnostic](overscaling_eval.md), whose pretrained execution is deferred. The conventions derive from project plan sections 6–8 and 23–27. Allowed-token raw-logit margins are implemented and tested in [outputs](../scripts/recurrent_qwen/outputs.py). [Stage 0](experiments/stage0_validation.md) records architecture measurements only.
 
 The [ordinary-model final-answer baseline](naive_pointer_eval.md) is implemented separately with unconstrained greedy generation, strict decoded-symbol accuracy, per-depth summaries, and CSV/JSON artifacts. Its toy-model tests verify evaluation mechanics; the [first full pretrained run](experiments/naive_pointer_baseline.md) achieved 60/1,000 correct and has been audited. The restricted-logit and recurrent-transition conventions below apply to the later recurrent evaluation, not automatically to this generation baseline.
 
@@ -10,7 +10,7 @@ The [ordinary-model final-answer baseline](naive_pointer_eval.md) is implemented
 
 Record both step-specific intermediate targets and the fixed final answer. Intermediate accuracy measures execution at the corresponding step. Final-answer correctness supports repair, damage, and solution-survival analysis. Label the target basis explicitly rather than using an ambiguous `is_correct` field alone.
 
-Stage 1 data uses explicit requested steps and a non-repeating nominal path, with targets only at steps 1..d. `scripts.dataset.pointer.check_predictions` checks decoded symbols against that nominal trajectory; training monitoring records recurrent per-loop metrics. Post-completion behavior and future cyclic-task semantics remain open in [decisions](decisions.md). Report nominal execution separately from post-completion trajectories; a valid additional pointer lookup must not automatically count as damage.
+Stage 1 data uses explicit requested steps and a non-repeating nominal path, with targets only at steps 1..d. `scripts.dataset.pointer.check_predictions` checks decoded symbols against that nominal trajectory; training monitoring records recurrent per-loop metrics. Original continuing-task post-completion behavior and general cyclic-task semantics remain open in [decisions](decisions.md). The separate terminal diagnostic resolves completion only for its own transformed inputs. Report nominal execution separately from post-completion trajectories; a valid additional pointer lookup must not automatically count as damage.
 
 ## Answer margins
 
@@ -80,4 +80,11 @@ Write human-readable reports in `docs/experiments/` as Markdown. Keep machine-re
 
 `naive_test --model <recurrent step directory>` evaluates the final allowed-symbol readout at each task's requested loop count. It uses raw dataset prompts and reports example-loops/s; ordinary model paths retain three-shot unconstrained generation and tokens/s. These are distinct evaluation conditions, even though both write final-answer CSV/JSON under `eval/pointer_task/`.
 
-`python -m scripts.eval.loop_test --model <step directory>` evaluates every example through a common loop budget, exporting nominal losses/accuracies, full trajectories, first-error and correct-prefix diagnostics, and the depth-by-loop matrix under `eval/pointer_loops/`. See [commands and metric definitions](loop_pointer_eval.md). Its full final-target sweep is observational; repair/damage and survival are not computed under unresolved completion semantics.
+`python -m scripts.eval.loop_test --model <step directory>` evaluates every example through a common loop budget, exporting nominal losses/accuracies, full trajectories, first-error and correct-prefix diagnostics, and the depth-by-loop matrix under `eval/pointer_loops/`. See [commands and metric definitions](loop_pointer_eval.md). Its original-task final-target sweep remains observational. The separate `python -m scripts.eval.overscaling_test` CLI transforms inputs into absorbing-terminal tasks and computes explicitly scoped dynamics; it must not relabel the original runs as terminal experiments.
+
+
+## Implemented terminal dynamics and future knowledge retention
+
+The [terminal evaluator](overscaling_eval.md) exports every adjacent transition, per-depth and aggregate rates, raw final margins, continuous survival, and a hold-at-d decoded-answer baseline. Primary dynamics include only transitions starting at t >= d; all-loop counts remain observational. Survival is anchored to the first final-correct loop at or after d, and reports observed/censored denominators. Earlier final matches are separately counted as potential shortcuts. Post-completion CE is not introduced. Figures and hidden-state diagnostics are not implemented by these exports.
+
+A later [knowledge-retention regression check](project_plan.md#future-knowledge-retention-regression-check) will compare original versus adapted one-pass ordinary-model performance on a fixed small benchmark, potentially a seeded MMLU subset. Benchmark choice, scoring protocol, and implementation remain deferred. It will not reuse the pointer A–Z-only readout as a general knowledge evaluator or silently introduce anchor training.

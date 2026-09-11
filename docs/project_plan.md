@@ -13,6 +13,16 @@ The first question is the core project. The second question is the natural expan
 
 ---
 
+## Current execution priority — user update, 2026-09-10
+
+The immediate next experiment remains **Stage 1 training for stronger depth generalization**. Full-loop evaluation now supports unseen-mapping execution at trained depths 1–4, while deeper execution is weak. Continue a bounded training run with intermediate supervision; do not treat more epochs as guaranteed success. Keep training depth fixed initially so improvement at depths 5–8 still measures extension beyond trained depth. The [current status](status.md), [training continuation](training_pointer.md#continue-the-current-desktop-run), and [experiment report](experiments/stage1_cuda_5k.md) own the current commands and evidence.
+
+The user authorized preparing overscaling scripts now but deferred running those experiments until further training and review. The separate [absorbing-terminal diagnostic](overscaling_eval.md) replaces only the final state's outgoing edge with a self-loop, making post-completion reference execution unambiguous. This is an explicit evaluation distribution change, not a change to Stage 1 training or retroactive damage labels for original tasks. Inspect nominal execution and possible terminal-identification shortcuts before interpreting dynamics. No asymmetric retention, multi-family expansion, or anchor loss is authorized by this preparation.
+
+Generalization claims remain distinct: unseen mappings already provide instance-generalization evidence; performance beyond trained depth is the immediate unresolved objective. Cross-family and natural-language transfer remain later questions. Formal gate thresholds and confirmation seeds must be set before future confirmatory evaluations, not fitted to the results already inspected.
+
+---
+
 # 1\. Research thesis
 
 We are **not** trying to prove that Qwen has learned a general reasoning step.
@@ -897,6 +907,16 @@ ordinary-Qwen behavior degradation
 ```
 
 The anchor loss is a preservation tool, not part of the core recurrent-dynamics claim.
+
+---
+
+## Future knowledge-retention regression check
+
+Add a small evaluation of retained ordinary pretrained knowledge later, at the user's request. A fixed, seeded subset of MMLU is a candidate, not a selected benchmark or an implemented evaluator. Choose items that give the unadapted 0.5B checkpoint a measurable baseline; do not assume MMLU is easy for it. Small subsets are noisy and cannot establish broad preservation on their own.
+
+Compare the pinned original checkpoint with the adapted checkpoint at **one recurrent pass**, using the same examples, prompts, tokenizer, full-vocabulary answer scoring, and inference settings. Record item-level paired changes, overall and subject counts, uncertainty, dataset version, selection seed, and model hashes. One-pass comparison is the primary forgetting diagnostic; any multi-loop knowledge evaluation is a separate condition because the extra compute changes the comparison.
+
+Keep this assessment separate from pointer accuracy, general reasoning claims, and the optional ordinary-Qwen anchor loss. Merely observing a regression does not automatically introduce an anchor objective. No benchmark download, MMLU script, new dependency, or retention training is part of the current implementation.
 
 ---
 

@@ -7,7 +7,7 @@
 3. [Architecture](architecture.md): implemented Stage 0 modules, recurrent execution, and gradient boundaries.
 4. The relevant phase guide below, together with [evaluation](evaluation.md) and [decisions](decisions.md).
 
-[Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Stage 0 and Stage 1 data are implemented and validated; Stage 1 training has toy-model checks and completed [CUDA pointer runs and final-answer evaluations](experiments/stage1_cuda_5k.md); Gate 1 and later stages remain unverified.
+[Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Stage 0 and Stage 1 data are implemented and validated; Stage 1 training and full-loop checkpoint evaluations are [complete and audited](experiments/stage1_cuda_5k.md). Further training for depth generalization is the current priority; prepared overscaling experiments are deferred. Formal Gate 1 and later gates remain unverified.
 
 ## Phase guides
 
@@ -19,7 +19,7 @@ For collaborator onboarding, see [Python environment setup](setup.md), the pinne
 | 1, data milestone | Validate symbols, mappings, intermediate targets, and splits before training | [Pointer execution](phases/stage1_pointer.md) |
 | 1, training milestone | Establish one-loop/one-transition execution | [Training usage](training_pointer.md) and [research gate](phases/stage1_pointer.md) |
 | 1, checkpoint evaluation | Inspect every loop on full datasets | [Full-loop evaluation](loop_pointer_eval.md) |
-| 2 | Measure repair and damage in untreated recurrent trajectories | [Overthinking](phases/stage2_overthinking.md) |
+| 2, deferred | Measure repair and damage on separate terminal tasks | [Overthinking](phases/stage2_overthinking.md) and [overscaling usage](overscaling_eval.md) |
 | 3 | Reduce damage while retaining useful computation | [Asymmetric dynamics](phases/stage3_asymmetric.md) |
 | 4 and 4b | Train shared multi-family execution; optionally preserve ordinary Qwen behavior | [Transfer](phases/stages4_6_transfer.md) |
 | 5 | Evaluate a wholly held-out task family | [Transfer](phases/stages4_6_transfer.md) |
@@ -31,7 +31,7 @@ Ordinary-model baseline: [final-answer pointer evaluation](naive_pointer_eval.md
 
 Recorded validation: [Stage 0 architecture on pretrained Qwen, CPU and MPS](experiments/stage0_validation.md), and [Stage 1 training implementation with toy models](experiments/stage1_training_implementation.md).
 
-Latest training evidence: [5,000-mapping CUDA run and checkpoint final-answer evaluations](experiments/stage1_cuda_5k.md). Full-dataset per-loop execution is the next measurement, using the [saved-checkpoint loop evaluator](loop_pointer_eval.md).
+Latest evidence: [5,000-mapping CUDA run and audited final-answer/full-loop evaluations](experiments/stage1_cuda_5k.md). Next: [bounded training continuation](training_pointer.md#continue-the-current-desktop-run), with deeper validation reported separately. [Terminal overscaling scripts](overscaling_eval.md) are prepared for later. The [future knowledge-retention check](project_plan.md#future-knowledge-retention-regression-check) is documentation only.
 
 Desktop setup: [WSL CUDA environment and instruct baseline](experiments/wsl_cuda_baseline.md) records the actual desktop installation, dataset reproduction, checks, and evaluation status.
 

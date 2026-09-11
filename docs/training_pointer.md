@@ -1,6 +1,6 @@
 # Train recurrent pointer execution
 
-Status: implemented and tested with random tiny Qwen models; pretrained CUDA training and resource measurements are recorded in the [5,000-mapping report](experiments/stage1_cuda_5k.md). Full-test intermediate execution remains to be measured with the [loop evaluator](loop_pointer_eval.md). See [implementation validation](experiments/stage1_training_implementation.md) for the checks performed. The [Stage 1 guide](phases/stage1_pointer.md) owns the research objective and acceptance gate.
+Status: implemented and tested with random tiny Qwen models; pretrained CUDA training and resource measurements are recorded in the [5,000-mapping report](experiments/stage1_cuda_5k.md). Full-test trajectories for updates 500 and 625 are now audited in the same report; trained-depth complete-trajectory accuracy is 86.2% and 92.4%, respectively. The current priority is further training for depth extension, before overscaling experiments. See [implementation validation](experiments/stage1_training_implementation.md) for the checks performed. The [Stage 1 guide](phases/stage1_pointer.md) owns the research objective and acceptance gate.
 
 ## Preview, then run
 
@@ -102,3 +102,34 @@ python -m scripts.training.train_pointer \
 This restores adapters, optimizer, Torch RNG, epoch shuffle position, and completed-step count. The configured epoch/step budget is the total, not an additional budget. To continue a finished run, increase `epochs` or `max_steps` in a copied JSON config. Those fields and reporting/checkpoint cadence may change; model, device, data, tokenization, subset selection, and optimization settings must match the saved identity. The resumed directory only records a new best checkpoint if it beats the previously saved best loss; consult the parent run for an earlier best.
 
 Exact resume was tested on a fixed CPU toy model, including a short final accumulation group and a mid-epoch interruption. Cross-device/version bitwise reproducibility is not claimed. Keep the pinned environment, unchanged code, and original artifacts to reproduce a scientific run.
+
+
+## Continue the current desktop run
+
+Current priority: improve held-out mapping execution and depth extension before launching the deferred terminal overscaling experiment. We already have instance generalization; broader depth generalization is weak. `configs/stage1_pointer_continue.json` copies the first full-run settings and changes only `epochs` from 1 to 3. Training still uses the same 5,000 depth-1–4 mappings, intermediate supervision, and learning rate. Depths 5–8 stay untrained. If we later train through depth 8, success there would become in-range execution rather than depth extrapolation.
+
+From the configured WSL repository with its complete checkpoints:
+
+```bash
+source .venv/bin/activate
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+
+python -m scripts.training.train_pointer \
+  --config configs/stage1_pointer_continue.json --device cuda --dry-run
+
+python -m scripts.training.train_pointer \
+  --config configs/stage1_pointer_continue.json --device cuda \
+  --resume models/stage1_pointer/20260910T220130.926886Z/step-000625
+```
+
+The preview loads data/tokenization but no model weights, writes nothing, and is not a full resume-integrity check. Actual resume requires `training_state.pt`, adapter weights, and tokenizer files on the desktop; Git metadata alone is insufficient. The trainer validates saved configuration/data identity when resuming and writes a new run directory.
+
+**Three total epochs** means two additional epochs from update 625: 1,250 additional optimizer updates, ending at update 1,875. This is a bounded pilot budget, not a guarantee of generalization. Do not omit `--resume` unless a fresh three-epoch run is intended. Resume uses the last optimizer state for a continuous training trajectory; it does not reselect update 625 as the historical primary evaluation checkpoint. The learning-rate schedule uses warmup then the existing constant rate; this config does not restart warmup or introduce a new decay schedule.
+
+Use the fixed validation curves during the run, then evaluate the validation file across all depths using `scripts.eval.loop_test --data data/pointer/seed-17/validation.jsonl`. Keep nominal loss, complete trajectories, first failures, and depths 1–4 versus 5–8 separate. The small monitoring subset is only eight examples per depth, so do not rely on it alone to conclude generalization. Checkpoints continue to be selected by the existing trained-depth validation loss rule; do not silently switch selection to test accuracy.
+
+Review this bounded run before adding epochs, changing architecture, or increasing training depth. If in-range execution improves but depth 5–8 stays poor, record that failure and choose the next isolated change. Set measurable acceptance criteria and a confirmation seed before the next evaluation intended to establish a gate. Previously inspected test sets are now development diagnostics for decisions informed by them, not an untouched confirmation set.
+
+The desktop has a recorded tiny exact-resume discrepancy in a toy test; byte-for-byte resume equivalence on CUDA is **not established**. Preserve parent/resumed run metadata and report this limitation. The continuation configuration does not fix that separate issue. No pretrained continuation has been launched by the assistant.
+
+Validation of the continuation config on the Mac: data/tokenizer-only dry run passed with 5,000 training examples, 64 validation examples, 16 probe examples, and 1,875 total planned updates. No checkpoint restoration or pretrained training was performed.

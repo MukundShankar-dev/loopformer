@@ -129,3 +129,33 @@ def test_saved_checkpoint_loop_cli_matches_naive_readout(tmp_path):
     rejected = subprocess.run([*command, '--output', str(tmp_path / 'too_short'), '--loops', '2'], cwd=ROOT, capture_output=True, text=True)
     assert rejected.returncode != 0 and 'deepest selected task' in rejected.stderr
     assert not (tmp_path / 'too_short').exists()
+
+    # The terminal CLI uses the same model path and scoring, but persists changed
+    # prompts and explicit dynamics. No optimizer state or pretrained downloads.
+    terminal_output = tmp_path / 'terminal'
+    terminal_command = [sys.executable, '-m', 'scripts.eval.overscaling_test', '--model', str(checkpoint),
+                        '--data', str(data), '--output', str(terminal_output), '--loops', '11',
+                        '--threads', '1', '--batch-size', '2', '--test']
+    subprocess.run(terminal_command, cwd=ROOT, capture_output=True, text=True, check=True)
+    terminal_summary = json.loads((terminal_output / 'summary.json').read_text())
+    assert terminal_summary['status'] == 'complete'
+    assert terminal_summary['task_variant'] == 'absorbing-terminal-v1'
+    assert terminal_summary['executed_example_loops'] == 33
+    assert len(list(csv.DictReader((terminal_output / 'transitions.csv').open()))) == 30
+    terminal_data = terminal_output / 'tasks.jsonl'
+    transformed = [json.loads(line) for line in terminal_data.read_text().splitlines()]
+    assert all(dict(t['mapping'])[t['final_state']] == t['final_state'] for t in transformed)
+    from scripts.eval.pointer_task import sha256_file
+    assert sha256_file(terminal_data) == terminal_summary['transformed_tasks_sha256']
+    terminal_naive = tmp_path / 'terminal_naive'
+    subprocess.run([sys.executable, '-m', 'scripts.eval.naive_test', '--model', str(checkpoint),
+                    '--data', str(terminal_data), '--output', str(terminal_naive), '--threads', '1'],
+                   cwd=ROOT, capture_output=True, text=True, check=True)
+    expected = list(csv.DictReader((terminal_naive / 'predictions.csv').open()))
+    terminal_rows = list(csv.DictReader((terminal_output / 'trajectories.csv').open()))
+    nominal = [r for r in terminal_rows if r['loop'] == r['task_depth']]
+    assert [r['prediction'] for r in nominal] == [r['prediction'] for r in expected]
+    rejected = subprocess.run([*terminal_command, '--output', str(tmp_path / 'no_extra'), '--loops', '10'],
+                              cwd=ROOT, capture_output=True, text=True)
+    assert rejected.returncode != 0 and 'greater than' in rejected.stderr
+    assert not (tmp_path / 'no_extra').exists()

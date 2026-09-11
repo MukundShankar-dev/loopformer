@@ -59,10 +59,59 @@ Artifacts, each containing `predictions.csv` and `summary.json`:
 
 Both 1,000-row files passed independent audits of unique IDs, reference targets, scores, input prompts, symbol token IDs, requested/executed loops, source hashes, and data hashes. Adapter hashes are recorded in the summaries; absent weights were not independently rehashed on the Mac.
 
-## Interpretation and next measurement
+## Interpretation before full-loop evaluation (historical)
 
 The larger run supports learned final-answer execution on unseen mappings within trained depths and some extension to depth 5. At update 500, 62/125 depth-5 answers equal the fourth reference state; at update 625 this falls to 12/125, while 46/125 depth-6 answers equal the fifth state. These final-output patterns suggest stalled progression but do not reconstruct internal trajectories.
 
 Keep update 500 as the validation-selected primary result and update 625 as secondary. The 7/8 depth-5 validation observation did not translate to comparable full-test accuracy. Do not silently change checkpoint selection based on test outcomes.
 
-Next: run the [full-loop evaluator](../loop_pointer_eval.md) on both checkpoints to measure complete trajectories, first errors, and depth-by-loop behavior on full datasets. Gate 1 criteria remain unresolved; final-answer accuracy alone does not establish the mechanism gate. The [WSL exact-resume issue](wsl_cuda_baseline.md) remains unresolved by this uninterrupted run.
+The next measurement at that point was full-loop evaluation; it is now complete and audited below. Gate 1 criteria remained unresolved. The uninterrupted run did not resolve the [WSL exact-resume issue](wsl_cuda_baseline.md).
+
+## Full-loop evaluations and audit
+
+The user subsequently ran the full-loop evaluator on both saved checkpoints:
+
+```bash
+python -m scripts.eval.loop_test \
+  --model models/stage1_pointer/20260910T220130.926886Z/step-000500 \
+  --device cuda --loops 8
+python -m scripts.eval.loop_test \
+  --model models/stage1_pointer/20260910T220130.926886Z/step-000625 \
+  --device cuda --loops 8
+```
+
+Each run contains 1,000 examples and 8,000 readouts. Primary update 500 took 152.55 seconds; secondary update 625 took 160.51 seconds, excluding model loading and final diagnostic exports.
+
+| Depth | Update 500 complete trajectories / 125 | Update 625 complete trajectories / 125 |
+| --- | ---: | ---: |
+| 1 | 123 | 125 |
+| 2 | 120 | 124 |
+| 3 | 108 | 117 |
+| 4 | 80 | 96 |
+| 5 | 11 | 50 |
+| 6 | 0 | 4 |
+| 7 | 0 | 0 |
+| 8 | 0 | 0 |
+| Overall / 1,000 | 442 (44.2%) | 516 (51.6%) |
+
+Complete-trajectory accuracy at trained depths 1–4 is **431/500 (86.2%)** versus **462/500 (92.4%)**. Nominal final accuracy remains 47.0% versus 53.7% overall. Every nominal final prediction matches the preceding corresponding `naive_test` run. At update 625, 462 of 465 correct trained-depth final answers also have every preceding step correct.
+
+Conditional first failures localize the extension breakdown. At update 500, 257/318 examples requiring loop 5 fail there despite every preceding step being correct; 197 of those failures repeat the preceding decoded symbol. At update 625, 155/170 examples requiring loop 6 fail after five correct steps; 103 of those failures repeat the preceding symbol. This is evidence of stalled decoded progression, not proof of frozen hidden states.
+
+Overall equal-example nominal CE is 0.83299 at update 500 and 0.97028 at update 625. Despite higher accuracy, update 625 has larger losses at loops 6–8. Accuracy and probability quality therefore do not improve uniformly with more updates.
+
+Artifacts:
+
+- Primary: `eval/pointer_loops/20260910T225645.650884Z-20260910T220130.926886Z-step-000500/`
+- Secondary: `eval/pointer_loops/20260910T224545.524555Z-20260910T220130.926886Z-step-000625/`
+- Secondary three-example preview: `eval/pointer_loops/20260910T224510.343269Z-20260910T220130.926886Z-step-000625/`
+
+The read-only audits independently executed the dataset mappings, checked trajectory coverage, nominal/final labels, correctness and first-error counts, and aggregated exported losses. Source and dataset hashes were consistent with each run at audit time. Full logits and adapter binaries were unavailable locally, so the audits did not independently recompute CE from logits, rehash model tensors, or rerun inference. Later source edits do not retroactively alter the recorded run provenance.
+
+## Current interpretation and next experiment
+
+These runs support **instance generalization and meaningful stepwise execution at trained depths**, with limited extension to depth 5 and weak execution beyond it. They do not support general depth extrapolation, cross-family transfer, or natural-language reasoning. Both checkpoints are from a single training seed, and Gate 1 quantitative acceptance criteria were not set in advance; no formal gate is declared passed after inspecting these results.
+
+The user has prioritized further Stage 1 training before running overscaling experiments. A [three-total-epoch continuation](../training_pointer.md#continue-the-current-desktop-run) keeps training depths at 1–4 and examines whether extension improves on validation. Retain update 500 as the historical primary and 625 as secondary, even when resuming the latest optimizer state at 625. The seed-17 test results already inspected are diagnostic evidence, not untouched final confirmation for future tuned runs.
+
+[Absorbing-terminal overscaling tools](../overscaling_eval.md) are prepared but execution is deferred. The original continuing-pointer tasks still cannot establish post-completion damage by a changed decoded answer alone. The [WSL exact-resume precision limitation](wsl_cuda_baseline.md) remains unresolved; it is separate from the correctness of these completed evaluation artifacts.

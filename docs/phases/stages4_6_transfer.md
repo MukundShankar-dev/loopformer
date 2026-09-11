@@ -47,3 +47,8 @@ After relevant trajectories exist, use entropy/margins, linear probes, or small 
 ## Implementation record
 
 No multi-family generators, training mixture, anchor implementation, holdout results, or natural-language experiments exist yet. Split this guide into more detailed phase documents only when implementation warrants it, and update the documentation index and agent reading map.
+
+
+## Future preservation regression evaluation
+
+At the user's request, the [project plan](../project_plan.md#future-knowledge-retention-regression-check) now includes a small fixed ordinary-knowledge regression check before/after pointer adaptation, with a seeded MMLU subset as one candidate. It is a future evaluation, not an implemented benchmark or a requirement to introduce the anchor loss. Keep one-pass preservation distinct from cross-family and natural-language transfer. Current work remains Stage 1 depth generalization; these later stages are not activated by preparing that plan.

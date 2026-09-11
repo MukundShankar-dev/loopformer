@@ -1,6 +1,6 @@
 # Stage 1: pointer data and stepwise execution
 
-Status: data milestone implemented and validated on 2026-09-10; pretrained CUDA training and final-answer checkpoint evaluation have run. The [full-loop CLI](../loop_pointer_eval.md) is implemented; pretrained full-dataset per-loop evaluation remains pending. Gate 1 is not established. Source: project plan sections 5, 7, and 32. See [current evidence](../status.md) and the [data validation report](../experiments/stage1_data_validation.md).
+Status: data milestone implemented and validated on 2026-09-10; pretrained CUDA training and final-answer checkpoint evaluation have run. Full-dataset per-loop evaluations of updates 500 and 625 are complete and audited in the [run report](../experiments/stage1_cuda_5k.md). Further training for depth extension is the current priority. Gate 1 is not established. Source: project plan sections 5, 7, and 32. See [current evidence](../status.md) and the [data validation report](../experiments/stage1_data_validation.md).
 
 ## Purpose
 
@@ -37,7 +37,7 @@ Evaluate complete datasets from saved checkpoints with `python -m scripts.eval.l
 - Additional loops can extend execution, including evaluation beyond trained depths.
 - Final-answer accuracy does not conceal shallow shortcuts or broken intermediate execution.
 
-Use the depth-by-loop heatmap and intermediate trajectories to assess the gate. Establish quantitative thresholds and evaluation sizes before judging success; none have been measured yet.
+Use the depth-by-loop heatmap and intermediate trajectories to assess the gate. Establish quantitative thresholds, confirmation seeds, and evaluation sizes before a future gate decision. Current measurements are exploratory: trained-depth complete-trajectory accuracy is 86.2%/92.4% at updates 500/625, with weak execution beyond depth 5.
 
 ## Implementation record
 
@@ -124,4 +124,4 @@ The checker accepts a prediction prefix, strips surrounding whitespace, and requ
 
 Verification checks file hashes, counts and depth histograms, unique mappings, prompt/table consistency, all labels by reparsing and executing the prompt, actual token contexts, and exact per-record seed replay. Source hashes and runtime provenance live in the manifest; generated data is excluded from Git by `data/` in `.gitignore`. The [report](../experiments/stage1_data_validation.md) records the default artifact hashes as durable evidence.
 
-The separate [ordinary-model final-answer baseline](../naive_pointer_eval.md) is implemented and tested with toy models; the user's first full three-shot run reached 6.00% accuracy and is documented in the [baseline report](../experiments/naive_pointer_baseline.md). It shares the dataset and uses `prompts/pointer_task.txt` instructions, without changing the nominal targets or introducing recurrent training. Training code, resumable adapter checkpoints, and per-loop validation are implemented and tested on random tiny models. Pretrained CUDA training and checkpoint final-answer results are recorded in the [5,000-mapping report](../experiments/stage1_cuda_5k.md); full-test per-loop evaluation is pending. Passing data validation or final-answer baseline tests does not establish Gate 1.
+The separate [ordinary-model final-answer baseline](../naive_pointer_eval.md) is implemented and tested with toy models; the user's first full three-shot run reached 6.00% accuracy and is documented in the [baseline report](../experiments/naive_pointer_baseline.md). It shares the dataset and uses `prompts/pointer_task.txt` instructions, without changing the nominal targets or introducing recurrent training. Training code, resumable adapter checkpoints, and per-loop validation are implemented and tested on random tiny models. Pretrained CUDA training and checkpoint final-answer results are recorded in the [5,000-mapping report](../experiments/stage1_cuda_5k.md); full-test per-loop evaluation is now complete and audited. The next bounded experiment is [continued depth-1–4 training](../training_pointer.md#continue-the-current-desktop-run), while terminal overscaling execution is deferred. Passing data validation or final-answer baseline tests does not establish Gate 1.
