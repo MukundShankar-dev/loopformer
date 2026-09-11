@@ -170,6 +170,8 @@ Budget: one epoch, 3,750 updates, batch 1 with accumulation 8, float32, learning
 
 The config passes schema validation. The new dataset is absent on the Mac, so its training dry-run and pretrained training have not been run by the assistant; preview on the desktop before launching.
 
+Startup troubleshooting: the desktop fresh run reported one vocabulary logit just outside the T=1 tolerance (approximately `1.3e-5` absolute difference). The startup reference now projects only the answer position, matching the recurrent readout's matrix shape, with the original tolerance unchanged. Transfer the updated `scripts/training/gates.py` and rerun the same training command. This failure occurs before the run directory is created or any optimizer update. The CUDA retry remains unverified; if the comparison still fails, retain the complete traceback rather than bypassing the gate.
+
 ## Earlier depth stage: adapter-only initialization
 
 The three-epoch depth-4 run and full validation evaluation are complete. The next [depth-6 experiment](depth_generalization.md) expands OOD evaluation through depths 9–16, keeps the depth-4 checkpoint as a paired reference, and reserves seed 29 for later confirmation.

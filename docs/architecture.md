@@ -32,6 +32,8 @@ Frozen operations remain differentiable. Gradients pass through C to the adapter
 
 Stage 1 uses differentiable unrolls with masked intermediate 26-symbol CE in `scripts/training/objective.py`. Later losses retain gradients through earlier recurrent states. Future Stage 3 detached rollouts and asymmetric objectives remain unimplemented.
 
+The training startup gate compares ordinary-Qwen and fresh-adapter T=1 logits over the full vocabulary at the answer position. Its reference uses `logits_to_keep` to project only that position, matching the wrapper's compact LM-head readout instead of projecting the whole prompt and slicing afterward. This removes a matrix-shape difference from the numerical comparison; `atol=rtol=1e-5` remains unchanged. Full-sequence equivalence remains covered separately by Stage 0. The change does not alter recurrent forward behavior, the training objective, or saved-checkpoint evaluation.
+
 ## Implemented forward interface
 
 `model(input_ids, attention_mask=None, *, num_loops=1, position_ids=None, answer_positions=None, labels=None, allowed_token_ids=None, return_hidden_states=False, logits_mode="answer")` returns `RecurrentOutput`.

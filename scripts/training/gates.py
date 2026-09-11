@@ -17,7 +17,11 @@ def initialize(base: Qwen2ForCausalLM, config: TrainingConfig, inputs: dict, tok
     mask = inputs["attention_mask"][:1]
     position = int(mask.sum().item()) - 1
     with torch.no_grad():
-        reference = base(input_ids=x, attention_mask=mask, use_cache=False).logits[:, position].clone()
+        # Match the wrapper's one-position LM-head projection. Projecting the
+        # entire prompt first can introduce shape-dependent rounding on CUDA.
+        readout = torch.tensor([position], device=x.device)
+        reference = base(input_ids=x, attention_mask=mask, use_cache=False,
+                         logits_to_keep=readout).logits[:, 0].clone()
     model = RecurrentQwen(base, config.recurrent_start, config.recurrent_end).eval()
     attach_recurrent_lora(model, rank=config.lora_rank, alpha=config.lora_alpha)
     with torch.no_grad():

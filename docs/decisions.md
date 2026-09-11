@@ -62,6 +62,8 @@ Use Python 3.11 with a local `venv` and pinned direct dependencies in [requireme
 
 ## Remaining implementation and research choices
 
+**Training startup reference projection — 2026-09-11.** Following a desktop report of one T=1 vocabulary logit outside tolerance by a small amount, align the ordinary-Qwen reference's LM-head projection to the same single answer position as the recurrent wrapper. The previous reference projected the entire sequence before slicing. Keep the full-vocabulary comparison and `atol=rtol=1e-5`; do not loosen or disable Gate 0. This is a numerical comparison correction, not a research-design or recurrent-model change. Tiny-model regression checks cover the right-padded answer position and rejection of deliberately incorrect logits; the exact CUDA failure and fix require a desktop retry.
+
 **Full-loop checkpoint evaluation — 2026-09-10.** Reuse training's nominal CE/readout path for saved-checkpoint evaluation. Run a common loop budget across selected examples (default their maximum depth) and reject insufficient budgets. Preserve blank intermediate labels/losses/margins after nominal completion. Export first-error indices, correct-prefix lengths, and observed final-target matches without declaring repair/damage or a gate result. The user will run pretrained evaluation; implementation checks use random tiny models and prescribed logits. This adds observability without changing recurrence, training, or completion semantics. See [full-loop evaluation](loop_pointer_eval.md).
 
 | ID | Resolve before | Question and consequence |
