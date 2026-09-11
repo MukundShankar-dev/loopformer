@@ -115,3 +115,37 @@ These runs support **instance generalization and meaningful stepwise execution a
 The user has prioritized further Stage 1 training before running overscaling experiments. A [three-total-epoch continuation](../training_pointer.md#continue-the-current-desktop-run) keeps training depths at 1–4 and examines whether extension improves on validation. Retain update 500 as the historical primary and 625 as secondary, even when resuming the latest optimizer state at 625. The seed-17 test results already inspected are diagnostic evidence, not untouched final confirmation for future tuned runs.
 
 [Absorbing-terminal overscaling tools](../overscaling_eval.md) are prepared but execution is deferred. The original continuing-pointer tasks still cannot establish post-completion damage by a changed decoded answer alone. The [WSL exact-resume precision limitation](wsl_cuda_baseline.md) remains unresolved; it is separate from the correctness of these completed evaluation artifacts.
+
+## Three-epoch continuation and full validation
+
+The user completed the documented continuation from update 625, using `configs/stage1_pointer_continue.json` and `--resume models/stage1_pointer/20260910T220130.926886Z/step-000625`. New run: `models/stage1_pointer/20260911T003442.178029Z/`, source revision `04179d37ff714531a8707fe1b4d673565d7d1e43`. All 1,250 additional optimizer updates (626–1875) completed, for three total epochs. Wall time was 1,992.25 seconds (33m12s), with the same 2.77 GiB peak CUDA tensor allocation. Source/data hashes and parent training identity matched. Initial resumed monitoring predictions matched the parent checkpoint; this does not establish bitwise optimizer resume equivalence on CUDA.
+
+Update 1875 was selected by the existing trained-depth validation loss rule: 0.00001757054 on the small monitoring subset. That subset had 32/32 complete trajectories at depths 1–4, 8/8 at depth 5, 3/8 at depth 6, and none at 7–8. Across continuation checkpoints, deeper monitoring fluctuated; update 1700 reached 6/8 at depth 6 but was not substituted for the selected checkpoint.
+
+The user then ran:
+
+```bash
+python -m scripts.eval.loop_test \
+  --model models/stage1_pointer/20260911T003442.178029Z/step-001875 \
+  --data data/pointer/seed-17/validation.jsonl --device cuda --loops 8
+```
+
+Artifacts: `eval/pointer_loops/20260911T011247.420716Z-20260911T003442.178029Z-step-001875/`. Full validation took 177.91 seconds for 1,000 examples / 8,000 readouts.
+
+| Depth | Complete trajectories / 125 | Correct final / 125 |
+| --- | ---: | ---: |
+| 1 | 125 | 125 |
+| 2 | 124 | 124 |
+| 3 | 125 | 125 |
+| 4 | 123 | 123 |
+| 5 | 103 | 103 |
+| 6 | 26 | 29 |
+| 7 | 2 | 7 |
+| 8 | 0 | 9 |
+| Overall / 1,000 | 628 | 645 |
+
+Trained-depth complete-trajectory accuracy is **497/500 (99.4%)**. Depth-5 accuracy is 82.4%, depth-6 accuracy 20.8%, depth-7 accuracy 1.6%, and depth-8 accuracy 0%. Among 320 examples with five correct preceding steps that require a sixth, 230 first fail at loop 6; 172 of those failures repeat the preceding decoded symbol. This supports reliable nominal execution plus limited depth extension, not arbitrary-depth execution or frozen hidden states.
+
+The read-only audits covered all 30 continuation monitoring CSVs (8,280 rows) and all 8,000 full-validation rows: exact interpreter targets, masks, correctness, aggregate exported CE, source/data hashes, and update sequence. The 512 corresponding monitoring readouts matched the full validation sweep. Adapter tensors and full logits were not available locally; no pretrained inference was repeated by the assistant. The full validation set is different from the earlier checkpoint-500/625 test set, so do not describe their score differences as a paired comparison.
+
+Next is the [depth-6 training and outward OOD experiment](../depth_generalization.md), not additional unchanged depth-4 epochs. Keep update 1875 as the depth-4 reference, run paired evaluation on the same depth-1–16 development examples, and reserve seed 29 for later confirmation. Increasing training depth without moving the OOD range would weaken the extrapolation test. Overscaling and knowledge-retention evaluation remain deferred.

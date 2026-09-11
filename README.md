@@ -85,7 +85,7 @@ python -m scripts.training.train_pointer --config configs/stage1_pointer.json --
 
 Configs live in [`configs/`](configs/). The trainer uses raw dataset prompts and exact per-loop supervision. A compact Rich dashboard shows progress, ETA, losses, accuracy, and memory. Checkpoints and logs go to `models/stage1_pointer/`; model binaries are excluded from Git.
 
-For the existing desktop run, [continuation instructions](docs/training_pointer.md#continue-the-current-desktop-run) use `configs/stage1_pointer_continue.json` to extend training to three total epochs. This is a bounded experiment, not a guarantee of depth generalization. The guide also covers the small overfit run, checkpoint selection, and resume limitations.
+The three-epoch depth-4 run is complete. The next experiment uses `configs/stage1_pointer_depth6.json` and adapter-only initialization, with OOD evaluation moved outward through depth 16. Follow the [depth-6 setup and paired evaluation commands](docs/depth_generalization.md), starting with its dry-run. The [training guide](docs/training_pointer.md) covers checkpoint selection and resume.
 
 ## Inspect recurrent checkpoints
 

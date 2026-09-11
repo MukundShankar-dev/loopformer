@@ -18,6 +18,7 @@ For collaborator onboarding, see [Python environment setup](setup.md), the pinne
 | 0 | Verify the recurrent architecture before research training | [Architecture validation](phases/stage0_architecture.md) |
 | 1, data milestone | Validate symbols, mappings, intermediate targets, and splits before training | [Pointer execution](phases/stage1_pointer.md) |
 | 1, training milestone | Establish one-loop/one-transition execution | [Training usage](training_pointer.md) and [research gate](phases/stage1_pointer.md) |
+| 1, depth extension | Train through depth 6 and compare OOD execution through depth 16 | [Depth generalization setup](depth_generalization.md) |
 | 1, checkpoint evaluation | Inspect every loop on full datasets | [Full-loop evaluation](loop_pointer_eval.md) |
 | 2, deferred | Measure repair and damage on separate terminal tasks | [Overthinking](phases/stage2_overthinking.md) and [overscaling usage](overscaling_eval.md) |
 | 3 | Reduce damage while retaining useful computation | [Asymmetric dynamics](phases/stage3_asymmetric.md) |
@@ -31,7 +32,7 @@ Ordinary-model baseline: [final-answer pointer evaluation](naive_pointer_eval.md
 
 Recorded validation: [Stage 0 architecture on pretrained Qwen, CPU and MPS](experiments/stage0_validation.md), and [Stage 1 training implementation with toy models](experiments/stage1_training_implementation.md).
 
-Latest evidence: [5,000-mapping CUDA run and audited final-answer/full-loop evaluations](experiments/stage1_cuda_5k.md). Next: [bounded training continuation](training_pointer.md#continue-the-current-desktop-run), with deeper validation reported separately. [Terminal overscaling scripts](overscaling_eval.md) are prepared for later. The [future knowledge-retention check](project_plan.md#future-knowledge-retention-regression-check) is documentation only.
+Latest evidence: [5,000-mapping CUDA run and audited final-answer/full-loop evaluations](experiments/stage1_cuda_5k.md). The three-epoch continuation and its full validation evaluation are complete. Next: [depth-6 initialization and paired OOD evaluation through depth 16](depth_generalization.md). [Terminal overscaling scripts](overscaling_eval.md) are prepared for later. The [future knowledge-retention check](project_plan.md#future-knowledge-retention-regression-check) is documentation only.
 
 Desktop setup: [WSL CUDA environment and instruct baseline](experiments/wsl_cuda_baseline.md) records the actual desktop installation, dataset reproduction, checks, and evaluation status.
 

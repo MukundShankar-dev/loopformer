@@ -51,7 +51,7 @@ Each run writes a new directory under `eval/pointer_loops/<timestamp>-<training-
 - All examples are swept through the same loop count, so the final-target depth × loop matrix includes post-completion observations. Intermediate target/loss/margin/correctness are blank after completion and excluded from supervised metrics. This does not define a retention target or classify valid continuing pointer moves as damage.
 - Repeated adjacent predictions can indicate a stalled decoded answer, but do not establish frozen hidden states. The count considers adjacent nominal loops only, where the reference path does not repeat.
 
-Update 500 remains the validation-loss-selected primary checkpoint. Update 625 is the already inspected secondary comparison; do not silently reselect a primary checkpoint using test performance. Separate depths 1–4 (trained), 5–8 (untrained depths already monitored during training), and the deeper test file. Both historical checkpoints have now been evaluated and audited in the [run report](experiments/stage1_cuda_5k.md). Gate 1 still requires explicit empirical criteria; the CLI does not declare a gate passed. The next priority is [further training](training_pointer.md#continue-the-current-desktop-run), not repeating these completed sweeps.
+For the original one-epoch experiment, update 500 remains the validation-loss-selected primary checkpoint. Update 625 is its already inspected secondary comparison; do not silently reselect a primary checkpoint using test performance. Separate depths 1–4 (trained), 5–8 (untrained depths already monitored during training), and the deeper test file. Both historical checkpoints have now been evaluated and audited in the [run report](experiments/stage1_cuda_5k.md). Gate 1 still requires explicit empirical criteria; the CLI does not declare a gate passed. The next priority is [further training](training_pointer.md#continue-the-current-desktop-run), not repeating these completed sweeps.
 
 ## Validation
 
@@ -61,3 +61,5 @@ Validation on the Mac: `.venv/bin/python -m pytest tests/test_loop_eval.py tests
 
 
 For later overscaling experiments with a well-defined terminal state, use the separate [terminal evaluator](overscaling_eval.md). The ordinary `loop_test` command and existing dataset retain their nominal-only semantics. Terminal execution is currently deferred in favor of further Stage 1 training.
+
+For the current outward-depth experiment, update 1875 from the completed depth-4 continuation is the reference. The [paired depth evaluator](depth_generalization.md#evaluate-both-models-through-depth-16) evaluates it and the new depth-6 checkpoint on identical files and exports absolute and relative depth metrics.

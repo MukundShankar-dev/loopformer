@@ -13,6 +13,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | Recurrent wrapper and architecture tests | [Stage 0](docs/phases/stage0_architecture.md) |
 | Pretrained Stage 0 validation evidence and device limits | [Validation report](docs/experiments/stage0_validation.md) |
 | Symbol vocabulary, pointer data, and intermediate training | [Stage 1](docs/phases/stage1_pointer.md) |
+| Depth-6 training, initialization, and outward OOD evaluation | [Depth generalization setup](docs/depth_generalization.md) |
 | Training commands, logging, checkpoints, and resume | [Pointer training](docs/training_pointer.md) |
 | Windows desktop setup, CUDA dependencies, and state migration | [WSL2/CUDA guide](docs/windows_cuda_setup.md) |
 | Untreated overscaling and failure analysis | [Stage 2](docs/phases/stage2_overthinking.md) and [terminal evaluation usage](docs/overscaling_eval.md) |

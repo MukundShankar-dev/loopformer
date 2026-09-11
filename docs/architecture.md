@@ -85,3 +85,6 @@ The [full-loop CLI](loop_pointer_eval.md) restores the same saved model/tokenize
 
 
 The deferred terminal experiment composes that same inference path via `overscaling_test.py`. Before encoding, `terminal.py` returns new task records with only the final outgoing edge changed to a self-loop. `tasks.jsonl` and its hash preserve the exact changed inputs. Nominal CE remains masked after d; post-nominal fixed-final scoring lives exclusively in `overscaling_metrics.py` and never enters the optimizer. No hidden states, model internals, or gradient behavior are changed. Conditional counts and survival are validated independently of model inference; see [usage and semantics](overscaling_eval.md).
+
+
+Depth-stage initialization is separate from resume: `scripts/training/initialization.py` validates the saved adapter interpretation and training-exposure metadata, while the training CLI restores only adapter tensors before creating a new optimizer. Checkpoint lineage survives subsequent resume. `scripts/eval/depth_generalization.py` composes matched `loop_test` sweeps; `depth_comparison.py` checks pairing/provenance and reports absolute and relative depth. No recurrent forward or gradient semantics change. See [depth-6 setup](depth_generalization.md).

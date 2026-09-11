@@ -246,3 +246,29 @@ def test_training_cli_dry_run_and_toy_update(tmp_path):
     subprocess.run([*command, '--output', str(continuation), '--resume', str(output / 'step-000001')], cwd=ROOT, capture_output=True, text=True, check=True)
     summary = json.loads((continuation / 'summary.json').read_text())
     assert summary['step'] == 2 and summary['next_epoch'] == 1
+
+    # A new depth stage loads adapters, but must not reuse optimizer/cursor state.
+    source = continuation / 'step-000002'
+    (source / 'training_state.pt').unlink()
+    for split in ('train', 'validation'):
+        content = ''.join(json.dumps(generate_example((217 if split == 'train' else 317) + i, 1 + i % 3, split, i).to_dict()) + '\n' for i in range(6))
+        (tmp_path / f'{split}.jsonl').write_text(content)
+        manifest['splits'][split] = {'sha256': hashlib.sha256(content.encode()).hexdigest(), 'count': 6}
+    (tmp_path / 'manifest.json').write_text(json.dumps(manifest))
+    deeper_config = replace(config, train_max_depth=3, validation_max_depth=3, max_steps=1)
+    config_path.write_text(json.dumps(deeper_config.to_dict()))
+    deeper = tmp_path / 'deeper'
+    warm_command = [*command, '--output', str(deeper), '--init-from', str(source)]
+    subprocess.run([*warm_command, '--dry-run'], cwd=ROOT, capture_output=True, text=True, check=True)
+    assert not deeper.exists()
+    subprocess.run(warm_command, cwd=ROOT, capture_output=True, text=True, check=True)
+    initial = torch.load(deeper / 'step-000000/adapter_model.pt', weights_only=True)
+    expected = torch.load(source / 'adapter_model.pt', weights_only=True)
+    assert all(torch.equal(initial[k], expected[k]) for k in expected)
+    state = torch.load(deeper / 'step-000001/training_state.pt', weights_only=True)
+    assert state['step'] == 1 and state['next_offset'] == 2
+    saved_spec = json.loads((deeper / 'step-000001/recurrent_config.json').read_text())
+    assert saved_spec['train_max_depth'] == 3 and saved_spec['initialization']['source_train_max_depth'] == 2
+    config_path.write_text(json.dumps(replace(deeper_config, max_steps=2).to_dict()))
+    subprocess.run([*command, '--output', str(tmp_path / 'deeper_resume'), '--resume', str(deeper / 'step-000001')],
+                   cwd=ROOT, capture_output=True, text=True, check=True)

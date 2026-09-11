@@ -133,3 +133,12 @@ Review this bounded run before adding epochs, changing architecture, or increasi
 The desktop has a recorded tiny exact-resume discrepancy in a toy test; byte-for-byte resume equivalence on CUDA is **not established**. Preserve parent/resumed run metadata and report this limitation. The continuation configuration does not fix that separate issue. No pretrained continuation has been launched by the assistant.
 
 Validation of the continuation config on the Mac: data/tokenizer-only dry run passed with 5,000 training examples, 64 validation examples, 16 probe examples, and 1,875 total planned updates. No checkpoint restoration or pretrained training was performed.
+
+
+## New depth stage: adapter-only initialization
+
+The three-epoch depth-4 run and full validation evaluation are complete. The next [depth-6 experiment](depth_generalization.md) expands OOD evaluation through depths 9–16, keeps the depth-4 checkpoint as a paired reference, and reserves seed 29 for later confirmation.
+
+Use `--init-from <step-directory>` to load compatible adapters into a **new** training stage. It is mutually exclusive with `--resume`. Base revision, recurrent architecture, LoRA settings, vocabulary, prompt/loss format, and tokenizer must match; training depth may increase. A decrease in the recorded maximum below source exposure is rejected. Original weights stay frozen and per-loop supervision is unchanged. The new optimizer, warmup schedule, seeded RNG sequence, and counters start afresh; parent optimizer state is not required. Source hashes/depth are recorded in `run.json` and saved recurrent metadata. Subsequent resume of this new stage retains lineage and uses the normal strict identity contract.
+
+Preview validates source metadata but does not load adapter tensors. Actual initialization additionally checks tokenizer identity, hashes the adapter/metadata/tokenizer files, and validates tensor names, shapes, and finite values. Exact commands, budgets, checkpoint selection, OOD comparisons, and confirmation policy live in the [depth experiment guide](depth_generalization.md).

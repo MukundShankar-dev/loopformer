@@ -18,7 +18,9 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=root / "configs/stage1_pointer.json")
     parser.add_argument("--device", choices=("cpu", "mps", "cuda"), help="Override the config device explicitly")
     parser.add_argument("--output", type=Path, help="New run directory; default models/stage1_pointer/<timestamp>")
-    parser.add_argument("--resume", type=Path, help="Resume from a step directory; use the matching config and a new output directory")
+    initialization = parser.add_mutually_exclusive_group()
+    initialization.add_argument("--resume", type=Path, help="Resume optimizer/RNG/cursor with matching config")
+    initialization.add_argument("--init-from", type=Path, help="Initialize adapters only; new optimizer/RNG/counter, compatible architecture required")
     parser.add_argument("--download", action="store_true", help="Allow missing base model/tokenizer files to download")
     parser.add_argument("--dry-run", action="store_true", help="Validate config/data/tokenizer and print the budget; do not load model weights or write output")
     args = parser.parse_args()
@@ -38,6 +40,7 @@ def main() -> None:
     from scripts.training.config import read_config
     from scripts.training.data import collate, encode_tasks, read_tasks, select_tasks
     from scripts.training.gates import initialize
+    from scripts.training.initialization import validate_initialization
     from scripts.training.runner import resume_identity, train
 
     config = read_config(args.config)
@@ -72,6 +75,23 @@ def main() -> None:
         train_items = encode_tasks(selected, tokenizer, token_map, config.max_prompt_tokens)
         validation_items = encode_tasks(validation_selected, tokenizer, token_map, config.max_prompt_tokens)
         probe_items = encode_tasks(probe_selected, tokenizer, token_map, config.max_prompt_tokens)
+    token_ids = [token_map[symbol] for symbol in SYMBOLS]
+    spec = {"base_model": config.model, "revision": config.revision,
+            "recurrent_start": config.recurrent_start, "recurrent_end": config.recurrent_end,
+            "lora_rank": config.lora_rank, "lora_alpha": config.lora_alpha,
+            "symbols": list(SYMBOLS), "token_ids": token_ids,
+            "prompt_format": "dataset_raw", "loss_vocabulary": "symbols", "train_max_depth": config.train_max_depth}
+    initialization_metadata = None
+    if args.init_from:
+        source_spec = validate_initialization(args.init_from, spec)
+        initialization_metadata = {"checkpoint": str(args.init_from.resolve()), "source_train_max_depth": source_spec["train_max_depth"],
+                                   "mode": "adapters_only", "optimizer_rng_cursor": "fresh"}
+        if not args.dry_run:
+            saved_tokenizer = AutoTokenizer.from_pretrained(args.init_from, local_files_only=True, trust_remote_code=False)
+            if saved_tokenizer.backend_tokenizer.to_str() != tokenizer.backend_tokenizer.to_str():
+                raise ValueError("Initialization tokenizer differs from the configured tokenizer")
+            initialization_metadata["sha256"] = {name: sha256_file(args.init_from / name)
+                                                  for name in ("adapter_model.pt", "recurrent_config.json", "tokenizer.json")}
     effective_batch = config.batch_size * config.gradient_accumulation
     planned = ((len(train_items) + effective_batch - 1) // effective_batch) * config.epochs
     planned = min(planned, config.max_steps) if config.max_steps else planned
@@ -88,13 +108,14 @@ def main() -> None:
         ("Loss", "26-symbol CE · mean loops per example, then mean examples"),
         ("Prompt", "Dataset raw rules/start/steps · no few-shot examples"),
         ("Output", str(output.resolve())),
+        ("Initialization", str(args.init_from) + " · adapters only, new optimizer" if args.init_from else
+         (str(args.resume) + " · resume" if args.resume else "Fresh adapters")),
     ):
         table.add_row(label, value)
     console.print(table)
     if args.dry_run:
         console.print("[green]Dry run passed.[/green] No model weights loaded, training performed, or output files written.")
         return
-    token_ids = [token_map[symbol] for symbol in SYMBOLS]
     with console.status("Loading base and checking T=1 equivalence, weight sharing, and two-loop gradients…"):
         base = Qwen2ForCausalLM.from_pretrained(
             config.model, revision=config.revision, local_files_only=not args.download,
@@ -105,11 +126,16 @@ def main() -> None:
         probe = collate(train_items[:1], tokenizer.pad_token_id, config.device)
         model, gate = initialize(base, config, probe, token_ids)
     console.print(f"[green]Architecture/loss-path checks passed[/green] · {gate['trainable_parameters']:,} trainable parameters")
-    spec = {"base_model": config.model, "revision": getattr(base.config, "_commit_hash", None) or config.revision,
-            "recurrent_start": config.recurrent_start, "recurrent_end": config.recurrent_end,
-            "lora_rank": config.lora_rank, "lora_alpha": config.lora_alpha,
-            "symbols": list(SYMBOLS), "token_ids": token_ids,
-            "prompt_format": "dataset_raw", "loss_vocabulary": "symbols", "train_max_depth": config.train_max_depth}
+    spec["revision"] = getattr(base.config, "_commit_hash", None) or config.revision
+    if args.init_from:
+        validate_initialization(args.init_from, spec)
+        restore_adapters(model, args.init_from)
+        spec["initialization"] = initialization_metadata
+    if args.resume:
+        saved_spec = json.loads((args.resume / "recurrent_config.json").read_text())
+        if "initialization" in saved_spec:
+            initialization_metadata = saved_spec["initialization"]
+            spec["initialization"] = initialization_metadata
     data_identity = {"train_sha256": sha256_file(train_path), "validation_sha256": sha256_file(validation_path),
                      "selected_ids_sha256": hashlib.sha256(json.dumps([[item.task.example_id for item in items] for items in (train_items, validation_items, probe_items)]).encode()).hexdigest(),
                      "spec": spec, "tokenizer_sha256": hashlib.sha256(tokenizer.backend_tokenizer.to_str().encode()).hexdigest()}
@@ -127,6 +153,7 @@ def main() -> None:
     sources = [*root.glob("scripts/training/*.py"), *root.glob("scripts/recurrent_qwen/*.py"), *root.glob("scripts/dataset/*.py"), root / "scripts/eval/pointer_task.py"]
     metadata = {"status": "running", "command": [sys.executable, "-m", "scripts.training.train_pointer", *sys.argv[1:]],
                 "gate": gate, "identity": identity, "resume": str(args.resume) if args.resume else None,
+                "initialization": initialization_metadata,
                 "python": platform.python_version(), "packages": {name: version(name) for name in ("torch", "transformers", "tokenizers", "peft", "rich")},
                 "source_sha256": {str(path.relative_to(root)): sha256_file(path) for path in sources},
                 "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
