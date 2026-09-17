@@ -335,3 +335,18 @@ def test_training_cli_dry_run_and_toy_update(tmp_path):
     config_path.write_text(json.dumps(replace(deeper_config, max_steps=2).to_dict()))
     subprocess.run([*command, '--output', str(tmp_path / 'deeper_resume'), '--resume', str(deeper / 'step-000001')],
                    cwd=ROOT, capture_output=True, text=True, check=True)
+
+    balanced_config = replace(deeper_config, loss_reduction='loop_mean')
+    config_path.write_text(json.dumps(balanced_config.to_dict()))
+    balanced = tmp_path / 'balanced'
+    subprocess.run([*command, '--output', str(balanced)], cwd=ROOT, capture_output=True, text=True, check=True)
+    balanced_spec = json.loads((balanced / 'step-000001/recurrent_config.json').read_text())
+    assert balanced_spec['loss_reduction'] == 'loop_mean'
+    events = [json.loads(line) for line in (balanced / 'metrics.jsonl').read_text().splitlines()]
+    objective = next(e for e in events if e['event'] == 'objective')
+    assert objective['loop_weights'] == pytest.approx([1 / 3, 1 / 2, 1])
+    assert next(e for e in events if e['event'] == 'train')['train']['objective_loss'] >= 0
+    assert next(e for e in events if e['event'] == 'validation')['validation']['selection_reduction'] == 'loop_mean'
+    config_path.write_text(json.dumps(replace(balanced_config, max_steps=2).to_dict()))
+    subprocess.run([*command, '--output', str(tmp_path / 'balanced_resume'), '--resume', str(balanced / 'step-000001')],
+                   cwd=ROOT, capture_output=True, text=True, check=True)

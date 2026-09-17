@@ -84,6 +84,8 @@ def main() -> None:
             "lora_rank": config.lora_rank, "lora_alpha": config.lora_alpha,
             "symbols": list(SYMBOLS), "token_ids": token_ids,
             "prompt_format": "dataset_raw", "loss_vocabulary": "symbols", "train_max_depth": config.train_max_depth}
+    if config.loss_reduction != "example_mean":
+        spec["loss_reduction"] = config.loss_reduction
     initialization_metadata = None
     if args.init_from:
         source_spec = validate_initialization(args.init_from, spec)
@@ -108,7 +110,7 @@ def main() -> None:
         ("Validation / train probe", f"{len(validation_items)} / {len(probe_items)} examples · validation depths 1–{config.validation_max_depth}"),
         ("Batch / accumulation", f"{config.batch_size} × {config.gradient_accumulation} = {effective_batch} examples/update"),
         ("Updates / learning rate", f"{planned} / {config.learning_rate:g}"),
-        ("Loss", "26-symbol CE · mean loops per example, then mean examples"),
+        ("Loss", f"26-symbol CE · {config.loss_reduction} · nominal targets only"),
         ("Prompt", "Dataset raw rules/start/steps · no few-shot examples"),
         ("Output", str(output.resolve())),
         ("Initialization", str(args.init_from) + " · adapters only, new optimizer" if args.init_from else
@@ -176,11 +178,12 @@ def main() -> None:
         dashboard.add_row("Phase", state["phase"])
         if "train" in state:
             values = state["train"]
-            dashboard.add_row("Training", f"loss {values['loss']:.4f} · step accuracy {values['intermediate_accuracy']:.1%} · trajectory {values['trajectory_accuracy']:.1%}")
+            dashboard.add_row("Training", f"objective {values['objective_loss']:.4f} · example CE {values['loss']:.4f} · step accuracy {values['intermediate_accuracy']:.1%} · trajectory {values['trajectory_accuracy']:.1%}")
             dashboard.add_row("Loop losses", "  ".join(f"L{t}: {value['loss']:.3f}" for t, value in values["per_loop"].items()))
         if "validation" in state:
             values = state["validation"]
             dashboard.add_row("Validation", f"loss {values['loss']:.4f} · step accuracy {values['intermediate_accuracy']:.1%} · trajectory {values['trajectory_accuracy']:.1%}")
+            dashboard.add_row("Checkpoint selection", f"{config.loss_reduction} · trained-depth loss {values['selection_loss']:.4f}")
         if "train_probe" in state:
             dashboard.add_row("Fixed train probe", f"trajectory {state['train_probe']['trajectory_accuracy']:.1%}")
         if "gradient_norm_before_clip" in state:

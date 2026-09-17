@@ -38,8 +38,11 @@ class TrainingConfig:
     eval_every: int = 100
     save_every: int = 100
     loss_vocabulary: str = "symbols"
+    loss_reduction: str = "example_mean"
 
     def validate(self) -> None:
+        if self.loss_reduction not in ("example_mean", "loop_mean"):
+            raise ValueError("loss_reduction must be example_mean or loop_mean")
         positive = ("threads", "lora_rank", "lora_alpha", "train_max_depth", "validation_max_depth",
                     "validation_per_depth", "train_probe_per_depth", "max_prompt_tokens", "epochs",
                     "batch_size", "gradient_accumulation", "eval_every", "save_every")

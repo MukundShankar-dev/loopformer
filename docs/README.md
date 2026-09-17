@@ -28,6 +28,8 @@ For collaborator onboarding, see [Python environment setup](setup.md), the pinne
 
 ## Keeping documentation current
 
+Current experiment: [loop-balanced loss training](training_pointer.md#loop-balanced-loss-experiment), compared with the [completed fresh 30k baseline and full evaluations](experiments/stage1_fresh30k.md). The [status](status.md) supersedes historical setup notes below. See [artifact cleanup](training_pointer.md#artifact-cleanup) for the explicitly retired runs and retained evidence.
+
 Ordinary-model baseline: [final-answer pointer evaluation](naive_pointer_eval.md), including model loading, shared prompting, CSV output, scoring, and throughput. Implemented with toy-model tests. The user completed the [first full three-shot baseline](experiments/naive_pointer_baseline.md): 6.00% accuracy, with audited per-depth and response diagnostics.
 
 Recorded validation: [Stage 0 architecture on pretrained Qwen, CPU and MPS](experiments/stage0_validation.md), and [Stage 1 training implementation with toy models](experiments/stage1_training_implementation.md).

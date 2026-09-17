@@ -135,6 +135,40 @@ The desktop has a recorded tiny exact-resume discrepancy in a toy test; byte-for
 Validation of the continuation config on the Mac: data/tokenizer-only dry run passed with 5,000 training examples, 64 validation examples, 16 probe examples, and 1,875 total planned updates. No checkpoint restoration or pretrained training was performed.
 
 
+## Loop-balanced loss experiment
+
+The [completed 30k baseline](experiments/stage1_fresh30k.md) used per-example mean CE. The new [loop-balanced config](../configs/stage1_pointer_depth6_loopbalanced.json) changes only `loss_reduction` to `loop_mean` relative to the batch-4 baseline. Start fresh adapters with the same existing seed-37 dataset and training seed 17; no regeneration, `--resume`, or `--init-from` is needed. Training remains depths 1–6, batch 4/accumulation 2, one epoch/3,750 updates, and learning rate 0.0002. Keep the desktop in tmux as described below.
+
+```bash
+source .venv/bin/activate
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+
+python -m scripts.training.train_pointer \
+  --config configs/stage1_pointer_depth6_loopbalanced.json --device cuda \
+  --output models/stage1_pointer/depth6-loopbalanced-seed37 --dry-run
+
+python -m scripts.training.train_pointer \
+  --config configs/stage1_pointer_depth6_loopbalanced.json --device cuda \
+  --output models/stage1_pointer/depth6-loopbalanced-seed37
+```
+
+For the selected training dataset, let N be the example count, D the maximum depth, and N_t the number of examples reaching loop t. Give each valid CE term weight N/(D*N_t), sum within an example, then average examples. Over the dataset this equals the mean of the D per-loop mean losses. The 30k balanced-depth dataset gives weights `[1/6, 1/5, 1/4, 1/3, 1/2, 1]`: each loop receives 1/6 of the total direct coefficient weight. These weights stay fixed across microbatches and accumulation, including batches without a deep example. Losses beyond an example's depth remain zero. Minibatches estimate this dataset objective; equal loss coefficients do not imply equal gradient norms.
+
+The dashboard shows optimized objective loss separately from legacy example-mean CE. Existing evaluation loss fields retain their meaning for comparison. For this run only, automatic checkpoint selection uses equal-loop mean CE over validation tasks within training depths 1–6; it excludes depth-7/8 examples even from early-loop means. Monitor full trajectories and compare matching update numbers against the baseline. A different objective-selected checkpoint is not by itself proof of improved generalization. Depths 7–16 remain development evaluation; seed 29 stays reserved.
+
+Historical configs default to `example_mean`. Resume cannot change the objective, including with `--allow-batch-change`. The new reduction is recorded in config, run identity, checkpoint metadata, and logs. No explicit loop counter, prompt modification, longer training horizon, or asymmetric retention is introduced. The pretrained experiment remains unrun by the assistant.
+
+## Artifact cleanup
+
+Old recurrent runs and redundant baseline checkpoint directories were removed locally at the user's request. Their tracked evidence remains in Git history; historical report paths can refer to removed files. Git pull will not remove ignored weights on the desktop. With no affected run active, preview and then apply the same bounded cleanup there:
+
+```bash
+python -m scripts.training.cleanup_pointer_runs
+python -m scripts.training.cleanup_pointer_runs --apply
+```
+
+The script targets only named pre-30k runs, their recurrent evaluations, and redundant checkpoints of `depth6-fresh30k-seed37-batch4`. It keeps that run's metrics and evaluations, checkpoints 2250/2500/2750/3000/3250/3750, ordinary-Qwen baseline results, datasets, Stage 0 evidence, and all new or unknown runs. Retained checkpoints include optimizer state for future continuation; deleted directories include both tracked metadata and ignored binaries. This cleanup does not rewrite Git history or remove the shared pretrained-model cache.
+
 ## Fresh depth-6 run with 30,000 mappings
 
 The current experiment uses [stage1_pointer_depth6_fresh30k.json](../configs/stage1_pointer_depth6_fresh30k.json): fresh recurrent adapters on the pinned pretrained Qwen base, with no `--init-from` or `--resume`. All original weights stay frozen and intermediate supervision is unchanged. This directly trains depths 1–6 without the earlier depth-4 curriculum; comparison with that curriculum does not isolate data diversity alone.

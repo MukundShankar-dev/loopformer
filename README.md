@@ -94,7 +94,7 @@ python -m scripts.training.train_pointer --config configs/stage1_pointer.json --
 
 Configs live in [`configs/`](configs/). The trainer uses raw dataset prompts and exact per-loop supervision. A compact Rich dashboard shows progress, ETA, losses, accuracy, and memory. Checkpoints and logs go to `models/stage1_pointer/`; model binaries are excluded from Git.
 
-The current experiment uses `configs/stage1_pointer_depth6_fresh30k.json`: fresh adapters, 30,000 new mappings at depths 1–6, and evaluation through depth 16. Follow the [fresh-run commands](docs/training_pointer.md#fresh-depth-6-run-with-30000-mappings), starting with the dry-run. The [training guide](docs/training_pointer.md) also covers checkpoint selection and resume.
+The next experiment uses `configs/stage1_pointer_depth6_loopbalanced.json`: fresh adapters on the existing 30,000 mappings, with equal loss weight per loop position. Follow the [loop-balanced training commands](docs/training_pointer.md#loop-balanced-loss-experiment), starting with the dry-run. The [training guide](docs/training_pointer.md) also covers checkpoint selection, resume, tmux, and [old-artifact cleanup](docs/training_pointer.md#artifact-cleanup).
 
 ## Inspect recurrent checkpoints
 

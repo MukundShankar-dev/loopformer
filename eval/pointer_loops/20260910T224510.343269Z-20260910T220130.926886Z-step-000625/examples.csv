@@ -1,4 +1,0 @@
-example_id,split,seed,task_depth,initial_state,targets,predictions,executed_loops,trajectory_correct,nominal_final_correct,first_error_loop,correct_prefix_length,first_final_correct_loop,nominal_repeated_predictions
-test-000000-4bf9ebab4bcddde0,test,5474665942989266400,1,P,Y,Y Q O H C C C S,8,True,True,,1,1,0
-test-000001-82297e76f221a0b2,test,9379166748309299378,2,T,L X,L X A J J J J J,8,True,True,,2,2,0
-test-000002-10022bdfb63d5451,test,1153532694395442257,3,P,F O C,F O C V Z Z N N,8,True,True,,3,3,0

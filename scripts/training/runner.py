@@ -17,7 +17,7 @@ from scripts.eval.pointer_task import synchronize
 from .config import TrainingConfig
 from .data import EncodedExample, collate
 from .evaluation import evaluate
-from .objective import batch_metrics, combine_metrics, step_loss, symbolic_scores
+from .objective import batch_metrics, combine_metrics, step_loss, symbolic_scores, loop_loss_weights, training_selection_loss
 
 
 def memory_usage(device: str) -> dict:
@@ -51,6 +51,9 @@ def resume_identity(config: TrainingConfig, data_identity: dict) -> dict:
     # A continuation can extend its budget or change reporting cadence. All
     # sampling, optimization, model, validation, and device settings must match.
     settings = config.to_dict()
+    # Historical checkpoints predate this field and used equal-example loss.
+    if settings["loss_reduction"] == "example_mean":
+        settings.pop("loss_reduction")
     for name in ("epochs", "max_steps", "eval_every", "save_every"):
         settings.pop(name)
     return {"config": settings, "data": data_identity}
@@ -83,9 +86,12 @@ def train(
     identity: dict, *, resume: dict | None = None, allow_batch_change: bool = False,
     progress: Callable[[dict], None] = lambda event: None,
 ) -> dict:
-    """Accumulate equal-example gradients; checkpoint only completed updates."""
+    """Accumulate the configured objective; checkpoint only completed updates."""
     config.validate()
     token_ids, pad_id = spec["token_ids"], tokenizer.pad_token_id
+    weights = (torch.tensor(loop_loss_weights([len(item.targets) for item in train_items]),
+                            device=config.device, dtype=next(model.parameters()).dtype)
+               if config.loss_reduction == "loop_mean" else None)
     parameters = [parameter for parameter in model.parameters() if parameter.requires_grad]
     optimizer = torch.optim.AdamW(parameters, lr=config.learning_rate, weight_decay=config.weight_decay, foreach=False)
     step, epoch, offset, best_loss = 0, 0, 0, float("inf")
@@ -122,9 +128,9 @@ def train(
             output=output / f"train-probe-step-{step:06d}.csv",
             progress=lambda done, total: progress({"phase": f"Train probe {done}/{total}"}),
         )
-        eligible = [values for depth, values in latest_validation["by_depth"].items() if int(depth) <= config.train_max_depth]
-        selection_loss = sum(values["loss"] * values["examples"] for values in eligible) / sum(values["examples"] for values in eligible)
+        selection_loss = training_selection_loss(latest_validation, config.train_max_depth, config.loss_reduction)
         latest_validation["selection_loss"] = selection_loss
+        latest_validation["selection_reduction"] = config.loss_reduction
         improved = selection_loss < best_loss
         best_loss = min(best_loss, selection_loss)
         seconds = perf_counter() - begin
@@ -153,6 +159,9 @@ def train(
             (output / "best_checkpoint.json").write_text(json.dumps({"path": path.name, "step": step, "selection_loss": best_loss}) + "\n")
 
     try:
+        log({"event": "objective", "loss_reduction": config.loss_reduction,
+             "loop_weights": weights.tolist() if weights is not None else None,
+             "training_examples": len(train_items)})
         progress({"step": step, "total_steps": total_steps, "phase": "Initial validation"})
         improved = validate()
         checkpoint(improved)
@@ -164,6 +173,7 @@ def train(
                 model.train()
                 optimizer.zero_grad(set_to_none=True)
                 parts = []
+                objective_sum = 0.0
                 rate = config.learning_rate * min(1.0, (step + 1) / max(1, config.warmup_steps))
                 for param_group in optimizer.param_groups:
                     param_group["lr"] = rate
@@ -174,11 +184,12 @@ def train(
                     batch = collate(items, pad_id, config.device)
                     result = model(batch["input_ids"], batch["attention_mask"], num_loops=batch["targets"].shape[1])
                     scores = symbolic_scores(result.loop_logits, token_ids)
-                    loss, losses = step_loss(scores, batch["targets"], batch["target_mask"])
+                    loss, losses = step_loss(scores, batch["targets"], batch["target_mask"], loop_weights=weights)
                     (loss * len(items) / len(group)).backward()
+                    objective_sum += loss.detach().item() * len(items)
                     parts.append(batch_metrics(scores, batch["targets"], batch["target_mask"], losses))
                     progress({"phase": f"Epoch {epoch + 1}/{config.epochs} · accumulation {min(start + len(items), len(group))}/{len(group)}",
-                              "train": combine_metrics(parts), "learning_rate": rate})
+                              "train": {**combine_metrics(parts), "objective_loss": objective_sum / (start + len(items))}, "learning_rate": rate})
                     del result, scores, loss, losses
                 for name, parameter in model.named_parameters():
                     if not parameter.requires_grad and parameter.grad is not None:
@@ -197,6 +208,7 @@ def train(
                     epoch += 1
                     offset = 0
                 metrics = combine_metrics(parts)
+                metrics["objective_loss"] = objective_sum / len(group)
                 event = {"event": "train", "step": step, "next_epoch": epoch, "next_offset": offset,
                          "train": metrics, "learning_rate": rate, "gradient_norm_before_clip": norm.item(),
                          "update_seconds": seconds, "examples_per_second": len(group) / seconds,

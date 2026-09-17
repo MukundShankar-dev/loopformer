@@ -23,6 +23,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | Ordinary-model final-answer pointer baseline | [Naive pointer evaluation](docs/naive_pointer_eval.md) |
 | Saved-checkpoint per-loop pointer evaluation | [Full-loop evaluation](docs/loop_pointer_eval.md) |
 | Latest pointer training and full-loop evidence | [CUDA experiment report](docs/experiments/stage1_cuda_5k.md) |
+| Fresh 30k baseline and loop-balanced follow-up | [Fresh-run report](docs/experiments/stage1_fresh30k.md) and [training commands](docs/training_pointer.md#loop-balanced-loss-experiment) |
 | Unresolved choices and recorded design decisions | [Decisions](docs/decisions.md) |
 | Implemented work, validation evidence, and next milestone | [Status](docs/status.md) |
 

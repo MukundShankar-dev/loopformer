@@ -1,4 +1,4 @@
-"""One loss per valid recurrent transition, with equal example weighting."""
+"""Nominal transition CE with explicit example or dataset-level loop weighting."""
 
 import torch
 from torch import Tensor
@@ -17,8 +17,41 @@ def symbolic_scores(loop_logits: tuple[Tensor, ...], token_ids: list[int]) -> Te
     ], dim=1)
 
 
-def step_loss(scores: Tensor, targets: Tensor, mask: Tensor) -> tuple[Tensor, Tensor]:
-    """CE over symbols; mean valid loops per example, then mean examples.
+def loop_loss_weights(depths: list[int]) -> list[float]:
+    """Weights N/(D*N_t) make the dataset objective mean_t(mean_eligible CE).
+
+    Use counts from the entire selected training set, never a microbatch. This
+    gives unbiased minibatch estimates and preserves accumulation equivalence.
+    """
+    if not depths or any(type(d) is not int or d < 1 for d in depths):
+        raise ValueError("Need positive integer training depths")
+    maximum = max(depths)
+    return [len(depths) / (maximum * sum(d >= t for d in depths))
+            for t in range(1, maximum + 1)]
+
+
+def training_selection_loss(metrics: dict, max_depth: int, reduction: str) -> float:
+    """Select on trained depths only; never include OOD tasks' early loops."""
+    eligible = [v for d, v in metrics["by_depth"].items() if int(d) <= max_depth]
+    if reduction == "example_mean":
+        return sum(v["loss"] * v["examples"] for v in eligible) / sum(v["examples"] for v in eligible)
+    if reduction != "loop_mean":
+        raise ValueError("Unknown loss reduction")
+    means = []
+    for t in range(1, max_depth + 1):
+        values = [v["per_loop"][str(t)] for v in eligible if str(t) in v["per_loop"]]
+        count = sum(v["count"] for v in values)
+        if not count:
+            raise ValueError(f"No trained-range validation targets for loop {t}")
+        means.append(sum(v["loss"] * v["count"] for v in values) / count)
+    return sum(means) / len(means)
+
+
+def step_loss(scores: Tensor, targets: Tensor, mask: Tensor, *, loop_weights: Tensor | None = None) -> tuple[Tensor, Tensor]:
+    """CE over symbols; default mean valid loops per example, then examples.
+
+    Optional dataset-derived loop_weights replace the within-example mean with
+    a weighted sum. Return unweighted masked CE separately for shared metrics.
 
     Later losses retain their graph through earlier recurrence. Masked positions
     contribute zero loss/gradient and are not final-answer retention supervision.
@@ -31,6 +64,12 @@ def step_loss(scores: Tensor, targets: Tensor, mask: Tensor) -> tuple[Tensor, Te
         raise FloatingPointError("Non-finite symbolic logits")
     losses = F.cross_entropy(scores.reshape(-1, scores.shape[-1]), targets.reshape(-1), reduction="none").reshape_as(targets)
     losses = losses * mask
+    if loop_weights is not None:
+        if (loop_weights.ndim != 1 or len(loop_weights) < scores.shape[1]
+                or loop_weights.device != scores.device or not torch.isfinite(loop_weights).all()
+                or not (loop_weights > 0).all()):
+            raise ValueError("Need positive finite loop weights covering all loops on the scores device")
+        return (losses * loop_weights[:scores.shape[1]]).sum(-1).mean(), losses
     return (losses.sum(-1) / mask.sum(-1)).mean(), losses
 
 

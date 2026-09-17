@@ -129,6 +129,8 @@ The separate [ordinary-model final-answer baseline](../naive_pointer_eval.md) is
 
 ## Current training experiment
 
+The fresh 30k baseline and full evaluations are complete; see [results](../experiments/stage1_fresh30k.md). The current authorized experiment changes only the training reduction to [equal-loop CE](../training_pointer.md#loop-balanced-loss-experiment), preserving nominal targets and the depth-6 training ceiling. It starts fresh adapters on the same dataset/seed and budget. This supersedes the earlier setup notes below; no pretrained loop-balanced result is available yet.
+
 The depth-6 curriculum and full-loop evaluations are complete. The next run uses [fresh adapters and 30,000 new mappings at depths 1–6](../training_pointer.md#fresh-depth-6-run-with-30000-mappings). Original weights remain frozen, per-loop targets are unchanged, and OOD evaluation stays at depths 7–16. The user generated the desktop dataset; the config is implemented, but this new run has not been trained or evaluated. See [current status](../status.md).
 
 ## Earlier depth extension
