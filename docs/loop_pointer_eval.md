@@ -1,6 +1,6 @@
 # Full-loop pointer evaluation
 
-Evaluate a saved recurrent checkpoint without training or loading optimizer state. The CLI reuses the trainer's per-loop evaluation and exact nominal targets. It records every frozen-coda readout; predictions are never fed back as input tokens. This measures latent recurrent execution, not a generated explanation.
+Evaluate a saved recurrent checkpoint without training or loading optimizer state. The CLI reuses the trainer's per-loop evaluation and exact nominal targets. It records every frozen-coda readout; predictions are never fed back as input tokens. This measures latent recurrent execution, not a generated explanation. Fixed-depth behavior remains the default; opt-in stopping and its methods are documented only in the [adaptive-compute guide](adaptive_compute.md).
 
 ## Run
 
@@ -35,7 +35,7 @@ Each run writes a new directory under `eval/pointer_loops/<timestamp>-<training-
 
 | File | Contents |
 | --- | --- |
-| `trajectories.csv` | One row per example per loop: ID, split, seed, family, depth, initial state, prediction, intermediate and final targets/correctness, intermediate CE, intermediate/final raw-logit margins, and post-completion flag |
+| `trajectories.csv` | One row per example per loop: ID, split, seed, family, depth, initial state, prediction, intermediate and final targets/correctness, intermediate CE, intermediate/final raw-logit margins, target-free predicted-answer margin and entropy in new runs, and post-completion flag |
 | `examples.csv` | One row per example: target and predicted sequences, complete-trajectory correctness, nominal final correctness, first erroneous loop, correct-prefix length, first loop matching the final answer, and repeated adjacent nominal predictions |
 | `depth_by_loop.csv` | Task depth × loop matrix in long form: counts, final accuracy, and nominal intermediate accuracy/loss |
 | `summary.json` | Overall and per-depth/per-loop metrics, diagnostic counts, model/checkpoint/data/source hashes, command, settings, package versions, Git provenance, timing, and completion status |

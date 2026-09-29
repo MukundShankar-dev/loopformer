@@ -60,7 +60,7 @@ def summarize_trajectories(path: Path) -> tuple[list[dict], dict]:
 def write_csv(path: Path, rows: list[dict]) -> None:
     """Write nonempty flat records with a header."""
     with path.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 

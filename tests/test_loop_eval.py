@@ -114,6 +114,8 @@ def test_saved_checkpoint_loop_cli_matches_naive_readout(tmp_path):
     assert summary['per_loop']['1']['count'] == 3 and summary['per_loop']['3']['count'] == 1
     trajectories = list(csv.DictReader((output / 'trajectories.csv').open()))
     assert len(trajectories) == 30
+    assert all(float(row['predicted_margin']) >= 0 and float(row['answer_entropy']) >= 0
+               for row in trajectories)
     assert len(list(csv.DictReader((output / 'examples.csv').open()))) == 3
     assert len(list(csv.DictReader((output / 'depth_by_loop.csv').open()))) == 30
     naive_output = tmp_path / 'naive'
@@ -129,6 +131,17 @@ def test_saved_checkpoint_loop_cli_matches_naive_readout(tmp_path):
     rejected = subprocess.run([*command, '--output', str(tmp_path / 'too_short'), '--loops', '2'], cwd=ROOT, capture_output=True, text=True)
     assert rejected.returncode != 0 and 'deepest selected task' in rejected.stderr
     assert not (tmp_path / 'too_short').exists()
+    adaptive_output = tmp_path / 'adaptive'
+    subprocess.run([sys.executable, '-m', 'scripts.eval.loop_test', '--model', str(checkpoint),
+                    '--data', str(data), '--output', str(adaptive_output), '--loops', '10',
+                    '--threads', '1', '--stop-policy', 'requested_depth'],
+                   cwd=ROOT, capture_output=True, text=True, check=True)
+    adaptive = json.loads((adaptive_output / 'summary.json').read_text())
+    assert adaptive['status'] == 'complete' and adaptive['executed_example_loops'] == 13
+    assert len(list(csv.DictReader((adaptive_output / 'decisions.csv').open()))) == 3
+    stopped_rows = list(csv.DictReader((adaptive_output / 'trajectories.csv').open()))
+    assert len(stopped_rows) == 13
+    assert [r['prediction'] for r in stopped_rows if r['stopped'] == 'True'] == [r['prediction'] for r in naive]
 
     # The terminal CLI uses the same model path and scoring, but persists changed
     # prompts and explicit dynamics. No optimizer state or pretrained downloads.

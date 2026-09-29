@@ -1,6 +1,6 @@
 """Qwen2 decoder surgery for the pinned Transformers implementation."""
 
-from typing import Literal
+from typing import Callable, Literal
 
 import torch
 from torch import Tensor, nn
@@ -93,6 +93,7 @@ class RecurrentQwen(nn.Module):
         allowed_token_ids: Tensor | None = None,
         return_hidden_states: bool = False,
         logits_mode: Literal["answer", "all"] = "answer",
+        stop_policy: Callable[[int, Tensor, Tensor], bool] | None = None,
     ) -> RecurrentOutput:
         """Run complete prompt states through shared recurrence, without KV cache.
 
@@ -102,9 +103,13 @@ class RecurrentQwen(nn.Module):
         target per loop, with an explicit allowed answer set [A]. No CE loss
         or causal label shifting is performed. Pass repeated final labels
         explicitly if final-answer margins, rather than step margins, are wanted.
+        Optional stop_policy(t, h_t, answer_logits_t) is inference-only, batch 1,
+        and may return True to end after loop t. It never sees labels.
         """
         if type(num_loops) is not int or num_loops < 1:
             raise ValueError("num_loops must be a positive integer")
+        if stop_policy is not None and (self.training or torch.is_grad_enabled() or input_ids.shape[0] != 1 or labels is not None or logits_mode != "answer"):
+            raise ValueError("Stopping requires eval/no_grad, batch 1, no labels, and answer logits")
         if logits_mode not in ("answer", "all"):
             raise ValueError("logits_mode must be 'answer' or 'all'")
         if input_ids.ndim != 2 or input_ids.dtype != torch.long or 0 in input_ids.shape:
@@ -177,6 +182,8 @@ class RecurrentQwen(nn.Module):
             if labels is not None:
                 answer_scores = _answer_readout(scores, readout_positions) if logits_mode == "all" else scores
                 margins.append(answer_margin(answer_scores, labels[:, loop], allowed_token_ids))
+            if stop_policy is not None and stop_policy(loop + 1, hidden, scores):
+                break
         return RecurrentOutput(
             loop_logits=tuple(logits),
             hidden_states=tuple(states) if return_hidden_states else None,

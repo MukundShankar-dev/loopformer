@@ -1,6 +1,7 @@
 """Per-loop evaluation with nominal targets and an explicitly separate final readout."""
 
 import csv
+import math
 from pathlib import Path
 from typing import Callable
 
@@ -44,6 +45,12 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
                 for row_index, (item, predicted, logits) in enumerate(zip(items, predictions, values)):
                     final = item.targets[-1]
                     for t, (prediction, scores_t) in enumerate(zip(predicted, logits), 1):
+                        ranked = sorted(scores_t, reverse=True)
+                        predicted_margin = ranked[0] - ranked[1]
+                        normalized = [math.exp(value - ranked[0]) for value in scores_t]
+                        total = sum(normalized)
+                        probabilities = [value / total for value in normalized]
+                        answer_entropy = -sum(p * math.log(p) for p in probabilities if p)
                         target = item.targets[t - 1] if t <= len(item.targets) else None
                         rows.append({
                             "example_id": item.task.example_id, "task_depth": len(item.targets), "loop": t,
@@ -57,6 +64,7 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
                             "intermediate_loss": losses[row_index, t - 1].item() if target is not None else "",
                             "intermediate_margin": (scores_t[target] - max(value for j, value in enumerate(scores_t) if j != target)) if target is not None else "",
                             "final_margin": scores_t[final] - max(value for j, value in enumerate(scores_t) if j != final),
+                            "predicted_margin": predicted_margin, "answer_entropy": answer_entropy,
                         })
                 if progress:
                     progress(min(start + batch_size, len(examples)), len(examples))

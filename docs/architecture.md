@@ -40,11 +40,11 @@ The training startup gate compares ordinary-Qwen and fresh-adapter T=1 logits ov
 
 ## Implemented forward interface
 
-`model(input_ids, attention_mask=None, *, num_loops=1, position_ids=None, answer_positions=None, labels=None, allowed_token_ids=None, return_hidden_states=False, logits_mode="answer")` returns `RecurrentOutput`.
+`model(input_ids, attention_mask=None, *, num_loops=1, position_ids=None, answer_positions=None, labels=None, allowed_token_ids=None, return_hidden_states=False, logits_mode="answer", stop_policy=None)` returns `RecurrentOutput`.
 
 - Inputs are long `[B,S]` token IDs and a binary `[B,S]` mask. Each row needs an unmasked token. Positions are long `[1,S]` or `[B,S]`; loops do not append token positions.
 - Answer positions are long `[B]`, defaulting to the last unmasked token for either padding side. They select a next-token prediction location, not a token to insert into the prompt. Padding positions are rejected. Integer slices implement this readout because advanced indexing and gather backward fail under strict MPS determinism; indices synchronize to a Python list once per forward. This is appropriate for the intended tiny batches.
-- `loop_logits` is a tuple of length T, with tensors `[B,V]` by default or `[B,S,V]` in `"all"` mode. `.logits` returns the final item. Every loop reads C; no final-only supervision is imposed.
+- `loop_logits` is a tuple of length T for fixed-depth calls (or the executed prefix when stopping), with tensors `[B,V]` by default or `[B,S,V]` in `"all"` mode. `.logits` returns the final item. Every loop reads C; no final-only supervision is imposed.
 - With hidden capture enabled, `initial_hidden_state` is `h_0`, and `hidden_states[t-1]` is `h_t`, each `[B,S,H]`. Otherwise both fields are `None`; autograd can still retain the activations required for backward.
 - Optional labels are long `[B,T]` **token IDs**, with an explicit unique allowed set `[A]` of at least two tokens. `margins[B,T]` uses the target raw logit minus the largest other allowed logit. Labels can differ by loop. Repeating a final label is an explicit caller choice. This interface neither computes CE nor shifts labels.
 - Outputs retain gradients when autograd is enabled. Use caller-side `torch.no_grad()` for evaluation. No bridge, KV cache, generation API, or detached-rollout training is implemented. Adapter save/load is provided separately by `scripts/recurrent_qwen/checkpoint.py`.
@@ -74,7 +74,8 @@ Only current-stage modules exist; future locations below are not scaffolded requ
 | `scripts/training/train_pointer.py` | Composing training CLI and compact Rich dashboard |
 | `scripts/recurrent_qwen/checkpoint.py` | Adapter/tokenizer/optimizer persistence and recurrent model reconstruction |
 | `scripts/eval/recurrent_pointer.py` | Saved recurrent final-answer readout through the naive-test CLI |
-| `scripts/eval/loop_test.py`, `loop_metrics.py` | Full-loop checkpoint CLI, per-example first-error diagnostics, and depth-by-loop CSV export, reusing `scripts/training/evaluation.py` |
+| `scripts/eval/loop_test.py`, `loop_metrics.py` | Fixed-depth checkpoint CLI, per-example first-error diagnostics, and depth-by-loop CSV export; optional adaptive routing |
+| `scripts/eval/adaptive_*.py` | Offline oracle/heuristic analysis, causal stopping, latency summaries, and gated head fitting; see [one adaptive guide](adaptive_compute.md) |
 | `scripts/dataset/terminal.py` | Deterministic, evaluation-only terminal-rule transform with unchanged nominal targets |
 | `scripts/eval/overscaling_test.py`, `overscaling_metrics.py` | Terminal sweep through the shared loop CLI, conditional dynamics and censored survival |
 | Future evaluation extensions | Knowledge retention, transfer, hidden-state diagnostics, and plots |
@@ -95,6 +96,6 @@ The deferred terminal experiment composes that same inference path via `overscal
 
 Depth-stage initialization is separate from resume: `scripts/training/initialization.py` validates the saved adapter interpretation and training-exposure metadata, while the training CLI restores only adapter tensors before creating a new optimizer. Checkpoint lineage survives subsequent resume. `scripts/eval/depth_generalization.py` composes matched `loop_test` sweeps; `depth_comparison.py` checks pairing/provenance and reports absolute and relative depth. No recurrent forward or gradient semantics change. See [depth-6 setup](depth_generalization.md).
 
-## Planned adaptive-compute boundary
+## Adaptive-compute boundary
 
-[Adaptive inference depth](adaptive_compute.md) will extend the existing evaluation components, starting with offline analysis of trajectory exports. No controller, stopping-aware forward path, or hidden-state feature export is implemented. Current forwards execute a caller-specified loop count and read the coda at every loop. A future stopping implementation must preserve fixed-depth inference and intermediate supervision, and separately account for readout/controller cost and actual skipped work.
+[Adaptive inference compute](adaptive_compute.md) owns the implemented opt-in stopping interface and its remaining research gates. `RecurrentQwen.forward(stop_policy=...)` accepts a causal callback in eval/no-grad batch-1 mode, reads the shared recurrent state after each loop, and returns the executed prefix. The default fixed-depth forward and training gradients remain unchanged. A separate lightweight head may consume target-free confidence/history features; no pretrained head or adaptive benefit has been established.

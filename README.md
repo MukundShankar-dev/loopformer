@@ -41,7 +41,7 @@ Depths 1–6 aggregate 750 examples; each individual depth has 125. Step 2500 is
 
 The immediate pending experiment is [loop-balanced intermediate loss](docs/training_pointer.md#loop-balanced-loss-experiment), implemented but unrun on the pretrained model. [Terminal overscaling evaluation](docs/overscaling_eval.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.
 
-The next major direction is **adaptive inference compute**: reuse existing trajectories to analyze stopping opportunities, establish an offline oracle, then compare heuristic stopping before considering learned halting. [The adaptive-compute roadmap](docs/adaptive_compute.md) is planned research; no adaptive policy or compute-saving result exists yet. The original continuing-pointer tasks need explicit completion semantics before answer changes can be interpreted as damage.
+The next major direction is **adaptive inference compute**. Offline oracle/heuristic analysis, opt-in stopped inference, synchronized latency recording, and a gated lightweight head trainer now have code and tests. [The adaptive-compute guide](docs/adaptive_compute.md) is the single source for methods and usage; no pretrained adaptive policy or speedup result has been verified. The original continuing-pointer tasks need explicit completion semantics before answer changes can be interpreted as damage.
 
 Start with the [research plan](docs/project_plan.md), [current status](docs/status.md), [evaluation guide](docs/evaluation.md), and [documentation index](docs/README.md).
 
@@ -165,4 +165,4 @@ Checkpoint sweeps, repair/damage scoring, and survival exports are available but
 - [Current status and next experiment](docs/status.md)
 - [Research plan](docs/project_plan.md)
 - [Fresh 30k training and full-loop results](docs/experiments/stage1_fresh30k.md)
-- [Planned adaptive-compute roadmap](docs/adaptive_compute.md)
+- [Adaptive-compute guide](docs/adaptive_compute.md)

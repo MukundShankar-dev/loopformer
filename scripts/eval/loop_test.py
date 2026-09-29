@@ -31,9 +31,21 @@ def main(*, overscaling: bool = False) -> None:
     if overscaling:
         subset.add_argument("--dry-run", nargs="?", type=int, const=5, choices=(5, 10),
                             help="Preview terminal transformations and exact targets; no model loading or writes")
-    category = "pointer_overscaling" if overscaling else "pointer_loops"
-    parser.add_argument("--output", type=Path, help=f"New output directory; default eval/{category}/<timestamp>-<run>-<step>")
+    parser.add_argument("--stop-policy", choices=("requested_depth", "stability", "margin", "entropy", "learned"),
+                        help="Adaptive batch-1 inference; default keeps historical fixed-depth exports")
+    parser.add_argument("--stop-k", type=int, default=2, help="Consecutive predictions for stability stopping")
+    parser.add_argument("--stop-threshold", type=float,
+                        help="Predicted margin / entropy / learned probability threshold")
+    parser.add_argument("--head", type=Path, help="Trained halting-head directory for learned stopping")
+    parser.add_argument("--output", type=Path, help="New output directory; default eval/<category>/<timestamp>-<run>-<step>")
     args = parser.parse_args()
+    if args.stop_policy and args.batch_size != 1:
+        parser.error("Adaptive stopping requires --batch-size 1 for actual per-example compute savings")
+    if args.stop_policy in ("margin", "entropy", "learned") and args.stop_threshold is None:
+        parser.error("Confidence and learned policies require a development-selected --stop-threshold")
+    if args.stop_k < 1 or (args.stop_policy == "learned") != (args.head is not None):
+        parser.error("Learned stopping requires --head; other policies cannot use it; --stop-k must be positive")
+    category = ("pointer_adaptive_terminal" if overscaling else "pointer_adaptive") if args.stop_policy else ("pointer_overscaling" if overscaling else "pointer_loops")
     for name in ("batch_size", "threads", "loops", "limit"):
         if getattr(args, name) is not None and getattr(args, name) < 1:
             parser.error(f"{name} must be positive")
@@ -97,9 +109,13 @@ def main(*, overscaling: bool = False) -> None:
     torch.set_num_threads(args.threads)
     torch.manual_seed(args.seed)
     torch.use_deterministic_algorithms(True)
-    console.print("[bold cyan]Pointer task · absorbing-terminal overscaling[/bold cyan]" if overscaling else "[bold cyan]Pointer task · full recurrent loop evaluation[/bold cyan]")
-    console.print(f"{len(examples):,} examples · {loops} loops each · {args.device} · float32 · batch {args.batch_size}")
-    console.print("Raw dataset prompts · A–Z readout · nominal CE through requested depth · cache disabled")
+    title = ("absorbing-terminal adaptive stopping" if overscaling else "adaptive stopping") if args.stop_policy else (
+        "absorbing-terminal overscaling" if overscaling else "full recurrent loop evaluation")
+    console.print(f"[bold cyan]Pointer task · {title}[/bold cyan]")
+    budget_label = f"up to {loops} loops each" if args.stop_policy else f"{loops} loops each"
+    console.print(f"{len(examples):,} examples · {budget_label} · {args.device} · float32 · batch {args.batch_size}")
+    console.print("Raw dataset prompts · A–Z readout · cache disabled" +
+                  (" · stopped-answer and nominal-prefix scoring" if args.stop_policy else " · nominal CE through requested depth"))
     if overscaling:
         console.print("[yellow]Separate terminal-rule distribution. Check nominal execution and early-final shortcuts before interpreting dynamics.[/yellow]")
     console.print(f"Results: {output.resolve()}")
@@ -146,6 +162,31 @@ def main(*, overscaling: bool = False) -> None:
         metadata["transformed_tasks_sha256"] = sha256_file(tasks_path)
     summary_path = output / "summary.json"
     summary_path.write_text(json.dumps(metadata, indent=2) + "\n")
+    if args.stop_policy:
+        metadata["scoring"] = "allowed_symbol_argmax_at_stopped_loop"
+        metadata["loss_reduction"] = None
+        metadata["stopping_semantics"] = "Causal target-free policy; t>=task_depth; batch 1; max-loop fallback"
+        from scripts.eval.adaptive_inference import evaluate_stopping
+        from scripts.eval.adaptive_head import load_head
+        head = load_head(args.head, checkpoint=args.model) if args.head else None
+        with console.status("Running stopped recurrent inference…"):
+            trajectory_rows, decision_rows, adaptive = evaluate_stopping(
+                model, items, spec["token_ids"], tokenizer.pad_token_id,
+                loops=loops, policy=args.stop_policy, k=args.stop_k,
+                threshold=args.stop_threshold if args.stop_threshold is not None else .5, head=head)
+        write_csv(output / "trajectories.csv", trajectory_rows)
+        write_csv(output / "decisions.csv", decision_rows)
+        summary_path.write_text(json.dumps({**metadata, **adaptive, "status": "complete",
+            "stop_policy": args.stop_policy, "stop_k": args.stop_k,
+            "stop_threshold": args.stop_threshold,
+            "head": str(args.head.resolve()) if args.head else None,
+            "head_sha256": {p.name: sha256_file(p) for p in args.head.iterdir() if p.is_file()} if args.head else None,
+            "throughput_definition": "Actual stopped example-loops; synchronized batch-1 model/policy time excludes loading, encoding, and export",
+        }, indent=2) + "\n")
+        console.print(f"[bold]Stopped accuracy: {adaptive['accuracy']:.2%}; mean loops: {adaptive['mean_loops']:.2f}; "
+                      f"p95 latency: {adaptive['p95_latency_seconds']:.4f}s[/bold]")
+        console.print(f"Saved stopped trajectories.csv, decisions.csv, summary.json to {output.resolve()}")
+        return
     device = torch.device(args.device)
     synchronize(device)
     began = perf_counter()

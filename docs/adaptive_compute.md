@@ -1,6 +1,6 @@
 # Adaptive inference compute roadmap
 
-**Status: planned research direction.** No adaptive stopping policy, oracle-summary utility, learned halting head, calibration study, or adaptive latency result is implemented. The immediate experiment remains [loop-balanced Stage 1 training](training_pointer.md#loop-balanced-loss-experiment). This roadmap extends the [research plan](project_plan.md), preserving its gates for execution, untreated dynamics, asymmetric training, and transfer.
+**Status: implementation substrate added; pretrained adaptive research remains unverified.** Offline oracle/heuristic analysis, target-free confidence export for future full-loop runs, opt-in causal stopping, synchronized batch-1 latency recording, and a gated lightweight halting-head trainer are implemented and tested on synthetic/tiny-model cases. No pretrained terminal sweep, adaptive latency comparison, fitted pretrained head, calibration result, or confirmed compute saving exists. The immediate pretrained experiment remains [loop-balanced Stage 1 training](training_pointer.md#loop-balanced-loss-experiment). This document is the canonical adaptive-compute design and usage guide; [the project plan](project_plan.md) retains the research gates.
 
 ## Core question
 
@@ -25,9 +25,40 @@ Extend the current components rather than building a second evaluation framework
 | [`overscaling_metrics.py`](../scripts/eval/overscaling_metrics.py) | All four adjacent correctness transitions, repair/damage, net gain, continuously-correct survival with censoring on validated terminal tasks |
 | [`recurrent_pointer.py`](../scripts/eval/recurrent_pointer.py) | Synchronized inference timing and executed example-loops/s, including mixed-depth batch padding |
 
-Existing exports contain predictions, labels, and true-target margins. They do not contain full answer distributions, hidden-state features, or per-example latency distributions. Prediction stability and offline labeled analysis can use existing traces without inference; entropy and top-two answer confidence require a small future feature-export extension to the same evaluator. A stopping-aware execution path and actual latency measurements would be later work. Post-processing full traces does not skip model work.
+Historical exports contain predictions, labels, and true-target margins but no target-free confidence or per-example latency. New `loop_test` exports append `predicted_margin` (top-two allowed-answer logit gap) and `answer_entropy` (softmax entropy over allowed answers). They do not contain full distributions or hidden states. `adaptive_analyze` can replay prediction stability on historical traces; margin/entropy replay requires new exports. `loop_test --stop-policy` now stops actual batch-1 execution and records synchronized per-example latency. Post-processing full traces still does not skip model work.
 
-Use only complete runs with a declared task variant, horizon, target basis, and provenance. Preserve historical output schemas and metric definitions; write any derived analysis to a new location with its own config, version, and input hashes.
+Use only complete runs with a declared task variant, horizon, target basis, and provenance. Historical files and metric definitions remain untouched; derived analyses write to new directories with input and analyzer-source hashes. The head code is present at the user's request, but its command refuses training without a distinct terminal development run demonstrating oracle headroom over comparable simple baselines. Tests of the head are implementation checks, not a passed scientific gate.
+
+## Commands and implemented interfaces
+
+From the repository root, analyze an existing complete run without rerunning inference:
+
+```bash
+python -m scripts.eval.adaptive_analyze eval/pointer_loops/<complete-run> \
+  --output eval/pointer_adaptive_analysis/<new-name> --allow-observational
+```
+
+The opt-in flag is mandatory for original continuing-pointer tasks. The analyzer validates 1..T coverage, consistent targets, summary completion and cohort size. It writes `examples.csv` and `summary.json` with trajectory categories, suffix and first-correct oracles, a requested-depth baseline, prediction stability, a fixed-depth/oracle frontier, and mean/p50/p95 loops. Optional `--stability-k`, `--oracle-window`, `--margin-threshold`, and `--entropy-threshold` set declared alternatives. The latter two require new full-loop exports. Oracle loops are counterfactual; all model loops in the source run were executed.
+
+On a machine holding the complete saved adapter and base, use the existing evaluator for actual stopped inference:
+
+```bash
+python -m scripts.eval.loop_test --model models/stage1_pointer/<run>/<step> \
+  --device cuda --loops 16 --stop-policy stability --stop-k 2
+```
+
+`--stop-policy` also accepts `requested_depth`, `margin`, `entropy`, and `learned`; the latter requires `--head <fitted-head-directory>`. `--stop-threshold` is required for margin, entropy, or learned probability; choose and freeze it on development data. Every policy waits at least until the prompt's requested depth and falls back at `--loops`. Adaptive evaluation requires batch 1, reuses `RecurrentQwen`'s prelude and recurrent state without rerunning earlier loops, and leaves fixed-depth `loop_test` unchanged by default. It writes variable-length `trajectories.csv`, `decisions.csv`, and `summary.json` under a new `eval/pointer_adaptive*/` directory. Use `python -m scripts.eval.overscaling_test` with the same stopping options for the terminal variant; stopped traces are not full-budget terminal survival exports.
+
+The implementation provides a five-feature linear halting head: normalized loop and requested depth, predicted-answer margin, entropy, and recent prediction-run length. The head sees no true target at inference. Its trainer requires **two distinct complete absorbing-terminal full-loop runs on the same checkpoint**, one for fitting and one for development headroom. It rejects missing confidence exports, overlapping example IDs, or insufficient oracle advantage over comparable fixed/requested-depth/stability policies. When those prerequisites exist:
+
+```bash
+python -m scripts.eval.adaptive_head \
+  --train-run eval/pointer_overscaling/<train-run> \
+  --dev-run eval/pointer_overscaling/<dev-run> \
+  --output models/adaptive_head/<new-name> --label-rule first_correct
+```
+
+`--label-rule suffix` is the conservative alternative. `first_correct` trains current correctness at eligible loops; suffix trains finite-horizon correctness from the selected loop onward. The serialized head is marked `fitted_unconfirmed` and bound to the recurrent adapter hash. Its manifest includes a development-only threshold curve and stop-label Brier score; these do not constitute confirmation or calibrated task-success probabilities. Training is supervised classification, with no RL or recurrent-weight updates. Before a real run, separate development from untouched confirmation, inspect distribution overlap and calibration, and compare stopped inference at matched compute. No pretrained head has been fitted here.
 
 ## Stage A — depth trajectory analysis
 
@@ -139,6 +170,6 @@ An adaptive policy should ideally preserve most of the best fixed-depth quality,
 
 Useful negative results include little oracle headroom, confidence that is poorly calibrated beyond training depth, heuristics matching a learned head, controller overfitting, savings disappearing after runtime overhead, and failure to transfer. Report these with the same provenance and per-depth diagnostics. They constrain the adaptive-compute hypothesis without erasing the existing recurrent-execution evidence.
 
-## Current implementation decision
+## Current evidence and limits
 
-This update adds a roadmap only. The retained nominal traces support observational analysis, but no pretrained terminal traces establish the primary damage/safety setting, and the richer confidence and latency fields are absent. A metrics-only oracle utility is deferred until its task semantics and stability rule are fixed for a bounded analysis. It would read existing traces without rerunning inference or changing historical metrics.
+A read-only [observational analysis of retained step-2500 traces](experiments/adaptive_nominal_analysis.md) exercised the offline analyzer. It is a pipeline check on original continuing-pointer tasks; differences after the requested depth are not terminal damage. The saved pretrained adapter tensors are absent from this checkout, so the new stopped-inference path and latency recorder were validated only with a tiny model in tests. No pretrained terminal trace exists to pass the headroom gate or train a head. The next scientific sequence remains the loop-balanced ablation, terminal overscaling diagnosis, then oracle and heuristic comparisons on that terminal distribution before a learned-policy claim.

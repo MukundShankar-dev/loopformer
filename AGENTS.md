@@ -19,7 +19,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | Untreated overscaling and failure analysis | [Stage 2](docs/phases/stage2_overthinking.md) and [terminal evaluation usage](docs/overscaling_eval.md) |
 | Detached rollouts, asymmetric losses, and baselines | [Stage 3](docs/phases/stage3_asymmetric.md) |
 | Multi-family execution, preservation, and transfer | [Stages 4–6](docs/phases/stages4_6_transfer.md) |
-| Planned adaptive inference depth, oracle allocation, and stopping baselines | [Adaptive-compute roadmap](docs/adaptive_compute.md) |
+| Adaptive inference depth: implemented interfaces and remaining research gates | [Adaptive-compute guide](docs/adaptive_compute.md) |
 | Metrics, trajectories, figures, and reproducibility | [Evaluation](docs/evaluation.md) |
 | Ordinary-model final-answer pointer baseline | [Naive pointer evaluation](docs/naive_pointer_eval.md) |
 | Saved-checkpoint per-loop pointer evaluation | [Full-loop evaluation](docs/loop_pointer_eval.md) |
