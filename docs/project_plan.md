@@ -688,6 +688,20 @@ If Stage 3 succeeds only on pointer chasing, that is still a valid result about 
 
 ---
 
+## Later extension — adaptive inference compute (planned)
+
+Once useful recurrent execution, depth generalization, and overscaling behavior are established, ask:
+
+> If recurrent computation can improve or damage a state depending on the example and depth, can inference learn to allocate recurrence dynamically?
+
+This is a practical extension of the dynamics question, alongside the Stage 3 halting baselines. It preserves the sequence of recurrent execution → depth generalization → untreated repair/damage → asymmetric dynamics → transfer. Stopping avoids transitions; asymmetric training changes them. Evaluate both without substituting a stopping result for Gate 3 or a transfer claim.
+
+Follow the [adaptive-compute roadmap](adaptive_compute.md): analyze existing per-loop trajectories, quantify offline oracle headroom, evaluate development-tuned heuristic policies, and only then consider learned halting. Reuse `scripts/eval/loop_test.py`, `loop_metrics.py`, `overscaling_metrics.py`, and synchronized timing in `recurrent_pointer.py`; do not build a second evaluation framework. Offline analysis can begin with existing exports, but original-task final matches are observational and do not establish terminal damage.
+
+Keep fixed-depth baselines, compare quality at matched average compute, and report a quality-compute Pareto curve, confidence/calibration, and measured latency separately from loop savings. Freeze settings before untouched confirmation. A successful adaptive policy would preserve most of the best fixed-depth quality with materially fewer loops and possibly avoid later damage; this is an additional compute-allocation claim, not evidence of arbitrary-depth or general reasoning. Oracle allocation, heuristic stopping, learned halting, and their results are currently unimplemented. The immediate loop-balanced Stage 1 experiment remains unchanged.
+
+---
+
 # 14\. Project Question 2 — how general is the recurrent operation?
 
 Only after the single-task recurrent mechanism and asymmetric dynamics work should we broaden the task distribution.

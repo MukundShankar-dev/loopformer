@@ -94,3 +94,7 @@ The deferred terminal experiment composes that same inference path via `overscal
 
 
 Depth-stage initialization is separate from resume: `scripts/training/initialization.py` validates the saved adapter interpretation and training-exposure metadata, while the training CLI restores only adapter tensors before creating a new optimizer. Checkpoint lineage survives subsequent resume. `scripts/eval/depth_generalization.py` composes matched `loop_test` sweeps; `depth_comparison.py` checks pairing/provenance and reports absolute and relative depth. No recurrent forward or gradient semantics change. See [depth-6 setup](depth_generalization.md).
+
+## Planned adaptive-compute boundary
+
+[Adaptive inference depth](adaptive_compute.md) will extend the existing evaluation components, starting with offline analysis of trajectory exports. No controller, stopping-aware forward path, or hidden-state feature export is implemented. Current forwards execute a caller-specified loop count and read the coda at every loop. A future stopping implementation must preserve fixed-depth inference and intermediate supervision, and separately account for readout/controller cost and actual skipped work.

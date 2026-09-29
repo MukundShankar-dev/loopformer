@@ -19,6 +19,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | Untreated overscaling and failure analysis | [Stage 2](docs/phases/stage2_overthinking.md) and [terminal evaluation usage](docs/overscaling_eval.md) |
 | Detached rollouts, asymmetric losses, and baselines | [Stage 3](docs/phases/stage3_asymmetric.md) |
 | Multi-family execution, preservation, and transfer | [Stages 4–6](docs/phases/stages4_6_transfer.md) |
+| Planned adaptive inference depth, oracle allocation, and stopping baselines | [Adaptive-compute roadmap](docs/adaptive_compute.md) |
 | Metrics, trajectories, figures, and reproducibility | [Evaluation](docs/evaluation.md) |
 | Ordinary-model final-answer pointer baseline | [Naive pointer evaluation](docs/naive_pointer_eval.md) |
 | Saved-checkpoint per-loop pointer evaluation | [Full-loop evaluation](docs/loop_pointer_eval.md) |
@@ -54,6 +55,12 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 - Keep instance, depth, cross-family, and natural-language transfer claims separate. Record negative results and unresolved limitations.
 - Explain the scientific consequence of a necessary design change before making it, and record the decision. Unresolved proposals in the docs are not settled requirements.
 - Design for the target 32 GB Apple Silicon machine: short prompts, tiny batches, gradient accumulation, and short initial training unrolls. Measure actual resource use before scaling.
+- Before implementing learned halting, establish offline oracle headroom and heuristic stopping baselines; follow [the planned roadmap](docs/adaptive_compute.md).
+- Reuse and extend the existing loop evaluator and metrics rather than creating parallel evaluation infrastructure. Keep fixed-depth inference available as a baseline.
+- Keep development and confirmation splits separate. Choose thresholds and checkpoints on development data and freeze them before confirmation; do not optimize thresholds on the confirmation set.
+- Distinguish compute savings from quality improvements and compare quality at matched average compute. Offline oracle savings are not measured inference speedups.
+- Synchronize CUDA/MPS appropriately for latency measurements; record timing scope and controller/readout overhead.
+- Natural-language transfer must not be described as evidence that one loop corresponds to one human reasoning step.
 
 ## Documentation conventions
 

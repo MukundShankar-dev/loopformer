@@ -1,6 +1,6 @@
 # Project status
 
-Last updated: 2026-09-17.
+Last updated: 2026-09-29.
 
 ## Current priority
 
@@ -29,3 +29,13 @@ At the user's request, superseded pre-30k recurrent runs/evaluations and redunda
 Frozen pretrained base, shared recurrent q/v LoRA, intermediate supervision, and `use_cache=False` remain unchanged. The updated startup gate passed on the desktop with zero reported T=1 logit error. Batch changes can preserve optimizer/cursor state via explicit same-effective-batch resume, but bitwise numerical equivalence is not claimed. See [architecture](architecture.md) and [training](training_pointer.md).
 
 Overscaling execution, shortcut diagnostics, asymmetric training, multi-family transfer, and knowledge-retention benchmarks remain deferred. Gate 1 lacks predeclared thresholds and independent confirmation; Gate 2 lacks pretrained terminal-dynamics evidence. Supporting historical evidence lives in [the original CUDA report](experiments/stage1_cuda_5k.md) and the [documentation index](README.md).
+
+## Research direction after the current bounded experiment
+
+Loop-balanced training remains the immediate pending pretrained experiment; no new pretrained training or inference was run for this documentation update. The next major research direction is [adaptive inference compute](adaptive_compute.md): analyze existing depth trajectories, establish offline oracle allocation, then evaluate heuristic stopping before a learned halting head. Adaptive stopping and oracle summaries are not implemented, and no compute savings or calibration results have been measured.
+
+This extends the dynamics question: if extra recurrence helps some examples but is unnecessary or damaging for others, can inference allocate it per example? Reuse the full-loop evaluator, trajectory diagnostics, terminal repair/damage metrics, and synchronized timing. First establish completion semantics and useful recurrent dynamics, including the deferred terminal evidence needed for damage claims. Adaptive allocation does not replace asymmetric-dynamics or transfer gates, and thresholds must be frozen on development data before confirmation.
+
+## Documentation update validation — 2026-09-29
+
+Reframed the entry point and added the planned adaptive-compute roadmap without changing model code, historical reports, or experiment artifacts. Full suite: `python -m pytest -q` using `.venv` — **107 passed in 87.54 seconds**. A local file/directory and heading-link check passed for all 162 links in the nine edited Markdown files; `git diff --check` passed. No repository-provided documentation/link checker was found. No metrics utility, stopping policy, or new pretrained experiment was added.

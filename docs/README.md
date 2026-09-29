@@ -5,7 +5,9 @@
 1. [Project plan](project_plan.md): research thesis, full stage sequence, constraints, and supported claims.
 2. [Status](status.md): what exists, what has been verified, and the next implementation milestone.
 3. [Architecture](architecture.md): implemented Stage 0 modules, recurrent execution, and gradient boundaries.
-4. The relevant phase guide below, together with [evaluation](evaluation.md) and [decisions](decisions.md).
+4. [Evaluation](evaluation.md): targets, trajectories, repair/damage, provenance, and reproducibility.
+5. [Adaptive-compute roadmap](adaptive_compute.md): **future/planned** trajectory analysis, oracle allocation, heuristic stopping, and conditional learned halting.
+6. The relevant phase guide below, together with [decisions](decisions.md).
 
 [Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Stage 0 and Stage 1 data are implemented and validated; Stage 1 training and full-loop checkpoint evaluations are [complete and audited](experiments/stage1_cuda_5k.md). Further training for depth generalization is the current priority; prepared overscaling experiments are deferred. Formal Gate 1 and later gates remain unverified.
 
@@ -21,6 +23,7 @@ For collaborator onboarding, see [Python environment setup](setup.md), the pinne
 | 1, depth extension | Train through depth 6 and compare OOD execution through depth 16 | [Depth generalization setup](depth_generalization.md) |
 | 1, checkpoint evaluation | Inspect every loop on full datasets | [Full-loop evaluation](loop_pointer_eval.md) |
 | 2, deferred | Measure repair and damage on separate terminal tasks | [Overthinking](phases/stage2_overthinking.md) and [overscaling usage](overscaling_eval.md) |
+| Later extension, planned | Allocate inference recurrence after useful dynamics and overscaling are established | [Adaptive-compute roadmap](adaptive_compute.md) |
 | 3 | Reduce damage while retaining useful computation | [Asymmetric dynamics](phases/stage3_asymmetric.md) |
 | 4 and 4b | Train shared multi-family execution; optionally preserve ordinary Qwen behavior | [Transfer](phases/stages4_6_transfer.md) |
 | 5 | Evaluate a wholly held-out task family | [Transfer](phases/stages4_6_transfer.md) |
@@ -28,13 +31,13 @@ For collaborator onboarding, see [Python environment setup](setup.md), the pinne
 
 ## Keeping documentation current
 
-Current experiment: [loop-balanced loss training](training_pointer.md#loop-balanced-loss-experiment), compared with the [completed fresh 30k baseline and full evaluations](experiments/stage1_fresh30k.md). The [status](status.md) supersedes historical setup notes below. See [artifact cleanup](training_pointer.md#artifact-cleanup) for the explicitly retired runs and retained evidence.
+Immediate pending pretrained experiment (implemented, unrun): [loop-balanced loss training](training_pointer.md#loop-balanced-loss-experiment), compared with the [completed fresh 30k baseline and full evaluations](experiments/stage1_fresh30k.md). The [status](status.md) supersedes historical setup notes below. See [artifact cleanup](training_pointer.md#artifact-cleanup) for the explicitly retired runs and retained evidence.
 
 Ordinary-model baseline: [final-answer pointer evaluation](naive_pointer_eval.md), including model loading, shared prompting, CSV output, scoring, and throughput. Implemented with toy-model tests. The user completed the [first full three-shot baseline](experiments/naive_pointer_baseline.md): 6.00% accuracy, with audited per-depth and response diagnostics.
 
 Recorded validation: [Stage 0 architecture on pretrained Qwen, CPU and MPS](experiments/stage0_validation.md), and [Stage 1 training implementation with toy models](experiments/stage1_training_implementation.md).
 
-Latest evidence: [5,000-mapping CUDA run and audited final-answer/full-loop evaluations](experiments/stage1_cuda_5k.md). The three-epoch continuation and its full validation evaluation are complete. Next: [depth-6 initialization and paired OOD evaluation through depth 16](depth_generalization.md). [Terminal overscaling scripts](overscaling_eval.md) are prepared for later. The [future knowledge-retention check](project_plan.md#future-knowledge-retention-regression-check) is documentation only.
+Latest evidence: [fresh 30k depth-6 baseline and full evaluations](experiments/stage1_fresh30k.md). Earlier evidence: [5,000-mapping CUDA run, three-epoch continuation, and audited evaluations](experiments/stage1_cuda_5k.md). The [depth-6 initialization and paired OOD setup](depth_generalization.md) records the earlier curriculum protocol; current commands are in the loop-balanced training guide. [Terminal overscaling scripts](overscaling_eval.md) are prepared for later. The [future knowledge-retention check](project_plan.md#future-knowledge-retention-regression-check) is documentation only.
 
 Desktop setup: [WSL CUDA environment and instruct baseline](experiments/wsl_cuda_baseline.md) records the actual desktop installation, dataset reproduction, checks, and evaluation status.
 

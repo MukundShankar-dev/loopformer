@@ -1,8 +1,49 @@
 # LoopFormer
 
-This project studies whether a recurrent block in `Qwen/Qwen2.5-0.5B-Instruct` can learn one pointer transition per loop, generalize to deeper tasks, and eventually repair mistakes while preserving correct answers.
+LoopFormer studies **recurrent computation and adaptive inference depth** in `Qwen/Qwen2.5-0.5B-Instruct`.
 
-The current focus is **further pointer training and depth generalization**. Full-loop tests show strong execution on unseen mappings at trained depths 1–6, with limited extension beyond them. Overscaling tools are prepared for later; those experiments have not run. See [current status](docs/status.md) and the [research plan](docs/project_plan.md).
+> Can a recurrent language model learn useful iterative computation, and can inference determine when additional recurrent computation is useful, unnecessary, or harmful?
+
+Reusing a learned block lets inference vary computational depth without adding a separate set of weights for every step. The project first tests whether recurrence executes an interpretable algorithm, then studies depth generalization, overscaling dynamics, and eventually compute-quality tradeoffs through stopping. Pointer chasing is the controlled starting environment: fresh rules live in each prompt, and exact intermediate targets make errors and progress checkable.
+
+```text
+prompt
+  ↓
+frozen prelude
+  ↓
+shared recurrent block × T
+  ↓
+frozen coda
+  ↓
+readout
+```
+
+One recurrent block and its LoRA adapters are reused across all loops. Original pretrained weights stay frozen. The prelude runs once; the frozen coda reads each loop's state for supervision and evaluation. The next loop consumes the recurrent hidden state, rather than the coda output or a decoded answer. See [architecture](docs/architecture.md).
+
+## Verified so far
+
+| Evidence | Scope and limits |
+| --- | --- |
+| [One-loop equivalence](docs/experiments/stage0_validation.md), shared-weight and gradient-scope tests | Validated model surgery; useful task execution needs separate evidence. |
+| [Fresh 30k depth-6 experiment](docs/experiments/stage1_fresh30k.md) | Strong unseen-mapping trajectories and bounded extension beyond training depth; one training run on development evaluation sets. |
+| [Evaluation and reproducibility](docs/evaluation.md) | Seeded data, exact intermediate supervision, full per-loop exports, source/data/checkpoint provenance, selection discipline, synchronized timing and throughput. |
+| [107 passing contract tests recorded](docs/status.md#implemented-next-experiment) | Architecture, data, training and metric contracts; tests do not establish empirical research gates. |
+
+For the fresh 30k run, **step 2500** achieved the following complete-trajectory accuracy (every nominal intermediate state correct):
+
+| Task depth | 1–6 | 7 | 8 | 9 | 10 | 11 | 12 | 13–16 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Accuracy | 98.0% | 94.4% | 94.4% | 73.6% | 41.6% | 14.4% | 1.6% | 0% |
+
+Depths 1–6 aggregate 750 examples; each individual depth has 125. Step 2500 is the working depth-generalization checkpoint among three fully evaluated candidates; step 3250 remains the trained-loss-selected reference. Seed-17 evaluations are development diagnostics, and seed 29 remains reserved for confirmation. This supports execution beyond the training depth followed by degradation at greater task depths. It does not establish arbitrary-depth execution, general reasoning, or post-completion overscaling damage.
+
+## What comes next
+
+The immediate pending experiment is [loop-balanced intermediate loss](docs/training_pointer.md#loop-balanced-loss-experiment), implemented but unrun on the pretrained model. [Terminal overscaling evaluation](docs/overscaling_eval.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.
+
+The next major direction is **adaptive inference compute**: reuse existing trajectories to analyze stopping opportunities, establish an offline oracle, then compare heuristic stopping before considering learned halting. [The adaptive-compute roadmap](docs/adaptive_compute.md) is planned research; no adaptive policy or compute-saving result exists yet. The original continuing-pointer tasks need explicit completion semantics before answer changes can be interpreted as damage.
+
+Start with the [research plan](docs/project_plan.md), [current status](docs/status.md), [evaluation guide](docs/evaluation.md), and [documentation index](docs/README.md).
 
 ## Setup
 
@@ -59,7 +100,7 @@ python -m scripts.dataset \
 python -m scripts.dataset --verify data/pointer/seed-17
 ```
 
-The existing seed-17 dataset **already reaches depth 16; no regeneration is needed for depth-6 training**. Generated files are excluded from Git, so use the reproduction command above only if the dataset is missing on a new machine.
+The existing seed-17 dataset **already reaches depth 16** for development evaluation. The current fresh-training experiment uses a separate [30k seed-37 dataset](docs/training_pointer.md#loop-balanced-loss-experiment). Generated files are excluded from Git, so use the reproduction command above only if the dataset is missing on a new machine.
 
 | File under `data/pointer/seed-17/` | Examples | Depths | Examples per depth |
 | --- | ---: | --- | ---: |
@@ -102,11 +143,11 @@ Pass a complete saved step directory, including its adapter weights and tokenize
 
 ```bash
 python -m scripts.eval.loop_test \
-  --model models/stage1_pointer/<run>/step-000625 \
+  --model models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500 \
   --device cuda --loops 8 --test
 ```
 
-Remove `--test` for all 1,000 test examples. Outputs go to `eval/pointer_loops/`. This reads the model after every recurrent loop; the ordinary three-shot prompt is not used. See [full-loop evaluation](docs/loop_pointer_eval.md) for commands and metrics.
+This requires the complete checkpoint on the training desktop; local metadata alone is insufficient. Remove `--test` for all 1,000 test examples. Outputs go to `eval/pointer_loops/`. This reads the model after every recurrent loop; the ordinary three-shot prompt is not used. See [full-loop evaluation](docs/loop_pointer_eval.md) for commands and metrics.
 
 ## Deferred overscaling experiments
 
@@ -123,4 +164,5 @@ Checkpoint sweeps, repair/damage scoring, and survival exports are available but
 - [Documentation index](docs/README.md)
 - [Current status and next experiment](docs/status.md)
 - [Research plan](docs/project_plan.md)
-- [Audited training and full-loop results](docs/experiments/stage1_cuda_5k.md)
+- [Fresh 30k training and full-loop results](docs/experiments/stage1_fresh30k.md)
+- [Planned adaptive-compute roadmap](docs/adaptive_compute.md)

@@ -1,6 +1,6 @@
 # Depth-6 training and outward OOD evaluation
 
-Status: setup implemented; pretrained depth-6 training and paired sweeps have not run. This is the next Stage 1 experiment. Overscaling and knowledge-retention benchmarks remain deferred.
+Status: this document records the earlier depth-6 curriculum setup and paired-evaluation protocol. The later [fresh 30k depth-6 baseline and full evaluations](experiments/stage1_fresh30k.md) are complete; [loop-balanced training](training_pointer.md#loop-balanced-loss-experiment) is the current pending experiment. See [status](status.md) for the latest evidence. Commands and resource expectations below describe that earlier protocol, not the current run instructions. Overscaling and knowledge-retention benchmarks remain deferred.
 
 ## Question and comparison
 
