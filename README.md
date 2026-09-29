@@ -39,7 +39,7 @@ Depths 1–6 aggregate 750 examples; each individual depth has 125. Step 2500 is
 
 ## What comes next
 
-The immediate pending experiment is [loop-balanced intermediate loss](docs/training_pointer.md#loop-balanced-loss-experiment), implemented but unrun on the pretrained model. [Terminal overscaling evaluation](docs/overscaling_eval.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.
+The immediate pending experiment is [loop-balanced intermediate loss](docs/training_pointer.md#loop-balanced-loss-experiment), implemented but unrun on the pretrained model. [Terminal overscaling evaluation](docs/evaluation.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.
 
 The next major direction is **adaptive inference compute**. Offline oracle/heuristic analysis, opt-in stopped inference, synchronized latency recording, and a gated lightweight head trainer now have code and tests. [The adaptive-compute guide](docs/adaptive_compute.md) is the single source for methods and usage; no pretrained adaptive policy or speedup result has been verified. The original continuing-pointer tasks need explicit completion semantics before answer changes can be interpreted as damage.
 
@@ -109,7 +109,7 @@ The existing seed-17 dataset **already reaches depth 16** for development evalua
 | `test.jsonl` | 1,000 | 1–8 | 125 |
 | `depth_test.jsonl` | 1,000 | 9–16 | 125 |
 
-The depth-6 training config selects only depths 1–6 from `train.jsonl`. Its `validation_max_depth: 8` controls training-time monitoring; the paired depth evaluator separately reads `depth_test.jsonl` and runs through depth 16. See [dataset details](docs/phases/stage1_pointer.md) and [paired evaluation](docs/depth_generalization.md).
+The depth-6 training config selects only depths 1–6 from `train.jsonl`. Its `validation_max_depth: 8` controls training-time monitoring; the paired depth evaluator separately reads `depth_test.jsonl` and runs through depth 16. See [dataset details](docs/training_pointer.md) and [paired evaluation](docs/training_pointer.md).
 
 ## Evaluate a model
 
@@ -122,7 +122,7 @@ python -m scripts.eval.naive_test --model Qwen/Qwen2.5-0.5B-Instruct
 
 The ordinary baseline uses **three-shot examples at depths 1, 2, and 3**, defined in [`prompts/pointer_task.txt`](prompts/pointer_task.txt). `--model` also accepts a saved model directory. Models load locally by default; `--download` permits missing downloads.
 
-Progress and throughput appear in the terminal. Predictions and summaries go to `eval/pointer_task/`. See [baseline evaluation](docs/naive_pointer_eval.md) for loading and scoring options.
+Progress and throughput appear in the terminal. Predictions and summaries go to `eval/pointer_task/`. See [baseline evaluation](docs/evaluation.md) for loading and scoring options.
 
 ## Train pointer execution
 
@@ -147,7 +147,7 @@ python -m scripts.eval.loop_test \
   --device cuda --loops 8 --test
 ```
 
-This requires the complete checkpoint on the training desktop; local metadata alone is insufficient. Remove `--test` for all 1,000 test examples. Outputs go to `eval/pointer_loops/`. This reads the model after every recurrent loop; the ordinary three-shot prompt is not used. See [full-loop evaluation](docs/loop_pointer_eval.md) for commands and metrics.
+This requires the complete checkpoint on the training desktop; local metadata alone is insufficient. Remove `--test` for all 1,000 test examples. Outputs go to `eval/pointer_loops/`. This reads the model after every recurrent loop; the ordinary three-shot prompt is not used. See [full-loop evaluation](docs/evaluation.md) for commands and metrics.
 
 ## Deferred overscaling experiments
 
@@ -157,7 +157,7 @@ Preview the separate absorbing-terminal task variant without loading a model or 
 python -m scripts.eval.overscaling_test --dry-run
 ```
 
-Checkpoint sweeps, repair/damage scoring, and survival exports are available but **running them is deferred until further Stage 1 training and review**. See [overscaling usage](docs/overscaling_eval.md).
+Checkpoint sweeps, repair/damage scoring, and survival exports are available but **running them is deferred until further Stage 1 training and review**. See [overscaling usage](docs/evaluation.md).
 
 ## Documentation
 

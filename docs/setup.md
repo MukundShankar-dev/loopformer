@@ -92,4 +92,4 @@ The [CLI](../scripts/validate_stage0.py) composes the implementation in `scripts
 
 Unlike the older smoke test, this command defaults to **local files only** at model revision `7ae557604adf67be50417f59c2c2f167def9a775`. Add `--download` explicitly when files are missing. No model was downloaded during the recorded Stage 0 validation. MPS may be hidden by an execution sandbox; the recorded MPS checks ran outside it. Device fallback is never automatic.
 
-See [Stage 0](phases/stage0_architecture.md) for options, contracts, and the stop boundary before pointer data and training.
+See [Stage 0](architecture.md) for options, contracts, and the stop boundary before pointer data and training.

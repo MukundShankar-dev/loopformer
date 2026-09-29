@@ -1,50 +1,21 @@
-# Documentation index
+# Documentation
 
-## Reading order
+Start with the [research plan](project_plan.md) for the questions, stage gates, and claim hierarchy, then read [current status](status.md) for what has actually run and the next bounded experiment. The plan is the research source of truth; status supersedes dated setup language in the guides.
 
-1. [Project plan](project_plan.md): research thesis, full stage sequence, constraints, and supported claims.
-2. [Status](status.md): what exists, what has been verified, and the next implementation milestone.
-3. [Architecture](architecture.md): implemented Stage 0 modules, recurrent execution, and gradient boundaries.
-4. [Evaluation](evaluation.md): targets, trajectories, repair/damage, provenance, and reproducibility.
-5. [Adaptive-compute guide](adaptive_compute.md): one canonical source for implemented analysis/stopping interfaces, unrun head training, and the planned research gates.
-6. The relevant phase guide below, together with [decisions](decisions.md).
+| Need | Canonical document |
+| --- | --- |
+| Recurrent model, parameter sharing, gradient behavior, Stage 0 validation protocol | [Architecture](architecture.md) |
+| Pointer data, training, checkpoints, resume, and historical depth-6 comparison commands | [Pointer execution and training](training_pointer.md) |
+| Metrics, ordinary baseline, full-loop evaluation, and deferred terminal overscaling | [Evaluation](evaluation.md) |
+| Adaptive analysis, oracle/heuristic stopping, implemented interfaces, and remaining gates | [Adaptive inference compute](adaptive_compute.md) |
+| Python environment and pretrained Stage 0 checks | [Setup](setup.md) |
+| Windows/WSL2/CUDA installation and artifact migration | [Desktop setup](windows_cuda_setup.md) |
+| Resolved and open design choices | [Decisions](decisions.md) |
 
-[Agent instructions](../AGENTS.md) define coding and documentation conventions. The project plan is the research source of truth; these guides translate it into bounded implementation work. Stage 0 and Stage 1 data are implemented and validated; Stage 1 training and full-loop checkpoint evaluations are [complete and audited](experiments/stage1_cuda_5k.md). Further training for depth generalization is the current priority; prepared overscaling experiments are deferred. Formal Gate 1 and later gates remain unverified.
+The adaptive-compute guide is the **single source for that extension**. The research plan states its place in the stage sequence; evaluation documents shared metric conventions; status records current evidence. Stage 3 asymmetric dynamics and Stages 4–6 transfer remain planned in the research plan. No separate phase-guide directory is needed.
 
-## Phase guides
+## Evidence, not instructions
 
-For collaborator onboarding, see [Python environment setup](setup.md), the pinned requirements, and the [Windows / WSL2 / CUDA setup and state-migration guide](windows_cuda_setup.md).
+The dated reports in [`experiments/`](experiments/) preserve experiment configuration, observations, and limitations. They are not current runbooks. For the latest pretrained depth results, see the [fresh 30k report](experiments/stage1_fresh30k.md); the earlier [CUDA run](experiments/stage1_cuda_5k.md) and [Stage 0 validation](experiments/stage0_validation.md) provide historical evidence. The [adaptive nominal-trace analysis](experiments/adaptive_nominal_analysis.md) is observational and is not a pretrained terminal or adaptive-policy result.
 
-| Phase | Purpose | Guide |
-| --- | --- | --- |
-| 0 | Verify the recurrent architecture before research training | [Architecture validation](phases/stage0_architecture.md) |
-| 1, data milestone | Validate symbols, mappings, intermediate targets, and splits before training | [Pointer execution](phases/stage1_pointer.md) |
-| 1, training milestone | Establish one-loop/one-transition execution | [Training usage](training_pointer.md) and [research gate](phases/stage1_pointer.md) |
-| 1, depth extension | Train through depth 6 and compare OOD execution through depth 16 | [Depth generalization setup](depth_generalization.md) |
-| 1, checkpoint evaluation | Inspect every loop on full datasets | [Full-loop evaluation](loop_pointer_eval.md) |
-| 2, deferred | Measure repair and damage on separate terminal tasks | [Overthinking](phases/stage2_overthinking.md) and [overscaling usage](overscaling_eval.md) |
-| Later extension, partially implemented | Analyze trajectories and allocate inference recurrence after useful dynamics and overscaling are established | [Adaptive-compute guide](adaptive_compute.md) |
-| 3 | Reduce damage while retaining useful computation | [Asymmetric dynamics](phases/stage3_asymmetric.md) |
-| 4 and 4b | Train shared multi-family execution; optionally preserve ordinary Qwen behavior | [Transfer](phases/stages4_6_transfer.md) |
-| 5 | Evaluate a wholly held-out task family | [Transfer](phases/stages4_6_transfer.md) |
-| 6 | Explore natural-language and real-task transfer | [Transfer](phases/stages4_6_transfer.md) |
-
-## Keeping documentation current
-
-Immediate pending pretrained experiment (implemented, unrun): [loop-balanced loss training](training_pointer.md#loop-balanced-loss-experiment), compared with the [completed fresh 30k baseline and full evaluations](experiments/stage1_fresh30k.md). The [status](status.md) supersedes historical setup notes below. See [artifact cleanup](training_pointer.md#artifact-cleanup) for the explicitly retired runs and retained evidence.
-
-Ordinary-model baseline: [final-answer pointer evaluation](naive_pointer_eval.md), including model loading, shared prompting, CSV output, scoring, and throughput. Implemented with toy-model tests. The user completed the [first full three-shot baseline](experiments/naive_pointer_baseline.md): 6.00% accuracy, with audited per-depth and response diagnostics.
-
-Recorded validation: [Stage 0 architecture on pretrained Qwen, CPU and MPS](experiments/stage0_validation.md), and [Stage 1 training implementation with toy models](experiments/stage1_training_implementation.md).
-
-Adaptive pipeline check: [observational analysis of retained nominal traces](experiments/adaptive_nominal_analysis.md). This is not terminal damage or a pretrained adaptive-policy result.
-
-Latest evidence: [fresh 30k depth-6 baseline and full evaluations](experiments/stage1_fresh30k.md). Earlier evidence: [5,000-mapping CUDA run, three-epoch continuation, and audited evaluations](experiments/stage1_cuda_5k.md). The [depth-6 initialization and paired OOD setup](depth_generalization.md) records the earlier curriculum protocol; current commands are in the loop-balanced training guide. [Terminal overscaling scripts](overscaling_eval.md) are prepared for later. The [future knowledge-retention check](project_plan.md#future-knowledge-retention-regression-check) is documentation only.
-
-Desktop setup: [WSL CUDA environment and instruct baseline](experiments/wsl_cuda_baseline.md) records the actual desktop installation, dataset reproduction, checks, and evaluation status.
-
-Recorded data validation: [Stage 1 seeded pointer dataset](experiments/stage1_data_validation.md). Preview and exact seed-17 reproduction commands are in the [root README](../README.md#pointer-dataset-preview-and-reproduce). Generator commands, schema, and programmatic prediction checking live in the [Stage 1 guide](phases/stage1_pointer.md). All current dataset code is packaged under `scripts/dataset/`.
-
-Put implementation explanations in the owning phase guide and shared architecture document. Put metric definitions in the evaluation guide, design decisions in the decision record, and current progress in status. Add verified setup and execution commands when the corresponding code exists.
-
-Future experiment reports belong in `docs/experiments/` as Markdown. Each should identify its hypothesis, code and checkpoint versions, configuration, exact commands, validation, artifact locations, observations, and supported conclusions. Link new reports here and from status; do not rely on conversation history for evidence.
+The immediate pending pretrained experiment is [loop-balanced loss training](training_pointer.md#loop-balanced-loss-experiment). Pretrained terminal overscaling and confirmation evaluation remain deferred. [AGENTS.md](../AGENTS.md) contains repository conventions.

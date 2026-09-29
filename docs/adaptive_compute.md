@@ -62,7 +62,7 @@ python -m scripts.eval.adaptive_head \
 
 ## Stage A — depth trajectory analysis
 
-Start with saved traces. Report nominal intermediate execution separately from fixed-final-answer observations. Original pointer mappings continue after requested depth `d`: a correct additional lookup can change the answer. Such changes cannot automatically be labeled overthinking damage. For genuine post-completion analysis, first obtain the deferred [absorbing-terminal evidence](overscaling_eval.md), inspecting nominal performance and terminal-identification shortcuts.
+Start with saved traces. Report nominal intermediate execution separately from fixed-final-answer observations. Original pointer mappings continue after requested depth `d`: a correct additional lookup can change the answer. Such changes cannot automatically be labeled overthinking damage. For genuine post-completion analysis, first obtain the deferred [absorbing-terminal evidence](evaluation.md), inspecting nominal performance and terminal-identification shortcuts.
 
 Declare an observed horizon `T`, an eligible first loop `L`, and an early cutoff `b` before analysis. For primary terminal dynamics use `L = d` and, initially, `b = d`. Let `c_t` mean allowed-symbol argmax equals the fixed final target; preserve the evaluator's tie convention. Earlier final matches remain shortcut diagnostics. For other tasks, define completion and eligibility explicitly; original-task classifications are observational only.
 
@@ -118,7 +118,7 @@ Before learned halting, compare simple causal policies using only information av
 - Confidence improvement below a threshold over a declared window, where meaningful; stalled wrong predictions can also look stable.
 - Common fixed-depth baselines at matched average compute, plus the requested-depth baseline.
 
-Declare minimum loop, maximum budget, feature vocabulary/normalization, tie handling, and fallback. Thresholds, `k`, and windows must be selected on development data and frozen before confirmation. Calibration fits also use development data only. Seed-17 evaluations already inspected are development diagnostics; seed 29 remains reserved under the [confirmation protocol](depth_generalization.md#reserved-confirmation-set).
+Declare minimum loop, maximum budget, feature vocabulary/normalization, tie handling, and fallback. Thresholds, `k`, and windows must be selected on development data and frozen before confirmation. Calibration fits also use development data only. Seed-17 evaluations already inspected are development diagnostics; seed 29 remains reserved under the [confirmation protocol](training_pointer.md#reserved-confirmation-set).
 
 Report task accuracy at the stopped readout, mean/p50/p95 loops, synchronized latency, and quality-compute curves. Complete-trajectory accuracy retains its historical definition: all nominal steps must be observed and correct. Early stopping before `d` leaves that metric incomplete; report coverage and a full-trace diagnostic reference separately, never score a correct truncated prefix as a complete trajectory.
 

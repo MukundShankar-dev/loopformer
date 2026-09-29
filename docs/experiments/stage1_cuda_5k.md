@@ -114,7 +114,7 @@ These runs support **instance generalization and meaningful stepwise execution a
 
 The user has prioritized further Stage 1 training before running overscaling experiments. A [three-total-epoch continuation](../training_pointer.md#continue-the-current-desktop-run) keeps training depths at 1–4 and examines whether extension improves on validation. Retain update 500 as the historical primary and 625 as secondary, even when resuming the latest optimizer state at 625. The seed-17 test results already inspected are diagnostic evidence, not untouched final confirmation for future tuned runs.
 
-[Absorbing-terminal overscaling tools](../overscaling_eval.md) are prepared but execution is deferred. The original continuing-pointer tasks still cannot establish post-completion damage by a changed decoded answer alone. The [WSL exact-resume precision limitation](wsl_cuda_baseline.md) remains unresolved; it is separate from the correctness of these completed evaluation artifacts.
+[Absorbing-terminal overscaling tools](../evaluation.md) are prepared but execution is deferred. The original continuing-pointer tasks still cannot establish post-completion damage by a changed decoded answer alone. The [WSL exact-resume precision limitation](wsl_cuda_baseline.md) remains unresolved; it is separate from the correctness of these completed evaluation artifacts.
 
 ## Three-epoch continuation and full validation
 
@@ -148,4 +148,4 @@ Trained-depth complete-trajectory accuracy is **497/500 (99.4%)**. Depth-5 accur
 
 The read-only audits covered all 30 continuation monitoring CSVs (8,280 rows) and all 8,000 full-validation rows: exact interpreter targets, masks, correctness, aggregate exported CE, source/data hashes, and update sequence. The 512 corresponding monitoring readouts matched the full validation sweep. Adapter tensors and full logits were not available locally; no pretrained inference was repeated by the assistant. The full validation set is different from the earlier checkpoint-500/625 test set, so do not describe their score differences as a paired comparison.
 
-Next is the [depth-6 training and outward OOD experiment](../depth_generalization.md), not additional unchanged depth-4 epochs. Keep update 1875 as the depth-4 reference, run paired evaluation on the same depth-1–16 development examples, and reserve seed 29 for later confirmation. Increasing training depth without moving the OOD range would weaken the extrapolation test. Overscaling and knowledge-retention evaluation remain deferred.
+Next is the [depth-6 training and outward OOD experiment](../training_pointer.md), not additional unchanged depth-4 epochs. Keep update 1875 as the depth-4 reference, run paired evaluation on the same depth-1–16 development examples, and reserve seed 29 for later confirmation. Increasing training depth without moving the OOD range would weaken the extrapolation test. Overscaling and knowledge-retention evaluation remain deferred.

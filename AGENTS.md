@@ -8,25 +8,15 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 
 | Working on | Read |
 | --- | --- |
-| Research objectives, constraints, and claim hierarchy | [Project plan](docs/project_plan.md) |
-| Module boundaries, model flow, and gradient behavior | [Architecture](docs/architecture.md) |
-| Recurrent wrapper and architecture tests | [Stage 0](docs/phases/stage0_architecture.md) |
-| Pretrained Stage 0 validation evidence and device limits | [Validation report](docs/experiments/stage0_validation.md) |
-| Symbol vocabulary, pointer data, and intermediate training | [Stage 1](docs/phases/stage1_pointer.md) |
-| Depth-6 training, initialization, and outward OOD evaluation | [Depth generalization setup](docs/depth_generalization.md) |
-| Training commands, logging, checkpoints, and resume | [Pointer training](docs/training_pointer.md) |
-| Windows desktop setup, CUDA dependencies, and state migration | [WSL2/CUDA guide](docs/windows_cuda_setup.md) |
-| Untreated overscaling and failure analysis | [Stage 2](docs/phases/stage2_overthinking.md) and [terminal evaluation usage](docs/overscaling_eval.md) |
-| Detached rollouts, asymmetric losses, and baselines | [Stage 3](docs/phases/stage3_asymmetric.md) |
-| Multi-family execution, preservation, and transfer | [Stages 4–6](docs/phases/stages4_6_transfer.md) |
-| Adaptive inference depth: implemented interfaces and remaining research gates | [Adaptive-compute guide](docs/adaptive_compute.md) |
-| Metrics, trajectories, figures, and reproducibility | [Evaluation](docs/evaluation.md) |
-| Ordinary-model final-answer pointer baseline | [Naive pointer evaluation](docs/naive_pointer_eval.md) |
-| Saved-checkpoint per-loop pointer evaluation | [Full-loop evaluation](docs/loop_pointer_eval.md) |
-| Latest pointer training and full-loop evidence | [CUDA experiment report](docs/experiments/stage1_cuda_5k.md) |
-| Fresh 30k baseline and loop-balanced follow-up | [Fresh-run report](docs/experiments/stage1_fresh30k.md) and [training commands](docs/training_pointer.md#loop-balanced-loss-experiment) |
-| Unresolved choices and recorded design decisions | [Decisions](docs/decisions.md) |
-| Implemented work, validation evidence, and next milestone | [Status](docs/status.md) |
+| Research objectives, stage gates, transfer, and claim hierarchy | [Project plan](docs/project_plan.md) |
+| Implemented work and the next bounded milestone | [Status](docs/status.md) |
+| Recurrent model, gradients, and Stage 0 validation | [Architecture](docs/architecture.md) |
+| Pointer data, training, checkpoints, and depth comparison | [Pointer execution and training](docs/training_pointer.md) |
+| Metrics, ordinary and recurrent baselines, and terminal overscaling | [Evaluation](docs/evaluation.md) |
+| Adaptive inference, stopping, and its remaining research gates | [Adaptive-compute guide](docs/adaptive_compute.md) |
+| Environment setup and device migration | [Setup](docs/setup.md) and [WSL2/CUDA](docs/windows_cuda_setup.md) |
+| Unresolved choices and recorded decisions | [Decisions](docs/decisions.md) |
+| Dated validation and experiment evidence | [Experiment reports](docs/README.md#evidence-not-instructions) |
 
 ## Code conventions
 
@@ -66,7 +56,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 
 - Store all Codex planning, design, implementation, validation, experiment-report, and handoff documentation as Markdown files under `docs/`. `AGENTS.md` is the root instruction and navigation exception. Keep a root README, if used, to an entry-point description and links into `docs/`.
 - Use [docs/project_plan.md](docs/project_plan.md) as the research source of truth. Supporting docs explain execution; do not silently rewrite the research design or treat an implementation proposal as an amendment.
-- Update the relevant phase and architecture documentation in the same change as implementation. Describe the purpose, actual implementation and interfaces, commands, validation results, and limitations as they become known.
+- Update the relevant canonical guide and architecture documentation in the same change as implementation. Describe the purpose, actual implementation and interfaces, commands, validation results, and limitations as they become known.
 - Distinguish planned, implemented, and verified behavior. Never present unrun commands, unmeasured performance, or unpassed gates as established results.
 - Maintain [docs/status.md](docs/status.md) with the current phase, completed work, evidence, unresolved issues, and next bounded milestone. Record design choices and their rationale in [docs/decisions.md](docs/decisions.md).
 - Keep durable information in its owning document and link to it elsewhere. Add new documents to [docs/README.md](docs/README.md), and update this reading map when they provide an important new entry point.

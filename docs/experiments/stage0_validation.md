@@ -74,4 +74,4 @@ Timing figures are individual short validation runs, not throughput benchmarks o
 
 Tiny tests cover SDPA and configurable split extremes; pretrained validation here covers eager float32 at the default split only. Pretrained numerical equivalence uses three small cases, not an exhaustive language evaluation. MPS CE backward is verified; MPS backward through margin-based objectives is not. No checkpoint serialization/resumption interface is implemented. Other Transformers versions, sliding attention, non-default RoPE, generation/KV caching, and large-depth performance are outside the verified scope.
 
-The next milestone is [pointer symbols and data validation](../phases/stage1_pointer.md), with a stop before training. See [status](../status.md) and [decisions](../decisions.md) for remaining task semantics.
+The next milestone is [pointer symbols and data validation](../training_pointer.md), with a stop before training. See [status](../status.md) and [decisions](../decisions.md) for remaining task semantics.

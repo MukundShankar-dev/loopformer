@@ -17,9 +17,9 @@ The first question is the core project. The second question is the natural expan
 
 **2026-09-17 update:** The user authorized a fresh equal-loop CE ablation after the completed 30k depth-6 baseline. Preserve exact per-loop targets and the six-loop training ceiling, but replace equal-example loss weighting with equal dataset-level loop weighting; keep the other run settings fixed. This tests an objective change without adding a loop counter, retention objective, or new prompt format. See [current status](status.md), [baseline evidence](experiments/stage1_fresh30k.md), and [new run instructions](training_pointer.md#loop-balanced-loss-experiment). Superseded raw artifacts are pruned at user request, with current comparison evidence retained and older tracked artifacts recoverable from Git history. The paragraphs below record the earlier curriculum decision.
 
-The immediate next experiment remains **Stage 1 training for stronger depth generalization**. Full-loop evaluation now supports unseen-mapping execution at trained depths 1–4, while deeper execution is weak. Continue a bounded training run with intermediate supervision; do not treat more epochs as guaranteed success. The fixed-depth continuation is now complete. The user authorized the next depth-6 stage only with OOD evaluation moved outward: compare the depth-4 reference and new checkpoint on identical examples through depth 16, and report both absolute depth and steps beyond the training maximum. Depths 5–6 become in-range for the new stage. See [depth experiment setup](depth_generalization.md). The [current status](status.md), [training setup](depth_generalization.md), and [experiment report](experiments/stage1_cuda_5k.md) own the current commands and evidence.
+The immediate next experiment remains **Stage 1 training for stronger depth generalization**. Full-loop evaluation now supports unseen-mapping execution at trained depths 1–4, while deeper execution is weak. Continue a bounded training run with intermediate supervision; do not treat more epochs as guaranteed success. The fixed-depth continuation is now complete. The user authorized the next depth-6 stage only with OOD evaluation moved outward: compare the depth-4 reference and new checkpoint on identical examples through depth 16, and report both absolute depth and steps beyond the training maximum. Depths 5–6 become in-range for the new stage. See [depth experiment setup](training_pointer.md). The [current status](status.md), [training setup](training_pointer.md), and [experiment report](experiments/stage1_cuda_5k.md) own the current commands and evidence.
 
-The user authorized preparing overscaling scripts now but deferred running those experiments until further training and review. The separate [absorbing-terminal diagnostic](overscaling_eval.md) replaces only the final state's outgoing edge with a self-loop, making post-completion reference execution unambiguous. This is an explicit evaluation distribution change, not a change to Stage 1 training or retroactive damage labels for original tasks. Inspect nominal execution and possible terminal-identification shortcuts before interpreting dynamics. No asymmetric retention, multi-family expansion, or anchor loss is authorized by this preparation.
+The user authorized preparing overscaling scripts now but deferred running those experiments until further training and review. The separate [absorbing-terminal diagnostic](evaluation.md) replaces only the final state's outgoing edge with a self-loop, making post-completion reference execution unambiguous. This is an explicit evaluation distribution change, not a change to Stage 1 training or retroactive damage labels for original tasks. Inspect nominal execution and possible terminal-identification shortcuts before interpreting dynamics. No asymmetric retention, multi-family expansion, or anchor loss is authorized by this preparation.
 
 Generalization claims remain distinct: unseen mappings already provide instance-generalization evidence; performance beyond trained depth is the immediate unresolved objective. Cross-family and natural-language transfer remain later questions. Formal gate thresholds and confirmation seeds must be set before future confirmatory evaluations, not fitted to the results already inspected.
 
@@ -1455,3 +1455,106 @@ scientific interpretability
 # 34\. One-line summary
 
 > **Teach a small recurrent Qwen to execute one useful in-context state transition per loop, first study and stabilize its recurrent dynamics on a clean task, then test how far that same update mechanism transfers across different algorithms without becoming a no-op or destroying ordinary model behavior.**
+
+---
+
+## Stage 3 implementation notes (planned)
+
+Status: planned; requires demonstrated repair and overscaling damage in Stage 2. Source: project plan sections 9–13 and 31.
+
+### Purpose
+
+Train transitions on states the model actually visits, reducing damage without losing repair or stepwise execution. Correct hidden states may continue moving as long as their answers remain safe.
+
+### Implementation approach
+
+1. Sample a rollout length and generate `h_t` with gradients disabled using the current recurrent model.
+2. Detach `h_t`, then compute one additional shared recurrent transition and coda readout with gradients enabled.
+3. Classify the current state using its labeled answer margin and configured `gamma > 0`.
+4. Apply the corresponding next-step objective and update only the recurrent adapters/optional bridge.
+
+For wrong states before nominal completion, use cross-entropy toward the known next intermediate target. For wrong states after completion, use the final answer as the recovery target. Fragile and robust correct cases both use `max(0, gamma - next_margin)`; the robust case has zero retention loss while the next state stays inside the safe region.
+
+Before coding the objective, settle the target basis and branch precedence for unfinished programs, the exact completion boundary, and early/repeated final-state visits in [decisions](decisions.md). The project plan does not fully specify these cases. Do not silently freeze valid intermediate progress or substitute a different training objective.
+
+Document rollout-length sampling, case weights, batch reduction, CE vocabulary, and treatment of empty cases. Validate off-by-one targets, gradient detachment, margin boundaries, and the zero-loss safe region.
+
+### Controlled comparisons
+
+| Variant | State generation | Step/repair objective | Retention |
+| --- | --- | --- | --- |
+| A | Differentiable unroll | Yes | No |
+| B | Detached model rollout | Yes | No |
+| C | Detached model rollout | Ordinary task loss, definition to settle | Yes |
+| D | Detached model rollout | Yes | Yes |
+
+Use the same starting Stage 1 checkpoint, data splits, and documented budget accounting. Report compute differences between differentiable unrolls and detached updates. Define variant C before experiments so it is distinguishable from D.
+
+Include fixed-budget, confidence-stopping, prediction-stability-stopping, and trivial no-op baselines. Practical halting must use observable predictions, not the labeled true-answer margin; label any oracle comparison explicitly. Probe-based stopping is optional later work.
+
+### Acceptance gate
+
+Compared especially with variant B, damage should fall substantially at 16–64 loops while repair remains useful, intermediate execution persists, and net recurrent gain stays useful farther beyond training depth. Compare survival and the depth-by-loop heatmap using the same evaluation examples.
+
+A near-zero damage rate with collapsed repair does not pass. Hidden-state motion is diagnostic evidence, not by itself proof of useful computation. Report negative outcomes and comparisons where halting performs as well as or better than transition training.
+
+### Implementation record
+
+No detached-rollout trainer, asymmetric loss implementation, or pretrained Stage 3 result exists. Adaptive stopping baselines have separate implemented interfaces, but no pretrained terminal confirmation; see [adaptive compute](adaptive_compute.md). Add concrete Stage 3 validation commands, configurations, reports, and gate evidence if implemented.
+
+---
+
+## Stages 4–6 implementation notes (planned)
+
+Status: planned future work; requires validated single-family recurrent dynamics. Source: project plan sections 14–22 and 25.
+
+### Stage 4: shared multi-family execution
+
+Purpose: test whether one recurrent parameter set can execute several trained transition families.
+
+Extend the task interface with pointer lookup, random permutations, finite-state machines, symbolic conditional transitions, graph/grid navigation, and modular updates as appropriate to the chosen experiment. Every family must provide exact intermediate targets, a prompt containing its rules, and reproducible generation.
+
+For families with input or action sequences, specify how the current instruction/progress is represented. Validate reference execution and tokenization before mixing tasks. Randomize symbols, rules, structures, start states, depths, and surface forms without changing the intended transition semantics.
+
+Train one shared LoRA configuration and optional bridge across the configured family mixture. Do not add task-specific adapters. Preserve intermediate supervision and report results per family, alongside aggregate dynamics and compute use.
+
+Gate: several trained families retain interpretable one-loop/one-transition execution with the same parameters. Investigate family-specific specialization and loss of pointer behavior before claiming a reusable mechanism.
+
+### Stage 4b: optional ordinary-Qwen preservation
+
+Purpose: measure and, if useful, limit changes to ordinary pretrained behavior.
+
+Evaluate frozen original Qwen and adapted Qwen at one-pass behavior on ordinary text/prompts. Optionally train with `KL(p_base || p_adapted)` on these inputs. Document prompt selection, token masking, loss weighting, and additional compute.
+
+Track preservation separately from synthetic recurrent performance and compare with/without the anchor. This loss is not part of the first pointer experiment or a requirement for the core dynamics result.
+
+### Stage 5: whole-family holdout
+
+Purpose: test zero-shot recurrent progression on an entire family excluded from recurrent training.
+
+Choose the holdout and evaluation protocol before multi-family training. Keep the held-out family out of training and model-selection decisions. For example, train pointer, modular, symbolic, and FSM tasks, then evaluate graph navigation.
+
+Measure each intermediate transition, final accuracy across loop counts, depth extrapolation, and overscaling behavior. Compare against relevant unadapted/single-family baselines and document shared encodings or structural similarities that limit the interpretation.
+
+Gate: meaningful zero-shot progression on a wholly held-out family supports cross-algorithm transfer. Several trained families or unseen mappings alone do not establish that claim. Failed transfer remains an informative result.
+
+### Stage 6: exploratory natural-language transfer
+
+Purpose: determine whether recurrence survives changes in rule representation and eventually helps structured real tasks.
+
+Progress from formal rules to natural-language versions of the same rules, then algorithm instructions, structured reasoning, and only later real benchmarks. Change one source of difficulty at a time and document target/decoding conventions when intermediate states become ambiguous.
+
+Distinguish failures of execution from language understanding, arithmetic, and answer decoding. Natural-language or benchmark transfer is exploratory and is not required for the core project to succeed.
+
+### Optional probes
+
+After relevant trajectories exist, use entropy/margins, linear probes, or small MLPs to study current correctness, next-step help/harm, and task-family separability. Use separate probe training/evaluation data. Treat probe findings as diagnostics; do not force a proposed representation during the core training experiment.
+
+### Implementation record
+
+No multi-family generators, training mixture, anchor implementation, holdout results, or natural-language experiments exist yet. Keep implementation detail in the owning canonical guide and update the documentation index and agent reading map.
+
+
+### Future preservation regression evaluation
+
+At the user's request, the [project plan](project_plan.md#future-knowledge-retention-regression-check) now includes a small fixed ordinary-knowledge regression check before/after pointer adaptation, with a seeded MMLU subset as one candidate. It is a future evaluation, not an implemented benchmark or a requirement to introduce the anchor loss. Keep one-pass preservation distinct from cross-family and natural-language transfer. Current work remains Stage 1 depth generalization; these later stages are not activated by preparing that plan.

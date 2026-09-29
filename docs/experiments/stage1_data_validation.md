@@ -4,7 +4,7 @@
 
 The data-only milestone is complete. Generated and verified 13,000 seeded pointer examples, with exact intermediate states, single-token answer IDs, balanced depth splits, and no repeated whole mapping table within/across splits. No model loading, optimizer step, training, or model-output evaluation was performed. Gate 1 (learned stepwise execution) remains untested.
 
-The [Stage 1 guide](../phases/stage1_pointer.md) owns commands, APIs, schema, and sampling details; [decisions](../decisions.md#stage-1-data-resolutions--2026-09-10) records their interpretation.
+The [Stage 1 guide](../training_pointer.md) owns commands, APIs, schema, and sampling details; [decisions](../decisions.md#stage-1-data-resolutions--2026-09-10) records their interpretation.
 
 ## Configuration and artifacts
 
