@@ -27,7 +27,7 @@ One recurrent block and its LoRA adapters are reused across all loops. Original 
 | [One-loop equivalence](docs/experiments/stage0_validation.md), shared-weight and gradient-scope tests | Validated model surgery; useful task execution needs separate evidence. |
 | [Fresh 30k depth-6 experiment](docs/experiments/stage1_fresh30k.md) | Strong unseen-mapping trajectories and bounded extension beyond training depth; one training run on development evaluation sets. |
 | [Evaluation and reproducibility](docs/evaluation.md) | Seeded data, exact intermediate supervision, full per-loop exports, source/data/checkpoint provenance, selection discipline, synchronized timing and throughput. |
-| [107 passing contract tests recorded](docs/status.md#implemented-next-experiment) | Architecture, data, training and metric contracts; tests do not establish empirical research gates. |
+| [Recorded contract-test validation](docs/status.md) | Architecture, data, training and metric contracts; tests do not establish empirical research gates. |
 
 For the fresh 30k run, **step 2500** achieved the following complete-trajectory accuracy (every nominal intermediate state correct):
 
@@ -39,7 +39,7 @@ Depths 1–6 aggregate 750 examples; each individual depth has 125. Step 2500 is
 
 ## What comes next
 
-The immediate pending experiment is [loop-balanced intermediate loss](docs/training_pointer.md#loop-balanced-loss-experiment), implemented but unrun on the pretrained model. [Terminal overscaling evaluation](docs/evaluation.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.
+The [loop-balanced loss ablation](docs/experiments/stage1_loopbalanced.md) did not improve farther-depth generalization. Next is [failure diagnosis and performance profiling](docs/diagnostics_and_performance.md) before another training change. [Terminal overscaling evaluation](docs/evaluation.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.
 
 The next major direction is **adaptive inference compute**. Offline oracle/heuristic analysis, opt-in stopped inference, synchronized latency recording, and a gated lightweight head trainer now have code and tests. [The adaptive-compute guide](docs/adaptive_compute.md) is the single source for methods and usage; no pretrained adaptive policy or speedup result has been verified. The original continuing-pointer tasks need explicit completion semantics before answer changes can be interpreted as damage.
 

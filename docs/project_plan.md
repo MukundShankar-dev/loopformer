@@ -13,7 +13,9 @@ The first question is the core project. The second question is the natural expan
 
 ---
 
-## Current execution priority — user update, 2026-09-10
+## Current execution priority — user updates
+
+**2026-09-29 update:** The loop-balanced ablation is complete and did not improve farther-depth generalization. At the user’s request, retire its artifacts and prioritize [failure diagnostics and performance profiling](diagnostics_and_performance.md) before another training change. This supersedes the dated execution priorities below, without changing the research gates. See the [ablation report](experiments/stage1_loopbalanced.md).
 
 **2026-09-17 update:** The user authorized a fresh equal-loop CE ablation after the completed 30k depth-6 baseline. Preserve exact per-loop targets and the six-loop training ceiling, but replace equal-example loss weighting with equal dataset-level loop weighting; keep the other run settings fixed. This tests an objective change without adding a loop counter, retention objective, or new prompt format. See [current status](status.md), [baseline evidence](experiments/stage1_fresh30k.md), and [new run instructions](training_pointer.md#loop-balanced-loss-experiment). Superseded raw artifacts are pruned at user request, with current comparison evidence retained and older tracked artifacts recoverable from Git history. The paragraphs below record the earlier curriculum decision.
 
@@ -698,7 +700,7 @@ This is a practical extension of the dynamics question, alongside the Stage 3 ha
 
 Follow the [adaptive-compute roadmap](adaptive_compute.md): analyze existing per-loop trajectories, quantify offline oracle headroom, evaluate development-tuned heuristic policies, and only then consider learned halting. Reuse `scripts/eval/loop_test.py`, `loop_metrics.py`, `overscaling_metrics.py`, and synchronized timing in `recurrent_pointer.py`; do not build a second evaluation framework. Offline analysis can begin with existing exports, but original-task final matches are observational and do not establish terminal damage.
 
-Keep fixed-depth baselines, compare quality at matched average compute, and report a quality-compute Pareto curve, confidence/calibration, and measured latency separately from loop savings. Freeze settings before untouched confirmation. A successful adaptive policy would preserve most of the best fixed-depth quality with materially fewer loops and possibly avoid later damage; this is an additional compute-allocation claim, not evidence of arbitrary-depth or general reasoning. Oracle and heuristic analysis, opt-in stopping, and a gated lightweight head trainer now have tested code. Pretrained terminal adaptive experiments, fitted heads, latency gains, and confirmation remain unrun; see [implementation and limits](adaptive_compute.md). The immediate loop-balanced Stage 1 experiment remains unchanged.
+Keep fixed-depth baselines, compare quality at matched average compute, and report a quality-compute Pareto curve, confidence/calibration, and measured latency separately from loop savings. Freeze settings before untouched confirmation. A successful adaptive policy would preserve most of the best fixed-depth quality with materially fewer loops and possibly avoid later damage; this is an additional compute-allocation claim, not evidence of arbitrary-depth or general reasoning. Oracle and heuristic analysis, opt-in stopping, and a gated lightweight head trainer now have tested code. Pretrained terminal adaptive experiments, fitted heads, latency gains, and confirmation remain unrun; see [implementation and limits](adaptive_compute.md). The immediate priority is diagnosis and profiling following the completed loop-balanced ablation.
 
 ---
 

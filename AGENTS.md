@@ -14,6 +14,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | Pointer data, training, checkpoints, and depth comparison | [Pointer execution and training](docs/training_pointer.md) |
 | Metrics, ordinary and recurrent baselines, and terminal overscaling | [Evaluation](docs/evaluation.md) |
 | Adaptive inference, stopping, and its remaining research gates | [Adaptive-compute guide](docs/adaptive_compute.md) |
+| Failure diagnosis, proposed logging, and performance profiling | [Diagnostics and performance](docs/diagnostics_and_performance.md) |
 | Environment setup and device migration | [Setup](docs/setup.md) and [WSL2/CUDA](docs/windows_cuda_setup.md) |
 | Unresolved choices and recorded decisions | [Decisions](docs/decisions.md) |
 | Dated validation and experiment evidence | [Experiment reports](docs/README.md#evidence-not-instructions) |

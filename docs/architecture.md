@@ -156,3 +156,7 @@ The hard gate is passing equivalence, sharing, and gradient scope. An unavailabl
 ### Stop boundary
 
 Stage 0 ends here. Next is the [symbol vocabulary and pointer-data generator](training_pointer.md), including tests, followed by another stop before training. Completion semantics, cycles, and task-specific readout remain decisions for that milestone.
+
+## Performance investigation boundary
+
+The [diagnostics and performance proposal](diagnostics_and_performance.md) records inspected overhead in symbolic projection, metric synchronization, batching and execution settings. No fast-path model change has been implemented. Preserve full-vocabulary one-loop equivalence, intermediate readouts and gradients, frozen base weights, and shared recurrence while measuring candidates.

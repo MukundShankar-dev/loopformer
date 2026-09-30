@@ -10,6 +10,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 | Adaptive analysis, oracle/heuristic stopping, implemented interfaces, and remaining gates | [Adaptive inference compute](adaptive_compute.md) |
 | Python environment and pretrained Stage 0 checks | [Setup](setup.md) |
 | Windows/WSL2/CUDA installation and artifact migration | [Desktop setup](windows_cuda_setup.md) |
+| Failure diagnostics and performance profiling proposal | [Diagnostics and performance](diagnostics_and_performance.md) |
 | Resolved and open design choices | [Decisions](decisions.md) |
 
 The adaptive-compute guide is the **single source for that extension**. The research plan states its place in the stage sequence; evaluation documents shared metric conventions; status records current evidence. Stage 3 asymmetric dynamics and Stages 4–6 transfer remain planned in the research plan. No separate phase-guide directory is needed.
@@ -18,4 +19,4 @@ The adaptive-compute guide is the **single source for that extension**. The rese
 
 The dated reports in [`experiments/`](experiments/) preserve experiment configuration, observations, and limitations. They are not current runbooks. For the latest pretrained depth results, see the [fresh 30k report](experiments/stage1_fresh30k.md); the earlier [CUDA run](experiments/stage1_cuda_5k.md) and [Stage 0 validation](experiments/stage0_validation.md) provide historical evidence. The [adaptive nominal-trace analysis](experiments/adaptive_nominal_analysis.md) is observational and is not a pretrained terminal or adaptive-policy result.
 
-The immediate pending pretrained experiment is [loop-balanced loss training](training_pointer.md#loop-balanced-loss-experiment). Pretrained terminal overscaling and confirmation evaluation remain deferred. [AGENTS.md](../AGENTS.md) contains repository conventions.
+The [completed loop-balanced ablation](experiments/stage1_loopbalanced.md) did not extend the frontier. The immediate priority is [diagnosis and profiling](diagnostics_and_performance.md). Pretrained terminal overscaling and confirmation evaluation remain deferred. [AGENTS.md](../AGENTS.md) contains repository conventions.

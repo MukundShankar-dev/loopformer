@@ -1,6 +1,6 @@
 # Train recurrent pointer execution
 
-Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md) has completed; [loop-balanced loss](#loop-balanced-loss-experiment) is implemented but has no pretrained run. It is the immediate pending experiment. Other dated training and depth-comparison commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for toy-model checks.
+Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md) has completed; the [loop-balanced ablation](experiments/stage1_loopbalanced.md) is also complete, without an improved depth frontier. The immediate priority is [diagnosis and profiling](diagnostics_and_performance.md). Other dated training and depth-comparison commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for toy-model checks.
 
 ## Preview, then run
 
@@ -137,6 +137,8 @@ Validation of the continuation config on the Mac: data/tokenizer-only dry run pa
 
 ## Loop-balanced loss experiment
 
+**Completed and retired.** These commands preserve the protocol, not instructions for another run. See the [results and cleanup](experiments/stage1_loopbalanced.md). The next priority is [diagnosis and profiling](diagnostics_and_performance.md).
+
 The [completed 30k baseline](experiments/stage1_fresh30k.md) used per-example mean CE. The new [loop-balanced config](../configs/stage1_pointer_depth6_loopbalanced.json) changes only `loss_reduction` to `loop_mean` relative to the batch-4 baseline. Start fresh adapters with the same existing seed-37 dataset and training seed 17; no regeneration, `--resume`, or `--init-from` is needed. Training remains depths 1–6, batch 4/accumulation 2, one epoch/3,750 updates, and learning rate 0.0002. Keep the desktop in tmux as described below.
 
 ```bash
@@ -156,9 +158,11 @@ For the selected training dataset, let N be the example count, D the maximum dep
 
 The dashboard shows optimized objective loss separately from legacy example-mean CE. Existing evaluation loss fields retain their meaning for comparison. For this run only, automatic checkpoint selection uses equal-loop mean CE over validation tasks within training depths 1–6; it excludes depth-7/8 examples even from early-loop means. Monitor full trajectories and compare matching update numbers against the baseline. A different objective-selected checkpoint is not by itself proof of improved generalization. Depths 7–16 remain development evaluation; seed 29 stays reserved.
 
-Historical configs default to `example_mean`. Resume cannot change the objective, including with `--allow-batch-change`. The new reduction is recorded in config, run identity, checkpoint metadata, and logs. No explicit loop counter, prompt modification, longer training horizon, or asymmetric retention is introduced. The pretrained experiment remains unrun by the assistant.
+Historical configs default to `example_mean`. Resume cannot change the objective, including with `--allow-batch-change`. The new reduction is recorded in config, run identity, checkpoint metadata, and logs. No explicit loop counter, prompt modification, longer training horizon, or asymmetric retention is introduced. The user completed the pretrained experiment; its artifacts were audited and subsequently removed at their request.
 
 ## Artifact cleanup
+
+For the retired loop-balanced run only, preview with `python -m scripts.training.cleanup_pointer_runs --loopbalanced-only`, then add `--apply` on the desktop to remove the run and six exact evaluation directories, including ignored weights. This cleanup was completed locally; it leaves the baseline and any unknown/new run untouched.
 
 Old recurrent runs and redundant baseline checkpoint directories were removed locally at the user's request. Their tracked evidence remains in Git history; historical report paths can refer to removed files. Git pull will not remove ignored weights on the desktop. With no affected run active, preview and then apply the same bounded cleanup there:
 
@@ -391,7 +395,7 @@ The separate [ordinary-model final-answer baseline](evaluation.md) is implemente
 
 ### Current training experiment
 
-The fresh 30k baseline and full evaluations are complete; see [results](experiments/stage1_fresh30k.md). The current authorized experiment changes only the training reduction to [equal-loop CE](training_pointer.md#loop-balanced-loss-experiment), preserving nominal targets and the depth-6 training ceiling. It starts fresh adapters on the same dataset/seed and budget. This supersedes the earlier setup notes below; no pretrained loop-balanced result is available yet.
+The fresh 30k baseline and full evaluations are complete; see [results](experiments/stage1_fresh30k.md). The equal-loop CE ablation is now complete and retired; see its [report](experiments/stage1_loopbalanced.md). The current priority is failure diagnostics and profiling, not another training run.
 
 The subsequent fresh-adapter 30k run is complete; its [report](experiments/stage1_fresh30k.md) supersedes the setup notes for that run.
 
@@ -403,9 +407,9 @@ The depth-4 continuation reached update 1875 and full validation now shows 99.4%
 
 ## Historical depth-6 curriculum and paired evaluation
 
-These commands describe the completed curriculum comparison. For the immediate pending experiment, use [loop-balanced loss](#loop-balanced-loss-experiment) and [status](status.md).
+These commands describe the completed curriculum comparison. The current priority is [diagnosis and profiling](diagnostics_and_performance.md); see [status](status.md).
 
-Status: this document records the earlier depth-6 curriculum setup and paired-evaluation protocol. The later [fresh 30k depth-6 baseline and full evaluations](experiments/stage1_fresh30k.md) are complete; [loop-balanced training](training_pointer.md#loop-balanced-loss-experiment) is the current pending experiment. See [status](status.md) for the latest evidence. Commands and resource expectations below describe that earlier protocol, not the current run instructions. Overscaling and knowledge-retention benchmarks remain deferred.
+Status: this document records the earlier depth-6 curriculum setup and paired-evaluation protocol. The later [fresh 30k depth-6 baseline and full evaluations](experiments/stage1_fresh30k.md) are complete; the loop-balanced ablation is also complete. See [status](status.md) for the latest evidence. Commands and resource expectations below describe that earlier protocol, not the current run instructions. Overscaling and knowledge-retention benchmarks remain deferred.
 
 ### Question and comparison
 
