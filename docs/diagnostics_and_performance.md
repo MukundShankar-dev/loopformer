@@ -103,3 +103,7 @@ Outputs: `summary.json`, `operators.txt`, `ranges.json`, and optional-to-share `
 The paired probes and CUDA profiler have not been run on pretrained weights locally. Effective adapter contribution ratios, per-loop gradient attribution, optimizations, and full training-phase timing remain future work contingent on these measurements.
 
 Implementation validation: the full local suite passed 119 tests in 115.18 seconds, including offline CLI integrations with a tiny saved Qwen checkpoint. Tests verify reference/risk-set accounting, paired target semantics, hook removal and forward equivalence, frozen parameters, and unchanged checkpoint bytes. These checks do not certify CUDA performance or pretrained probe behavior.
+
+### Desktop shell wrapper
+
+Run `bash profile_pointer.sh` from the repository (or invoke the script by path). The wrapper changes to its own repository directory, activates `.venv`, sets the CUDA determinism environment, checks the baseline checkpoint metadata/weights, runs train profiles at batches 4 and 8, then the paired probe. Each invocation uses timestamp/PID output directories so earlier results are preserved. Combined stdout/stderr also goes to `profile-pointer-debug.txt` (replaced on each invocation). Any failed command stops the remaining work and returns a nonzero status through `tee`. The checkpoint variable and `--output` spelling are corrected. Shell syntax and stubbed success/failure execution were checked; no pretrained run was launched.
