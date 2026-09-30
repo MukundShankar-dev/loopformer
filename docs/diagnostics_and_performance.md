@@ -1,6 +1,6 @@
 # Diagnose recurrent failures and measure execution cost
 
-Status: proposed next bounded work after the [negative loop-balanced ablation](experiments/stage1_loopbalanced.md). The source inspection below is complete; new diagnostic logging, GPU profiling, and optimizations are not implemented or benchmarked. Do not start another training sweep based on this proposal.
+Status: initial diagnostics and short profiler implemented after the [negative loop-balanced ablation](experiments/stage1_loopbalanced.md). Offline first-failure analysis has run on retained traces. Paired model probes and pretrained CUDA profiling await desktop execution. The broader measurements below distinguish implemented interfaces from future work; no optimization or new training sweep has been run.
 
 ## Questions before another training change
 
@@ -21,7 +21,7 @@ Keep the terminal dashboard compact: step/ETA, recent loss, last validation with
 
 ## Concrete overhead found in the current code
 
-- `loop_test.py` defaults to batch 1; all six recent full evaluations used it. Fixed-depth evaluation supports larger batches already. Adaptive stopped inference currently requires batch 1 and must be benchmarked separately.
+- `loop_test.py` defaults to batch 1; the full scientific evaluations used it. A subsequent 128-example desktop benchmark measured 40.93/17.13/12.62/9.75 seconds at batches 1/4/8/16, with identical predictions across all 2,048 loop readouts. Batch 16 was 4.20× faster in that single 16-loop comparison; memory and timing variance were not recorded. Fixed-depth evaluation supports larger batches already. Adaptive stopped inference currently requires batch 1 and must be benchmarked separately.
 - Training and checkpoint loading explicitly use eager attention; training and the full-loop CLI use float32. CUDA fast-path alternatives need explicit configuration, equivalence/gradient checks, and paired quality measurements.
 - `RecurrentQwen.forward` projects the answer vector to all 151,936 vocabulary logits every loop, then `symbolic_scores` retains 26. A task-specific selected-row projection is mathematically sufficient for symbolic CE, but must be opt-in, preserve full-vocabulary Stage 0/ordinary behavior, and verify logits and adapter gradients under numerical tolerance. Its actual share of runtime is unmeasured.
 - `evaluate` calls `batch_metrics` for the batch and again for each example, causing repeated `.item()`/`.tolist()` transfers. It also reads individual GPU losses with `.item()` inside the row loop. Consolidate detached statistics and transfer once per batch. CPU entropy/margin calculation and CSV construction need separate timing.
@@ -40,3 +40,66 @@ These are code-level candidates, not evidence of GPU utilization percentages or 
 5. Only then assess SDPA, BF16/TF32 or compilation as separate explicit execution choices. Do not loosen the float32 architecture gate or silently change old checkpoint defaults. Numerical and determinism effects must be reported alongside speed.
 
 Use the results to choose one justified model/training intervention. No cache change, new loop counter, adaptive-head training, or longer training run is implied by this plan. The immediate need is diagnosis plus measured execution efficiency; the wider [adaptive roadmap](adaptive_compute.md) remains conditional on its research gates.
+
+## Implemented diagnostic commands
+
+The first implementation adds three opt-in CLIs. It does not change the optimizer objective, recurrent architecture, attention implementation, precision or evaluator batch default. New ordinary full-loop exports add `target_rank` (descending logits, A–Z tie break) and `top_symbols` (top three) alongside the existing confidence fields. Historical exports remain readable, with unavailable fields blank.
+
+### Existing traces: no GPU required
+
+```bash
+python -m scripts.eval.diagnose_pointer \
+  eval/pointer_loops/20260911T201847.679922Z-depth6-fresh30k-seed37-batch4-step-002500 \
+  --data data/pointer/seed-17/depth_test.jsonl \
+  --output eval/pointer_diagnostics/baseline2500-depth9to16
+```
+
+This command has already run locally. It checks the source summary/data hash, unique complete trace coverage, reference targets and correctness before reporting first failures. `first_failures.csv` contains classifications and available confidence before/at failure. `conditional_failures.csv` contains per-depth/per-loop correct-prefix denominators, first-failure counts and rates; an empty risk set has an undefined rate. `summary.json` records provenance and totals. No model loading or inference occurs. All-correct cohorts have no `first_failures.csv` and an explicit zero failure count.
+
+For the retained baseline's 1,000 depth-9–16 development examples, 164 have complete trajectories. Among 836 first failures, 191 repeat the preceding reference state, 317 predict another earlier path state, 163 predict a future nominal state, and 165 predict an off-path symbol. These mutually exclusive categories depend on the non-repeating nominal reference. They describe decoded errors, not hidden-state causes. The exact results are saved under the output path above.
+
+### Paired probes: small real checkpoint run
+
+Run on the desktop with the complete baseline checkpoint:
+
+```bash
+python -m scripts.eval.probe_pointer \
+  --model models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500 \
+  --data data/pointer/seed-17/depth_test.jsonl --device cuda \
+  --limit 32 --restart-after 6 \
+  --output eval/pointer_probes/baseline2500
+```
+
+The fixed prefix is selected before observing failures (four examples at each depth 9–16 with this dataset). Each task gets three forwards: original; suffix starting at the known reference state after step six with the remaining requested depth; and the same original start/table with requested depth reduced by one. Exact transformed tasks are saved in `tasks.jsonl`. `pairs.csv` compares aligned transition predictions and flags original first errors. `states.csv` records target rank, top symbols, confidence, hidden RMS, update RMS, relative update norm and cosine change at the answer position and over the whole unpadded sequence. Zero-norm ratios/cosines are undefined, not fabricated zeros. Hidden tensors are retained only for one example's forward at a time and never exported. `h0` is used only for state-change measurement and has no supervised start-state readout assertion.
+
+Changed prompts are a confound: successful suffix execution suggests history sensitivity, but cannot by itself prove hidden-state drift. Depth-cue probes test common-prefix invariance on shortened prompts, not all possible depth variations. The baseline's original correct-prefix condition is recorded explicitly; subsequent wrong-prefix outcomes must not be described as first-transition failures. This probe is not a throughput benchmark.
+
+### Short profiler: warmed evaluation and disposable training
+
+```bash
+python -m scripts.eval.profile_pointer \
+  --model models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500 \
+  --data data/pointer/seed-17/depth_test.jsonl --device cuda \
+  --mode eval --batch-size 16 --loops 16 --limit 128 \
+  --output eval/pointer_profiles/baseline2500-eval-b16
+
+for batch in 4 8; do
+  python -m scripts.eval.profile_pointer \
+    --model models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500 \
+    --data data/pointer/seed-37-depth6-30k/train.jsonl --device cuda \
+    --mode train --batch-size "$batch" --effective-batch 8 --train-max-depth 6 \
+    --output "eval/pointer_profiles/baseline2500-train-b$batch" || break
+done
+```
+
+All output directories must be new. The scripts default to cached models, eager float32, strict deterministic algorithms, seed 17, four CPU threads; set `CUBLAS_WORKSPACE_CONFIG=:4096:8` in the CUDA shell. `--download` is explicit. CPU mode exists for tiny implementation checks; GPU attribution requires a CUDA run. No fallback device or precision changes occur.
+
+The profiler loads once, warms up twice, and measures five synchronized repeats (`--warmup`/`--repeats` configurable). It reports individual samples, median, nearest-rank p95 (with five samples this is the maximum), examples/s, supervised/executed transitions/s, and CUDA allocated/reserved peaks plus device free/total memory. CPU memory/device utilization sampling is not implemented. Evaluation timing includes collation, forward, scoring, aggregation and CSV output but excludes loading/encoding. A separate one-batch trace compares the same interval with/without profiler; profiler teardown/export are excluded from that ratio. Do not add nested inclusive CPU/GPU range times together.
+
+Training mode selects one seeded balanced eight-example group, resets adapters outside each measurement and constructs a fresh AdamW optimizer (LR 0.0002, no weight decay, clipping 1). It measures one disposable example-mean update, including first-step optimizer allocation; it is not a resume, a training experiment, or steady-state trainer throughput. Both microbatch partitions use identical IDs and effective batch. A separate diagnostic update saves adapter parameter gradient/update norms and its overhead; these factor norms do not measure effective LoRA contribution relative to the base projection. Original checkpoint files remain untouched, no new checkpoint is saved, and no validation set is trained on.
+
+Outputs: `summary.json`, `operators.txt`, `ranges.json`, and optional-to-share `trace.json.gz`. The trace contains CPU/CUDA operator events and ranges for input preparation/transfer, prelude, recurrent block, coda, LM head, loss, backward/optimizer in training, and evaluation metrics/export. Large traces under `eval/pointer_profiles/` are ignored by Git; summaries and tables remain trackable. Warmed throughput uses the unprofiled repeats. Training validation, dashboard, and checkpoint serialization costs are outside this first profiler's scope; no end-to-end training speedup claim follows from it.
+
+The paired probes and CUDA profiler have not been run on pretrained weights locally. Effective adapter contribution ratios, per-loop gradient attribution, optimizations, and full training-phase timing remain future work contingent on these measurements.
+
+Implementation validation: the full local suite passed 119 tests in 115.18 seconds, including offline CLI integrations with a tiny saved Qwen checkpoint. Tests verify reference/risk-set accounting, paired target semantics, hook removal and forward equivalence, frozen parameters, and unchanged checkpoint bytes. These checks do not certify CUDA performance or pretrained probe behavior.

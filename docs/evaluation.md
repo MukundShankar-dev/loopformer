@@ -379,3 +379,7 @@ Nominal CE is unchanged and excludes t>d. Final-target margins remain available 
 ### Validation
 
 Focused tests cover terminal execution through 64 steps, original-record preservation, deterministic transformation, conditional counts, the net-gain identity, censoring, recovery after damage, malformed trajectories, a no-write preview, and offline tiny-Qwen checkpoint inference. The integration case checks nominal agreement with `naive_test` on the transformed tasks and inference without optimizer state. The Mac full suite passed 92 tests in 54.83 seconds; the five focused cases passed in 19.82 seconds. The continuation data/tokenizer preview and CLI help checks also passed. See [current status](status.md). No pretrained inference, training, or performance claims are made by these tests.
+
+## Failure and performance diagnostics
+
+Use the opt-in [diagnostic commands](diagnostics_and_performance.md#implemented-diagnostic-commands) for reference-checked first-error categories and conditional risk sets, paired suffix/depth-cue probes, and warmed performance attribution. New full-loop rows include A–Z-tie-broken target rank and top-three symbols. Old traces remain valid with absent confidence/rank fields left unknown. This does not change accuracy, loss, readout or stopping semantics.

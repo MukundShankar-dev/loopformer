@@ -160,3 +160,5 @@ Stage 0 ends here. Next is the [symbol vocabulary and pointer-data generator](tr
 ## Performance investigation boundary
 
 The [diagnostics and performance proposal](diagnostics_and_performance.md) records inspected overhead in symbolic projection, metric synchronization, batching and execution settings. No fast-path model change has been implemented. Preserve full-vocabulary one-loop equivalence, intermediate readouts and gradients, frozen base weights, and shared recurrence while measuring candidates.
+
+The initial profiler uses temporary module hooks and opt-in evaluation ranges to attribute existing computation, without changing recurrent tensors or gradient paths. The separate small probe uses the existing hidden-state capture interface one example at a time. Disposable profile updates use the production objective/backward with fresh optimizer state and restore the source adapter values in memory; source checkpoint files are never rewritten. See [implemented diagnostics](diagnostics_and_performance.md#implemented-diagnostic-commands).

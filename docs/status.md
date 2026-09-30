@@ -4,7 +4,7 @@ Last updated: 2026-09-29.
 
 ## Current priority
 
-Stage 1 diagnosis and execution efficiency. The completed loop-balanced ablation did not improve the observed depth-generalization frontier. The user requested retiring its artifacts and investigating informative logging and performance before another training change. Baseline step 2500 remains the working checkpoint. The next bounded proposal is [failure diagnostics and profiling](diagnostics_and_performance.md), not another full training run. Seed 29 remains reserved; seed-17 evaluations are development diagnostics.
+Stage 1 diagnosis and execution efficiency. The completed loop-balanced ablation did not improve the observed depth-generalization frontier. The user requested retiring its artifacts and investigating informative logging and performance before another training change. Baseline step 2500 remains the working checkpoint. The next bounded work is to run the implemented [failure diagnostics and profiler](diagnostics_and_performance.md), not another full training run. Seed 29 remains reserved; seed-17 evaluations are development diagnostics.
 
 ## Latest evidence
 
@@ -55,3 +55,11 @@ Active guidance is consolidated in the [documentation index](README.md): the res
 ## Diagnosis and cleanup update — 2026-09-29
 
 Inspected training/evaluation code for metric synchronization, full-vocabulary projection, batching, attention and dtype choices. These are performance candidates, not profiled CUDA bottlenecks. New diagnostic logging and optimizations are proposed, not implemented. Cleanup’s three focused tests passed; no model execution was performed.
+
+## Diagnostic implementation
+
+Added reference-checked offline first-failure/risk-set analysis, small paired suffix/depth-cue probes with hidden-state scalar summaries, and warmed eval/disposable-update profiling with separate trace overhead. New full-loop exports include target rank and top-three symbols. Fixed-depth defaults, float32/eager execution, training objectives and model mechanics remain unchanged. The [canonical guide](diagnostics_and_performance.md#implemented-diagnostic-commands) owns commands, timing scope and limitations.
+
+The baseline step-2500 depth-9–16 trace analysis completed locally: 164/1,000 complete trajectories; first failures split into 191 previous-state repeats, 317 other earlier-path predictions, 163 future-path predictions and 165 off-path predictions. These observations do not establish a causal failure mechanism. Paired pretrained probes and CUDA profiling require the desktop weights and have not run locally.
+
+Validation: full local suite passed **119 tests in 115.18 seconds**. New tests exercise reference/risk-set semantics, undefined denominators, paired target alignment, state summaries, unchanged forwards under profiling hooks, frozen-parameter preservation, all diagnostic CLIs, and byte-identical source checkpoint files before/after profiling. CLI tests use random tiny local Qwen models, not pretrained weights.

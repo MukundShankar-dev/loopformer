@@ -1,0 +1,17 @@
+{
+  "examples": 1000,
+  "complete_trajectories": 164,
+  "first_error_categories": {
+    "off_path": 165,
+    "earlier_path": 317,
+    "future_path": 163,
+    "repeat_previous": 191
+  },
+  "semantics": "Nominal first errors only; empty risk-set rates are undefined; no hidden-state or post-completion damage claim",
+  "status": "complete",
+  "source_run": "/Users/mukunds/Desktop/loopformer/eval/pointer_loops/20260911T201847.679922Z-depth6-fresh30k-seed37-batch4-step-002500",
+  "data_sha256": "20c92ce8159e895cd98e7cee2a2da46e01e0ecdf07457e58d91ec31134ead4c9",
+  "source_summary_sha256": "806c2aaa2259831616d23e15ef9b5171ed5a6efb8612c136afa265e5bd45b785",
+  "trajectories_sha256": "6e3870789a03c18552282c4a8ab4dff14ea61744f7dba6c57c221ca5e490c584",
+  "analyzer_sha256": "3f7f3d7d3b2693d423f40e6c1bdc5a597597d142c605917763cc19dffca0f452"
+}

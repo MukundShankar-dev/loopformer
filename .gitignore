@@ -35,3 +35,6 @@ data/
 *.tar.gz
 *.tgz
 *.zip
+
+# Large optional profiler traces; small summaries/operator tables remain trackable.
+/eval/pointer_profiles/**/trace.json*
