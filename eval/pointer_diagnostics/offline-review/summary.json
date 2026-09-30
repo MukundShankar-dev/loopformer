@@ -1,0 +1,625 @@
+{
+  "trained_range": [
+    {
+      "checkpoint": 2500,
+      "n": 750,
+      "complete": 735
+    },
+    {
+      "checkpoint": 3250,
+      "n": 750,
+      "complete": 744
+    },
+    {
+      "checkpoint": 3750,
+      "n": 750,
+      "complete": 745
+    }
+  ],
+  "whole_failure_windows": [
+    {
+      "checkpoint": 2500,
+      "offset": -3,
+      "n": 783,
+      "target_margin": 9.780904769897461
+    },
+    {
+      "checkpoint": 2500,
+      "offset": -2,
+      "n": 783,
+      "target_margin": 8.450535774230957
+    },
+    {
+      "checkpoint": 2500,
+      "offset": -1,
+      "n": 783,
+      "target_margin": 5.308045387268066
+    },
+    {
+      "checkpoint": 2500,
+      "offset": 0,
+      "n": 783,
+      "target_margin": -2.6381607055664062
+    },
+    {
+      "checkpoint": 3250,
+      "offset": -3,
+      "n": 882,
+      "target_margin": 10.521173477172852
+    },
+    {
+      "checkpoint": 3250,
+      "offset": -2,
+      "n": 882,
+      "target_margin": 9.53908920288086
+    },
+    {
+      "checkpoint": 3250,
+      "offset": -1,
+      "n": 882,
+      "target_margin": 6.06224250793457
+    },
+    {
+      "checkpoint": 3250,
+      "offset": 0,
+      "n": 882,
+      "target_margin": -3.609999179840088
+    },
+    {
+      "checkpoint": 3750,
+      "offset": -3,
+      "n": 856,
+      "target_margin": 9.705626964569092
+    },
+    {
+      "checkpoint": 3750,
+      "offset": -2,
+      "n": 856,
+      "target_margin": 8.910799503326416
+    },
+    {
+      "checkpoint": 3750,
+      "offset": -1,
+      "n": 856,
+      "target_margin": 7.0052337646484375
+    },
+    {
+      "checkpoint": 3750,
+      "offset": 0,
+      "n": 856,
+      "target_margin": -5.203856945037842
+    }
+  ],
+  "checkpoints": [
+    {
+      "step": 2500,
+      "split": "validation",
+      "examples": 1000,
+      "complete_trajectories": 971,
+      "first_error_categories": {
+        "off_path": 22,
+        "earlier_path": 2,
+        "future_path": 5
+      },
+      "semantics": "Nominal first errors only; empty risk-set rates are undefined; no hidden-state or post-completion damage claim"
+    },
+    {
+      "step": 2500,
+      "split": "depth_test",
+      "examples": 1000,
+      "complete_trajectories": 164,
+      "first_error_categories": {
+        "off_path": 165,
+        "earlier_path": 317,
+        "future_path": 163,
+        "repeat_previous": 191
+      },
+      "semantics": "Nominal first errors only; empty risk-set rates are undefined; no hidden-state or post-completion damage claim"
+    },
+    {
+      "step": 3250,
+      "split": "validation",
+      "examples": 1000,
+      "complete_trajectories": 969,
+      "first_error_categories": {
+        "off_path": 12,
+        "earlier_path": 8,
+        "future_path": 5,
+        "repeat_previous": 6
+      },
+      "semantics": "Nominal first errors only; empty risk-set rates are undefined; no hidden-state or post-completion damage claim"
+    },
+    {
+      "step": 3250,
+      "split": "depth_test",
+      "examples": 1000,
+      "complete_trajectories": 92,
+      "first_error_categories": {
+        "earlier_path": 319,
+        "future_path": 115,
+        "repeat_previous": 318,
+        "off_path": 156
+      },
+      "semantics": "Nominal first errors only; empty risk-set rates are undefined; no hidden-state or post-completion damage claim"
+    },
+    {
+      "step": 3750,
+      "split": "validation",
+      "examples": 1000,
+      "complete_trajectories": 972,
+      "first_error_categories": {
+        "repeat_previous": 5,
+        "off_path": 13,
+        "earlier_path": 4,
+        "future_path": 6
+      },
+      "semantics": "Nominal first errors only; empty risk-set rates are undefined; no hidden-state or post-completion damage claim"
+    },
+    {
+      "step": 3750,
+      "split": "depth_test",
+      "examples": 1000,
+      "complete_trajectories": 121,
+      "first_error_categories": {
+        "repeat_previous": 380,
+        "earlier_path": 251,
+        "off_path": 109,
+        "future_path": 139
+      },
+      "semantics": "Nominal first errors only; empty risk-set rates are undefined; no hidden-state or post-completion damage claim"
+    }
+  ],
+  "comparisons": [
+    {
+      "split": "validation",
+      "later_checkpoint": 3250,
+      "depth": null,
+      "n": 1000,
+      "lost_complete": 25,
+      "gained_complete": 23,
+      "earlier_failure": 25,
+      "later_failure": 26
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3250,
+      "depth": 1,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 1,
+      "earlier_failure": 0,
+      "later_failure": 1
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3250,
+      "depth": 2,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 5,
+      "earlier_failure": 0,
+      "later_failure": 5
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3250,
+      "depth": 3,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 2,
+      "earlier_failure": 0,
+      "later_failure": 2
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3250,
+      "depth": 4,
+      "n": 125,
+      "lost_complete": 2,
+      "gained_complete": 2,
+      "earlier_failure": 2,
+      "later_failure": 2
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3250,
+      "depth": 5,
+      "n": 125,
+      "lost_complete": 1,
+      "gained_complete": 1,
+      "earlier_failure": 1,
+      "later_failure": 1
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3250,
+      "depth": 6,
+      "n": 125,
+      "lost_complete": 3,
+      "gained_complete": 4,
+      "earlier_failure": 3,
+      "later_failure": 4
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3250,
+      "depth": 7,
+      "n": 125,
+      "lost_complete": 6,
+      "gained_complete": 5,
+      "earlier_failure": 6,
+      "later_failure": 7
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3250,
+      "depth": 8,
+      "n": 125,
+      "lost_complete": 13,
+      "gained_complete": 3,
+      "earlier_failure": 13,
+      "later_failure": 4
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3750,
+      "depth": null,
+      "n": 1000,
+      "lost_complete": 23,
+      "gained_complete": 24,
+      "earlier_failure": 23,
+      "later_failure": 26
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3750,
+      "depth": 1,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 1,
+      "earlier_failure": 0,
+      "later_failure": 1
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3750,
+      "depth": 2,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 5,
+      "earlier_failure": 0,
+      "later_failure": 5
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3750,
+      "depth": 3,
+      "n": 125,
+      "lost_complete": 1,
+      "gained_complete": 2,
+      "earlier_failure": 1,
+      "later_failure": 2
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3750,
+      "depth": 4,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 2,
+      "earlier_failure": 0,
+      "later_failure": 2
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3750,
+      "depth": 5,
+      "n": 125,
+      "lost_complete": 3,
+      "gained_complete": 1,
+      "earlier_failure": 3,
+      "later_failure": 1
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3750,
+      "depth": 6,
+      "n": 125,
+      "lost_complete": 1,
+      "gained_complete": 4,
+      "earlier_failure": 1,
+      "later_failure": 4
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3750,
+      "depth": 7,
+      "n": 125,
+      "lost_complete": 5,
+      "gained_complete": 5,
+      "earlier_failure": 5,
+      "later_failure": 6
+    },
+    {
+      "split": "validation",
+      "later_checkpoint": 3750,
+      "depth": 8,
+      "n": 125,
+      "lost_complete": 13,
+      "gained_complete": 4,
+      "earlier_failure": 13,
+      "later_failure": 5
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3250,
+      "depth": null,
+      "n": 1000,
+      "lost_complete": 96,
+      "gained_complete": 24,
+      "earlier_failure": 496,
+      "later_failure": 190
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3250,
+      "depth": 9,
+      "n": 125,
+      "lost_complete": 37,
+      "gained_complete": 15,
+      "earlier_failure": 43,
+      "later_failure": 20
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3250,
+      "depth": 10,
+      "n": 125,
+      "lost_complete": 41,
+      "gained_complete": 8,
+      "earlier_failure": 66,
+      "later_failure": 17
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3250,
+      "depth": 11,
+      "n": 125,
+      "lost_complete": 16,
+      "gained_complete": 1,
+      "earlier_failure": 75,
+      "later_failure": 19
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3250,
+      "depth": 12,
+      "n": 125,
+      "lost_complete": 2,
+      "gained_complete": 0,
+      "earlier_failure": 54,
+      "later_failure": 27
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3250,
+      "depth": 13,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 0,
+      "earlier_failure": 72,
+      "later_failure": 25
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3250,
+      "depth": 14,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 0,
+      "earlier_failure": 60,
+      "later_failure": 36
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3250,
+      "depth": 15,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 0,
+      "earlier_failure": 60,
+      "later_failure": 18
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3250,
+      "depth": 16,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 0,
+      "earlier_failure": 66,
+      "later_failure": 28
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3750,
+      "depth": null,
+      "n": 1000,
+      "lost_complete": 85,
+      "gained_complete": 42,
+      "earlier_failure": 451,
+      "later_failure": 238
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3750,
+      "depth": 9,
+      "n": 125,
+      "lost_complete": 36,
+      "gained_complete": 20,
+      "earlier_failure": 41,
+      "later_failure": 21
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3750,
+      "depth": 10,
+      "n": 125,
+      "lost_complete": 33,
+      "gained_complete": 15,
+      "earlier_failure": 58,
+      "later_failure": 25
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3750,
+      "depth": 11,
+      "n": 125,
+      "lost_complete": 14,
+      "gained_complete": 7,
+      "earlier_failure": 67,
+      "later_failure": 22
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3750,
+      "depth": 12,
+      "n": 125,
+      "lost_complete": 2,
+      "gained_complete": 0,
+      "earlier_failure": 54,
+      "later_failure": 34
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3750,
+      "depth": 13,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 0,
+      "earlier_failure": 67,
+      "later_failure": 30
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3750,
+      "depth": 14,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 0,
+      "earlier_failure": 52,
+      "later_failure": 36
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3750,
+      "depth": 15,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 0,
+      "earlier_failure": 55,
+      "later_failure": 33
+    },
+    {
+      "split": "depth_test",
+      "later_checkpoint": 3750,
+      "depth": 16,
+      "n": 125,
+      "lost_complete": 0,
+      "gained_complete": 0,
+      "earlier_failure": 57,
+      "later_failure": 37
+    }
+  ],
+  "late_probe_failure_windows": [
+    {
+      "offset": -3,
+      "n": 22,
+      "target_rank": 1.0,
+      "answer_entropy": 0.0018641431126828817,
+      "predicted_margin": 10.314826488494873,
+      "target_margin": 10.314826488494873,
+      "answer_relative_update_norm": 0.6762335300445557,
+      "sequence_relative_update_norm": 0.03289075568318367
+    },
+    {
+      "offset": -2,
+      "n": 22,
+      "target_rank": 1.0,
+      "answer_entropy": 0.0056459093782773645,
+      "predicted_margin": 8.756490230560303,
+      "target_margin": 8.756490230560303,
+      "answer_relative_update_norm": 0.5961828827857971,
+      "sequence_relative_update_norm": 0.032530367374420166
+    },
+    {
+      "offset": -1,
+      "n": 22,
+      "target_rank": 1.0,
+      "answer_entropy": 0.18171790662899726,
+      "predicted_margin": 5.1784138679504395,
+      "target_margin": 5.1784138679504395,
+      "answer_relative_update_norm": 0.4770851284265518,
+      "sequence_relative_update_norm": 0.0317850224673748
+    },
+    {
+      "offset": 0,
+      "n": 22,
+      "target_rank": 9.5,
+      "answer_entropy": 2.15105737212388,
+      "predicted_margin": 0.7206945419311523,
+      "target_margin": -2.5131325721740723,
+      "answer_relative_update_norm": 0.31482043862342834,
+      "sequence_relative_update_norm": 0.031204644590616226
+    }
+  ],
+  "aligned_first_error_medians": {
+    "original": {
+      "target_rank": 9.5,
+      "answer_entropy": 2.15105737212388,
+      "predicted_margin": 0.7206945419311523,
+      "target_margin": -2.5131325721740723,
+      "answer_relative_update_norm": 0.31482043862342834,
+      "sequence_relative_update_norm": 0.031204644590616226
+    },
+    "suffix": {
+      "target_rank": 1.0,
+      "answer_entropy": 0.0005458445477981979,
+      "predicted_margin": 11.558810710906982,
+      "target_margin": 11.558810710906982,
+      "answer_relative_update_norm": 0.7072278559207916,
+      "sequence_relative_update_norm": 0.03843127191066742
+    }
+  },
+  "first_error_target_rank_counts": {
+    "2": 6,
+    "9": 2,
+    "11": 3,
+    "4": 2,
+    "17": 2,
+    "20": 1,
+    "24": 1,
+    "21": 1,
+    "16": 1,
+    "14": 1,
+    "10": 1,
+    "3": 1
+  },
+  "source_files": {
+    "eval/pointer_loops/20260911T201538.726082Z-depth6-fresh30k-seed37-batch4-step-002500/summary.json": "333834593aa0fe22ce35f694d9495d51194c70bcec77d3b3017cf78ec0c88535",
+    "data/pointer/seed-17/validation.jsonl": "d5925d830c330808bc5df636018ef0728e39b376ca63fa2df2b8b6fce1355b74",
+    "eval/pointer_loops/20260911T201538.726082Z-depth6-fresh30k-seed37-batch4-step-002500/trajectories.csv": "19df5196d3562a8d9b7ea6f07907d012a8ef27b15d91eb12897498334f00de9e",
+    "eval/pointer_loops/20260911T201847.679922Z-depth6-fresh30k-seed37-batch4-step-002500/summary.json": "806c2aaa2259831616d23e15ef9b5171ed5a6efb8612c136afa265e5bd45b785",
+    "data/pointer/seed-17/depth_test.jsonl": "20c92ce8159e895cd98e7cee2a2da46e01e0ecdf07457e58d91ec31134ead4c9",
+    "eval/pointer_loops/20260911T201847.679922Z-depth6-fresh30k-seed37-batch4-step-002500/trajectories.csv": "6e3870789a03c18552282c4a8ab4dff14ea61744f7dba6c57c221ca5e490c584",
+    "eval/pointer_loops/20260911T202436.195959Z-depth6-fresh30k-seed37-batch4-step-003250/summary.json": "2e95e258ddaa5b9eb4233466ead914b4fd15488976733a6a14773fc729fb6442",
+    "eval/pointer_loops/20260911T202436.195959Z-depth6-fresh30k-seed37-batch4-step-003250/trajectories.csv": "ad4608f24e85becbbaeb5425df37ebec3f3f9e6737a3bcbc0a6f0af5f9d2ca35",
+    "eval/pointer_loops/20260911T202743.750447Z-depth6-fresh30k-seed37-batch4-step-003250/summary.json": "a1268efd8b96a7ef91a1b834e4d66d06f9d38e9d852e4cd622af84bcc58953b1",
+    "eval/pointer_loops/20260911T202743.750447Z-depth6-fresh30k-seed37-batch4-step-003250/trajectories.csv": "93703064d66f7afccd5d991df5de076502ecafd7bc713a99daa9794448581c93",
+    "eval/pointer_loops/20260911T203340.701127Z-depth6-fresh30k-seed37-batch4-step-003750/summary.json": "fc428a0d7a9a9d15b38c4f109df7e28f478a8db3c18715dd0fa3c27b9472af8c",
+    "eval/pointer_loops/20260911T203340.701127Z-depth6-fresh30k-seed37-batch4-step-003750/trajectories.csv": "d32017ad196816d00c4c8a8d910f1da640764d38c51ffbe9a13d376cbe6b706b",
+    "eval/pointer_loops/20260911T203644.858894Z-depth6-fresh30k-seed37-batch4-step-003750/summary.json": "d69ccc5fcd020e66cc155bc0f7470c6497dbbeca20ca4c098198bb007c6992f2",
+    "eval/pointer_loops/20260911T203644.858894Z-depth6-fresh30k-seed37-batch4-step-003750/trajectories.csv": "da1d8aa01e8ac8d14c7308f6e860bc0aa897a80ed09ce6049afab55fb6077cb3",
+    "eval/pointer_probes/baseline2500-20260930T005754Z-2318/states.csv": "ea9496c9226bd7c9573ab122772bc9bf5ab8f28192d289634be9d7dba1058dfc"
+  }
+}

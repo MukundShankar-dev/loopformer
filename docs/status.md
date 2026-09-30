@@ -4,7 +4,7 @@ Last updated: 2026-09-29.
 
 ## Current priority
 
-Stage 1 diagnosis and execution efficiency. The completed loop-balanced ablation did not improve the observed depth-generalization frontier. The user requested retiring its artifacts and investigating informative logging and performance before another training change. Baseline step 2500 remains the working checkpoint. The next bounded work is to run the implemented [failure diagnostics and profiler](diagnostics_and_performance.md), not another full training run. Seed 29 remains reserved; seed-17 evaluations are development diagnostics.
+Stage 1 diagnosis and execution efficiency. The completed loop-balanced ablation did not improve the observed depth-generalization frontier. The user requested retiring its artifacts and investigating informative logging and performance before another training change. Baseline step 2500 remains the working checkpoint. The paired probes and CUDA profiles have now completed; see the [diagnostic report](experiments/baseline2500_diagnostics.md). Next, isolate recurrent-history sensitivity and benchmark explicit numerical execution choices before another full training run. Seed 29 remains reserved; seed-17 evaluations are development diagnostics.
 
 ## Latest evidence
 
@@ -63,3 +63,13 @@ Added reference-checked offline first-failure/risk-set analysis, small paired su
 The baseline step-2500 depth-9–16 trace analysis completed locally: 164/1,000 complete trajectories; first failures split into 191 previous-state repeats, 317 other earlier-path predictions, 163 future-path predictions and 165 off-path predictions. These observations do not establish a causal failure mechanism. Paired pretrained probes and CUDA profiling require the desktop weights and have not run locally.
 
 Validation: full local suite passed **119 tests in 115.18 seconds**. New tests exercise reference/risk-set semantics, undefined denominators, paired target alignment, state summaries, unchanged forwards under profiling hooks, frozen-parameter preservation, all diagnostic CLIs, and byte-identical source checkpoint files before/after profiling. CLI tests use random tiny local Qwen models, not pretrained weights.
+
+## Offline failure review
+
+The [saved-artifact review](experiments/baseline2500_offline_review.md) validates all six baseline evaluations and matches all 32 original probe trajectories to historical predictions. Late failures show weakening target margins and smaller answer-state updates; reference suffix restarts restore confident execution at 22/22 aligned first errors. Later checkpoints improve trained-depth accuracy but shorten the correct prefix on hundreds of the same deep examples and increasingly repeat the previous reference state. These are descriptive results, not proof of hidden-state collapse or a missing supervision signal. The code audit confirms full intermediate supervision and differentiable recurrence; all prompt representations evolve each loop. Proposed next controls separate requested-depth changes from recurrence history and rule-context evolution. No model/training implementation changed.
+
+## Controlled probes ready for desktop
+
+Added `--controls` to the existing probe: suffix restart retaining original displayed Steps, and rule-prefix refresh/no-op after six original loops. `bash probe_controls.sh` runs 32 validation and 32 deep examples, logs all output, and checks no-op/prefix invariance; optional `full` expands each split to 1,000 after review. See the [exact runbook](diagnostics_and_performance.md#controlled-restart-and-rule-context-experiments). Per-example first errors and per-depth/paired outcomes are persisted. No pretrained result exists for these new interventions yet, and no new training is requested.
+
+Validation for controls: full local suite passed **122 tests in 116.76 seconds** before the final tokenizer-boundary correction. After that correction and the shell-wrapper test, all **9 focused diagnostic tests passed in 18.65 seconds**. The cached real Qwen tokenizer was checked against all 2,000 seed-17 validation/depth-test prompts: every refresh prefix ends before Start. Stubbed shell runs verified both-split success, stderr capture, and stopping after the first failed command with its exit code. Documentation links, shell syntax and whitespace checks passed. Actual pretrained CUDA controls remain unrun.

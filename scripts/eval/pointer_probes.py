@@ -1,7 +1,9 @@
 """Small paired prompt interventions and hidden-state diagnostics; no training."""
 
+from contextlib import contextmanager, nullcontext
 from dataclasses import replace
 import math
+from typing import Any, Iterator
 
 import torch
 
@@ -39,15 +41,21 @@ def state_change(previous: torch.Tensor, current: torch.Tensor) -> dict:
             'cosine_to_previous': cosine.item() if norm.item() and torch.linalg.vector_norm(b).item() else None}
 
 
-def inspect_example(model: torch.nn.Module, item: EncodedExample, token_ids: list[int], pad_id: int) -> list[dict]:
+def inspect_example(model: torch.nn.Module, item: EncodedExample, token_ids: list[int], pad_id: int, *, rule_control: str | None = None,
+                    prefix_tokens: int = 0, restart_after: int = 6) -> list[dict]:
     """Capture one unpadded example at a time; only scalar summaries leave this call."""
+    if rule_control not in (None, "refresh", "noop"):
+        raise ValueError("Unknown rule control")
     device = str(next(model.parameters()).device)
     batch = collate([item], pad_id, device)
     was_training = model.training
     model.eval()
     try:
         with torch.no_grad():
-            result = model(batch['input_ids'], batch['attention_mask'], num_loops=len(item.targets), return_hidden_states=True)
+            control = (rule_context_control(model, prefix_tokens, restart_after, refresh=rule_control == 'refresh')
+                       if rule_control else nullcontext())
+            with control:
+                result = model(batch['input_ids'], batch['attention_mask'], num_loops=len(item.targets), return_hidden_states=True)
             scores = symbolic_scores(result.loop_logits, token_ids)[0].float()
             values = scores.cpu().tolist()
             previous = result.initial_hidden_state
@@ -71,3 +79,58 @@ def inspect_example(model: torch.nn.Module, item: EncodedExample, token_ids: lis
             return rows
     finally:
         model.train(was_training)
+
+
+def rule_prefix_length(tokenizer: Any, prompt: str) -> int:
+    """Token boundary before Start, including the rule-line newline; reject crossings."""
+    boundary = prompt.index('\nStart:') + 1
+    encoded = tokenizer(prompt, add_special_tokens=False, return_offsets_mapping=True)
+    offsets = encoded['offset_mapping']
+    if any(start < boundary < end for start, end in offsets):
+        raise ValueError('A token crosses the Rules/Start boundary; cannot isolate rule positions')
+    count = sum(end <= boundary for start, end in offsets)
+    if not 0 < count < len(offsets) or any(start < boundary for start, end in offsets[count:]):
+        raise ValueError('Invalid contiguous rule-token prefix')
+    return count
+
+
+@contextmanager
+def rule_context_control(model: torch.nn.Module, prefix_tokens: int, restart_after: int, *, refresh: bool) -> Iterator[None]:
+    """Inference-only hook: replace [1,:prefix,H] at R input after K loops.
+
+    Refresh uses h0 from P; the no-op copies the current prefix. Remaining
+    positions retain the current state. Hooks and captured tensors are scoped
+    to one forward, including exceptional exits; model weights never change.
+    """
+    if model.training or torch.is_grad_enabled():
+        raise ValueError('Rule-context controls require eval mode and no_grad')
+    if prefix_tokens < 1 or restart_after < 1:
+        raise ValueError('Positive prefix length and restart boundary required')
+    initial = None
+    calls = 0
+
+    def capture(module, args, output):
+        nonlocal initial
+        if output.shape[0] != 1 or prefix_tokens >= output.shape[1]:
+            raise ValueError('Rule control requires batch 1 and a proper prefix')
+        initial = output[:, :prefix_tokens].detach().clone()
+
+    def intervene(module, args):
+        nonlocal calls
+        calls += 1
+        if initial is None:
+            raise ValueError('Prelude must run before recurrence')
+        if calls <= restart_after:
+            return None
+        hidden, *rest = args
+        prefix = initial if refresh else hidden[:, :prefix_tokens]
+        return (torch.cat((prefix, hidden[:, prefix_tokens:]), dim=1), *rest)
+
+    handles = []
+    try:
+        handles.append(model.prelude.register_forward_hook(capture))
+        handles.append(model.recurrent.register_forward_pre_hook(intervene))
+        yield
+    finally:
+        for handle in handles:
+            handle.remove()

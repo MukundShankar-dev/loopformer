@@ -1,6 +1,6 @@
 # Diagnose recurrent failures and measure execution cost
 
-Status: initial diagnostics and short profiler implemented after the [negative loop-balanced ablation](experiments/stage1_loopbalanced.md). Offline first-failure analysis has run on retained traces. Paired model probes and pretrained CUDA profiling await desktop execution. The broader measurements below distinguish implemented interfaces from future work; no optimization or new training sweep has been run.
+Status: initial diagnostics and short profiler implemented after the [negative loop-balanced ablation](experiments/stage1_loopbalanced.md). Offline first-failure analysis has run on retained traces. Paired model probes and pretrained CUDA profiling completed on the desktop; see the [results and limitations](experiments/baseline2500_diagnostics.md). The broader measurements below distinguish implemented interfaces from future work; no optimization or new training sweep has been run.
 
 ## Questions before another training change
 
@@ -23,7 +23,7 @@ Keep the terminal dashboard compact: step/ETA, recent loss, last validation with
 
 - `loop_test.py` defaults to batch 1; the full scientific evaluations used it. A subsequent 128-example desktop benchmark measured 40.93/17.13/12.62/9.75 seconds at batches 1/4/8/16, with identical predictions across all 2,048 loop readouts. Batch 16 was 4.20× faster in that single 16-loop comparison; memory and timing variance were not recorded. Fixed-depth evaluation supports larger batches already. Adaptive stopped inference currently requires batch 1 and must be benchmarked separately.
 - Training and checkpoint loading explicitly use eager attention; training and the full-loop CLI use float32. CUDA fast-path alternatives need explicit configuration, equivalence/gradient checks, and paired quality measurements.
-- `RecurrentQwen.forward` projects the answer vector to all 151,936 vocabulary logits every loop, then `symbolic_scores` retains 26. A task-specific selected-row projection is mathematically sufficient for symbolic CE, but must be opt-in, preserve full-vocabulary Stage 0/ordinary behavior, and verify logits and adapter gradients under numerical tolerance. Its actual share of runtime is unmeasured.
+- `RecurrentQwen.forward` projects the answer vector to all 151,936 vocabulary logits every loop, then `symbolic_scores` retains 26. A task-specific selected-row projection is mathematically sufficient for symbolic CE, but must be opt-in, preserve full-vocabulary Stage 0/ordinary behavior, and verify logits and adapter gradients under numerical tolerance. The measured evaluation trace assigns about 19.5 ms of a roughly 1.1 s batch to this head; it is not the leading optimization target for that workload.
 - `evaluate` calls `batch_metrics` for the batch and again for each example, causing repeated `.item()`/`.tolist()` transfers. It also reads individual GPU losses with `.item()` inside the row loop. Consolidate detached statistics and transfer once per batch. CPU entropy/margin calculation and CSV construction need separate timing.
 - Training extracts metrics and refreshes the dashboard each microbatch; input validation also evaluates GPU boolean reductions in Python. Preserve boundary validation and finite checks while measuring synchronization overhead and moving static checks to validated CPU inputs where appropriate.
 - Mixed-depth training unrolls every row to the deepest item in a microbatch. Shorter rows have masked losses but still consume recurrent/coda compute. Log executed versus supervised transitions. Repartitioning within the existing eight-example optimizer group can be tested without changing sample groups; globally sorting by depth changes training order and is a separate intervention.
@@ -107,3 +107,38 @@ Implementation validation: the full local suite passed 119 tests in 115.18 secon
 ### Desktop shell wrapper
 
 Run `bash profile_pointer.sh` from the repository (or invoke the script by path). The wrapper changes to its own repository directory, activates `.venv`, sets the CUDA determinism environment, checks the baseline checkpoint metadata/weights, runs train profiles at batches 4 and 8, then the paired probe. Each invocation uses timestamp/PID output directories so earlier results are preserved. Combined stdout/stderr also goes to `profile-pointer-debug.txt` (replaced on each invocation). Any failed command stops the remaining work and returns a nonzero status through `tee`. The checkpoint variable and `--output` spelling are corrected. Shell syntax and stubbed success/failure execution were checked; no pretrained run was launched.
+
+## Saved-artifact follow-up
+
+The [offline review](experiments/baseline2500_offline_review.md) records failure-aligned confidence measurements, checkpoint pairing, the supervision audit, and proposed controlled interventions. Rich confidence/state fields are available only for the 32-example probe; later historical checkpoints contain target margins alone. The artifact analysis reuses the existing reference validator and runs without model inference.
+
+## Controlled restart and rule-context experiments
+
+Implemented, awaiting pretrained desktop results. Use the same step-2500 checkpoint; no training or checkpoint mutation occurs. On the desktop, from the repository:
+
+```bash
+git pull --ff-only
+bash probe_controls.sh
+```
+
+The wrapper activates `.venv`, checks checkpoint files, sets the CUDA determinism environment, and runs the first 32 examples of both seed-17 validation and depth_test. Validation covers depths 1–8; depth_test covers 9–16. It uses float32/eager batch-1 inference and does not download missing models implicitly. Combined terminal output is saved in `eval/pointer_probes/controls-small-<UTC timestamp>-<PID>/run.log`; results go into `validation/` and `depth_test/` beneath that directory. Any failure stops the wrapper with a nonzero exit status. No output directory is reused.
+
+Review the small outputs before expanding. To run all 1,000 examples in each split later:
+
+```bash
+bash probe_controls.sh full
+```
+
+This remains development evaluation; neither command accesses seed 29. Both modes use the same implementation and variant definitions. Neither launches training or performance profiling.
+
+The existing probe CLI enables controls with `--controls`. Without that flag, its original three-variant behavior remains available. With controls, every task receives original, rule-refresh and rule-no-op runs. Tasks deeper than `--restart-after` additionally receive the original suffix and shortened-depth probes and the new `suffix_original_steps` run.
+
+- **suffix_original_steps:** same oracle-reference suffix start/table/targets as `suffix`, but the displayed Steps remains the original task depth. Execute exactly the remaining number of loops. This deliberately inconsistent instruction/horizon is a diagnostic: it separates two suffix prompts, not a normal task score. `tasks.jsonl` preserves a valid reference task separately from the actual `model_prompt`, input token IDs/count, answer position, rule-prefix boundary, displayed Steps and scoring horizon. Compare `suffix_steps_cue` directly to isolate this text change; token-length differences remain visible rather than silently padded away.
+- **rule_refresh:** run the original prompt uninterrupted. Before each R call after loop six, replace only the contiguous Rules prefix with its frozen prelude output h0. Start, Steps and answer positions retain their current recurrent state. The prefix includes the rule-line newline and ends immediately before Start (Qwen merges the closing parenthesis and newline into one token); a tokenizer token crossing it causes an error. R and C then operate normally on the resulting sequence. No reference intermediate answer enters this intervention.
+- **rule_noop:** the same hook timing and concatenation, copying the current rule prefix instead of h0. Exact equality of all exported observations with the untouched original is required; refresh must also match every untouched initial loop. A mismatch aborts the run. Tasks of depth six or less never activate refresh and are negative controls; validation depths seven/eight test nearby execution with refresh active.
+
+`states.csv` saves all loop readouts/confidence/hidden scalars; `examples.csv` saves complete-trajectory outcomes and first-error/prefix lengths. `pairs.csv` aligns equal reference transitions, labels its baseline variant, and retains the baseline correct-prefix condition. Summary counts include changed predictions, correct-to-wrong/wrong-to-correct steps and gained/lost fully correct aligned segments; `quality_by_depth` includes denominators. Suffix completeness describes a shorter, oracle-started task and must not be equated with original full-task completeness. For `suffix_steps_cue`, the baseline is `suffix`, not `original`.
+
+The hooks are scoped to one eval/no-grad forward and removed on exceptions. Production model/training interfaces are unchanged. Fresh rule context is an out-of-distribution intervention; a negative result does not rule out persistent-memory architectures. Positive results would justify further controls, not establish a new research gate. State-update summaries around refresh include the intervention's effect and must not be interpreted as unmodified recurrent dynamics or as direct cross-variant hidden distances.
+
+Local validation: 122 tests passed before the final tokenizer boundary adjustment; the final 9-test diagnostic suite passed afterward, including prefix-only intervention, no-op equivalence, exception cleanup, altered-prompt scoring, checkpoint preservation and shell logging/failure propagation. All 2,000 real development prompts passed boundary checks using the cached Qwen tokenizer. Pretrained CUDA behavior and runtime remain unmeasured for these controls.

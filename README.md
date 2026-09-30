@@ -37,6 +37,8 @@ For the fresh 30k run, **step 2500** achieved the following complete-trajectory 
 
 Depths 1–6 aggregate 750 examples; each individual depth has 125. Step 2500 is the working depth-generalization checkpoint among three fully evaluated candidates; step 3250 remains the trained-loss-selected reference. Seed-17 evaluations are development diagnostics, and seed 29 remains reserved for confirmation. This supports execution beyond the training depth followed by degradation at greater task depths. It does not establish arbitrary-depth execution, general reasoning, or post-completion overscaling damage.
 
+The next desktop diagnostic is `bash probe_controls.sh` after pulling the repository. See [control definitions, outputs, and the optional full run](docs/diagnostics_and_performance.md#controlled-restart-and-rule-context-experiments).
+
 ## What comes next
 
 The [loop-balanced loss ablation](docs/experiments/stage1_loopbalanced.md) did not improve farther-depth generalization. The [failure diagnostics and short profiler](docs/diagnostics_and_performance.md#implemented-diagnostic-commands) are ready for desktop runs before another training change. [Terminal overscaling evaluation](docs/evaluation.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.

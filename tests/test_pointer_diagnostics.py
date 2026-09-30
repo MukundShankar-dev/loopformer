@@ -146,3 +146,97 @@ def test_diagnostic_and_profiler_clis_are_offline_and_checkpoint_safe(tmp_path, 
         '--batch-size','1','--effective-batch','2','--train-max-depth','2','--warmup','1','--repeats','1','--threads','1')
     assert json.loads((train_output/'summary.json').read_text())['repeats'][0]['metrics']['supervised_transitions']==3
     assert before == {p.name:p.read_bytes() for p in checkpoint.iterdir() if p.is_file()}
+
+
+def test_rule_refresh_only_replaces_prefix_after_boundary(tiny_checkpoint):
+    from scripts.eval.pointer_probes import rule_context_control
+    _, model, _, _ = tiny_checkpoint
+    model.eval()
+    ids = torch.tensor([[3, 4, 5, 6]])
+    with torch.no_grad():
+        expected = model(ids, num_loops=3, return_hidden_states=True)
+        with rule_context_control(model, 2, 1, refresh=False):
+            noop = model(ids, num_loops=3, return_hidden_states=True)
+        assert all(torch.equal(a,b) for a,b in zip(expected.loop_logits,noop.loop_logits))
+        seen = []
+        with rule_context_control(model, 2, 1, refresh=True):
+            # Registered second, this sees the input after intervention.
+            hook = model.recurrent.register_forward_pre_hook(lambda module,args: seen.append(args[0].clone()))
+            try:
+                actual = model(ids, num_loops=3, return_hidden_states=True)
+            finally:
+                hook.remove()
+        assert torch.equal(actual.loop_logits[0], expected.loop_logits[0])
+        for i in range(1,3):
+            assert torch.equal(seen[i][:,:2], actual.initial_hidden_state[:,:2])
+            assert torch.equal(seen[i][:,2:], actual.hidden_states[i-1][:,2:])
+        with pytest.raises(RuntimeError, match='deliberate'):
+            with rule_context_control(model, 2, 1, refresh=True):
+                raise RuntimeError('deliberate')
+        assert not model.recurrent._forward_pre_hooks and not model.prelude._forward_hooks
+    with pytest.raises(ValueError, match='no_grad'):
+        with rule_context_control(model, 2, 1, refresh=True):
+            pass
+
+
+def test_control_probe_cli_records_prompt_and_scoring_horizons(tmp_path, tiny_checkpoint):
+    checkpoint, _, _, _ = tiny_checkpoint
+    before = {p.name:p.read_bytes() for p in checkpoint.iterdir() if p.is_file()}
+    tasks = [generate_example(201+i,d,'validation',i) for i,d in enumerate([1,3])]
+    data=tmp_path/'tasks.jsonl'
+    data.write_text(''.join(json.dumps(t.to_dict())+'\n' for t in tasks))
+    out=tmp_path/'controls'
+    subprocess.run([sys.executable,'-m','scripts.eval.probe_pointer','--model',str(checkpoint),
+        '--data',str(data),'--output',str(out),'--controls','--restart-after','1',
+        '--limit','2','--threads','1'],cwd=ROOT,capture_output=True,text=True,check=True)
+    summary=json.loads((out/'summary.json').read_text())
+    assert summary['status']=='complete' and summary['counts']['rule_noop']['prediction_changes']==0
+    records=[json.loads(line) for line in (out/'tasks.jsonl').read_text().splitlines()]
+    suffix=next(r for r in records if r['variant']=='suffix_original_steps')
+    assert suffix['displayed_steps']==3 and suffix['scoring_loops']==2
+    assert 'Steps: 3' in suffix['model_prompt'] and 'Steps: 2' in suffix['task']['prompt']
+    assert suffix['task']['intermediate_states']==tasks[1].intermediate_states[1:]
+    assert 0<suffix['rule_prefix_tokens']<suffix['answer_position']
+    assert summary['quality_by_depth']['rule_refresh']['1']['examples']==1
+    assert before=={p.name:p.read_bytes() for p in checkpoint.iterdir() if p.is_file()}
+
+
+def test_rule_boundary_rejects_crossing_tokens():
+    from scripts.eval.pointer_probes import rule_prefix_length
+    class CrossingTokenizer:
+        def __call__(self, prompt, **kwargs):
+            return {'offset_mapping': [(0,len(prompt))]}
+    with pytest.raises(ValueError,match='crosses'):
+        rule_prefix_length(CrossingTokenizer(),'Rules: ( A, B)\nStart: A\nSteps: 1\nAnswer:')
+
+
+def test_rule_boundary_includes_merged_closing_parenthesis_and_newline():
+    from scripts.eval.pointer_probes import rule_prefix_length
+    prompt='Rules: ( A, B)\nStart: A\nSteps: 1\nAnswer:'
+    boundary=prompt.index('Start:')
+    class MergedTokenizer:
+        def __call__(self, prompt, **kwargs):
+            return {'offset_mapping': [(0,boundary-2),(boundary-2,boundary),(boundary,len(prompt))]}
+    assert rule_prefix_length(MergedTokenizer(),prompt)==2
+
+
+def test_control_shell_logs_and_stops_on_failure(tmp_path):
+    import os
+    import shutil
+    shutil.copy(ROOT/'probe_controls.sh',tmp_path/'probe_controls.sh')
+    (tmp_path/'.venv/bin').mkdir(parents=True)
+    (tmp_path/'.venv/bin/activate').write_text('')
+    checkpoint=tmp_path/'models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500'
+    checkpoint.mkdir(parents=True)
+    for name in ['recurrent_config.json','adapter_model.pt','tokenizer.json']:
+        (checkpoint/name).touch()
+    stub=tmp_path/'.venv/bin/python'
+    stub.write_text('#!/usr/bin/env bash\necho "stub call $*"\necho "stub stderr" >&2\nexit "${PROBE_TEST_EXIT:-0}"\n')
+    stub.chmod(0o755)
+    env={**os.environ,'PATH':str(stub.parent)+os.pathsep+os.environ['PATH']}
+    success=subprocess.run(['bash','probe_controls.sh'],cwd=tmp_path,env=env,capture_output=True,text=True)
+    assert success.returncode==0 and success.stdout.count('stub call')==2
+    failure=subprocess.run(['bash','probe_controls.sh'],cwd=tmp_path,env={**env,'PROBE_TEST_EXIT':'7'},capture_output=True,text=True)
+    assert failure.returncode==7 and failure.stdout.count('stub call')==1
+    logs=list((tmp_path/'eval/pointer_probes').glob('*/run.log'))
+    assert len(logs)==2 and all('stub stderr' in p.read_text() for p in logs)
