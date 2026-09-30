@@ -9,10 +9,12 @@ import sys
 import pytest
 import torch
 
-from scripts.dataset.pointer import SYMBOLS, generate_example
+from scripts.dataset.pointer import SYMBOLS, execute, generate_example, parse_mapping
 from scripts.eval.failure_diagnostics import analyze_failures
 from scripts.eval.loop_metrics import write_csv
 from scripts.eval.pointer_probes import task_slice, state_change
+from scripts.eval.rule_edits import paired_rule_edits
+from scripts.eval.rule_edit_probe import _summarize
 from scripts.eval.profiling import distribution, module_ranges, training_update
 from scripts.training.data import EncodedExample
 
@@ -69,6 +71,47 @@ def test_suffix_and_depth_cue_preserve_reference_transitions():
     assert values['cosine_to_previous'] == pytest.approx(1)
     assert state_change(torch.zeros(2), torch.ones(2))['relative_update_norm'] is None
     assert distribution([4., 1., 2., 3.])['median_seconds'] == 2.5
+
+
+def test_paired_rule_edits_change_one_edge_and_preserve_prefix():
+    task = generate_example(51, 12, 'depth_test', 0)
+    original = task.to_dict()
+    for loop in (6, 10):
+        relevant, irrelevant = paired_rule_edits(task, loop)
+        for edit in (relevant, irrelevant):
+            mapping = parse_mapping(edit.prompt.splitlines()[0].removeprefix('Rules: '))
+            changed = [source for source in SYMBOLS if mapping[source] != dict(task.mapping)[source]]
+            assert changed == [edit.source]
+            assert edit.prompt.splitlines()[1:] == task.prompt.splitlines()[1:]
+            assert list(edit.targets) == execute(mapping, task.initial_state, loop)
+            assert list(edit.targets[:-1]) == task.intermediate_states[:loop - 1]
+            assert edit.new_destination not in [task.initial_state, *task.intermediate_states]
+        assert relevant.source == ([task.initial_state, *task.intermediate_states][loop - 1])
+        assert relevant.expected == relevant.new_destination
+        assert irrelevant.source not in [task.initial_state, *task.intermediate_states]
+        assert irrelevant.expected == task.intermediate_states[loop - 1]
+    assert task.to_dict() == original
+    with pytest.raises(ValueError, match='within'):
+        paired_rule_edits(task, 13)
+
+
+def test_rule_edit_counts_use_retained_prefix_and_matched_cases():
+    rows = [
+        {'example_id': 'a', 'phase': 'late', 'condition': 'relevant', 'edited_prefix_correct': True,
+         'edited_correct': True, 'prediction_changed': True, 'baseline_correct': False},
+        {'example_id': 'a', 'phase': 'late', 'condition': 'irrelevant', 'edited_prefix_correct': True,
+         'edited_correct': False, 'prediction_changed': False, 'baseline_correct': False},
+        {'example_id': 'b', 'phase': 'late', 'condition': 'relevant', 'edited_prefix_correct': False,
+         'edited_correct': True, 'prediction_changed': True, 'baseline_correct': False},
+        {'example_id': 'b', 'phase': 'late', 'condition': 'irrelevant', 'edited_prefix_correct': True,
+         'edited_correct': False, 'prediction_changed': False, 'baseline_correct': False},
+    ]
+    summary = _summarize(rows)['late']
+    assert summary['relevant']['attempted'] == 2
+    assert summary['relevant']['prefix_retained'] == 1
+    assert summary['relevant']['follows_edited_target'] == 1
+    assert summary['matched']['both_prefixes_retained'] == 1
+    assert summary['matched']['relevant_follows_new_edge'] == 1
 
 
 @pytest.fixture
@@ -198,6 +241,35 @@ def test_control_probe_cli_records_prompt_and_scoring_horizons(tmp_path, tiny_ch
     assert suffix['task']['intermediate_states']==tasks[1].intermediate_states[1:]
     assert 0<suffix['rule_prefix_tokens']<suffix['answer_position']
     assert summary['quality_by_depth']['rule_refresh']['1']['examples']==1
+
+
+def test_rule_edit_probe_cli_preserves_checkpoint_and_saved_prompts(tmp_path, tiny_checkpoint):
+    from scripts.eval.pointer_probes import inspect_example
+    from scripts.training.data import encode_tasks
+    checkpoint, model, tokenizer, spec = tiny_checkpoint
+    before = {path.name: path.read_bytes() for path in checkpoint.iterdir() if path.is_file()}
+    token_map = dict(zip(spec['symbols'], spec['token_ids'], strict=True))
+    chosen = None
+    for seed in range(300):
+        task = generate_example(10000 + seed, 2, 'depth_test', 0)
+        item = encode_tasks([task], tokenizer, token_map, model.config.max_position_embeddings)[0]
+        rows = inspect_example(model, item, spec['token_ids'], tokenizer.pad_token_id)
+        if rows[0]['correct'] and not rows[1]['correct']:
+            chosen = task
+            break
+    assert chosen is not None, 'Tiny model should provide a late first-error fixture'
+    data = tmp_path/'depth_test.jsonl'
+    data.write_text(json.dumps(chosen.to_dict())+'\n')
+    output = tmp_path/'rule_edits'
+    subprocess.run([sys.executable,'-m','scripts.eval.rule_edit_probe','--model',str(checkpoint),
+                    '--data',str(data),'--output',str(output),'--early-loop','1',
+                    '--limit','1','--threads','1'],cwd=ROOT,capture_output=True,text=True,check=True)
+    summary = json.loads((output/'summary.json').read_text())
+    assert summary['status'] == 'complete' and summary['eligible_late_first_errors'] == 1
+    assert len(list(csv.DictReader((output/'pairs.csv').open()))) == 4
+    inputs = [json.loads(line) for line in (output/'inputs.jsonl').read_text().splitlines()]
+    assert len(inputs) == 4 and all(record['prompt'].endswith('Steps: 2\nAnswer:') for record in inputs)
+    assert before == {path.name: path.read_bytes() for path in checkpoint.iterdir() if path.is_file()}
     assert before=={p.name:p.read_bytes() for p in checkpoint.iterdir() if p.is_file()}
 
 

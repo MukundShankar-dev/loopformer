@@ -123,7 +123,7 @@ bash probe_controls.sh
 
 The wrapper activates `.venv`, checks checkpoint files, sets the CUDA determinism environment, and runs the first 32 examples of both seed-17 validation and depth_test. Validation covers depths 1–8; depth_test covers 9–16. It uses float32/eager batch-1 inference and does not download missing models implicitly. Combined terminal output is saved in `eval/pointer_probes/controls-small-<UTC timestamp>-<PID>/run.log`; results go into `validation/` and `depth_test/` beneath that directory. Any failure stops the wrapper with a nonzero exit status. No output directory is reused.
 
-Review the small outputs before expanding. To run all 1,000 examples in each split later:
+The completed small result makes expansion of the harmful rule-refresh intervention unnecessary. The full-mode command remains available for reproduction, not the recommended next run:
 
 ```bash
 bash probe_controls.sh full
@@ -142,3 +142,23 @@ The existing probe CLI enables controls with `--controls`. Without that flag, it
 The hooks are scoped to one eval/no-grad forward and removed on exceptions. Production model/training interfaces are unchanged. Fresh rule context is an out-of-distribution intervention; a negative result does not rule out persistent-memory architectures. Positive results would justify further controls, not establish a new research gate. State-update summaries around refresh include the intervention's effect and must not be interpreted as unmodified recurrent dynamics or as direct cross-variant hidden distances.
 
 Local validation: 122 tests passed before the final tokenizer boundary adjustment; the final 9-test diagnostic suite passed afterward, including prefix-only intervention, no-op equivalence, exception cleanup, altered-prompt scoring, checkpoint preservation and shell logging/failure propagation. All 2,000 real development prompts passed boundary checks using the cached Qwen tokenizer. Pretrained CUDA behavior and runtime remain unmeasured for these controls.
+
+## Frozen rule-edit probe
+
+The next diagnostic uses the retained step-2500 checkpoint and the first 32 seed-17 `depth_test` examples. It runs original full questions to locate cases whose **first** wrong transition is later than loop six. For each eligible case, it probes loop six (normally correct) and the observed first-error loop. Each probe changes exactly one destination letter in the complete input table, keeping Start, Steps, rule order, and loop count fixed:
+
+- **Relevant:** change the outgoing edge of the exact reference state entering that loop to an unused symbol. The reference target changes only at that loop; all earlier targets are checked unchanged.
+- **Irrelevant:** make the same kind of one-letter edit to a source absent from the whole reference path. The target through that loop remains unchanged.
+
+The model processes each complete edited prompt internally. No loop receives an externally decoded answer or a reconstructed question. `pairs.csv` records original and edited predictions, targets, target rank/margin, whether earlier predictions changed, and whether the edited prefix remains correct. Interpret transition following only on the retained-prefix cohort; `summary.json` reports its denominator and a matched cohort where both edit types retain correct prefixes. An edited prompt can change hidden states from loop one, so a relevant-rule effect narrows the mechanism but cannot alone prove a particular internal lookup circuit. If most late counterfactuals lose the prefix, this probe is inconclusive and should lead to a different controlled measurement, not another training run.
+
+On the CUDA desktop, from the repository root:
+
+```bash
+git pull --ff-only
+bash probe_rule_edits.sh
+```
+
+The wrapper checks local checkpoint files, activates `.venv`, sets the deterministic CUDA environment, and writes `eval/pointer_rule_edits/baseline2500-<UTC timestamp>-<PID>/run.log` plus `results/summary.json`, `pairs.csv`, `states.csv`, and `inputs.jsonl`. `states.csv` contains C-readout symbols/confidence and scalar R-state summaries for every observed loop. `inputs.jsonl` records exact edited prompts, token IDs, edge changes, and reference targets through the probed loop. Full hidden vectors, internal per-layer attention, and gradients are not saved. The script is inference-only, never alters the checkpoint, and does not use the seed-29 confirmation split. The run has **not** been executed on pretrained weights in this checkout.
+
+Local checks: the diagnostic tests pass with a tiny saved model, including one full CLI run and byte-identical checkpoint files before/after. The complete repository suite passed 125 tests before the final added CLI test, which then passed separately. The cached pinned Qwen tokenizer validated all 88 edited prompts across the 22 eligible late-error cases in the first 32 development examples; their token counts match the originals. The checkpoint directory on this Mac lacks adapter weights and its saved tokenizer, so only the desktop can execute the pretrained diagnostic.

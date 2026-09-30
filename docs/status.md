@@ -4,7 +4,9 @@ Last updated: 2026-09-30.
 
 ## Current priority
 
-Stage 1 failure diagnosis. The completed loop-balanced ablation did not improve the observed depth-generalization frontier. Baseline step 2500 remains the working checkpoint. The paired probes, CUDA profiles, and controlled restart/rule-context probe have completed; see the [diagnostic report](experiments/baseline2500_diagnostics.md) and [controlled restart report](experiments/stage1_controlled_restarts.md). Those results do not locate the cause of late errors. Before choosing an architecture or training recipe, the next bounded work is a frozen-checkpoint rule-edit diagnostic with early-loop and irrelevant-rule controls. Seed 29 remains reserved; seed-17 evaluations are development diagnostics.
+Stage 1 failure diagnosis. The completed loop-balanced ablation did not improve the observed depth-generalization frontier. Baseline step 2500 remains the working checkpoint. The paired probes, CUDA profiles, and controlled restart/rule-context probe have completed; see the [diagnostic report](experiments/baseline2500_diagnostics.md) and [controlled restart report](experiments/stage1_controlled_restarts.md). Those results do not locate the cause of late errors. A frozen-checkpoint rule-edit diagnostic with early-loop and irrelevant-rule controls is now implemented but **not yet run on pretrained weights**; see the [runbook](diagnostics_and_performance.md#frozen-rule-edit-probe). Seed 29 remains reserved; seed-17 evaluations are development diagnostics.
+
+The [architecture cross-check](architecture.md#literature-cross-check-2026-09-30) finds that the code implements a valid shared-middle-block depth recurrence. It lacks the explicit loop-time signal of the Universal Transformer and the per-loop input injection studied by Yang et al.; these are differences to investigate, not diagnosed defects. Existing probes decode C's answer-position A–Z output each loop and save scalar R-state changes, not full hidden representations or a direct symbolic pointer from R.
 
 ## Latest evidence
 
