@@ -114,7 +114,7 @@ The [offline review](experiments/baseline2500_offline_review.md) records failure
 
 ## Controlled restart and rule-context experiments
 
-Implemented, awaiting pretrained desktop results. Use the same step-2500 checkpoint; no training or checkpoint mutation occurs. On the desktop, from the repository:
+Implemented and run on the 32-example validation/depth-test prefixes. See the [controlled restart report](experiments/stage1_controlled_restarts.md). The exact direct rule-refresh intervention was harmful and should not be expanded to the full development set. The commands below remain the reproduction interface; no training or checkpoint mutation occurs.
 
 ```bash
 git pull --ff-only
