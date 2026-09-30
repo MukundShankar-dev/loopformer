@@ -6,17 +6,23 @@ from pathlib import Path
 import subprocess
 import sys
 
+import numpy as np
 import pytest
 import torch
 
 from scripts.dataset.pointer import SYMBOLS, execute, generate_example, parse_mapping
 from scripts.eval.failure_diagnostics import analyze_failures
 from scripts.eval.loop_metrics import write_csv
-from scripts.eval.pointer_probes import task_slice, state_change
+from scripts.eval.pointer_probes import inspect_example, task_slice, state_change
 from scripts.eval.rule_edits import paired_rule_edits
 from scripts.eval.rule_edit_probe import _summarize
+from scripts.eval.mechanism_variants import structural_variants, directed_edge_variants
+from scripts.eval.mechanism_recording import (InternalRecorder, adapters_disabled,
+                                              fit_ridge_readout, preloop_symbol, recurrent_answer_vectors,
+                                              rule_symbol_positions)
+from scripts.eval.mechanism_metrics import directed_summary
 from scripts.eval.profiling import distribution, module_ranges, training_update
-from scripts.training.data import EncodedExample
+from scripts.training.data import EncodedExample, encode_tasks
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -241,6 +247,7 @@ def test_control_probe_cli_records_prompt_and_scoring_horizons(tmp_path, tiny_ch
     assert suffix['task']['intermediate_states']==tasks[1].intermediate_states[1:]
     assert 0<suffix['rule_prefix_tokens']<suffix['answer_position']
     assert summary['quality_by_depth']['rule_refresh']['1']['examples']==1
+    assert before=={p.name:p.read_bytes() for p in checkpoint.iterdir() if p.is_file()}
 
 
 def test_rule_edit_probe_cli_preserves_checkpoint_and_saved_prompts(tmp_path, tiny_checkpoint):
@@ -270,7 +277,131 @@ def test_rule_edit_probe_cli_preserves_checkpoint_and_saved_prompts(tmp_path, ti
     inputs = [json.loads(line) for line in (output/'inputs.jsonl').read_text().splitlines()]
     assert len(inputs) == 4 and all(record['prompt'].endswith('Steps: 2\nAnswer:') for record in inputs)
     assert before == {path.name: path.read_bytes() for path in checkpoint.iterdir() if path.is_file()}
-    assert before=={p.name:p.read_bytes() for p in checkpoint.iterdir() if p.is_file()}
+
+
+def test_mechanism_variants_are_reference_checked_and_exclude_existing_prediction():
+    task = generate_example(703, 12, 'depth_test', 0)
+    original = task.to_dict()
+    structural = {variant.name: variant for variant in structural_variants(task)}
+    assert set(structural) == {'rule_order', 'symbol_rename', 'steps_plus_one', 'irrelevant_edge'}
+    for name in ('rule_order', 'steps_plus_one', 'irrelevant_edge'):
+        assert structural[name].targets == tuple(task.intermediate_states)
+    assert structural['rule_order'].prompt != task.prompt
+    assert structural['steps_plus_one'].displayed_steps == 13
+    assert structural['irrelevant_edge'].changed_source not in [task.initial_state, *task.intermediate_states]
+    mapping = dict(zip(SYMBOLS, structural['symbol_rename'].symbol_map, strict=True))
+    assert structural['symbol_rename'].targets == tuple(mapping[symbol] for symbol in task.intermediate_states)
+    for branch, loop in [('early', 6), ('critical', 10)]:
+        variants = directed_edge_variants(task, loop, exclude_prediction='B', branch=branch)
+        assert len(variants) == 4
+        assert len({variant.new_destination for variant in variants}) == 2
+        for variant in variants:
+            assert variant.new_destination != 'B'
+            assert variant.targets[:loop - 1] == tuple(task.intermediate_states[:loop - 1])
+            if '_relevant_' in variant.name:
+                assert variant.targets[loop - 1] == variant.new_destination
+            else:
+                assert variant.targets[loop - 1] == task.intermediate_states[loop - 1]
+            assert len(variant.targets) == (task.task_depth if branch == 'early' else loop)
+    assert task.to_dict() == original
+
+
+def test_internal_recording_adapter_ablation_and_probe_are_read_only(tiny_checkpoint):
+    _, model, tokenizer, spec = tiny_checkpoint
+    task = generate_example(901, 2, 'validation', 0)
+    token_map = dict(zip(spec['symbols'], spec['token_ids'], strict=True))
+    item = encode_tasks([task], tokenizer, token_map, model.config.max_position_embeddings)[0]
+    source, destination = rule_symbol_positions(tokenizer, task)
+    baseline_rows = inspect_example(model, item, spec['token_ids'], tokenizer.pad_token_id)
+    vectors, initial = [], []
+    with InternalRecorder(model, len(item.input_ids)-1, source, destination) as recorder:
+        rows = inspect_example(model, item, spec['token_ids'], tokenizer.pad_token_id,
+                               state_sink=lambda result: (vectors.append(recurrent_answer_vectors(result, len(item.input_ids)-1)),
+                                                          initial.append(result.initial_hidden_state.detach().clone())))
+    saved = recorder.finish(2)
+    assert rows == baseline_rows
+    with torch.no_grad():
+        assert preloop_symbol(model, initial[0], spec['token_ids']) in SYMBOLS
+    assert len(rows) == 2 and vectors[0].shape == (3, model.config.hidden_size)
+    assert saved['coda'].shape == (2, model.config.hidden_size)
+    assert saved['source_attention'].shape[-1] == 26
+    assert saved['destination_attention'].shape[:2] == (2, 1)
+    assert not model.norm._forward_hooks and not model.recurrent.layers[0].self_attn._forward_hooks
+    with adapters_disabled(model):
+        assert all(layer.disable_adapters for layer in model.recurrent.modules()
+                   if hasattr(layer, 'disable_adapters'))
+    assert all(not layer.disable_adapters for layer in model.recurrent.modules()
+               if hasattr(layer, 'disable_adapters'))
+    assert inspect_example(model, item, spec['token_ids'], tokenizer.pad_token_id) == baseline_rows
+    with pytest.raises(RuntimeError, match='restore'):
+        with adapters_disabled(model):
+            raise RuntimeError('restore')
+    assert all(not layer.disable_adapters for layer in model.recurrent.modules()
+               if hasattr(layer, 'disable_adapters'))
+    features = torch.stack([vectors[0][1], vectors[0][2]])
+    labels = torch.tensor([0, 1])
+    probe = fit_ridge_readout(features, labels)
+    assert probe.predict(features).shape == (2, 26)
+
+
+def test_mechanism_suite_tiny_checkpoint(tmp_path, tiny_checkpoint):
+    checkpoint, _, _, _ = tiny_checkpoint
+    before = {path.name: path.read_bytes() for path in checkpoint.iterdir() if path.is_file()}
+    from scripts.eval.pointer_task import sha256_file
+    val = [generate_example(1200 + i, depth, 'validation', i)
+           for i, depth in enumerate([1, 1, 2, 2])]
+    deep = [generate_example(1400, 3, 'depth_test', 0)]
+    valpath = tmp_path/'validation.jsonl'; deeppath = tmp_path/'depth_test.jsonl'
+    valpath.write_text(''.join(json.dumps(task.to_dict())+'\n' for task in val))
+    deeppath.write_text(''.join(json.dumps(task.to_dict())+'\n' for task in deep))
+    manifest = {'splits': {'validation': {'sha256': sha256_file(valpath), 'count': len(val)},
+                           'depth_test': {'sha256': sha256_file(deeppath), 'count': len(deep)}}}
+    (tmp_path/'manifest.json').write_text(json.dumps(manifest))
+    output = tmp_path/'mechanism'
+    subprocess.run([sys.executable,'-m','scripts.eval.mechanism_diagnostic',
+                    '--model',str(checkpoint),'--validation',str(valpath),'--deep',str(deeppath),
+                    '--fit-per-depth','1','--eval-per-depth','1','--deep-per-depth','1',
+                    '--threads','1','--output',str(output)],cwd=ROOT,capture_output=True,text=True,check=True)
+    summary = json.loads((output/'summary.json').read_text())
+    assert summary['status'] == 'complete'
+    assert len(summary['cohort_ids']['fit']) == 2 and len(summary['cohort_ids']['deep']) == 1
+    with np.load(output/'answer_states.npz', allow_pickle=False) as vectors:
+        assert vectors['recurrent_answer'].shape[:2] == (5, 4)
+        assert vectors['coda_answer'].shape[:2] == (5, 3)
+        assert list(vectors['lengths']) == [1, 1, 2, 2, 3]
+    assert len(list(csv.DictReader((output/'paired.csv').open()))) == 5 * (1 + 2 + 3)
+    assert summary['paired_controls']['deep']['adapter_off']['paired_steps'] == 3
+    assert len(list(csv.DictReader((output/'attention.csv').open()))) == 6
+    assert before == {path.name: path.read_bytes() for path in checkpoint.iterdir() if path.is_file()}
+
+
+def test_directed_summary_requires_matched_prefixes_and_both_targets():
+    rows=[]
+    for index in (1,2):
+        for condition in ('relevant','irrelevant'):
+            rows.append({'phase':'critical','example_id':'a','replacement_index':index,
+                         'condition':condition,'loop':9,'probe_loop':9,
+                         'new_destination': 'B' if index == 1 else 'C',
+                         'edited_prefix_correct': not (index==2 and condition=='irrelevant'),
+                         'edited_correct':condition=='relevant','prediction_changed':condition=='relevant'})
+    result=directed_summary(rows)['critical']
+    assert result['attempted_pairs']==2 and result['matched_correct_prefix_pairs']==1
+    assert result['relevant_follows_new_target']==1
+    assert result['cases_with_both_replacements_retaining_prefix']==0
+    early=[]
+    for condition in ('relevant','irrelevant'):
+        for loop in (6,7,8):
+            early.append({'phase':'early','example_id':'b','replacement_index':1,
+                          'condition':condition,'loop':loop,'probe_loop':6,
+                          'new_destination':'D',
+                          'edited_prefix_correct':True,
+                          'edited_correct':not (condition=='relevant' and loop==8),
+                          'prediction_changed':condition=='relevant'})
+    continuation=directed_summary(early)['early']['branch_continuation']
+    assert continuation['1']=={'eligible_after_both_correct_edit_steps':1,
+                               'relevant_contiguous_correct':1,'irrelevant_contiguous_correct':1}
+    assert continuation['2']=={'eligible_after_both_correct_edit_steps':1,
+                               'relevant_contiguous_correct':0,'irrelevant_contiguous_correct':1}
 
 
 def test_rule_boundary_rejects_crossing_tokens():

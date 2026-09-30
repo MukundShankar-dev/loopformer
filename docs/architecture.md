@@ -132,6 +132,8 @@ Prove that model surgery preserves one-pass behavior and repeated passes use the
 
 The wrapper shares and freezes the supplied base in place. Compute reference outputs before LoRA attachment; a base sharing adapted layers is no longer an independent unadapted reference.
 
+The [integrated mechanism diagnostic](diagnostics_and_performance.md#integrated-frozen-mechanism-diagnostic) uses scoped eval-only hooks to record `h_t` at Answer after R, normalized Answer vectors after frozen C, and selected eager-attention weights from Answer to the 26 rule source/destination tokens. It also reads frozen C(`h_0`) once before recurrence, with the same mask and RoPE, to audit what P+C can already decode; that extra readout never feeds the model. Adapter ablation temporarily disables recurrent LoRA in memory and restores it even on errors. These probes do not alter `RecurrentQwen.forward`, training gradients, checkpoint files, or what is fed into the next loop. Rule tokens precede Start/Answer under the causal mask, so their representations cannot attend backward to the answer-position state; the answer position can attend to the rule table. Saved attention ranks and linear decodability are observations, not causal proof of which computation R performs.
+
 ### Run validation
 
 From the repository root:

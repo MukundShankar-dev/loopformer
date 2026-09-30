@@ -3,7 +3,7 @@
 from contextlib import contextmanager, nullcontext
 from dataclasses import replace
 import math
-from typing import Any, Iterator
+from typing import Any, Callable, Iterator
 
 import torch
 
@@ -42,7 +42,8 @@ def state_change(previous: torch.Tensor, current: torch.Tensor) -> dict:
 
 
 def inspect_example(model: torch.nn.Module, item: EncodedExample, token_ids: list[int], pad_id: int, *, rule_control: str | None = None,
-                    prefix_tokens: int = 0, restart_after: int = 6) -> list[dict]:
+                    prefix_tokens: int = 0, restart_after: int = 6,
+                    state_sink: Callable[[Any], None] | None = None) -> list[dict]:
     """Capture one unpadded example at a time; only scalar summaries leave this call."""
     if rule_control not in (None, "refresh", "noop"):
         raise ValueError("Unknown rule control")
@@ -56,6 +57,8 @@ def inspect_example(model: torch.nn.Module, item: EncodedExample, token_ids: lis
                        if rule_control else nullcontext())
             with control:
                 result = model(batch['input_ids'], batch['attention_mask'], num_loops=len(item.targets), return_hidden_states=True)
+            if state_sink is not None:
+                state_sink(result)
             scores = symbolic_scores(result.loop_logits, token_ids)[0].float()
             values = scores.cpu().tolist()
             previous = result.initial_hidden_state
