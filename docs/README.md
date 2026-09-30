@@ -24,3 +24,5 @@ The [completed loop-balanced ablation](experiments/stage1_loopbalanced.md) did n
 The [offline failure review](experiments/baseline2500_offline_review.md) compares first-error confidence, restarted lookups, and matched trajectories across checkpoints 2500/3250/3750, with a recurrence/supervision audit.
 
 The [controlled restart report](experiments/stage1_controlled_restarts.md) shows that retaining the original displayed Steps does not remove the suffix-restart benefit, while directly splicing fresh Rules-prefix representations into a loop-six state is strongly harmful.
+
+The [frozen rule-edit report](experiments/stage1_rule_edit_probe.md) compares relevant-edge, irrelevant-edge, and early-loop controls on the retained checkpoint. It finds reliable early rule response and weaker, partly prompt-sensitive late response; the mechanism of late failure remains unresolved.
