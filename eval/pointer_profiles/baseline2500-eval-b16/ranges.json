@@ -1,0 +1,138 @@
+[
+  {
+    "name": "pointer/input_prepare_transfer",
+    "calls": 1,
+    "cpu_total_us": 1536.4139999999998,
+    "cpu_self_us": 577.5289999999959,
+    "device_total_us": 5.247000000000298,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/input_prepare_transfer",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 534.2920000000004,
+    "device_self_us": 534.2920000000004
+  },
+  {
+    "name": "pointer/forward",
+    "calls": 1,
+    "cpu_total_us": 1007636.454,
+    "cpu_self_us": -951.4829999989597,
+    "device_total_us": 1033347.1469999964,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/forward",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 1076381.739,
+    "device_self_us": 1076381.739
+  },
+  {
+    "name": "pointer/prelude",
+    "calls": 1,
+    "cpu_total_us": 14392.205,
+    "cpu_self_us": 2961.5160000000124,
+    "device_total_us": 19885.896999999994,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/prelude",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 24510.740999999998,
+    "device_self_us": 24510.740999999998
+  },
+  {
+    "name": "pointer/recurrent",
+    "calls": 16,
+    "cpu_total_us": 674563.1089999998,
+    "cpu_self_us": 64805.62000000215,
+    "device_total_us": 666869.4269999992,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/coda",
+    "calls": 16,
+    "cpu_total_us": 307894.40599999996,
+    "cpu_self_us": 28606.038999997312,
+    "device_total_us": 323436.7479999974,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/recurrent",
+    "calls": 16,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 692114.9139999998,
+    "device_self_us": 692114.9139999998
+  },
+  {
+    "name": "pointer/lm_head",
+    "calls": 16,
+    "cpu_total_us": 1031.1610000000583,
+    "cpu_self_us": 345.16699999998673,
+    "device_total_us": 19538.395000000193,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/coda",
+    "calls": 16,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 336247.84799999977,
+    "device_self_us": 336247.84799999977
+  },
+  {
+    "name": "pointer/lm_head",
+    "calls": 16,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 19538.395000000193,
+    "device_self_us": 19538.395000000193
+  },
+  {
+    "name": "pointer/loss",
+    "calls": 1,
+    "cpu_total_us": 70658.50799999991,
+    "cpu_self_us": 721.5080000001471,
+    "device_total_us": 114.23800000036135,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/loss",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 645.160000000149,
+    "device_self_us": 645.160000000149
+  },
+  {
+    "name": "pointer/metrics_and_rows",
+    "calls": 1,
+    "cpu_total_us": 24629.388000000035,
+    "cpu_self_us": 4008.6490000006743,
+    "device_total_us": 608.5709999995306,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/metrics_and_rows",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 24556.736000000034,
+    "device_self_us": 24556.736000000034
+  },
+  {
+    "name": "pointer/aggregate_and_export",
+    "calls": 1,
+    "cpu_total_us": 1711.0270000000019,
+    "cpu_self_us": 1711.0270000000019,
+    "device_total_us": 0,
+    "device_self_us": 0
+  }
+]

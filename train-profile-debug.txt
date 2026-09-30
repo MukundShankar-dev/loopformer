@@ -1,0 +1,27 @@
+usage: profile_pointer.py [-h] --model MODEL --data DATA [--mode {eval,train}]
+                          [--device {cpu,cuda}] [--batch-size BATCH_SIZE]
+                          [--limit LIMIT] [--loops LOOPS]
+                          [--effective-batch EFFECTIVE_BATCH]
+                          [--train-max-depth TRAIN_MAX_DEPTH]
+                          [--warmup WARMUP] [--repeats REPEATS]
+                          [--threads THREADS] [--seed SEED] [--download]
+                          --output OUTPUT
+profile_pointer.py: error: the following arguments are required: --output
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/mukund/loopformer/scripts/eval/probe_pointer.py", line 96, in <module>
+    main()
+  File "/home/mukund/loopformer/scripts/eval/probe_pointer.py", line 45, in main
+    model, tokenizer, spec = load_recurrent_checkpoint(args.model, device=args.device, download=args.download)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mukund/loopformer/scripts/recurrent_qwen/checkpoint.py", line 57, in load_recurrent_checkpoint
+    spec = json.loads((path / "recurrent_config.json").read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mukund/.local/share/uv/python/cpython-3.11.8-linux-x86_64-gnu/lib/python3.11/pathlib.py", line 1058, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mukund/.local/share/uv/python/cpython-3.11.8-linux-x86_64-gnu/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'recurrent_config.json'
