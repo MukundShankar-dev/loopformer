@@ -1,0 +1,31 @@
+Checkpoint: models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500; mode: small; outputs/log: eval/pointer_probes/controls-small-20260930T112605Z-473
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:44,  6.49it/s]Loading weights:  42%|████▏     | 123/290 [00:00<00:00, 588.59it/s]Loading weights:  67%|██████▋   | 195/290 [00:00<00:00, 546.16it/s]Loading weights:  89%|████████▊ | 257/290 [00:00<00:00, 469.36it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 494.43it/s]
+Probing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:12
+  Complete scored trajectories (suffix tasks  
+            have shorter horizons)            
+┏━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┓
+┃ Variant               ┃ Correct / examples ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━┩
+│ original              │            30 / 32 │
+│ rule_noop             │            30 / 32 │
+│ rule_refresh          │            25 / 32 │
+│ shorter_depth         │              7 / 8 │
+│ suffix                │              8 / 8 │
+│ suffix_original_steps │              8 / 8 │
+└───────────────────────┴────────────────────┘
+Saved paired outcomes and hidden-state summaries to eval/pointer_probes/controls-small-20260930T112605Z-473/validation
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  37%|███▋      | 107/290 [00:00<00:00, 1051.72it/s]Loading weights:  89%|████████▊ | 257/290 [00:00<00:00, 1310.82it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1346.38it/s]
+Probing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:38
+  Complete scored trajectories (suffix tasks  
+            have shorter horizons)            
+┏━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┓
+┃ Variant               ┃ Correct / examples ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━┩
+│ original              │             6 / 32 │
+│ rule_noop             │             6 / 32 │
+│ rule_refresh          │             0 / 32 │
+│ shorter_depth         │             9 / 32 │
+│ suffix                │            30 / 32 │
+│ suffix_original_steps │            30 / 32 │
+└───────────────────────┴────────────────────┘
+Saved paired outcomes and hidden-state summaries to eval/pointer_probes/controls-small-20260930T112605Z-473/depth_test
