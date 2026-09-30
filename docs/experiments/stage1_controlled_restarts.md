@@ -48,11 +48,12 @@ The rule-refresh failure does not show that persistent rule memory is useless. I
 
 The evidence now favors a bounded continuous-state or re-entry problem over a prompt depth-cue problem. It does not yet distinguish whether success requires explicit symbolic re-encoding, a learned bridge, normalization, or jointly refreshed context. Introducing any of those into training would change the architecture and must be tested as a fresh controlled run.
 
-## Next bounded experiment
+## Next bounded direction
 
 Do not run `bash probe_controls.sh full`; the small paired result is sufficient to reject the direct rule-prefix splice and the Steps-cue explanation.
 
-The next diagnostic should test re-entry without oracle correction: after loop six, decode the model's current symbol, rebuild the prompt with that symbol as Start, preserve the original rule table, and execute the remaining loop budget. Report separately the cohort whose loop-six symbol is reference-correct and the cohort whose symbol is wrong. On the correct cohort this tests whether explicit state re-encoding and coherent context reset reproduce the suffix benefit without consulting the reference state. On the wrong cohort it measures propagation from the model's own error and must not be described as repair.
+An inference procedure that decodes the current letter, rebuilds the prompt, and invokes the model again is explicitly rejected: the external controller would perform the state transfer, so success would not show that the recurrent model learned to carry the process internally.
 
-This remains an inference diagnostic. Its outcome should determine whether a learned continuous re-entry/bridge experiment is justified. It should not silently become teacher forcing or a new training objective.
+The next change must remain differentiable and internal to the recurrent architecture. The leading design to specify and validate is a coherent static-memory/recurrent-workspace split used from loop one and throughout training. Immutable prompt memory would be supplied consistently at every loop, while a learned hidden workspace carries the evolving computational state. The model would still receive intermediate supervision at every transition, with no decoded symbol, reference state, or prompt reconstruction fed between loops.
 
+The failed loop-six splice does not test that trained architecture: it abruptly combines loop-age-zero Rules vectors with loop-age-six workspace vectors in a checkpoint never trained on that distribution. A static-memory model therefore requires fresh adapters and a matched fresh training run. Before authorizing that run, settle the exact memory/workspace boundary, prove one-loop equivalence, verify gradients reach only the intended recurrent parameters, and document how the boundary transfers beyond this pointer prompt format.
