@@ -1,0 +1,15 @@
+Checkpoint: models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500; dataset: seed-17 depth_test; outputs/log: eval/pointer_rule_edits/baseline2500-20260930T122401Z-2350
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:38,  7.59it/s]Loading weights:  38%|███▊      | 111/290 [00:00<00:00, 566.65it/s]Loading weights:  60%|██████    | 175/290 [00:00<00:00, 531.04it/s]Loading weights:  80%|████████  | 232/290 [00:00<00:00, 514.66it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 535.64it/s]
+Rule-edit diagnostic ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:25
+       Edited-target following after a correct edited prefix       
+┏━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┓
+┃ Phase / edit       ┃ Retained / attempted ┃ Followed / retained ┃
+┡━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━┩
+│ early / relevant   │                22/22 │               22/22 │
+│ early / irrelevant │                21/22 │               21/21 │
+│ late / relevant    │                19/22 │                7/19 │
+│ late / irrelevant  │                21/22 │                0/21 │
+└────────────────────┴──────────────────────┴─────────────────────┘
+early matched prefixes: 21 · relevant follows new edge 21 · irrelevant keeps original target 21
+late matched prefixes: 19 · relevant follows new edge 7 · irrelevant keeps original target 0
+Saved eval/pointer_rule_edits/baseline2500-20260930T122401Z-2350/results · 22/32 eligible late first errors

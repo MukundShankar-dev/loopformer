@@ -1,0 +1,89 @@
+{
+  "status": "complete",
+  "started_utc": "2026-09-30T12:24:07.552625+00:00",
+  "command": [
+    "/home/mukund/loopformer/.venv/bin/python",
+    "-m",
+    "scripts.eval.rule_edit_probe",
+    "--model",
+    "models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500",
+    "--data",
+    "data/pointer/seed-17/depth_test.jsonl",
+    "--device",
+    "cuda",
+    "--limit",
+    "32",
+    "--early-loop",
+    "6",
+    "--output",
+    "eval/pointer_rule_edits/baseline2500-20260930T122401Z-2350/results"
+  ],
+  "model": "/home/mukund/loopformer/models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500",
+  "data": "/home/mukund/loopformer/data/pointer/seed-17/depth_test.jsonl",
+  "data_sha256": "20c92ce8159e895cd98e7cee2a2da46e01e0ecdf07457e58d91ec31134ead4c9",
+  "adapter_sha256": "25c428d2528e4352e460036d59b7b8d80b0175210135051920d2d30cbc80d4ef",
+  "checkpoint_metadata_sha256": "8791505f331fd361fe62c8efc4fe1a9759d47adac6b781205f5104f3a08b2383",
+  "tokenizer_sha256": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+  "source_sha256": {
+    "scripts/eval/rule_edit_probe.py": "ab20eb3c44e65f5b7744a654ff69336b24691b5de6de7684f120bb2d730d96dc",
+    "scripts/eval/rule_edits.py": "4e8b2731928ac3b270b59fca2efbcbb36d5ac779e6a98189af1189180ccf8a1e",
+    "scripts/eval/pointer_probes.py": "8c141ec12e0afcd45dc1bfce525f2cc757ed5bf5eaf0c1e01e5e19badbbdc3b6",
+    "scripts/recurrent_qwen/model.py": "fdae798cb576c13e7ce73aa8d3716455f397d73546f752b8fbd75e6d9540c872"
+  },
+  "device": "cuda",
+  "dtype": "float32",
+  "seed": 17,
+  "fixed_prefix_examples": 32,
+  "early_loop": 6,
+  "semantics": "Complete prompt is encoded once per variant and recurrent state is never externally reset. Late cases have an observed correct original prefix and first error after early_loop; only edited-prefix-retained cases support transition comparison. Edits perturb the input from loop one, so outcomes are diagnostic rather than causal isolation.",
+  "eligible_late_first_errors": 22,
+  "counts": {
+    "early": {
+      "relevant": {
+        "attempted": 22,
+        "prefix_retained": 22,
+        "follows_edited_target": 22,
+        "prediction_changed": 22,
+        "baseline_correct": 22
+      },
+      "irrelevant": {
+        "attempted": 22,
+        "prefix_retained": 21,
+        "follows_edited_target": 21,
+        "prediction_changed": 0,
+        "baseline_correct": 21
+      },
+      "matched": {
+        "both_prefixes_retained": 21,
+        "relevant_follows_new_edge": 21,
+        "irrelevant_keeps_original_target": 21,
+        "relevant_prediction_changed": 21,
+        "irrelevant_prediction_changed": 0
+      }
+    },
+    "late": {
+      "relevant": {
+        "attempted": 22,
+        "prefix_retained": 19,
+        "follows_edited_target": 7,
+        "prediction_changed": 9,
+        "baseline_correct": 0
+      },
+      "irrelevant": {
+        "attempted": 22,
+        "prefix_retained": 21,
+        "follows_edited_target": 0,
+        "prediction_changed": 4,
+        "baseline_correct": 0
+      },
+      "matched": {
+        "both_prefixes_retained": 19,
+        "relevant_follows_new_edge": 7,
+        "irrelevant_keeps_original_target": 0,
+        "relevant_prediction_changed": 9,
+        "irrelevant_prediction_changed": 4
+      }
+    }
+  },
+  "inputs_sha256": "19f117b2f23e90eb7822f48ccdf5b89e389525499debbfa21cc87beaacef0239"
+}
