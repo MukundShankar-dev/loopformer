@@ -1,0 +1,16 @@
+Checkpoint: models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500
+Run ID: 20260930T005754Z-2318
+Log: /home/mukund/loopformer/profile-pointer-debug.txt
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:39,  7.30it/s]Loading weights:  35%|███▍      | 101/290 [00:00<00:00, 513.06it/s]Loading weights:  55%|█████▌    | 160/290 [00:00<00:00, 534.62it/s]Loading weights:  79%|███████▉  | 229/290 [00:00<00:00, 591.99it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 546.06it/s]
+USDT:2026-09-29 20:58:10 2325:2325 SyncActivityProfilerHandler.cpp:39] profiler_start
+USDT:2026-09-29 20:58:11 2325:2325 SyncActivityProfilerHandler.cpp:46] profiler_stop
+Complete · median 0.633s · p95 0.787s · 12.63 examples/s
+Saved summary.json, operators.txt and trace.json.gz to eval/pointer_profiles/baseline2500-20260930T005754Z-2318/train-b4
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  34%|███▍      | 99/290 [00:00<00:00, 950.86it/s]Loading weights:  96%|█████████▌| 279/290 [00:00<00:00, 1440.24it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1416.66it/s]
+USDT:2026-09-29 20:58:37 2397:2397 SyncActivityProfilerHandler.cpp:39] profiler_start
+USDT:2026-09-29 20:58:37 2397:2397 SyncActivityProfilerHandler.cpp:46] profiler_stop
+Complete · median 0.658s · p95 0.779s · 12.16 examples/s
+Saved summary.json, operators.txt and trace.json.gz to eval/pointer_profiles/baseline2500-20260930T005754Z-2318/train-b8
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  45%|████▌     | 131/290 [00:00<00:00, 1303.72it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1562.44it/s]
+Probing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:22
+Saved paired outcomes and hidden-state summaries to eval/pointer_probes/baseline2500-20260930T005754Z-2318

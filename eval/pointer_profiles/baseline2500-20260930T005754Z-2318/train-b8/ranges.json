@@ -1,0 +1,162 @@
+[
+  {
+    "name": "pointer/input_prepare_transfer",
+    "calls": 1,
+    "cpu_total_us": 963.9949999999999,
+    "cpu_self_us": 245.42399999998815,
+    "device_total_us": 4.711999999999534,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/input_prepare_transfer",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 471.48199999999997,
+    "device_self_us": 471.48199999999997
+  },
+  {
+    "name": "pointer/forward",
+    "calls": 1,
+    "cpu_total_us": 234542.94,
+    "cpu_self_us": 1340.9360000000452,
+    "device_total_us": 201651.31700000013,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/forward",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 258276.887,
+    "device_self_us": 258276.887
+  },
+  {
+    "name": "pointer/prelude",
+    "calls": 1,
+    "cpu_total_us": 30588.163999999997,
+    "cpu_self_us": 6600.398999999972,
+    "device_total_us": 10208.161999999953,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/prelude",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 31442.273999999998,
+    "device_self_us": 31442.273999999998
+  },
+  {
+    "name": "pointer/recurrent",
+    "calls": 6,
+    "cpu_total_us": 126074.01600000002,
+    "cpu_self_us": 17923.02299999963,
+    "device_total_us": 125922.95200000031,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/recurrent",
+    "calls": 6,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 148166.48399999997,
+    "device_self_us": 148166.48399999997
+  },
+  {
+    "name": "pointer/coda",
+    "calls": 6,
+    "cpu_total_us": 67699.78399999997,
+    "cpu_self_us": 9318.570999999909,
+    "device_total_us": 61512.603999999934,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/lm_head",
+    "calls": 6,
+    "cpu_total_us": 197.23799999996845,
+    "cpu_self_us": 82.36499999994703,
+    "device_total_us": 3807.1480000000447,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/coda",
+    "calls": 6,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 66296.945,
+    "device_self_us": 66296.945
+  },
+  {
+    "name": "pointer/lm_head",
+    "calls": 6,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 3807.1480000000447,
+    "device_self_us": 3807.1480000000447
+  },
+  {
+    "name": "pointer/loss",
+    "calls": 1,
+    "cpu_total_us": 25045.744999999995,
+    "cpu_self_us": 342.82600000008824,
+    "device_total_us": 57.827999999863096,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/loss",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 624.7919999999576,
+    "device_self_us": 624.7919999999576
+  },
+  {
+    "name": "pointer/backward",
+    "calls": 1,
+    "cpu_total_us": 289167.344,
+    "cpu_self_us": 256761.33300000016,
+    "device_total_us": 3.242000000027474,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/backward",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 67.12800000002608,
+    "device_self_us": 67.12800000002608
+  },
+  {
+    "name": "pointer/metrics",
+    "calls": 1,
+    "cpu_total_us": 4698.202000000048,
+    "cpu_self_us": 83.18400000047404,
+    "device_total_us": 30.573999999673106,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/metrics",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 599.8249999999534,
+    "device_self_us": 599.8249999999534
+  },
+  {
+    "name": "pointer/optimizer",
+    "calls": 1,
+    "cpu_total_us": 6237.800999999978,
+    "cpu_self_us": 254.6199999996461,
+    "device_total_us": 584.6370000013849,
+    "device_self_us": 0.0
+  },
+  {
+    "name": "pointer/optimizer",
+    "calls": 1,
+    "cpu_total_us": 0,
+    "cpu_self_us": 0,
+    "device_total_us": 1852.0800000000745,
+    "device_self_us": 1852.0800000000745
+  }
+]
