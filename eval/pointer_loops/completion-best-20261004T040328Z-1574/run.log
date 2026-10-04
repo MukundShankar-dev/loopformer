@@ -1,0 +1,46 @@
+Checkpoint: /home/mukund/loopformer/models/stage1_pointer/depth6-completion-seed37/step-003250
+Output: eval/pointer_loops/completion-best-20261004T040328Z-1574
+Pointer task · full recurrent loop evaluation
+1,000 examples · 20 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_loops/completion-best-20261004T040328Z-1574/validation
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<01:00,  4.79it/s]Loading weights:  88%|████████▊ | 255/290 [00:00<00:00, 1000.20it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 851.29it/s] 
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:01:56 0:00:00 8.61 q/s · 172.10 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 1     │ 125      │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 2     │ 125      │ 99.60%        │ 99.20%            │ 100.00%        │
+│ 3     │ 125      │ 99.73%        │ 99.20%            │ 100.00%        │
+│ 4     │ 125      │ 99.00%        │ 98.40%            │ 98.40%         │
+│ 5     │ 125      │ 99.52%        │ 99.20%            │ 99.20%         │
+│ 6     │ 125      │ 99.07%        │ 97.60%            │ 98.40%         │
+│ 7     │ 125      │ 94.74%        │ 76.00%            │ 77.60%         │
+│ 8     │ 125      │ 87.80%        │ 27.20%            │ 28.80%         │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 87.10% · final accuracy: 87.80%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_loops/completion-best-20261004T040328Z-1574/validation
+Pointer task · full recurrent loop evaluation
+1,000 examples · 20 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_loops/completion-best-20261004T040328Z-1574/depth_test
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:38,  7.51it/s]Loading weights:  80%|████████  | 232/290 [00:00<00:00, 1191.90it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1050.81it/s]
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:01:59 0:00:00 8.39 q/s · 167.74 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 9     │ 125      │ 78.58%        │ 2.40%             │ 9.60%          │
+│ 10    │ 125      │ 71.68%        │ 0.00%             │ 12.00%         │
+│ 11    │ 125      │ 63.78%        │ 0.00%             │ 5.60%          │
+│ 12    │ 125      │ 58.87%        │ 0.00%             │ 3.20%          │
+│ 13    │ 125      │ 54.40%        │ 0.00%             │ 4.80%          │
+│ 14    │ 125      │ 52.34%        │ 0.00%             │ 4.00%          │
+│ 15    │ 125      │ 49.39%        │ 0.00%             │ 5.60%          │
+│ 16    │ 125      │ 45.50%        │ 0.00%             │ 6.40%          │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 0.30% · final accuracy: 6.40%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_loops/completion-best-20261004T040328Z-1574/depth_test
+validation: trajectory 87.1%; final 87.8%; stop exact 74.5%; early 25.5%; late/missing 0.0%
+depth_test: trajectory 0.3%; final 6.4%; stop exact 0.0%; early 100.0%; late/missing 0.0%
