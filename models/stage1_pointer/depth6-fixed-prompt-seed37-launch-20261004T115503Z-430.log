@@ -1,0 +1,14 @@
+Script started on 2026-10-04 07:55:03-04:00 [COMMAND="python -u -m scripts.training.train_pointer --config configs/stage1_pointer_depth6_fixed_prompt.json --device cuda --output models/stage1_pointer/depth6-fixed-prompt-seed37" TERM="xterm-256color" TTY="/dev/pts/0" COLUMNS="209" LINES="51"]
+^CTraceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/mukund/loopformer/scripts/training/train_pointer.py", line 232, in <module>
+    main()
+  File "/home/mukund/loopformer/scripts/training/train_pointer.py", line 31, in main
+    import torch
+  File "/home/mukund/loopformer/.venv/lib/python3.11/site-packages/torch/__init__.py", line 496, in <module>
+    from torch._C import *  # noqa: F403
+    ^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+Script done on 2026-10-04 07:55:04-04:00 [COMMAND_EXIT_CODE="130"]

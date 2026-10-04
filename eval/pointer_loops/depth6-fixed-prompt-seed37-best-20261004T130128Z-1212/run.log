@@ -1,0 +1,64 @@
+Checkpoint: /home/mukund/loopformer/models/stage1_pointer/depth6-fixed-prompt-seed37/step-003250
+Output: eval/pointer_loops/depth6-fixed-prompt-seed37-best-20261004T130128Z-1212
+Pointer task · full recurrent loop evaluation
+1,000 examples · 20 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_loops/depth6-fixed-prompt-seed37-best-20261004T130128Z-1212/validation
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:38,  7.51it/s]Loading weights:  68%|██████▊   | 196/290 [00:00<00:00, 1001.42it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 954.22it/s] 
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:01:57 0:00:00 8.50 q/s · 169.91 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 1     │ 125      │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 2     │ 125      │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 3     │ 125      │ 99.47%        │ 99.20%            │ 99.20%         │
+│ 4     │ 125      │ 99.60%        │ 98.40%            │ 98.40%         │
+│ 5     │ 125      │ 99.52%        │ 99.20%            │ 99.20%         │
+│ 6     │ 125      │ 99.33%        │ 96.80%            │ 97.60%         │
+│ 7     │ 125      │ 99.54%        │ 97.60%            │ 98.40%         │
+│ 8     │ 125      │ 98.00%        │ 96.00%            │ 96.00%         │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 98.40% · final accuracy: 98.60%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_loops/depth6-fixed-prompt-seed37-best-20261004T130128Z-1212/validation
+Pointer task · adaptive stopping
+1,000 examples · up to 20 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and nominal-prefix scoring
+Results: /home/mukund/loopformer/eval/pointer_loops/depth6-fixed-prompt-seed37-best-20261004T130128Z-1212/validation-stopped
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:33,  8.72it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1385.79it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:01:55 0:00:00
+Stopped accuracy: 74.60%; mean loops: 4.13; p95 latency: 0.1976s
+Saved stopped trajectories.csv, decisions.csv, summary.json to /home/mukund/loopformer/eval/pointer_loops/depth6-fixed-prompt-seed37-best-20261004T130128Z-1212/validation-stopped
+Pointer task · full recurrent loop evaluation
+1,000 examples · 20 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_loops/depth6-fixed-prompt-seed37-best-20261004T130128Z-1212/depth_test
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  41%|████      | 119/290 [00:00<00:00, 1189.13it/s]Loading weights:  97%|█████████▋| 280/290 [00:00<00:00, 1413.39it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1408.75it/s]
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:01:59 0:00:00 8.38 q/s · 167.59 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 9     │ 125      │ 94.67%        │ 72.80%            │ 74.40%         │
+│ 10    │ 125      │ 84.96%        │ 3.20%             │ 6.40%          │
+│ 11    │ 125      │ 76.07%        │ 0.00%             │ 4.00%          │
+│ 12    │ 125      │ 71.20%        │ 0.00%             │ 2.40%          │
+│ 13    │ 125      │ 64.92%        │ 0.00%             │ 7.20%          │
+│ 14    │ 125      │ 60.34%        │ 0.00%             │ 0.80%          │
+│ 15    │ 125      │ 57.71%        │ 0.00%             │ 4.00%          │
+│ 16    │ 125      │ 53.05%        │ 0.00%             │ 3.20%          │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 9.50% · final accuracy: 12.80%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_loops/depth6-fixed-prompt-seed37-best-20261004T130128Z-1212/depth_test
+Pointer task · adaptive stopping
+1,000 examples · up to 20 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and nominal-prefix scoring
+Results: /home/mukund/loopformer/eval/pointer_loops/depth6-fixed-prompt-seed37-best-20261004T130128Z-1212/depth_test-stopped
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  42%|████▏     | 123/290 [00:00<00:00, 1225.32it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1537.76it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:02:24 0:00:00
+Stopped accuracy: 0.30%; mean loops: 5.51; p95 latency: 0.1983s
+Saved stopped trajectories.csv, decisions.csv, summary.json to /home/mukund/loopformer/eval/pointer_loops/depth6-fixed-prompt-seed37-best-20261004T130128Z-1212/depth_test-stopped
+validation: trajectory 98.4%; final 98.6%; stop exact 75.3%; early 24.7%; late/missing 0.0%
+  Actual stopped answer: 74.6%; head exact 75.3%; cap fallback 0.0%; mean loops 4.13
+depth_test: trajectory 9.5%; final 12.8%; stop exact 0.0%; early 100.0%; late/missing 0.0%
+  Actual stopped answer: 0.3%; head exact 0.0%; cap fallback 0.0%; mean loops 5.51
