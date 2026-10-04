@@ -122,6 +122,7 @@ def train(
     train_probe: list[EncodedExample], config: TrainingConfig, output: Path, spec: dict,
     identity: dict, *, resume: dict | None = None, allow_batch_change: bool = False,
     progress: Callable[[dict], None] = lambda event: None,
+    event_sink: Callable[[dict], None] = lambda event: None,
 ) -> dict:
     """Accumulate the configured objective; checkpoint only completed updates."""
     config.validate()
@@ -152,9 +153,20 @@ def train(
     current_best_path = None
     history = (output / "metrics.jsonl").open("w")
 
+    lifetime_cuda_peak = torch.cuda.max_memory_allocated() if config.device == "cuda" else 0
+
+    def measured_memory() -> dict:
+        nonlocal lifetime_cuda_peak
+        values = memory_usage(config.device)
+        if config.device == "cuda":
+            lifetime_cuda_peak = max(lifetime_cuda_peak, values["cuda_peak_bytes"])
+            values["cuda_peak_bytes"] = lifetime_cuda_peak
+        return values
+
     def log(event: dict) -> None:
         history.write(json.dumps({"elapsed_seconds": perf_counter() - started, **event}, allow_nan=False) + "\n")
         history.flush()
+        event_sink({"elapsed_seconds": perf_counter() - started, **event})
 
     def validate() -> bool:
         nonlocal best_loss, validation_seconds, evaluations, latest_validation
@@ -189,7 +201,7 @@ def train(
         validation_seconds += seconds
         evaluations += 1
         log({"event": "validation", "step": step, "validation": latest_validation, "train_probe": probe,
-             "best_selection_loss": best_loss, "seconds": seconds, **memory_usage(config.device)})
+             "best_selection_loss": best_loss, "seconds": seconds, **measured_memory()})
         progress({"validation": latest_validation, "train_probe": probe})
         return improved
 
@@ -230,6 +242,8 @@ def train(
                 for param_group in optimizer.param_groups:
                     param_group["lr"] = rate
                 synchronize(torch.device(config.device))
+                if config.device == "cuda":
+                    torch.cuda.reset_peak_memory_stats()
                 begin = perf_counter()
                 for start in range(0, len(group), config.batch_size):
                     items = group[start:start + config.batch_size]
@@ -272,12 +286,16 @@ def train(
                 metrics["objective_loss"] = objective_sum / len(group)
                 if stop_parts:
                     metrics["completion"] = combine_completion_metrics(stop_parts)
-                event = {"event": "train", "step": step, "next_epoch": epoch, "next_offset": offset,
+                update_memory = ({"update_peak_allocated_bytes": torch.cuda.max_memory_allocated(),
+                                  "update_peak_reserved_bytes": torch.cuda.max_memory_reserved()}
+                                 if config.device == "cuda" else {})
+                event = {"event": "train", "batch_max_depth": max(len(item.targets) for item in group),
+                         "batch_min_depth": min(len(item.targets) for item in group), **update_memory, "step": step, "next_epoch": epoch, "next_offset": offset,
                          "train": metrics, "learning_rate": rate, "gradient_norm_before_clip": norm.item(),
                          "update_seconds": seconds, "examples_per_second": len(group) / seconds,
                          "valid_transitions_per_second": sum(len(item.targets) for item in group) / seconds,
                          "eta_seconds": (total_steps - step) * (train_seconds / completed_here + validation_seconds / evaluations / config.eval_every),
-                         **memory_usage(config.device)}
+                         **measured_memory()}
                 log(event)
                 progress(event)
                 improved = False
@@ -292,7 +310,7 @@ def train(
                   "best_checkpoint_in_this_run": current_best_path,
                   "validation": latest_validation, "training_seconds": train_seconds,
                   "validation_seconds": validation_seconds, "wall_seconds": perf_counter() - started,
-                  **memory_usage(config.device)}
+                  **measured_memory()}
         (output / "summary.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
         return result
     finally:

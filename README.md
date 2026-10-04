@@ -42,6 +42,8 @@ The completed [mechanism diagnostics](docs/experiments/stage1_integrated_mechani
 
 ## What comes next
 
+Training supports [W&B logging](docs/training_pointer.md#wb-experiment-logging) to the `loopformer` project, with local metrics retained.
+
 The current checkpoint comparison runs with `bash compare_depth12.sh` on the CUDA desktop. See [evaluation instructions and outputs](docs/evaluation.md#depth-12-checkpoint-progression).
 
 The [loop-balanced loss ablation](docs/experiments/stage1_loopbalanced.md) and joint completion training did not improve farther-depth generalization. Further experiments should target a specific unresolved mechanism. [Terminal overscaling evaluation](docs/evaluation.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.

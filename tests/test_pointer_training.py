@@ -208,8 +208,10 @@ def test_completion_training_logs_and_resume(tiny_training, tmp_path):
     identity = resume_identity(config, {'data': 'completion-test'})
     output = tmp_path / 'joint'
     output.mkdir()
-    train(model, tokenizer, items, items[:2], items[:2], config, output, spec, identity)
+    tracked = []
+    train(model, tokenizer, items, items[:2], items[:2], config, output, spec, identity, event_sink=tracked.append)
     events = [json.loads(line) for line in (output / 'metrics.jsonl').read_text().splitlines()]
+    assert [(e['event'], e.get('step')) for e in tracked] == [(e['event'], e.get('step')) for e in events]
     training = next(event for event in events if event['event'] == 'train')
     validation = next(event for event in events if event['event'] == 'validation' and event['step'] == 1)
     assert training['train']['completion']['objective_loss'] > 0
