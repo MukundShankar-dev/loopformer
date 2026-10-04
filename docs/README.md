@@ -37,3 +37,5 @@ The [fixed-prompt failure investigation](experiments/stage1_fixed_prompt_review.
 The [paired-Steps probe](experiments/stage1_paired_steps.md) controls mapping/start and confirms requested-count effects on late execution and failure to extend stop timing; it also records working-state drift without claiming a hidden-state fixed point.
 
 The [depth-12 checkpoint progression](experiments/stage1_depth12_progression.md) finds regression after step 5,000 and motivates a matched-count probe before further training.
+
+The [depth-12 paired-count probe](experiments/stage1_depth12_paired_counts.md) demonstrates late execution sensitivity to requested count on identical mappings, alongside persistent later-loop failure.
