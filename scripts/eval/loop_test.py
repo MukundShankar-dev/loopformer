@@ -199,7 +199,8 @@ def main(*, overscaling: bool = False) -> None:
             progress.update(task, completed=done, rates=f"{rate:.2f} q/s · {rate * loops:.2f} example-loops/s")
 
         metrics = evaluate(model, items, spec["token_ids"], tokenizer.pad_token_id, batch_size=args.batch_size,
-                           loops=loops, output=output / "trajectories.csv", progress=update)
+                           loops=loops, output=output / "trajectories.csv", progress=update,
+                           completion_loss_weight=spec.get("completion_loss_weight", 0.0))
     synchronize(device)
     elapsed = perf_counter() - began
     example_rows, diagnostics = summarize_trajectories(output / "trajectories.csv")

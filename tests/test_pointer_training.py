@@ -465,3 +465,13 @@ def test_training_cli_dry_run_and_toy_update(tmp_path):
                     '--output', str(completion_eval), '--test'], cwd=ROOT,
                    capture_output=True, text=True, check=True)
     assert json.loads((completion_eval / 'summary.json').read_text())['total'] == 3
+    completion_loops = tmp_path / 'completion_loops'
+    subprocess.run([sys.executable, '-m', 'scripts.eval.loop_test', '--model',
+                    str(completion / 'step-000001'), '--data', str(tmp_path / 'validation.jsonl'),
+                    '--device', 'cpu', '--batch-size', '2', '--loops', '4',
+                    '--output', str(completion_loops)], cwd=ROOT,
+                   capture_output=True, text=True, check=True)
+    loop_summary = json.loads((completion_loops / 'summary.json').read_text())
+    assert loop_summary['status'] == 'complete'
+    assert 'first_stop_exact_rate' in loop_summary['completion']
+    assert 'stop_probability' in (completion_loops / 'trajectories.csv').read_text().splitlines()[0]

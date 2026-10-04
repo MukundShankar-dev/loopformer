@@ -26,8 +26,9 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
     """
     if not examples or batch_size < 1:
         raise ValueError("Evaluation requires examples and a positive batch size")
-    if completion_loss_weight < 0 or (completion_loss_weight > 0) != (getattr(model, "completion_head", None) is not None):
-        raise ValueError("Completion evaluation requires matching positive weight and model head")
+    if completion_loss_weight < 0 or (completion_loss_weight > 0 and getattr(model, "completion_head", None) is None):
+        raise ValueError("Positive completion evaluation weight requires a model head")
+    completion_enabled = getattr(model, "completion_head", None) is not None
     def scope(name: str):
         return torch.profiler.record_function("pointer/" + name) if profile_ranges else nullcontext()
 
@@ -46,18 +47,18 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
                 with scope("loss"):
                     scores = symbolic_scores(result.loop_logits, token_ids)
                     _, losses = step_loss(scores, batch["targets"], batch["target_mask"])
-                    if completion_loss_weight:
+                    if completion_enabled:
                         stop_objective, stop_losses = completion_loss(result.stop_logits, batch["target_mask"])
                 with scope("metrics_and_rows"):
                     parts.append(batch_metrics(scores, batch["targets"], batch["target_mask"], losses))
-                    if completion_loss_weight:
+                    if completion_enabled:
                         stop_parts.append(completion_metrics(result.stop_logits, batch["target_mask"],
                                                              stop_losses, stop_objective))
                     for row, item in enumerate(items):
                         depth_parts.setdefault(len(item.targets), []).append(batch_metrics(
                             scores[row:row + 1], batch["targets"][row:row + 1], batch["target_mask"][row:row + 1], losses[row:row + 1],
                         ))
-                        if completion_loss_weight:
+                        if completion_enabled:
                             one_mask = batch["target_mask"][row:row + 1]
                             one_logits = result.stop_logits[row:row + 1]
                             one_objective, one_losses = completion_loss(one_logits, one_mask)
@@ -92,7 +93,7 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
                                                         for j, value in enumerate(scores_t))) if target is not None else "",
                                 "top_symbols": " ".join(SYMBOLS[j] for j in sorted(range(len(scores_t)), key=lambda j: (-scores_t[j], j))[:3]),
                             })
-                            if completion_loss_weight:
+                            if completion_enabled:
                                 rows[-1]["stop_logit"] = result.stop_logits[row_index, t - 1].item()
                                 rows[-1]["stop_probability"] = result.stop_logits[row_index, t - 1].sigmoid().item()
                                 rows[-1]["stop_target"] = (t == len(item.targets)) if t <= len(item.targets) else ""
@@ -104,7 +105,7 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
     with scope("aggregate_and_export"):
         summary = combine_metrics(parts)
         summary["by_depth"] = {str(depth): combine_metrics(values) for depth, values in sorted(depth_parts.items())}
-        if completion_loss_weight:
+        if completion_enabled:
             summary["completion"] = combine_completion_metrics(stop_parts)
             for depth, values in stop_depth_parts.items():
                 summary["by_depth"][str(depth)]["completion"] = combine_completion_metrics(values)

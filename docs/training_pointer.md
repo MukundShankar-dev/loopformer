@@ -18,7 +18,22 @@ python -m scripts.training.train_pointer \
   --output models/stage1_pointer/depth6-completion-seed37
 ```
 
-The output directory must be new. The live dashboard shows pointer objective/accuracy and completion loss, exact-stop rate, and early-stop rate at the diagnostic probability threshold 0.5. `metrics.jsonl` keeps each update's two loss terms, validation summaries, and selection loss; validation CSVs append stop logits, probabilities, nominal labels, and BCE through each task's depth. Checkpoints use `loopformer-stage1-completion-v1` and include both LoRA and head weights in `adapter_model.pt`; historical checkpoints remain `loopformer-stage1-v1`. The existing `naive_test` and `loop_test` can load new checkpoints for **forced-depth pointer evaluation**. Actual self-stopped inference and threshold selection are not yet implemented, so the 0.5 diagnostic rate does not establish deployed stopping accuracy. The 30k training data are absent from this Mac checkout; the new real-data dry run has not been verified here.
+The output directory must be new. The live dashboard shows pointer objective/accuracy and completion loss, exact-stop rate, and early-stop rate at the diagnostic probability threshold 0.5. `metrics.jsonl` keeps each update's two loss terms, validation summaries, and selection loss; validation CSVs append stop logits, probabilities, nominal labels, and BCE through each task's depth. Checkpoints use `loopformer-stage1-completion-v1` and include both LoRA and head weights in `adapter_model.pt`; historical checkpoints remain `loopformer-stage1-v1`. The existing `naive_test` and `loop_test` can load new checkpoints for **forced-depth pointer evaluation**. `loop_test` also records head probabilities and diagnostic stop timing for all executed passes, without actually stopping execution. Actual self-stopped inference and threshold selection are not yet implemented, so the 0.5 diagnostic rate does not establish deployed stopping accuracy. The 30k training data are absent from this Mac checkout; the new real-data dry run has not been verified here.
+
+After training, resolve the pointer-CE-selected checkpoint and run full development sweeps on the same validation and depth-test sets used for the baseline. In bash under WSL:
+
+```bash
+RUN=models/stage1_pointer/depth6-completion-seed37
+BEST=$(python -c 'import json,sys; from pathlib import Path; p=Path(sys.argv[1]); print(p/json.loads((p/"best_checkpoint.json").read_text())["path"])' "$RUN")
+python -m scripts.eval.loop_test --model "$BEST" \
+  --data data/pointer/seed-17/validation.jsonl --device cuda --batch-size 16 \
+  --output eval/pointer_loops/completion-best-validation
+python -m scripts.eval.loop_test --model "$BEST" \
+  --data data/pointer/seed-17/depth_test.jsonl --device cuda --batch-size 16 --loops 20 \
+  --output eval/pointer_loops/completion-best-depth-test
+```
+
+These commands run the model through the full budget and record every pass. The validation sweep covers requested depths 1–8; the depth-test sweep covers 9–16 and runs to 20 to distinguish a late head signal from no signal within the budget. `summary.json` reports pointer trajectory/final accuracy and the head's 0.5-threshold nominal exact/early/late stop rates. `trajectories.csv` includes per-pass stop probabilities, so thresholds can be studied on development data without rerunning the model. This is an **offline stopping diagnostic**, not measured compute saving or an actual self-stopped answer. Do not use the untouched confirmation split for threshold or checkpoint selection.
 
 ## Preview, then run
 
