@@ -26,3 +26,5 @@ The [offline failure review](experiments/baseline2500_offline_review.md) compare
 The [controlled restart report](experiments/stage1_controlled_restarts.md) shows that retaining the original displayed Steps does not remove the suffix-restart benefit, while directly splicing fresh Rules-prefix representations into a loop-six state is strongly harmful.
 
 The [frozen rule-edit report](experiments/stage1_rule_edit_probe.md) compares relevant-edge, irrelevant-edge, and early-loop controls on the retained checkpoint. It finds reliable early rule response and weaker, partly prompt-sensitive late response; the mechanism of late failure remains unresolved.
+
+The [integrated mechanism report](experiments/stage1_integrated_mechanism.md) audits the completed three-checkpoint, same-mapping horizon and rule-edit diagnostic. It separates the strong local transition behavior from the later recurrent-history failure and records why the internal cause remains unresolved.
