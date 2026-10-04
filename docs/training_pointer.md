@@ -1,8 +1,8 @@
 # Train recurrent pointer execution
 
-Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md) has completed; the [loop-balanced ablation](experiments/stage1_loopbalanced.md) is also complete, without an improved depth frontier. The new [learned-completion training ablation](learned_loop_completion.md) is implemented but has not run on pretrained Qwen. Other dated training and depth-comparison commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
+Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md), [loop-balanced ablation](experiments/stage1_loopbalanced.md), and [learned-completion ablation](experiments/stage1_learned_completion.md) have completed. The latter two did not improve the depth frontier. Dated commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
 
-## Learned completion training: next authorized run
+## Learned completion training: completed protocol
 
 The [config](../configs/stage1_pointer_depth6_completion.json) matches the fresh 30k depth-6 batch-4 baseline's data selection, seed, optimizer, effective batch, and update budget. It adds a 128-wide hidden-state stop head and weight `0.1` on the continue/stop loss. The exact intermediate A–Z target is still decoded by frozen C after **every** recurrent pass and supervised by the existing 26-symbol CE. The head receives only the recurrent answer-position state. `Steps` appears in the raw prompt; the trainer's label mask uses task depth, but no loop/depth scalar is passed to R or the head. The first run must use fresh adapters; do not pass `--init-from` or `--resume`.
 

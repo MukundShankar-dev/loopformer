@@ -1,6 +1,6 @@
 # Learned completion of an explicit-step pointer task
 
-**Status: joint training and full-loop offline stop diagnostics implemented; pretrained training and actual self-stopped inference have not run.** This is a Stage 1 ablation of the existing [pointer training](training_pointer.md), not the terminal-damage controller in [adaptive inference](adaptive_compute.md). It asks whether making the recurrent state support its own continue/stop decision improves pointer execution, especially beyond trained depths. No pretrained improvement is implied by the implementation checks.
+**Status: joint training and full-loop offline stop diagnostics completed on pretrained Qwen; actual self-stopped inference has not run.** The [experiment report](experiments/stage1_learned_completion.md) records a negative result: at the 0.5 diagnostic threshold, the head stops early on every depth-9–16 example, and the jointly trained checkpoint has worse forced-depth pointer trajectories than the matched CE-only checkpoint. This is a Stage 1 ablation of the existing [pointer training](training_pointer.md), not the terminal-damage controller in [adaptive inference](adaptive_compute.md).
 
 ## Task and model contract
 

@@ -29,3 +29,5 @@ The [controlled restart report](experiments/stage1_controlled_restarts.md) shows
 The [frozen rule-edit report](experiments/stage1_rule_edit_probe.md) compares relevant-edge, irrelevant-edge, and early-loop controls on the retained checkpoint. It finds reliable early rule response and weaker, partly prompt-sensitive late response; the mechanism of late failure remains unresolved.
 
 The [integrated mechanism report](experiments/stage1_integrated_mechanism.md) audits the completed three-checkpoint, same-mapping horizon and rule-edit diagnostic. It separates the strong local transition behavior from the later recurrent-history failure and records why the internal cause remains unresolved.
+
+The [learned-completion ablation](experiments/stage1_learned_completion.md) records the joint stop-head training and full-loop evaluation. Stop timing does not extend beyond trained depths, and forced-depth pointer generalization is worse than the matched CE-only checkpoint.
