@@ -1,0 +1,1911 @@
+{
+  "status": "complete",
+  "started_utc": "2026-10-04T00:18:09.956563+00:00",
+  "command": [
+    "/home/mukund/loopformer/.venv/bin/python",
+    "-m",
+    "scripts.eval.mechanism_diagnostic",
+    "--model",
+    "models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500",
+    "--device",
+    "cuda",
+    "--comparison-model",
+    "models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-003250",
+    "--comparison-model",
+    "models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-003750",
+    "--validation",
+    "data/pointer/seed-17/validation.jsonl",
+    "--deep",
+    "data/pointer/seed-17/depth_test.jsonl",
+    "--fit-per-depth",
+    "24",
+    "--eval-per-depth",
+    "8",
+    "--deep-per-depth",
+    "8",
+    "--output",
+    "eval/pointer_mechanism/matched-2500-3250-3750-20261004T001803Z-552/results"
+  ],
+  "checkpoint": "/home/mukund/loopformer/models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500",
+  "device": "cuda",
+  "dtype": "float32",
+  "device_name": "NVIDIA GeForce RTX 5070 Ti",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.11.8 (main, Feb 25 2024, 04:18:18) [Clang 17.0.6 ]",
+  "versions": {
+    "torch": "2.14.0+cu130",
+    "transformers": "5.17.0",
+    "peft": "0.20.0",
+    "numpy": "2.4.6"
+  },
+  "seed": 17,
+  "model_spec": {
+    "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "recurrent_start": 6,
+    "recurrent_end": 18,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "symbols": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J",
+      "K",
+      "L",
+      "M",
+      "N",
+      "O",
+      "P",
+      "Q",
+      "R",
+      "S",
+      "T",
+      "U",
+      "V",
+      "W",
+      "X",
+      "Y",
+      "Z"
+    ],
+    "token_ids": [
+      362,
+      425,
+      356,
+      422,
+      468,
+      434,
+      479,
+      472,
+      358,
+      619,
+      730,
+      444,
+      386,
+      451,
+      506,
+      393,
+      1207,
+      431,
+      328,
+      350,
+      547,
+      647,
+      467,
+      1599,
+      809,
+      1863
+    ],
+    "prompt_format": "dataset_raw",
+    "loss_vocabulary": "symbols",
+    "train_max_depth": 6,
+    "format": "loopformer-stage1-v1"
+  },
+  "train_max_depth": 6,
+  "trainable_adapter_parameters": 270336,
+  "fit_per_depth": 24,
+  "eval_per_depth": 8,
+  "deep_per_depth": 8,
+  "cohort_ids": {
+    "fit": [
+      "validation-000000-44a3a8e15b4fe090",
+      "validation-000008-26bbd517902715c2",
+      "validation-000016-7624c0bfaa93b852",
+      "validation-000024-b636b0a377002802",
+      "validation-000032-11b5907d21624cf4",
+      "validation-000040-b997521fc3960fd8",
+      "validation-000048-8f5f1149256d09d8",
+      "validation-000056-9973982589704ab7",
+      "validation-000064-41a2b21207af8ac0",
+      "validation-000072-04122f870bb12f64",
+      "validation-000080-3d66821aae539e11",
+      "validation-000088-e14a6640ba78f606",
+      "validation-000096-15f23d1068f6d87a",
+      "validation-000104-6c243df23a263048",
+      "validation-000112-345dc7872b1213eb",
+      "validation-000120-a86d99ae22e547a4",
+      "validation-000128-55e059ade74c4adf",
+      "validation-000136-19776a2f1470e10d",
+      "validation-000144-14f26118ddd9d3ee",
+      "validation-000152-c93e3d7c6c4c1e95",
+      "validation-000160-0d477333edc297f4",
+      "validation-000168-bbd5f80a0ac4a3e6",
+      "validation-000176-166900e3069cc004",
+      "validation-000184-7960f676cc59d977",
+      "validation-000001-bcd1fad8b169949a",
+      "validation-000009-a4ff25768b201a11",
+      "validation-000017-391c267293facdca",
+      "validation-000025-4f1614d3853c02e9",
+      "validation-000033-4922e6ebcaa3f96a",
+      "validation-000041-70b3a8bb14c18a3e",
+      "validation-000049-ccd4dc3e467ed41f",
+      "validation-000057-4abe48f17638cc4d",
+      "validation-000065-857de9e1e8cc4fb9",
+      "validation-000073-eda4ccfe1b5ef30b",
+      "validation-000081-76070193c485c538",
+      "validation-000089-76f05b80c717287b",
+      "validation-000097-6538745df9528979",
+      "validation-000105-fa2380ba6b83c506",
+      "validation-000113-2db6ebc0a14b7af1",
+      "validation-000121-72ab2e21c76c4190",
+      "validation-000129-8292409c53884e2c",
+      "validation-000137-28c43610c27d2ca7",
+      "validation-000145-177cc02820872774",
+      "validation-000153-e6e18697077a2290",
+      "validation-000161-020438fabfee1652",
+      "validation-000169-916deb7519ddf40c",
+      "validation-000177-9b585ac6e213513b",
+      "validation-000185-7cd1a75a8d5fffa5",
+      "validation-000002-b08f149f9aa37ed5",
+      "validation-000010-b428f2c085e967b3",
+      "validation-000018-41dd6fd43974df6c",
+      "validation-000026-6a84339f681e7846",
+      "validation-000034-0981e4c5a21c25f8",
+      "validation-000042-dee1b6aaadfe11d8",
+      "validation-000050-cb94766bd589015f",
+      "validation-000058-0aa84caee25f8b32",
+      "validation-000066-fdd7f6cfa852ff80",
+      "validation-000074-d37e4ee9d2c4f08a",
+      "validation-000082-f254c3aef0f9a61d",
+      "validation-000090-57eb7dec22b537e5",
+      "validation-000098-a72454e2aa2f8640",
+      "validation-000106-bf59091566bb22fe",
+      "validation-000114-9382834963ea7a72",
+      "validation-000122-f69d536d690884f6",
+      "validation-000130-da98da5342a46f0c",
+      "validation-000138-fc4806b428319053",
+      "validation-000146-2077acb4e5d4cca2",
+      "validation-000154-4fa6fac52b6abdec",
+      "validation-000162-41085513f3d3d933",
+      "validation-000170-e69faf7474e93840",
+      "validation-000178-cc4c987534ca2b30",
+      "validation-000186-0227043a10cedec4",
+      "validation-000003-ee63654d4400d10e",
+      "validation-000011-fa233c48809f2210",
+      "validation-000019-d17e9c1f747e149d",
+      "validation-000027-6a66b9da2a8537e2",
+      "validation-000035-f334c692c3207d62",
+      "validation-000043-463c62180ecfb94c",
+      "validation-000051-1e33db28f82b32f6",
+      "validation-000059-1842dd17fe00bdd1",
+      "validation-000067-5eeb79a8ddc0cdd0",
+      "validation-000075-7fa553d45fc52e87",
+      "validation-000083-bdc3d443f696c6e4",
+      "validation-000091-327c4bc459356cd8",
+      "validation-000099-30bbc5dbcc1accd2",
+      "validation-000107-9e23e5e8346602f4",
+      "validation-000115-6139bbcec06f250d",
+      "validation-000123-c6abae455be22fcb",
+      "validation-000131-8b8d693c28553472",
+      "validation-000139-5181c0cd584f6071",
+      "validation-000147-63023f85c6bd5183",
+      "validation-000155-e9d74c162ed14a9e",
+      "validation-000163-2d7b8efc65a8d194",
+      "validation-000171-9bad7f5691efdcaf",
+      "validation-000179-7c54298867a7fd04",
+      "validation-000187-1dff2391537e0c38",
+      "validation-000004-be347ef6cc6858f2",
+      "validation-000012-e2f4a057e2875346",
+      "validation-000020-fafb179cc6cc2b81",
+      "validation-000028-76d75e52450d2a4e",
+      "validation-000036-08d479af2fbfcd13",
+      "validation-000044-58b8cd97550023e0",
+      "validation-000052-dd865f95456b1eab",
+      "validation-000060-68f9d5e9ee013b7a",
+      "validation-000068-14255701ef8439b3",
+      "validation-000076-d6e153cb1f35b781",
+      "validation-000084-3d9612f51d8c4a4c",
+      "validation-000092-acd13f4225977e17",
+      "validation-000100-d2a8f012078b5f97",
+      "validation-000108-6c89efd8433cdd88",
+      "validation-000116-1f5840224815d03a",
+      "validation-000124-98eb3fdae592478c",
+      "validation-000132-ee40dc25b876a568",
+      "validation-000140-c13ca92169b78ded",
+      "validation-000148-011f491f75e7cc0d",
+      "validation-000156-28aa130473578f19",
+      "validation-000164-88ea4dae8d3b05c2",
+      "validation-000172-006ee886bd27d96d",
+      "validation-000180-835a56d9808dc5fe",
+      "validation-000188-25ff6ee1f8d413c5",
+      "validation-000005-f03c660decf2b2bd",
+      "validation-000013-4d733abda971964d",
+      "validation-000021-2f5bbacfb012b7e5",
+      "validation-000029-c6c8daa7e61a4960",
+      "validation-000037-8dda1803e360d5f9",
+      "validation-000045-80517b31209af834",
+      "validation-000053-f2e5913a49e576a4",
+      "validation-000061-57c2e70093a3b618",
+      "validation-000069-5a91f4b14c2482b4",
+      "validation-000077-ee11dad22038a0fa",
+      "validation-000085-87bc7632ac9e5aea",
+      "validation-000093-8de94f228442308b",
+      "validation-000101-d407be643181f3a2",
+      "validation-000109-ad947f72b9accd8d",
+      "validation-000117-6c2b54ae4e2026b1",
+      "validation-000125-c2f612c496421102",
+      "validation-000133-7a60692abdecec36",
+      "validation-000141-9aba654221a48742",
+      "validation-000149-0d79ee5bab9b67fb",
+      "validation-000157-568ef0c51588214d",
+      "validation-000165-d0d05460b182cb15",
+      "validation-000173-308b38b2646882a5",
+      "validation-000181-68a20428b3fc1704",
+      "validation-000189-2dceca2f39239486"
+    ],
+    "validation": [
+      "validation-000192-fbba589bac0a3de6",
+      "validation-000200-d425883f5eabaa03",
+      "validation-000208-5f1f6e3ac4eae0e4",
+      "validation-000216-e321e2467232572d",
+      "validation-000224-700423711d7c9dd9",
+      "validation-000232-506dce636bc5de49",
+      "validation-000240-81a092e07224d991",
+      "validation-000248-1d0edc6300e481a7",
+      "validation-000193-a86cac2e1e960a6a",
+      "validation-000201-78c8f6742a060ba0",
+      "validation-000209-62457b08cc0f7624",
+      "validation-000217-dfd9e532063d9fd2",
+      "validation-000225-f23c302db458dd16",
+      "validation-000233-c3d2f08e9fe13be4",
+      "validation-000241-95906b369f7047f9",
+      "validation-000249-a9b71e54dcc8bf38",
+      "validation-000194-fb18cafc70a343b6",
+      "validation-000202-dc659cd58bdc6408",
+      "validation-000210-b627c607e78c425c",
+      "validation-000218-106f356f3354edd7",
+      "validation-000226-ebca28af8d4d8bfe",
+      "validation-000234-eecb168782c62f74",
+      "validation-000242-11c6fd1edcd57efa",
+      "validation-000250-7e3e34031a4f9dcc",
+      "validation-000195-917b2e3562d62a2b",
+      "validation-000203-c88fc2f01196d4d9",
+      "validation-000211-b0aaf850ce98644f",
+      "validation-000219-d2b3bce87a15ed8c",
+      "validation-000227-25eb915122c7fbd9",
+      "validation-000235-5852e20f1dc6109e",
+      "validation-000243-76d39fea7bcce71b",
+      "validation-000251-daa4af8e7e6c984f",
+      "validation-000196-cf2acf0b476ccd3f",
+      "validation-000204-3c6a5f424d66dfa0",
+      "validation-000212-fba7a3bde1690f7c",
+      "validation-000220-38a2ec220e7e2ade",
+      "validation-000228-fb6c61a4942016ce",
+      "validation-000236-d0d1b94e762a8dea",
+      "validation-000244-921482674f23d6c8",
+      "validation-000252-9d24c6d509d45841",
+      "validation-000197-a94df45850f43682",
+      "validation-000205-f1978ad97b32009c",
+      "validation-000213-364610b0f344c1b2",
+      "validation-000221-619f319f4ed53965",
+      "validation-000229-03db876ba798a02b",
+      "validation-000237-427db4192eee1eab",
+      "validation-000245-0aa003a13f411d1b",
+      "validation-000253-bee33eaf03a5587d",
+      "validation-000006-a6e441149aba0044",
+      "validation-000014-f5b2ab5ccc56bb71",
+      "validation-000022-3fad179539e7a16e",
+      "validation-000030-166d0df58e937775",
+      "validation-000038-2ce4de4c1670f4db",
+      "validation-000046-41e1da52f4934913",
+      "validation-000054-66c8ee3a5ca93358",
+      "validation-000062-28e1c80b88c48163",
+      "validation-000007-7d4d438bcaad515d",
+      "validation-000015-1c87bbda5f60bba9",
+      "validation-000023-daa87323515f8ff9",
+      "validation-000031-63fbd012f4dd2445",
+      "validation-000039-bcd018b9b60a7394",
+      "validation-000047-8cefdd5a971426a3",
+      "validation-000055-029d7157c2614773",
+      "validation-000063-44af1d3a50b91767"
+    ],
+    "deep": [
+      "depth_test-000000-f5f8b5359ebcfd62",
+      "depth_test-000008-1a8c030e30f29d33",
+      "depth_test-000016-8ce7c70966e0b547",
+      "depth_test-000024-7f01dccad9ec4fb6",
+      "depth_test-000032-14349adf6f52b224",
+      "depth_test-000040-01045c38dc283f10",
+      "depth_test-000048-5bb50722ca08482d",
+      "depth_test-000056-0ad9000c039a2123",
+      "depth_test-000001-904a7dba03dcd057",
+      "depth_test-000009-59161e71dd430aaa",
+      "depth_test-000017-fabe5e30d201367a",
+      "depth_test-000025-ef01a236e265853e",
+      "depth_test-000033-b363479b1a25169d",
+      "depth_test-000041-7577661fbcf12593",
+      "depth_test-000049-12e5691edab299a6",
+      "depth_test-000057-89b74ae127a8cc5f",
+      "depth_test-000002-b8838dee4b18ff80",
+      "depth_test-000010-53ab148a10d24b2f",
+      "depth_test-000018-0e2326f55fcc5ad6",
+      "depth_test-000026-3c1145b2fd204573",
+      "depth_test-000034-ed72e9893d0bd2eb",
+      "depth_test-000042-120b98365b8dc816",
+      "depth_test-000050-d57c26653f2fcee0",
+      "depth_test-000058-da70f4db4d4d7a7e",
+      "depth_test-000003-ff959615d005f3c1",
+      "depth_test-000011-46be39ae43fe5203",
+      "depth_test-000019-6f67b85d2a407ab0",
+      "depth_test-000027-838873f7e0b5d31b",
+      "depth_test-000035-86b9f251fc5b260e",
+      "depth_test-000043-819c9a6e4c15d86e",
+      "depth_test-000051-6a1da2c00912e4af",
+      "depth_test-000059-2dadbc8dd5b54ffa",
+      "depth_test-000004-df8df2f48813c17a",
+      "depth_test-000012-2af7935bce9a5e8b",
+      "depth_test-000020-d5545e314ab401b4",
+      "depth_test-000028-e997a184ef02d991",
+      "depth_test-000036-d7256a0bf997acd5",
+      "depth_test-000044-575b0f7e04432491",
+      "depth_test-000052-6bc3029add182929",
+      "depth_test-000060-0b66828796a36e3e",
+      "depth_test-000005-566c29b0d46644e0",
+      "depth_test-000013-a50daaffa2300786",
+      "depth_test-000021-c9a63508d5be6c3a",
+      "depth_test-000029-77c17133afab30a6",
+      "depth_test-000037-bf496af446ac7698",
+      "depth_test-000045-3b9b80bdf34b6187",
+      "depth_test-000053-3d7c37f77e2d734b",
+      "depth_test-000061-25f4c5deb8b83234",
+      "depth_test-000006-505e8d3136a36689",
+      "depth_test-000014-80a729b6633e8f73",
+      "depth_test-000022-c73ceea1b6a2236e",
+      "depth_test-000030-8631a8282709091d",
+      "depth_test-000038-b9174cd52cb68319",
+      "depth_test-000046-f8cb04fefefa1432",
+      "depth_test-000054-6462e38226e70262",
+      "depth_test-000062-cf5bf36d79a413ca",
+      "depth_test-000007-169948e3c4f02556",
+      "depth_test-000015-12a6018e7c0c3529",
+      "depth_test-000023-9235f9c3c66ca02c",
+      "depth_test-000031-f4c4829d855aab7b",
+      "depth_test-000039-e8273e6d03b97881",
+      "depth_test-000047-50526cac687efcc6",
+      "depth_test-000055-e2833f20e08f01b3",
+      "depth_test-000063-0df2371e9581c4b6"
+    ]
+  },
+  "data_sha256": {
+    "validation": "d5925d830c330808bc5df636018ef0728e39b376ca63fa2df2b8b6fce1355b74",
+    "deep": "20c92ce8159e895cd98e7cee2a2da46e01e0ecdf07457e58d91ec31134ead4c9"
+  },
+  "adapter_sha256": "25c428d2528e4352e460036d59b7b8d80b0175210135051920d2d30cbc80d4ef",
+  "checkpoint_metadata_sha256": "8791505f331fd361fe62c8efc4fe1a9759d47adac6b781205f5104f3a08b2383",
+  "tokenizer_sha256": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+  "comparison_checkpoints": {
+    "step-002500": {
+      "path": "/home/mukund/loopformer/models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500",
+      "adapter_sha256": "25c428d2528e4352e460036d59b7b8d80b0175210135051920d2d30cbc80d4ef",
+      "metadata_sha256": "8791505f331fd361fe62c8efc4fe1a9759d47adac6b781205f5104f3a08b2383",
+      "tokenizer_sha256": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8"
+    },
+    "step-003250": {
+      "path": "/home/mukund/loopformer/models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-003250",
+      "adapter_sha256": "8a088eee4204fd9e0833715c5750d3740ebe83182dd5d46f6fd6e92b2fe44675",
+      "metadata_sha256": "8791505f331fd361fe62c8efc4fe1a9759d47adac6b781205f5104f3a08b2383",
+      "tokenizer_sha256": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8"
+    },
+    "step-003750": {
+      "path": "/home/mukund/loopformer/models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-003750",
+      "adapter_sha256": "96f7ede7acf6b53a6c8ffd9afb390ece84000c4b3238c2aebccb1b7704b5bcb2",
+      "metadata_sha256": "8791505f331fd361fe62c8efc4fe1a9759d47adac6b781205f5104f3a08b2383",
+      "tokenizer_sha256": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8"
+    }
+  },
+  "source_sha256": {
+    "scripts/eval/mechanism_diagnostic.py": "6f6158d41ed04fcdbb764a466bf9e12bdff3eeb7bd75dd00c8770d9b129a479c",
+    "scripts/eval/mechanism_variants.py": "a7212a0cac5c6867587ce0eb8a1f05119565ce9b69f697b95651f06bd84fc585",
+    "scripts/eval/mechanism_recording.py": "9fd6ca306147bc024cd731c1c9ac52fa57643cf6aa50f2af0852668bf2c31c73",
+    "scripts/eval/mechanism_metrics.py": "6fedd370bbda5f3731992b9747556bdff8c819c98e6dea6710619858a94c1361",
+    "scripts/eval/mechanism_comparison.py": "9b722a5ead5035fb5abf877cff9466027d1007388479442db1e6461b0247ce12",
+    "scripts/eval/pointer_probes.py": "7338511db4d05f11fa3683fedf7817b3987ceaa2efc372fcd2471e8efdfef226",
+    "scripts/recurrent_qwen/model.py": "fdae798cb576c13e7ce73aa8d3716455f397d73546f752b8fbd75e6d9540c872",
+    "scripts/recurrent_qwen/checkpoint.py": "f7a811460c44d33c45a7c383cde80b4f289a66a3a07d4b0274af60d6998a0f34",
+    "scripts/recurrent_qwen/lora_utils.py": "4f2baf46c9a57f9aa79bf41e50c5fc1cc5bd8020c8e066e5829cfb8284a9b803",
+    "scripts/training/data.py": "fd20a295a0f994d78844585e3ede6dcf7fe43ed47cc72319d02c8347fceed688",
+    "scripts/dataset/pointer.py": "e7030dcd9d4df329c95a640fe79c24e9358f1d828cda0f5306236229e882a08f",
+    "scripts/dataset/symbols.py": "5ad017b0333f51b51ae4b2dce8e1a2c33128ee55e1dc5bae35ead44663d6cf14"
+  },
+  "semantics": "One fixed development cohort and predeclared controls; no checkpoint update, no external state transfer during any inference. Representation probes are offline linear decodability tests, not evidence of a causal model algorithm.",
+  "completed_utc": "2026-10-04T00:25:58.566506+00:00",
+  "baseline": {
+    "by_depth": {
+      "deep": {
+        "9": {
+          "examples": 8,
+          "complete": 6,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 8.75,
+          "first_errors": {
+            "9": 2
+          }
+        },
+        "10": {
+          "examples": 8,
+          "complete": 5,
+          "preloop_matches_start": 1,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 9.5,
+          "first_errors": {
+            "9": 1,
+            "10": 2
+          }
+        },
+        "11": {
+          "examples": 8,
+          "complete": 1,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 7.5,
+          "first_errors": {
+            "11": 3,
+            "3": 1,
+            "9": 1,
+            "10": 1,
+            "1": 1
+          }
+        },
+        "12": {
+          "examples": 8,
+          "complete": 0,
+          "preloop_matches_start": 1,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 4.875,
+          "first_errors": {
+            "1": 1,
+            "10": 2,
+            "2": 3,
+            "8": 1,
+            "12": 1
+          }
+        },
+        "13": {
+          "examples": 8,
+          "complete": 0,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 7.875,
+          "first_errors": {
+            "11": 2,
+            "10": 3,
+            "1": 1,
+            "9": 2
+          }
+        },
+        "14": {
+          "examples": 8,
+          "complete": 0,
+          "preloop_matches_start": 1,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 8.25,
+          "first_errors": {
+            "11": 3,
+            "12": 1,
+            "9": 1,
+            "8": 2,
+            "4": 1
+          }
+        },
+        "15": {
+          "examples": 8,
+          "complete": 0,
+          "preloop_matches_start": 1,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 7.625,
+          "first_errors": {
+            "9": 1,
+            "10": 3,
+            "11": 2,
+            "7": 1,
+            "1": 1
+          }
+        },
+        "16": {
+          "examples": 8,
+          "complete": 0,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 8.875,
+          "first_errors": {
+            "10": 2,
+            "12": 2,
+            "11": 3,
+            "2": 1
+          }
+        }
+      },
+      "fit": {
+        "1": {
+          "examples": 24,
+          "complete": 24,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 1,
+          "first_errors": {}
+        },
+        "2": {
+          "examples": 24,
+          "complete": 23,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 1.9583333333333333,
+          "first_errors": {
+            "2": 1
+          }
+        },
+        "3": {
+          "examples": 24,
+          "complete": 23,
+          "preloop_matches_start": 1,
+          "preloop_matches_first_target": 3,
+          "mean_correct_prefix": 2.9583333333333335,
+          "first_errors": {
+            "3": 1
+          }
+        },
+        "4": {
+          "examples": 24,
+          "complete": 24,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 4,
+          "first_errors": {}
+        },
+        "5": {
+          "examples": 24,
+          "complete": 24,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 5,
+          "first_errors": {}
+        },
+        "6": {
+          "examples": 24,
+          "complete": 23,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 5.958333333333333,
+          "first_errors": {
+            "6": 1
+          }
+        }
+      },
+      "validation": {
+        "1": {
+          "examples": 8,
+          "complete": 8,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 1,
+          "first_errors": {}
+        },
+        "2": {
+          "examples": 8,
+          "complete": 8,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 2,
+          "first_errors": {}
+        },
+        "3": {
+          "examples": 8,
+          "complete": 8,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 3,
+          "first_errors": {}
+        },
+        "4": {
+          "examples": 8,
+          "complete": 7,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 3.625,
+          "first_errors": {
+            "2": 1
+          }
+        },
+        "5": {
+          "examples": 8,
+          "complete": 8,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 5,
+          "first_errors": {}
+        },
+        "6": {
+          "examples": 8,
+          "complete": 8,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 6,
+          "first_errors": {}
+        },
+        "7": {
+          "examples": 8,
+          "complete": 6,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 1,
+          "mean_correct_prefix": 6,
+          "first_errors": {
+            "2": 1,
+            "6": 1
+          }
+        },
+        "8": {
+          "examples": 8,
+          "complete": 7,
+          "preloop_matches_start": 0,
+          "preloop_matches_first_target": 0,
+          "mean_correct_prefix": 7.875,
+          "first_errors": {
+            "8": 1
+          }
+        }
+      }
+    },
+    "first_error_categories": {
+      "off_path": 15,
+      "future_path": 15,
+      "earlier_path": 17,
+      "repeat_previous": 12
+    }
+  },
+  "paired_controls": {
+    "deep": {
+      "adapter_off": {
+        "examples": 64,
+        "paired_steps": 800,
+        "examples_with_token_length_change": 0,
+        "equivariant_predictions": 29,
+        "variant_correct_steps": 21,
+        "baseline_correct_steps": 529,
+        "variant_complete_trajectories": 0,
+        "baseline_complete_trajectories": 12
+      },
+      "irrelevant_edge": {
+        "examples": 64,
+        "paired_steps": 800,
+        "examples_with_token_length_change": 0,
+        "equivariant_predictions": 709,
+        "variant_correct_steps": 539,
+        "baseline_correct_steps": 529,
+        "variant_complete_trajectories": 12,
+        "baseline_complete_trajectories": 12
+      },
+      "rule_order": {
+        "examples": 64,
+        "paired_steps": 800,
+        "examples_with_token_length_change": 0,
+        "equivariant_predictions": 528,
+        "variant_correct_steps": 586,
+        "baseline_correct_steps": 529,
+        "variant_complete_trajectories": 11,
+        "baseline_complete_trajectories": 12
+      },
+      "steps_plus_one": {
+        "examples": 64,
+        "paired_steps": 800,
+        "examples_with_token_length_change": 8,
+        "equivariant_predictions": 769,
+        "variant_correct_steps": 533,
+        "baseline_correct_steps": 529,
+        "variant_complete_trajectories": 12,
+        "baseline_complete_trajectories": 12
+      },
+      "symbol_rename": {
+        "examples": 64,
+        "paired_steps": 800,
+        "examples_with_token_length_change": 0,
+        "equivariant_predictions": 502,
+        "variant_correct_steps": 573,
+        "baseline_correct_steps": 529,
+        "variant_complete_trajectories": 14,
+        "baseline_complete_trajectories": 12
+      }
+    },
+    "validation": {
+      "adapter_off": {
+        "examples": 64,
+        "paired_steps": 288,
+        "examples_with_token_length_change": 0,
+        "equivariant_predictions": 6,
+        "variant_correct_steps": 6,
+        "baseline_correct_steps": 277,
+        "variant_complete_trajectories": 0,
+        "baseline_complete_trajectories": 60
+      },
+      "irrelevant_edge": {
+        "examples": 64,
+        "paired_steps": 288,
+        "examples_with_token_length_change": 0,
+        "equivariant_predictions": 282,
+        "variant_correct_steps": 281,
+        "baseline_correct_steps": 277,
+        "variant_complete_trajectories": 61,
+        "baseline_complete_trajectories": 60
+      },
+      "rule_order": {
+        "examples": 64,
+        "paired_steps": 288,
+        "examples_with_token_length_change": 0,
+        "equivariant_predictions": 268,
+        "variant_correct_steps": 274,
+        "baseline_correct_steps": 277,
+        "variant_complete_trajectories": 61,
+        "baseline_complete_trajectories": 60
+      },
+      "steps_plus_one": {
+        "examples": 64,
+        "paired_steps": 288,
+        "examples_with_token_length_change": 0,
+        "equivariant_predictions": 287,
+        "variant_correct_steps": 278,
+        "baseline_correct_steps": 277,
+        "variant_complete_trajectories": 60,
+        "baseline_complete_trajectories": 60
+      },
+      "symbol_rename": {
+        "examples": 64,
+        "paired_steps": 288,
+        "examples_with_token_length_change": 0,
+        "equivariant_predictions": 267,
+        "variant_correct_steps": 278,
+        "baseline_correct_steps": 277,
+        "variant_complete_trajectories": 62,
+        "baseline_complete_trajectories": 60
+      }
+    }
+  },
+  "directed_edges": {
+    "early": {
+      "attempted_pairs": 108,
+      "matched_correct_prefix_pairs": 106,
+      "replacement_targets_attempted": {
+        "X": 7,
+        "I": 4,
+        "U": 5,
+        "H": 4,
+        "R": 5,
+        "K": 5,
+        "Z": 7,
+        "L": 10,
+        "M": 4,
+        "C": 2,
+        "S": 4,
+        "B": 4,
+        "J": 4,
+        "N": 5,
+        "D": 5,
+        "G": 6,
+        "A": 3,
+        "W": 3,
+        "Y": 4,
+        "V": 4,
+        "P": 2,
+        "E": 2,
+        "Q": 3,
+        "T": 1,
+        "O": 3,
+        "F": 2
+      },
+      "relevant_follows_new_target": 106,
+      "irrelevant_keeps_original_target": 106,
+      "relevant_prediction_changed": 106,
+      "irrelevant_prediction_changed": 0,
+      "cases_with_both_replacements_retaining_prefix": 53,
+      "cases_following_both_distinct_replacements": 53,
+      "branch_continuation": {
+        "1": {
+          "eligible_after_both_correct_edit_steps": 106,
+          "relevant_contiguous_correct": 104,
+          "irrelevant_contiguous_correct": 105
+        },
+        "2": {
+          "eligible_after_both_correct_edit_steps": 106,
+          "relevant_contiguous_correct": 97,
+          "irrelevant_contiguous_correct": 99
+        },
+        "3": {
+          "eligible_after_both_correct_edit_steps": 106,
+          "relevant_contiguous_correct": 82,
+          "irrelevant_contiguous_correct": 80
+        }
+      }
+    },
+    "critical": {
+      "attempted_pairs": 84,
+      "matched_correct_prefix_pairs": 70,
+      "replacement_targets_attempted": {
+        "Z": 3,
+        "T": 8,
+        "H": 4,
+        "V": 4,
+        "S": 4,
+        "L": 8,
+        "E": 4,
+        "X": 5,
+        "U": 4,
+        "G": 3,
+        "Y": 2,
+        "I": 5,
+        "M": 3,
+        "B": 2,
+        "D": 3,
+        "A": 1,
+        "C": 1,
+        "K": 5,
+        "R": 5,
+        "W": 2,
+        "P": 1,
+        "F": 2,
+        "Q": 2,
+        "J": 2,
+        "N": 1
+      },
+      "relevant_follows_new_target": 17,
+      "irrelevant_keeps_original_target": 8,
+      "relevant_prediction_changed": 29,
+      "irrelevant_prediction_changed": 19,
+      "cases_with_both_replacements_retaining_prefix": 31,
+      "cases_following_both_distinct_replacements": 6
+    }
+  },
+  "representation_probe": {
+    "deep/early_1_to_6": {
+      "steps": 384,
+      "model_correct": 339,
+      "r_probe_correct": 336,
+      "c_probe_correct": 336
+    },
+    "deep/farther": {
+      "steps": 288,
+      "model_correct": 85,
+      "r_probe_correct": 60,
+      "c_probe_correct": 71
+    },
+    "deep/near_7_to_8": {
+      "steps": 128,
+      "model_correct": 105,
+      "r_probe_correct": 106,
+      "c_probe_correct": 106
+    },
+    "fit/fit_1_to_6": {
+      "steps": 504,
+      "model_correct": 501,
+      "r_probe_correct": 504,
+      "c_probe_correct": 504
+    },
+    "validation/early_1_to_6": {
+      "steps": 264,
+      "model_correct": 256,
+      "r_probe_correct": 255,
+      "c_probe_correct": 255
+    },
+    "validation/near_7_to_8": {
+      "steps": 24,
+      "model_correct": 21,
+      "r_probe_correct": 21,
+      "c_probe_correct": 21
+    },
+    "interpretation_gate": {
+      "heldout_early_steps": 264,
+      "model_early_accuracy": 0.9696969696969697,
+      "r_probe_early_accuracy": 0.9659090909090909,
+      "c_probe_early_accuracy": 0.9659090909090909,
+      "minimum_for_late_readout_interpretation": 0.9196969696969697,
+      "r_probe_adequate": true,
+      "c_probe_adequate": true,
+      "semantics": "Linear decodability only; below-threshold early probes cannot locate late representation loss."
+    }
+  },
+  "attention": {
+    "deep/early_1_to_6/wrong": {
+      "layer_loop_rows": 540,
+      "mean_destination_top1_heads": 0.6944444444444444,
+      "mean_source_top1_heads": 0.7351851851851852
+    },
+    "deep/early_1_to_6/correct": {
+      "layer_loop_rows": 4068,
+      "mean_destination_top1_heads": 2.3655358898721732,
+      "mean_source_top1_heads": 3.061455260570305
+    },
+    "deep/late_9_plus/wrong": {
+      "layer_loop_rows": 2436,
+      "mean_destination_top1_heads": 0.5804597701149425,
+      "mean_source_top1_heads": 0.6678981937602627
+    },
+    "deep/late_9_plus/correct": {
+      "layer_loop_rows": 1020,
+      "mean_destination_top1_heads": 1.7166666666666666,
+      "mean_source_top1_heads": 1.981372549019608
+    },
+    "deep/near_7_to_8/wrong": {
+      "layer_loop_rows": 276,
+      "mean_destination_top1_heads": 0.7572463768115942,
+      "mean_source_top1_heads": 0.9021739130434783
+    },
+    "deep/near_7_to_8/correct": {
+      "layer_loop_rows": 1260,
+      "mean_destination_top1_heads": 1.9817460317460318,
+      "mean_source_top1_heads": 2.6992063492063494
+    },
+    "validation/early_1_to_6/wrong": {
+      "layer_loop_rows": 96,
+      "mean_destination_top1_heads": 0.9270833333333334,
+      "mean_source_top1_heads": 1.0208333333333333
+    },
+    "validation/early_1_to_6/correct": {
+      "layer_loop_rows": 3072,
+      "mean_destination_top1_heads": 2.27734375,
+      "mean_source_top1_heads": 2.8932291666666665
+    },
+    "validation/near_7_to_8/wrong": {
+      "layer_loop_rows": 36,
+      "mean_destination_top1_heads": 1.9722222222222223,
+      "mean_source_top1_heads": 1.9722222222222223
+    },
+    "validation/near_7_to_8/correct": {
+      "layer_loop_rows": 252,
+      "mean_destination_top1_heads": 2.0238095238095237,
+      "mean_source_top1_heads": 2.8452380952380953
+    }
+  },
+  "matched_comparison": {
+    "semantics": "Paired mapping-level summaries; trained-cue loops beyond the displayed Steps are stress tests, not normal task accuracy. Bootstrap resamples examples within depth, not loop rows.",
+    "checkpoints": {
+      "step-002500": {
+        "validation": {
+          "examples": 64,
+          "complete": 60,
+          "by_depth": {
+            "1": {
+              "examples": 8,
+              "complete": 8
+            },
+            "2": {
+              "examples": 8,
+              "complete": 8
+            },
+            "3": {
+              "examples": 8,
+              "complete": 8
+            },
+            "4": {
+              "examples": 8,
+              "complete": 7
+            },
+            "5": {
+              "examples": 8,
+              "complete": 8
+            },
+            "6": {
+              "examples": 8,
+              "complete": 8
+            },
+            "7": {
+              "examples": 8,
+              "complete": 6
+            },
+            "8": {
+              "examples": 8,
+              "complete": 7
+            }
+          },
+          "by_loop": {
+            "1": {
+              "correct": 64,
+              "examples": 64
+            },
+            "2": {
+              "correct": 54,
+              "examples": 56
+            },
+            "3": {
+              "correct": 46,
+              "examples": 48
+            },
+            "4": {
+              "correct": 39,
+              "examples": 40
+            },
+            "5": {
+              "correct": 31,
+              "examples": 32
+            },
+            "6": {
+              "correct": 22,
+              "examples": 24
+            },
+            "7": {
+              "correct": 14,
+              "examples": 16
+            },
+            "8": {
+              "correct": 7,
+              "examples": 8
+            }
+          }
+        },
+        "deep": {
+          "examples": 64,
+          "complete": 12,
+          "by_depth": {
+            "9": {
+              "examples": 8,
+              "complete": 6
+            },
+            "10": {
+              "examples": 8,
+              "complete": 5
+            },
+            "11": {
+              "examples": 8,
+              "complete": 1
+            },
+            "12": {
+              "examples": 8,
+              "complete": 0
+            },
+            "13": {
+              "examples": 8,
+              "complete": 0
+            },
+            "14": {
+              "examples": 8,
+              "complete": 0
+            },
+            "15": {
+              "examples": 8,
+              "complete": 0
+            },
+            "16": {
+              "examples": 8,
+              "complete": 0
+            }
+          },
+          "by_loop": {
+            "1": {
+              "correct": 60,
+              "examples": 64
+            },
+            "2": {
+              "correct": 57,
+              "examples": 64
+            },
+            "3": {
+              "correct": 57,
+              "examples": 64
+            },
+            "4": {
+              "correct": 55,
+              "examples": 64
+            },
+            "5": {
+              "correct": 55,
+              "examples": 64
+            },
+            "6": {
+              "correct": 55,
+              "examples": 64
+            },
+            "7": {
+              "correct": 54,
+              "examples": 64
+            },
+            "8": {
+              "correct": 51,
+              "examples": 64
+            },
+            "9": {
+              "correct": 45,
+              "examples": 64
+            },
+            "10": {
+              "correct": 26,
+              "examples": 56
+            },
+            "11": {
+              "correct": 9,
+              "examples": 48
+            },
+            "12": {
+              "correct": 4,
+              "examples": 40
+            },
+            "13": {
+              "correct": 1,
+              "examples": 32
+            },
+            "14": {
+              "correct": 0,
+              "examples": 24
+            },
+            "15": {
+              "correct": 0,
+              "examples": 16
+            },
+            "16": {
+              "correct": 0,
+              "examples": 8
+            }
+          }
+        }
+      },
+      "step-003250": {
+        "validation": {
+          "examples": 64,
+          "complete": 60,
+          "by_depth": {
+            "1": {
+              "examples": 8,
+              "complete": 8
+            },
+            "2": {
+              "examples": 8,
+              "complete": 8
+            },
+            "3": {
+              "examples": 8,
+              "complete": 8
+            },
+            "4": {
+              "examples": 8,
+              "complete": 8
+            },
+            "5": {
+              "examples": 8,
+              "complete": 7
+            },
+            "6": {
+              "examples": 8,
+              "complete": 8
+            },
+            "7": {
+              "examples": 8,
+              "complete": 8
+            },
+            "8": {
+              "examples": 8,
+              "complete": 5
+            }
+          },
+          "by_loop": {
+            "1": {
+              "correct": 64,
+              "examples": 64
+            },
+            "2": {
+              "correct": 54,
+              "examples": 56
+            },
+            "3": {
+              "correct": 47,
+              "examples": 48
+            },
+            "4": {
+              "correct": 39,
+              "examples": 40
+            },
+            "5": {
+              "correct": 31,
+              "examples": 32
+            },
+            "6": {
+              "correct": 23,
+              "examples": 24
+            },
+            "7": {
+              "correct": 15,
+              "examples": 16
+            },
+            "8": {
+              "correct": 5,
+              "examples": 8
+            }
+          }
+        },
+        "deep": {
+          "examples": 64,
+          "complete": 3,
+          "by_depth": {
+            "9": {
+              "examples": 8,
+              "complete": 2
+            },
+            "10": {
+              "examples": 8,
+              "complete": 1
+            },
+            "11": {
+              "examples": 8,
+              "complete": 0
+            },
+            "12": {
+              "examples": 8,
+              "complete": 0
+            },
+            "13": {
+              "examples": 8,
+              "complete": 0
+            },
+            "14": {
+              "examples": 8,
+              "complete": 0
+            },
+            "15": {
+              "examples": 8,
+              "complete": 0
+            },
+            "16": {
+              "examples": 8,
+              "complete": 0
+            }
+          },
+          "by_loop": {
+            "1": {
+              "correct": 64,
+              "examples": 64
+            },
+            "2": {
+              "correct": 62,
+              "examples": 64
+            },
+            "3": {
+              "correct": 62,
+              "examples": 64
+            },
+            "4": {
+              "correct": 62,
+              "examples": 64
+            },
+            "5": {
+              "correct": 62,
+              "examples": 64
+            },
+            "6": {
+              "correct": 61,
+              "examples": 64
+            },
+            "7": {
+              "correct": 61,
+              "examples": 64
+            },
+            "8": {
+              "correct": 55,
+              "examples": 64
+            },
+            "9": {
+              "correct": 38,
+              "examples": 64
+            },
+            "10": {
+              "correct": 17,
+              "examples": 56
+            },
+            "11": {
+              "correct": 3,
+              "examples": 48
+            },
+            "12": {
+              "correct": 2,
+              "examples": 40
+            },
+            "13": {
+              "correct": 3,
+              "examples": 32
+            },
+            "14": {
+              "correct": 0,
+              "examples": 24
+            },
+            "15": {
+              "correct": 0,
+              "examples": 16
+            },
+            "16": {
+              "correct": 0,
+              "examples": 8
+            }
+          }
+        }
+      },
+      "step-003750": {
+        "validation": {
+          "examples": 64,
+          "complete": 63,
+          "by_depth": {
+            "1": {
+              "examples": 8,
+              "complete": 8
+            },
+            "2": {
+              "examples": 8,
+              "complete": 8
+            },
+            "3": {
+              "examples": 8,
+              "complete": 8
+            },
+            "4": {
+              "examples": 8,
+              "complete": 8
+            },
+            "5": {
+              "examples": 8,
+              "complete": 8
+            },
+            "6": {
+              "examples": 8,
+              "complete": 8
+            },
+            "7": {
+              "examples": 8,
+              "complete": 8
+            },
+            "8": {
+              "examples": 8,
+              "complete": 7
+            }
+          },
+          "by_loop": {
+            "1": {
+              "correct": 64,
+              "examples": 64
+            },
+            "2": {
+              "correct": 56,
+              "examples": 56
+            },
+            "3": {
+              "correct": 48,
+              "examples": 48
+            },
+            "4": {
+              "correct": 40,
+              "examples": 40
+            },
+            "5": {
+              "correct": 32,
+              "examples": 32
+            },
+            "6": {
+              "correct": 24,
+              "examples": 24
+            },
+            "7": {
+              "correct": 16,
+              "examples": 16
+            },
+            "8": {
+              "correct": 7,
+              "examples": 8
+            }
+          }
+        },
+        "deep": {
+          "examples": 64,
+          "complete": 8,
+          "by_depth": {
+            "9": {
+              "examples": 8,
+              "complete": 5
+            },
+            "10": {
+              "examples": 8,
+              "complete": 3
+            },
+            "11": {
+              "examples": 8,
+              "complete": 0
+            },
+            "12": {
+              "examples": 8,
+              "complete": 0
+            },
+            "13": {
+              "examples": 8,
+              "complete": 0
+            },
+            "14": {
+              "examples": 8,
+              "complete": 0
+            },
+            "15": {
+              "examples": 8,
+              "complete": 0
+            },
+            "16": {
+              "examples": 8,
+              "complete": 0
+            }
+          },
+          "by_loop": {
+            "1": {
+              "correct": 64,
+              "examples": 64
+            },
+            "2": {
+              "correct": 63,
+              "examples": 64
+            },
+            "3": {
+              "correct": 63,
+              "examples": 64
+            },
+            "4": {
+              "correct": 63,
+              "examples": 64
+            },
+            "5": {
+              "correct": 63,
+              "examples": 64
+            },
+            "6": {
+              "correct": 62,
+              "examples": 64
+            },
+            "7": {
+              "correct": 59,
+              "examples": 64
+            },
+            "8": {
+              "correct": 56,
+              "examples": 64
+            },
+            "9": {
+              "correct": 38,
+              "examples": 64
+            },
+            "10": {
+              "correct": 16,
+              "examples": 56
+            },
+            "11": {
+              "correct": 7,
+              "examples": 48
+            },
+            "12": {
+              "correct": 1,
+              "examples": 40
+            },
+            "13": {
+              "correct": 0,
+              "examples": 32
+            },
+            "14": {
+              "correct": 2,
+              "examples": 24
+            },
+            "15": {
+              "correct": 2,
+              "examples": 16
+            },
+            "16": {
+              "correct": 0,
+              "examples": 8
+            }
+          }
+        }
+      }
+    },
+    "cue_pairs": {
+      "step-002500": {
+        "trained_cue": {
+          "paired_examples": 64,
+          "examples_with_token_length_change": 56,
+          "examples_with_any_prediction_change": 25,
+          "valid_steps": 384,
+          "valid_prediction_matches_native": 366,
+          "valid_mean_case_accuracy_difference": 0.033854166666666664,
+          "valid_case_bootstrap_95": [
+            0.005208333333333333,
+            0.06770833333333333
+          ],
+          "same_token_length_cases": 8,
+          "same_token_length_valid_mean_case_accuracy_difference": 0,
+          "same_token_length_case_bootstrap_95": [
+            0,
+            0
+          ],
+          "beyond_displayed_horizon_stress_steps": 416,
+          "stress_prediction_matches_native": 354,
+          "stress_mean_case_accuracy_difference": 0.0032986111111111107,
+          "stress_case_bootstrap_95": [
+            -0.023697916666666666,
+            0.034740823412698414
+          ],
+          "valid_segments": {
+            "early_1_to_train_max": {
+              "paired_examples": 64,
+              "paired_steps": 384,
+              "prediction_matches_native": 366,
+              "mean_case_accuracy_difference": 0.033854166666666664,
+              "case_bootstrap_95": [
+                0.0078125,
+                0.06770833333333333
+              ],
+              "same_token_length_cases": 8,
+              "same_token_length_mean_case_accuracy_difference": 0,
+              "same_token_length_case_bootstrap_95": [
+                0,
+                0
+              ]
+            }
+          }
+        },
+        "fixed_long_cue": {
+          "paired_examples": 64,
+          "examples_with_token_length_change": 8,
+          "examples_with_any_prediction_change": 14,
+          "valid_steps": 800,
+          "valid_prediction_matches_native": 771,
+          "valid_mean_case_accuracy_difference": 0.0055059523809523805,
+          "valid_case_bootstrap_95": [
+            -0.0024305555555555556,
+            0.01617063492063492
+          ],
+          "same_token_length_cases": 56,
+          "same_token_length_valid_mean_case_accuracy_difference": 0.006292517006802721,
+          "same_token_length_case_bootstrap_95": [
+            0,
+            0.01768707482993197
+          ],
+          "beyond_displayed_horizon_stress_steps": 0,
+          "stress_prediction_matches_native": 0,
+          "stress_mean_case_accuracy_difference": null,
+          "stress_case_bootstrap_95": [],
+          "valid_segments": {
+            "early_1_to_train_max": {
+              "paired_examples": 64,
+              "paired_steps": 384,
+              "prediction_matches_native": 380,
+              "mean_case_accuracy_difference": 0.0078125,
+              "case_bootstrap_95": [
+                0,
+                0.0234375
+              ],
+              "same_token_length_cases": 56,
+              "same_token_length_mean_case_accuracy_difference": 0.008928571428571428,
+              "same_token_length_case_bootstrap_95": [
+                0,
+                0.026785714285714284
+              ]
+            },
+            "late_after_train_max": {
+              "paired_examples": 64,
+              "paired_steps": 416,
+              "prediction_matches_native": 391,
+              "mean_case_accuracy_difference": 0.003689236111111111,
+              "case_bootstrap_95": [
+                -0.010416666666666666,
+                0.019314236111111112
+              ],
+              "same_token_length_cases": 56,
+              "same_token_length_mean_case_accuracy_difference": 0.004216269841269841,
+              "same_token_length_case_bootstrap_95": [
+                0,
+                0.01066468253968254
+              ]
+            }
+          }
+        }
+      },
+      "step-003250": {
+        "trained_cue": {
+          "paired_examples": 64,
+          "examples_with_token_length_change": 56,
+          "examples_with_any_prediction_change": 17,
+          "valid_steps": 384,
+          "valid_prediction_matches_native": 379,
+          "valid_mean_case_accuracy_difference": 0.010416666666666666,
+          "valid_case_bootstrap_95": [
+            0,
+            0.03125
+          ],
+          "same_token_length_cases": 8,
+          "same_token_length_valid_mean_case_accuracy_difference": 0,
+          "same_token_length_case_bootstrap_95": [
+            0,
+            0
+          ],
+          "beyond_displayed_horizon_stress_steps": 416,
+          "stress_prediction_matches_native": 379,
+          "stress_mean_case_accuracy_difference": 0.008872767857142857,
+          "stress_case_bootstrap_95": [
+            -0.0171875,
+            0.04609375
+          ],
+          "valid_segments": {
+            "early_1_to_train_max": {
+              "paired_examples": 64,
+              "paired_steps": 384,
+              "prediction_matches_native": 379,
+              "mean_case_accuracy_difference": 0.010416666666666666,
+              "case_bootstrap_95": [
+                0,
+                0.03125
+              ],
+              "same_token_length_cases": 8,
+              "same_token_length_mean_case_accuracy_difference": 0,
+              "same_token_length_case_bootstrap_95": [
+                0,
+                0
+              ]
+            }
+          }
+        },
+        "fixed_long_cue": {
+          "paired_examples": 64,
+          "examples_with_token_length_change": 8,
+          "examples_with_any_prediction_change": 12,
+          "valid_steps": 800,
+          "valid_prediction_matches_native": 780,
+          "valid_mean_case_accuracy_difference": -0.002894566371128871,
+          "valid_case_bootstrap_95": [
+            -0.00804664085914086,
+            0.002124828296703297
+          ],
+          "same_token_length_cases": 56,
+          "same_token_length_valid_mean_case_accuracy_difference": -0.0033080758527187096,
+          "same_token_length_case_bootstrap_95": [
+            -0.009203965677179963,
+            0.0024896978021978025
+          ],
+          "beyond_displayed_horizon_stress_steps": 0,
+          "stress_prediction_matches_native": 0,
+          "stress_mean_case_accuracy_difference": null,
+          "stress_case_bootstrap_95": [],
+          "valid_segments": {
+            "early_1_to_train_max": {
+              "paired_examples": 64,
+              "paired_steps": 384,
+              "prediction_matches_native": 383,
+              "mean_case_accuracy_difference": -0.0026041666666666665,
+              "case_bootstrap_95": [
+                -0.0078125,
+                0
+              ],
+              "same_token_length_cases": 56,
+              "same_token_length_mean_case_accuracy_difference": -0.002976190476190476,
+              "same_token_length_case_bootstrap_95": [
+                -0.008928571428571428,
+                0
+              ]
+            },
+            "late_after_train_max": {
+              "paired_examples": 64,
+              "paired_steps": 416,
+              "prediction_matches_native": 397,
+              "mean_case_accuracy_difference": -0.003236607142857143,
+              "case_bootstrap_95": [
+                -0.0125,
+                0.005245535714285715
+              ],
+              "same_token_length_cases": 56,
+              "same_token_length_mean_case_accuracy_difference": -0.003698979591836735,
+              "same_token_length_case_bootstrap_95": [
+                -0.014285714285714285,
+                0.006760204081632653
+              ]
+            }
+          }
+        }
+      },
+      "step-003750": {
+        "trained_cue": {
+          "paired_examples": 64,
+          "examples_with_token_length_change": 56,
+          "examples_with_any_prediction_change": 27,
+          "valid_steps": 384,
+          "valid_prediction_matches_native": 384,
+          "valid_mean_case_accuracy_difference": 0,
+          "valid_case_bootstrap_95": [
+            0,
+            0
+          ],
+          "same_token_length_cases": 8,
+          "same_token_length_valid_mean_case_accuracy_difference": 0,
+          "same_token_length_case_bootstrap_95": [
+            0,
+            0
+          ],
+          "beyond_displayed_horizon_stress_steps": 416,
+          "stress_prediction_matches_native": 378,
+          "stress_mean_case_accuracy_difference": -0.00505952380952381,
+          "stress_case_bootstrap_95": [
+            -0.014583333333333334,
+            0.002901785714285714
+          ],
+          "valid_segments": {
+            "early_1_to_train_max": {
+              "paired_examples": 64,
+              "paired_steps": 384,
+              "prediction_matches_native": 384,
+              "mean_case_accuracy_difference": 0,
+              "case_bootstrap_95": [
+                0,
+                0
+              ],
+              "same_token_length_cases": 8,
+              "same_token_length_mean_case_accuracy_difference": 0,
+              "same_token_length_case_bootstrap_95": [
+                0,
+                0
+              ]
+            }
+          }
+        },
+        "fixed_long_cue": {
+          "paired_examples": 64,
+          "examples_with_token_length_change": 8,
+          "examples_with_any_prediction_change": 11,
+          "valid_steps": 800,
+          "valid_prediction_matches_native": 788,
+          "valid_mean_case_accuracy_difference": -0.0014204545454545455,
+          "valid_case_bootstrap_95": [
+            -0.004261363636363636,
+            0
+          ],
+          "same_token_length_cases": 56,
+          "same_token_length_valid_mean_case_accuracy_difference": -0.0016233766233766235,
+          "same_token_length_case_bootstrap_95": [
+            -0.00487012987012987,
+            0
+          ],
+          "beyond_displayed_horizon_stress_steps": 0,
+          "stress_prediction_matches_native": 0,
+          "stress_mean_case_accuracy_difference": null,
+          "stress_case_bootstrap_95": [],
+          "valid_segments": {
+            "early_1_to_train_max": {
+              "paired_examples": 64,
+              "paired_steps": 384,
+              "prediction_matches_native": 384,
+              "mean_case_accuracy_difference": 0,
+              "case_bootstrap_95": [
+                0,
+                0
+              ],
+              "same_token_length_cases": 56,
+              "same_token_length_mean_case_accuracy_difference": 0,
+              "same_token_length_case_bootstrap_95": [
+                0,
+                0
+              ]
+            },
+            "late_after_train_max": {
+              "paired_examples": 64,
+              "paired_steps": 416,
+              "prediction_matches_native": 404,
+              "mean_case_accuracy_difference": -0.003125,
+              "case_bootstrap_95": [
+                -0.009375000000000001,
+                0
+              ],
+              "same_token_length_cases": 56,
+              "same_token_length_mean_case_accuracy_difference": -0.0035714285714285718,
+              "same_token_length_case_bootstrap_95": [
+                -0.010714285714285714,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "checkpoint_pairs_vs_first": {
+      "step-003250": {
+        "validation": {
+          "paired_examples": 64,
+          "longer_correct_prefix": 3,
+          "shorter_correct_prefix": 3,
+          "same_correct_prefix": 58,
+          "mean_case_step_accuracy_difference": 0.00859375,
+          "case_bootstrap_95": [
+            -0.031082589285714286,
+            0.048995535714285714
+          ],
+          "mean_correct_prefix_change": -0.015625,
+          "prefix_case_bootstrap_95": [
+            -0.34375,
+            0.28125
+          ]
+        },
+        "deep": {
+          "paired_examples": 64,
+          "longer_correct_prefix": 22,
+          "shorter_correct_prefix": 31,
+          "same_correct_prefix": 11,
+          "mean_case_step_accuracy_difference": 0.021711188117438114,
+          "case_bootstrap_95": [
+            -0.03934654754967255,
+            0.08163403436840937
+          ],
+          "mean_correct_prefix_change": 0.59375,
+          "prefix_case_bootstrap_95": [
+            -0.1875,
+            1.390625
+          ]
+        }
+      },
+      "step-003750": {
+        "validation": {
+          "paired_examples": 64,
+          "longer_correct_prefix": 3,
+          "shorter_correct_prefix": 0,
+          "same_correct_prefix": 61,
+          "mean_case_step_accuracy_difference": 0.02734375,
+          "case_bootstrap_95": [
+            0,
+            0.061383928571428575
+          ],
+          "mean_correct_prefix_change": 0.171875,
+          "prefix_case_bootstrap_95": [
+            0.0,
+            0.40625
+          ]
+        },
+        "deep": {
+          "paired_examples": 64,
+          "longer_correct_prefix": 18,
+          "shorter_correct_prefix": 24,
+          "same_correct_prefix": 22,
+          "mean_case_step_accuracy_difference": 0.03341120684870685,
+          "case_bootstrap_95": [
+            -0.026507628656066155,
+            0.09054409132534132
+          ],
+          "mean_correct_prefix_change": 0.609375,
+          "prefix_case_bootstrap_95": [
+            -0.140625,
+            1.453125
+          ]
+        }
+      }
+    }
+  },
+  "artifacts_sha256": {
+    "probe_predictions.csv": "4a387bae6d5b16167926865768f4688c46a68b7755c061f317ff4b47766dbb3b",
+    "directed.csv": "0ed2e58a827a98d40b0d45868bd1b00627374f0a303e7b28f080adc25548f768",
+    "first_error_risk.csv": "5cd62dca76312c81bd8073d2e382a2bf0e181d12ce901ed7adcafc42ae9a2362",
+    "original.csv": "6847520244f95dbe8d40f4f7bae890ae845ccba90582e8565202e3b5ea713727",
+    "answer_states.npz": "1f45d6736d11cc1a9c2352ba54944d1dca0997a841b016df323099eb1b77443d",
+    "inputs.jsonl": "88f97ea88ca1d52e288ef1b465b7eb08eba6c7ec5cddc33d244f483db1e8cc42",
+    "comparison_cases.csv": "95b90dcaa7b975dc62f3ce7a47cb332378f8d4519a4a536f0a55df79d83d4030",
+    "comparison.csv": "25e3941e3ab083a210a888ba2052d84ce974ae01f25bd98b3f3f2a8fcde44e1a",
+    "comparison_prefix.csv": "2c6b5ffe484b2f454e2131c621f970f8e2d76e8d945e4babf21fd5b9e3f93b70",
+    "attention.csv": "12b996f02be6dddc386e0fe373313ce684c05e811ced3d375c12738afae29c1c",
+    "cases.csv": "851d926e2f63bb57633f6826fd3fd23ba46d1d6d812f878ee1f929c4c470a493",
+    "paired.csv": "e9be4206ef5e1065abdb5419dee7352cdd0eae7bbe59f3ed2bfd12d9980644c1",
+    "comparison_inputs.jsonl": "9f4b2002c3c3b289c46dd8649805fc811aeef902d32e177819ab041652b432ae"
+  }
+}

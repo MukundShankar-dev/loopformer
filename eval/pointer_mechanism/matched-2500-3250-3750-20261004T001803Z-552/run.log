@@ -1,0 +1,42 @@
+Checkpoints: models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500 models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-003250 models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-003750; cohorts: seed-17 validation/depth_test; outputs/log: eval/pointer_mechanism/matched-2500-3250-3750-20261004T001803Z-552
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:39,  7.32it/s]Loading weights:  30%|███       | 88/290 [00:00<00:00, 445.31it/s]Loading weights:  51%|█████▏    | 149/290 [00:00<00:00, 499.49it/s]Loading weights:  72%|███████▏  | 208/290 [00:00<00:00, 531.31it/s]Loading weights:  91%|█████████ | 264/290 [00:00<00:00, 531.67it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 511.82it/s]
+Pointer mechanism diagnostic · frozen checkpoint
+models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500 · cuda · float32 · batch 1 · 144 probe-fit / 64 validation / 64 deep examples
+Full original trajectories, paired controls, directed branches, and compact internal readouts
+Original trajectories and hidden states ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:44
+Paired controls and directed edits ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:03:15
+Matched cues · step-002500 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:58
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:48,  6.01it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1174.19it/s]
+Matched cues · step-003250 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:01:21
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:53,  5.43it/s]Loading weights:  98%|█████████▊| 284/290 [00:00<00:00, 1239.08it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1019.31it/s]
+Matched cues · step-003750 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:01:18
+validation original complete trajectories: 60/64
+deep original complete trajectories: 12/64
+Frozen mechanism diagnostic · selected development
+                     cohorts                      
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Cohort / variant             ┃ Correct / steps ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
+│ validation / adapter_off     │           6/288 │
+│ validation / rule_order      │         274/288 │
+│ validation / symbol_rename   │         278/288 │
+│ validation / steps_plus_one  │         278/288 │
+│ validation / irrelevant_edge │         281/288 │
+│ deep / adapter_off           │          21/800 │
+│ deep / rule_order            │         586/800 │
+│ deep / symbol_rename         │         573/800 │
+│ deep / steps_plus_one        │         533/800 │
+│ deep / irrelevant_edge       │         539/800 │
+└──────────────────────────────┴─────────────────┘
+early: relevant follows 106/106 matched edits; two-target cases 53/53
+critical: relevant follows 17/70 matched edits; two-target cases 6/31
+Held-out early readout: R probe 96.6% (adequate), C probe 96.6% (adequate); interpretation threshold 92.0%
+step-002500 native deep complete trajectories: 12/64
+step-002500 Steps-long late paired change, same token count: +0.4% across 56 mappings
+step-003250 native deep complete trajectories: 3/64
+step-003250 Steps-long late paired change, same token count: -0.4% across 56 mappings
+step-003750 native deep complete trajectories: 8/64
+step-003750 Steps-long late paired change, same token count: -0.4% across 56 mappings
+step-003250 versus step-002500: deep prefix longer 22, shorter 31, same 11
+step-003750 versus step-002500: deep prefix longer 18, shorter 24, same 22
+Saved eval/pointer_mechanism/matched-2500-3250-3750-20261004T001803Z-552/results
