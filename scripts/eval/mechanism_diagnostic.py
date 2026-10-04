@@ -3,6 +3,7 @@
 import argparse
 from collections import defaultdict
 from datetime import datetime, timezone
+import gc
 from importlib.metadata import version
 import json
 from pathlib import Path
@@ -18,6 +19,7 @@ from rich.table import Table
 from scripts.dataset.pointer import PointerExample, SYMBOLS
 from scripts.dataset.symbols import validate_prompt_tokens
 from scripts.eval.loop_metrics import write_csv
+from scripts.eval.mechanism_comparison import comparison_cases, comparison_checkpoint, summarize_comparison
 from scripts.eval.mechanism_metrics import (attention_rows, attention_summary, baseline_case,
                                              baseline_summary, directed_summary, first_error,
                                              paired_summary)
@@ -150,6 +152,8 @@ def main() -> None:
     root = Path(__file__).resolve().parents[2]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", type=Path, required=True)
+    parser.add_argument("--comparison-model", type=Path, action="append", default=[],
+                        help="Additional compatible checkpoints on the identical selected examples")
     parser.add_argument("--validation", type=Path, default=root / "data/pointer/seed-17/validation.jsonl")
     parser.add_argument("--deep", type=Path, default=root / "data/pointer/seed-17/depth_test.jsonl")
     parser.add_argument("--device", choices=("cpu", "cuda", "mps"), default="cpu")
@@ -163,9 +167,15 @@ def main() -> None:
     args = parser.parse_args()
     if min(args.fit_per_depth, args.eval_per_depth, args.deep_per_depth, args.threads) < 1 or args.output.exists():
         parser.error("Positive cohort sizes/threads and a new output directory required")
-    for name in ("recurrent_config.json", "adapter_model.pt", "tokenizer.json"):
-        if not (args.model / name).is_file():
-            parser.error(f"Missing checkpoint file: {args.model / name}")
+    checkpoint_paths = [args.model, *args.comparison_model]
+    if len({str(path.resolve()) for path in checkpoint_paths}) != len(checkpoint_paths):
+        parser.error("Comparison checkpoints must be distinct")
+    if len({path.name for path in checkpoint_paths}) != len(checkpoint_paths):
+        parser.error("Comparison checkpoint directory names must be distinct")
+    for checkpoint in checkpoint_paths:
+        for name in ("recurrent_config.json", "adapter_model.pt", "tokenizer.json"):
+            if not (checkpoint / name).is_file():
+                parser.error(f"Missing checkpoint file: {checkpoint / name}")
     if args.device == "cuda" and not torch.cuda.is_available():
         parser.error("CUDA unavailable")
     if args.device == "mps" and not torch.backends.mps.is_available():
@@ -213,10 +223,17 @@ def main() -> None:
         "adapter_sha256": sha256_file(args.model / "adapter_model.pt"),
         "checkpoint_metadata_sha256": sha256_file(args.model / "recurrent_config.json"),
         "tokenizer_sha256": sha256_file(args.model / "tokenizer.json"),
+        "comparison_checkpoints": {path.name: {
+            "path": str(path.resolve()),
+            "adapter_sha256": sha256_file(path / "adapter_model.pt"),
+            "metadata_sha256": sha256_file(path / "recurrent_config.json"),
+            "tokenizer_sha256": sha256_file(path / "tokenizer.json")}
+            for path in checkpoint_paths},
         "source_sha256": {str(path.relative_to(root)): sha256_file(path) for path in
                           [Path(__file__), Path(__file__).with_name("mechanism_variants.py"),
                            Path(__file__).with_name("mechanism_recording.py"),
                            Path(__file__).with_name("mechanism_metrics.py"),
+                           Path(__file__).with_name("mechanism_comparison.py"),
                            Path(__file__).with_name("pointer_probes.py"),
                            root / "scripts/recurrent_qwen/model.py",
                            root / "scripts/recurrent_qwen/checkpoint.py",
@@ -353,17 +370,52 @@ def main() -> None:
     _write_rows(args.output / "first_error_risk.csv", risk)
     input_path = args.output / "inputs.jsonl"
     input_path.write_text("".join(json.dumps(item) + "\n" for item in inputs))
+    selected = [(record["group"], record["task"]) for record in evaluated]
+    checkpoint_order = [path.name for path in checkpoint_paths]
+    original_by_id = {record["task"].example_id: record["rows"] for record in evaluated}
+    comparison_rows, prefix_rows, comparison_inputs = comparison_checkpoint(
+        model, tokenizer, spec, selected, args.model.name,
+        original_rows=original_by_id, console=console)
     if trainable_before != {name: parameter.requires_grad for name, parameter in model.named_parameters()}:
         raise ValueError("Adapter ablation did not restore the original gradient scope")
-    for filename, key in (("adapter_model.pt", "adapter_sha256"),
-                          ("recurrent_config.json", "checkpoint_metadata_sha256"),
-                          ("tokenizer.json", "tokenizer_sha256")):
-        if sha256_file(args.model / filename) != metadata[key]:
-            raise ValueError(f"Checkpoint file changed during read-only diagnostic: {filename}")
+    del model, tokenizer, recorder, initial_states
+    gc.collect()
+    if args.device == "cuda":
+        torch.cuda.empty_cache()
+    for checkpoint in args.comparison_model:
+        with console.status(f"Loading comparison checkpoint {checkpoint.name}…"):
+            compared, compared_tokenizer, compared_spec = load_recurrent_checkpoint(
+                checkpoint, device=args.device, download=args.download)
+        if compared_spec != spec or sha256_file(checkpoint / "tokenizer.json") != metadata["tokenizer_sha256"]:
+            raise ValueError(f"Comparison checkpoint has different model/tokenizer specification: {checkpoint}")
+        extra_rows, extra_prefix, extra_inputs = comparison_checkpoint(
+            compared, compared_tokenizer, compared_spec, selected, checkpoint.name,
+            original_rows=None, console=console)
+        comparison_rows.extend(extra_rows)
+        prefix_rows.extend(extra_prefix)
+        comparison_inputs.extend(extra_inputs)
+        del compared, compared_tokenizer
+        gc.collect()
+        if args.device == "cuda":
+            torch.cuda.empty_cache()
+    _write_rows(args.output / "comparison.csv", comparison_rows)
+    _write_rows(args.output / "comparison_cases.csv", comparison_cases(comparison_rows))
+    _write_rows(args.output / "comparison_prefix.csv", prefix_rows)
+    (args.output / "comparison_inputs.jsonl").write_text(
+        "".join(json.dumps(item) + "\n" for item in comparison_inputs))
+    for checkpoint in checkpoint_paths:
+        expected = metadata["comparison_checkpoints"][checkpoint.name]
+        for filename, key in (("adapter_model.pt", "adapter_sha256"),
+                              ("recurrent_config.json", "metadata_sha256"),
+                              ("tokenizer.json", "tokenizer_sha256")):
+            if sha256_file(checkpoint / filename) != expected[key]:
+                raise ValueError(f"Checkpoint file changed during read-only diagnostic: {checkpoint / filename}")
     metadata.update(status="complete", completed_utc=datetime.now(timezone.utc).isoformat(),
                     baseline=baseline, paired_controls=paired_summary(paired),
                     directed_edges=directed_summary(directed),
                     representation_probe=probe_summary, attention=attention_summary(attention),
+                    matched_comparison=summarize_comparison(comparison_rows, checkpoint_order,
+                                                            train_max_depth, args.seed),
                     artifacts_sha256={path.name: sha256_file(path) for path in args.output.iterdir()
                                       if path.is_file() and path.name != "summary.json"})
     summary_path.write_text(json.dumps(metadata, indent=2) + "\n")
@@ -392,6 +444,18 @@ def main() -> None:
                   f"C probe {gate['c_probe_early_accuracy']:.1%} "
                   f"({'adequate' if gate['c_probe_adequate'] else 'inconclusive'}); "
                   f"interpretation threshold {gate['minimum_for_late_readout_interpretation']:.1%}")
+    for name in checkpoint_order:
+        value = metadata["matched_comparison"]["checkpoints"][name]["deep"]
+        console.print(f"{name} native deep complete trajectories: {value['complete']}/{value['examples']}")
+        late = metadata["matched_comparison"]["cue_pairs"][name]["fixed_long_cue"]["valid_segments"]["late_after_train_max"]
+        same_length_change = late["same_token_length_mean_case_accuracy_difference"]
+        rendered_change = f"{same_length_change:+.1%}" if same_length_change is not None else "n/a"
+        console.print(f"{name} Steps-long late paired change, same token count: "
+                      f"{rendered_change} across {late['same_token_length_cases']} mappings")
+    for name, values in metadata["matched_comparison"]["checkpoint_pairs_vs_first"].items():
+        deep = values["deep"]
+        console.print(f"{name} versus {checkpoint_order[0]}: deep prefix longer {deep['longer_correct_prefix']}, "
+                      f"shorter {deep['shorter_correct_prefix']}, same {deep['same_correct_prefix']}")
     console.print(f"[green]Saved[/green] {args.output}")
 
 

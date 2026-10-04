@@ -21,6 +21,7 @@ from scripts.eval.mechanism_recording import (InternalRecorder, adapters_disable
                                               fit_ridge_readout, preloop_symbol, recurrent_answer_vectors,
                                               rule_symbol_positions)
 from scripts.eval.mechanism_metrics import directed_summary
+from scripts.eval.mechanism_comparison import comparison_cases, comparison_prompts, summarize_comparison
 from scripts.eval.profiling import distribution, module_ranges, training_update
 from scripts.training.data import EncodedExample, encode_tasks
 
@@ -345,8 +346,13 @@ def test_internal_recording_adapter_ablation_and_probe_are_read_only(tiny_checkp
 
 
 def test_mechanism_suite_tiny_checkpoint(tmp_path, tiny_checkpoint):
+    import shutil
     checkpoint, _, _, _ = tiny_checkpoint
     before = {path.name: path.read_bytes() for path in checkpoint.iterdir() if path.is_file()}
+    comparison_one = tmp_path / 'step-003250'
+    comparison_two = tmp_path / 'step-003750'
+    shutil.copytree(checkpoint, comparison_one)
+    shutil.copytree(checkpoint, comparison_two)
     from scripts.eval.pointer_task import sha256_file
     val = [generate_example(1200 + i, depth, 'validation', i)
            for i, depth in enumerate([1, 1, 2, 2])]
@@ -360,6 +366,7 @@ def test_mechanism_suite_tiny_checkpoint(tmp_path, tiny_checkpoint):
     output = tmp_path/'mechanism'
     subprocess.run([sys.executable,'-m','scripts.eval.mechanism_diagnostic',
                     '--model',str(checkpoint),'--validation',str(valpath),'--deep',str(deeppath),
+                    '--comparison-model',str(comparison_one),'--comparison-model',str(comparison_two),
                     '--fit-per-depth','1','--eval-per-depth','1','--deep-per-depth','1',
                     '--threads','1','--output',str(output)],cwd=ROOT,capture_output=True,text=True,check=True)
     summary = json.loads((output/'summary.json').read_text())
@@ -372,7 +379,64 @@ def test_mechanism_suite_tiny_checkpoint(tmp_path, tiny_checkpoint):
     assert len(list(csv.DictReader((output/'paired.csv').open()))) == 5 * (1 + 2 + 3)
     assert summary['paired_controls']['deep']['adapter_off']['paired_steps'] == 3
     assert len(list(csv.DictReader((output/'attention.csv').open()))) == 6
+    comparison=list(csv.DictReader((output/'comparison.csv').open()))
+    prefix=list(csv.DictReader((output/'comparison_prefix.csv').open()))
+    assert len(comparison)==(1+2+3*3)*3
+    assert len(prefix)==2*3*3
+    assert all(row['prefix_invariant']=='True' for row in prefix)
+    assert summary['matched_comparison']['checkpoint_pairs_vs_first']['step-003250']['deep']['same_correct_prefix']==1
+    assert summary['matched_comparison']['cue_pairs']['checkpoint']['trained_cue']['valid_steps']==2
+    assert summary['matched_comparison']['cue_pairs']['checkpoint']['trained_cue']['beyond_displayed_horizon_stress_steps']==1
     assert before == {path.name: path.read_bytes() for path in checkpoint.iterdir() if path.is_file()}
+    assert before == {path.name: path.read_bytes() for path in comparison_one.iterdir() if path.is_file()}
+    assert before == {path.name: path.read_bytes() for path in comparison_two.iterdir() if path.is_file()}
+
+
+def test_same_mapping_horizon_prompts_change_only_steps():
+    task=generate_example(1400, 12, 'depth_test', 0)
+    variants=comparison_prompts(task, 6, 16)
+    assert variants['native']==(12,task.prompt)
+    for cue, (displayed,prompt) in variants.items():
+        assert prompt.splitlines()[:2]==task.prompt.splitlines()[:2]
+        assert prompt.splitlines()[2]==f'Steps: {displayed}'
+        assert prompt.splitlines()[3]=='Answer:'
+    assert variants['trained_cue'][0]==6 and variants['fixed_long_cue'][0]==16
+    with pytest.raises(ValueError):
+        comparison_prompts(task, 12, 16)
+
+
+def test_matched_comparison_counts_cases_not_loop_rows():
+    rows=[]
+    target={'validation':['A','B'], 'deep':['A','B','C']}
+    for checkpoint in ('first','later'):
+        for group in ('validation','deep'):
+            depth=len(target[group])
+            cues=('native','trained_cue','fixed_long_cue') if group=='deep' else ('native',)
+            for cue in cues:
+                displayed={'native':depth,'trained_cue':2,'fixed_long_cue':4}[cue]
+                predictions=list(target[group])
+                if checkpoint=='later' and cue=='native':
+                    predictions[-1]='X'
+                if cue=='trained_cue' and checkpoint=='first':
+                    predictions[-1]='X'
+                for loop,(expected,predicted) in enumerate(zip(target[group],predictions),1):
+                    rows.append({'checkpoint':checkpoint,'example_id':group,'group':group,
+                                 'task_depth':depth,'cue':cue,'displayed_steps':displayed,
+                                 'initial_state':'Z','input_tokens':10,'loop':loop,'target':expected,
+                                 'prediction':predicted,'correct':expected==predicted,
+                                 'within_displayed_horizon':loop<=displayed})
+    result=summarize_comparison(rows,['first','later'],2,17)
+    assert result['checkpoint_pairs_vs_first']['later']['deep']['paired_examples']==1
+    assert result['checkpoint_pairs_vs_first']['later']['deep']['shorter_correct_prefix']==1
+    assert result['checkpoint_pairs_vs_first']['later']['deep']['mean_correct_prefix_change']==-1
+    cue=result['cue_pairs']['later']['fixed_long_cue']
+    assert cue['valid_segments']['late_after_train_max']['paired_examples']==1
+    assert cue['valid_segments']['late_after_train_max']['mean_case_accuracy_difference']==1
+    assert result['cue_pairs']['first']['trained_cue']['beyond_displayed_horizon_stress_steps']==1
+    cases=comparison_cases(rows)
+    trained=next(row for row in cases if row['checkpoint']=='first' and row['cue']=='trained_cue')
+    assert trained['first_error_loop']==3 and trained['first_error_within_displayed_horizon'] is False
+    assert trained['valid_prefix_correct'] is True
 
 
 def test_directed_summary_requires_matched_prefixes_and_both_targets():

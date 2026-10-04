@@ -82,6 +82,8 @@ Write human-readable reports in `docs/experiments/` as Markdown. Keep machine-re
 
 `python -m scripts.eval.loop_test --model <step directory>` evaluates every example through a common loop budget, exporting nominal losses/accuracies, full trajectories, first-error and correct-prefix diagnostics, and the depth-by-loop matrix under `eval/pointer_loops/`. See [commands and metric definitions](evaluation.md). Its original-task final-target sweep remains observational. The separate `python -m scripts.eval.overscaling_test` CLI transforms inputs into absorbing-terminal tasks and computes explicitly scoped dynamics; it must not relabel the original runs as terminal experiments.
 
+The [integrated failure diagnostic](diagnostics_and_performance.md#integrated-frozen-mechanism-diagnostic) uses a smaller fixed development cohort for same-mapping prompt interventions and matched checkpoints. It records complete nominal trajectories separately from outputs produced after a prompt's displayed `Steps`; the latter are stress observations, not ordinary task accuracy. Checkpoint and cue comparisons use per-mapping pairs and case-level uncertainty rather than treating multiple loops from one mapping as independent trials.
+
 
 ## Implemented terminal dynamics and future knowledge retention
 
