@@ -1,0 +1,94 @@
+Results: eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322
+Pointer task · full recurrent loop evaluation
+1,000 examples · 24 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322/step-004500
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:37,  7.61it/s]Loading weights:  34%|███▍      | 100/290 [00:00<00:00, 509.74it/s]Loading weights:  56%|█████▌    | 161/290 [00:00<00:00, 510.04it/s]Loading weights:  79%|███████▉  | 229/290 [00:00<00:00, 560.06it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 552.25it/s]
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:01:53 0:00:00 8.79 q/s · 210.89 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 13    │ 125      │ 98.22%        │ 90.40%            │ 90.40%         │
+│ 14    │ 125      │ 95.94%        │ 61.60%            │ 62.40%         │
+│ 15    │ 125      │ 90.03%        │ 8.80%             │ 12.00%         │
+│ 16    │ 125      │ 85.35%        │ 0.80%             │ 5.60%          │
+│ 17    │ 125      │ 81.13%        │ 0.00%             │ 2.40%          │
+│ 18    │ 125      │ 78.98%        │ 0.00%             │ 1.60%          │
+│ 19    │ 125      │ 74.82%        │ 0.00%             │ 5.60%          │
+│ 20    │ 125      │ 64.48%        │ 0.00%             │ 6.40%          │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 20.20% · final accuracy: 23.30%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322/step-004500
+Pointer task · full recurrent loop evaluation
+1,000 examples · 24 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322/step-005000
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  37%|███▋      | 108/290 [00:00<00:00, 1079.39it/s]Loading weights:  96%|█████████▌| 279/290 [00:00<00:00, 1431.46it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1405.84it/s]
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:01:51 0:00:00 8.94 q/s · 214.64 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 13    │ 125      │ 98.03%        │ 94.40%            │ 95.20%         │
+│ 14    │ 125      │ 96.23%        │ 75.20%            │ 75.20%         │
+│ 15    │ 125      │ 90.93%        │ 16.80%            │ 16.80%         │
+│ 16    │ 125      │ 85.25%        │ 3.20%             │ 7.20%          │
+│ 17    │ 125      │ 80.80%        │ 0.80%             │ 4.00%          │
+│ 18    │ 125      │ 78.09%        │ 0.00%             │ 2.40%          │
+│ 19    │ 125      │ 74.11%        │ 0.00%             │ 4.00%          │
+│ 20    │ 125      │ 64.84%        │ 0.00%             │ 9.60%          │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 23.80% · final accuracy: 26.80%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322/step-005000
+Pointer task · full recurrent loop evaluation
+1,000 examples · 24 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322/step-005500
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:29,  9.82it/s]Loading weights:  96%|█████████▌| 279/290 [00:00<00:00, 1572.13it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1371.91it/s]
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:01:51 0:00:00 8.96 q/s · 214.98 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 13    │ 125      │ 98.58%        │ 91.20%            │ 91.20%         │
+│ 14    │ 125      │ 95.66%        │ 58.40%            │ 60.80%         │
+│ 15    │ 125      │ 88.27%        │ 5.60%             │ 8.80%          │
+│ 16    │ 125      │ 84.00%        │ 0.80%             │ 8.00%          │
+│ 17    │ 125      │ 78.68%        │ 0.80%             │ 3.20%          │
+│ 18    │ 125      │ 76.76%        │ 0.00%             │ 1.60%          │
+│ 19    │ 125      │ 73.85%        │ 0.00%             │ 3.20%          │
+│ 20    │ 125      │ 63.68%        │ 0.00%             │ 5.60%          │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 19.60% · final accuracy: 22.80%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322/step-005500
+Pointer task · full recurrent loop evaluation
+1,000 examples · 24 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322/step-007500
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  34%|███▍      | 100/290 [00:00<00:00, 957.15it/s]Loading weights:  96%|█████████▌| 279/290 [00:00<00:00, 1385.79it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1370.94it/s]
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1000/1000 0:01:51 0:00:00 8.94 q/s · 214.46 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 13    │ 125      │ 94.40%        │ 47.20%            │ 48.80%         │
+│ 14    │ 125      │ 87.71%        │ 3.20%             │ 4.00%          │
+│ 15    │ 125      │ 83.36%        │ 0.00%             │ 3.20%          │
+│ 16    │ 125      │ 77.25%        │ 0.00%             │ 5.60%          │
+│ 17    │ 125      │ 73.18%        │ 0.00%             │ 4.80%          │
+│ 18    │ 125      │ 69.20%        │ 0.00%             │ 6.40%          │
+│ 19    │ 125      │ 67.87%        │ 0.00%             │ 5.60%          │
+│ 20    │ 125      │ 62.08%        │ 0.00%             │ 4.00%          │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 6.30% · final accuracy: 10.30%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322/step-007500
+┏━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┓
+┃ Checkpoint  ┃ 13    ┃ 14    ┃ 15    ┃ 16   ┃ 17   ┃ 18   ┃ 19   ┃ 20   ┃
+┡━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━┩
+│ step-005000 │ 94.4% │ 75.2% │ 16.8% │ 3.2% │ 0.8% │ 0.0% │ 0.0% │ 0.0% │
+│ step-004500 │ 90.4% │ 61.6% │ 8.8%  │ 0.8% │ 0.0% │ 0.0% │ 0.0% │ 0.0% │
+│ step-005500 │ 91.2% │ 58.4% │ 5.6%  │ 0.8% │ 0.8% │ 0.0% │ 0.0% │ 0.0% │
+│ step-007500 │ 47.2% │ 3.2%  │ 0.0%  │ 0.0% │ 0.0% │ 0.0% │ 0.0% │ 0.0% │
+└─────────────┴───────┴───────┴───────┴──────┴──────┴──────┴──────┴──────┘
+Saved comparison CSVs and provenance to eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322

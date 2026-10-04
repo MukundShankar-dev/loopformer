@@ -1,0 +1,46 @@
+{
+  "step-005000": {
+    "checkpoint": "/home/mukund/loopformer/models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-005000",
+    "data_sha256": "638af21ed916b523e589db030e3f422901db6d4d7a969d02290ca3e8d8b2a246",
+    "loops": 24,
+    "dtype": "float32",
+    "batch_size": 16,
+    "scoring": "allowed_symbol_argmax_at_each_loop",
+    "prompt_format": "dataset_raw",
+    "summary_sha256": "a2bc8f3af576dac99b0a3b6e16ad468441ed78c0f4247b6ee9bfa06593ff6818",
+    "trajectories_sha256": "b67a8b0d57f479ebd2072b6aa9cb9c1e01c949fd5209aca4ab4bf2659b4cf9f9"
+  },
+  "step-004500": {
+    "checkpoint": "/home/mukund/loopformer/models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-004500",
+    "data_sha256": "638af21ed916b523e589db030e3f422901db6d4d7a969d02290ca3e8d8b2a246",
+    "loops": 24,
+    "dtype": "float32",
+    "batch_size": 16,
+    "scoring": "allowed_symbol_argmax_at_each_loop",
+    "prompt_format": "dataset_raw",
+    "summary_sha256": "67949986d6d48aa8dc859b7b3fc05a520d626cd1729acdf434bdb150a7b2dee5",
+    "trajectories_sha256": "f6bb2d98919bfbf04a16e82ddfe2606eaa107ccc541dc82fada2423cc5b6dd40"
+  },
+  "step-005500": {
+    "checkpoint": "/home/mukund/loopformer/models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-005500",
+    "data_sha256": "638af21ed916b523e589db030e3f422901db6d4d7a969d02290ca3e8d8b2a246",
+    "loops": 24,
+    "dtype": "float32",
+    "batch_size": 16,
+    "scoring": "allowed_symbol_argmax_at_each_loop",
+    "prompt_format": "dataset_raw",
+    "summary_sha256": "015633e7fde50996acc9c04afbd3d8c6e95d4f4776483e4352588cd051f155ee",
+    "trajectories_sha256": "26b2725724572f424abd2bae05e7bfcd17b563c9aa74e52b1fb572b013b85ec5"
+  },
+  "step-007500": {
+    "checkpoint": "/home/mukund/loopformer/models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-007500",
+    "data_sha256": "638af21ed916b523e589db030e3f422901db6d4d7a969d02290ca3e8d8b2a246",
+    "loops": 24,
+    "dtype": "float32",
+    "batch_size": 16,
+    "scoring": "allowed_symbol_argmax_at_each_loop",
+    "prompt_format": "dataset_raw",
+    "summary_sha256": "0f2098d16980ddc72f06cb3bbbc5611e26b45674b98da1b185ee83e77093e199",
+    "trajectories_sha256": "f747af524b173272990c1358fcec172e44ab95bd141872780f4a6465d69e6bae"
+  }
+}
