@@ -38,6 +38,8 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--output", type=Path, help="New results directory; default eval/pointer_task/<timestamp>-<model>")
+    from scripts.eval.tracking import add_tracking_arguments, report_saved_run
+    add_tracking_arguments(parser)
     args = parser.parse_args()
     if min(args.batch_size, args.max_new_tokens, args.threads) < 1 or (args.limit is not None and args.limit < 1):
         parser.error("Batch size, token budget, thread count, and limit must be positive")
@@ -179,6 +181,8 @@ def main() -> None:
     console.print(f"Invalid answers: {metrics['invalid_answers']} · token-budget stops: {metrics['token_budget_stops']}")
     console.print(f"{metrics['generated_tokens_per_second']:.2f} generated tok/s · {metrics['questions_per_second']:.2f} questions/s")
     console.print(f"Saved predictions.csv and summary.json to {output.resolve()}")
+
+    report_saved_run(output, args)
 
 
 if __name__ == "__main__":

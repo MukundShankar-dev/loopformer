@@ -35,3 +35,5 @@ The [learned-completion ablation](experiments/stage1_learned_completion.md) reco
 The [fixed-prompt failure investigation](experiments/stage1_fixed_prompt_review.md) audits the new pretrained run, locates the stopping supervision gap, measures conditional transition failure and threshold limits, and relates the findings to primary literature.
 
 The [paired-Steps probe](experiments/stage1_paired_steps.md) controls mapping/start and confirms requested-count effects on late execution and failure to extend stop timing; it also records working-state drift without claiming a hidden-state fixed point.
+
+The [depth-12 checkpoint progression](experiments/stage1_depth12_progression.md) finds regression after step 5,000 and motivates a matched-count probe before further training.

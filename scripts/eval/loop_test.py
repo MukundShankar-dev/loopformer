@@ -39,6 +39,8 @@ def main(*, overscaling: bool = False) -> None:
                         help="Predicted margin / entropy / learned probability threshold")
     parser.add_argument("--head", type=Path, help="Trained halting-head directory for learned stopping")
     parser.add_argument("--output", type=Path, help="New output directory; default eval/<category>/<timestamp>-<run>-<step>")
+    from scripts.eval.tracking import add_tracking_arguments, report_saved_run
+    add_tracking_arguments(parser)
     args = parser.parse_args()
     if args.stop_policy and args.batch_size != 1:
         parser.error("Adaptive stopping requires --batch-size 1 for actual per-example compute savings")
@@ -201,6 +203,7 @@ def main(*, overscaling: bool = False) -> None:
         console.print(f"[bold]Stopped accuracy: {adaptive['accuracy']:.2%}; mean loops: {adaptive['mean_loops']:.2f}; "
                       f"p95 latency: {adaptive['p95_latency_seconds']:.4f}s[/bold]")
         console.print(f"Saved stopped trajectories.csv, decisions.csv, summary.json to {output.resolve()}")
+        report_saved_run(output, args)
         return
     device = torch.device(args.device)
     synchronize(device)
@@ -258,6 +261,8 @@ def main(*, overscaling: bool = False) -> None:
     console.print(f"Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to {output.resolve()}")
     if overscaling:
         console.print("Also saved tasks.jsonl, transitions.csv, transition_rates.csv, survival.csv, and solutions.csv")
+
+    report_saved_run(output, args)
 
 
 if __name__ == "__main__":

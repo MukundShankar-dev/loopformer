@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Matched, forced-loop comparison; no training or learned stopping.
 set -euo pipefail
+export WANDB_MODE="${WANDB_MODE:-online}"
+export WANDB_PROJECT="${WANDB_PROJECT:-loopformer}"
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 if [[ $# -ne 0 ]]; then
   echo 'Usage: bash compare_depth12.sh' >&2

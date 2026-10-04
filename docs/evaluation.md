@@ -412,3 +412,27 @@ The timestamped `eval/pointer_loops/depth12-checkpoint-comparison-*/` directory 
 - `comparison.json`: input artifact hashes and evaluation provenance.
 
 Only loops through the requested depth contribute to these diagnostics. The aggregator rejects mismatched datasets, example identities/targets and core evaluation settings. This comparison tests whether additional optimization extends or shrinks R's reliable horizon; it does not identify the internal cause or establish that another epoch will help. Pretrained execution of this launcher remains pending. All four checkpoint binaries and the dataset must be present; missing files or evaluation failures stop the launcher. Existing artifacts are preserved.
+
+## W&B coverage for standalone evaluations
+
+`naive_test`, `loop_test` (including learned stopping), `overscaling_test`, `paired_steps`, and `compare_checkpoints` accept `--wandb-mode online|offline|disabled`, `--wandb-project` (default `loopformer`) and `--wandb-entity`. They also honor `WANDB_MODE`, `WANDB_PROJECT`, and `WANDB_ENTITY`. Direct CLIs default to disabled. The current `eval_depth12.sh`, `compare_depth12.sh` and `probe_depth12.sh` wrappers default to online; use `WANDB_MODE=disabled` to retain local-only behavior. Dry runs never initialize W&B.
+
+A completed evaluation is published after local files are saved. Each evaluation gets a separate W&B run with saved scalar metrics, provenance and checksums, diagnostic CSV tables, and a versioned artifact containing the summary and all top-level CSVs. Comparison runs additionally plot complete trajectories by requested depth and conditional transition accuracy by loop for each task depth. Interactive tables show at most 5,000 rows and record both shown/total counts; full rows remain in the artifact. Large trajectory/prediction CSVs are artifact-only. Model tensors and checkpoint directories are never uploaded. These CSVs can contain task text/predictions; they are experimental data, not model weights.
+
+`wandb_eval_run.json` stores tracking identity locally. Uploads are retrospective, so SDK system monitoring is disabled and inference timings remain those in the saved summary. This does not add live evaluation progress charts or kernel profiling. If upload fails, inference artifacts remain available and the command fails visibly. Retry the uploader rather than rerunning inference. Repeated publication creates a new tracking run; it does not resume or silently replace an earlier upload.
+
+Publish the already-completed comparison and its four nested evaluations without model loading:
+
+```bash
+python -m scripts.eval.tracking \
+  --results eval/pointer_loops/depth12-checkpoint-comparison-20261004T191905Z-1322 \
+  --recursive --wandb-mode online
+```
+
+The same uploader can publish other completed diagnostic directories containing `summary.json` and CSVs. Their existing metric semantics are preserved; specialized plots are currently provided for checkpoint comparisons. No historical training run is imported by this evaluator utility.
+
+## Matched requested counts after depth-12 training
+
+Run `bash probe_depth12.sh --dry-run`, then `bash probe_depth12.sh`. The existing paired-Steps evaluator now accepts `--depths` and `--loops`; historical defaults remain unchanged. The new launcher fixes 32 depth-20 seed-47 development mappings, counts 12/14/16/18/20, 24 loops, batch 8, and checkpoints 5,000/7,500. All counts are two-digit inputs. It saves exact task variants, checkpoint/data/source hashes, per-loop predictions/stop logits and working-state norms/update norms/cosines under `eval/pointer_probes/depth12-paired-*/`. Each checkpoint gets W&B coverage; stdout/stderr share one local log. Missing checkpoints and failures stop the launcher.
+
+Interpret comparisons only within both prompts' nominal horizons; extra loops after a smaller requested count are stress observations. The largest requested count is the paired-summary anchor. No new training or stopping-policy calibration is performed. See the [checkpoint progression report](experiments/stage1_depth12_progression.md) for the reason to run this diagnostic.

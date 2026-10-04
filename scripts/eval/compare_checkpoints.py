@@ -60,6 +60,8 @@ def compare_runs(paths: list[Path]) -> tuple[list[dict], list[dict], list[dict],
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--results', type=Path, required=True)
+    from scripts.eval.tracking import add_tracking_arguments, report_saved_run
+    add_tracking_arguments(parser)
     args = parser.parse_args()
     # The already-selected checkpoint is the paired reference, not an OOD selection.
     paths = [args.results / f'step-{step:06d}' for step in (5000, 4500, 5500, 7500)]
@@ -73,6 +75,8 @@ def main() -> None:
         table.add_row(path.name, *[f'{values[d]:.1%}' for d in range(13, 21)])
     Console().print(table)
     Console().print(f'Saved comparison CSVs and provenance to {args.results}')
+
+    report_saved_run(args.results, args)
 
 
 if __name__ == '__main__':

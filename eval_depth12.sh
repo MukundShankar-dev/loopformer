@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export WANDB_MODE="${WANDB_MODE:-online}"
+export WANDB_PROJECT="${WANDB_PROJECT:-loopformer}"
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 export POINTER_DATA_ROOT=data/pointer/seed-47-depth12-gaps
 export POINTER_LOOPS=24

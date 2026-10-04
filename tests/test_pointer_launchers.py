@@ -126,3 +126,23 @@ def test_depth12_smoke_is_separate_and_propagates_failure(launcher_repo):
     assert '--smoke-test' in calls[0]
     assert calls[0][calls[0].index('--config')+1]=='configs/stage1_pointer_depth12_gaps.json'
     assert '-smoke-' in calls[0][calls[0].index('--output')+1]
+
+
+@pytest.mark.parametrize('fail_call', [None, 1, 2])
+def test_depth12_probe_matches_checkpoints_and_preserves_failure(launcher_repo, fail_call):
+    root, old = launcher_repo
+    shutil.copy(Path(__file__).resolve().parents[1] / 'probe_depth12.sh', root)
+    run = root / 'models/stage1_pointer/depth12-fixed-prompt-seed47-gaps'
+    for step in ('005000', '007500'):
+        shutil.copytree(old / 'step-003250', run / f'step-{step}')
+    result = subprocess.run(['bash', 'probe_depth12.sh'], cwd=root,
+                            env={**os.environ, **({'FAIL_CALL': str(fail_call)} if fail_call else {})},
+                            capture_output=True, text=True)
+    assert result.returncode == (7 if fail_call else 0)
+    calls = [json.loads(x) for x in (root / 'calls.jsonl').read_text().splitlines()]
+    assert len(calls) == (fail_call or 2)
+    for i, call in enumerate(calls):
+        assert call[call.index('--model') + 1].endswith(('step-005000', 'step-007500')[i])
+        assert call[call.index('--depths') + 1:call.index('--loops')] == ['12','14','16','18','20']
+    if fail_call:
+        assert 'eval failed' in next((root / 'eval/pointer_probes').glob('*/run.log')).read_text()
