@@ -38,3 +38,6 @@ data/
 
 # Large optional profiler traces; small summaries/operator tables remain trackable.
 /eval/pointer_profiles/**/trace.json*
+
+# W&B SDK cache; keep wandb_run.json provenance trackable.
+wandb/

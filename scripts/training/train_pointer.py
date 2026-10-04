@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 from importlib.metadata import version
 import json
+import os
 from pathlib import Path
 import platform
 import subprocess
@@ -26,6 +27,11 @@ def main() -> None:
     parser.add_argument("--smoke-test", action="store_true", help="Ten disposable updates and small validation; writes a separate run")
     parser.add_argument("--download", action="store_true", help="Allow missing base model/tokenizer files to download")
     parser.add_argument("--dry-run", action="store_true", help="Validate config/data/tokenizer and print the budget; do not load model weights or write output")
+    parser.add_argument("--wandb-mode", choices=("online", "offline", "disabled"),
+                        default=os.environ.get("WANDB_MODE", "disabled"))
+    parser.add_argument("--wandb-project", default=os.environ.get("WANDB_PROJECT", "loopformer"))
+    parser.add_argument("--wandb-entity", default=os.environ.get("WANDB_ENTITY"))
+    parser.add_argument("--wandb-name", default=os.environ.get("WANDB_NAME"))
     args = parser.parse_args()
     if args.allow_batch_change and not args.resume:
         parser.error("--allow-batch-change requires --resume")
@@ -231,17 +237,21 @@ def main() -> None:
             dashboard.add_row("Optimization", f"grad norm {state['gradient_norm_before_clip']:.3g} · lr {state['learning_rate']:.3g}")
             dashboard.add_row("Resources", f"{state['examples_per_second']:.2f} examples/s · host RAM peak {state['peak_process_rss_bytes'] / 2**30:.2f} GiB")
             if "cuda_peak_bytes" in state:
-                dashboard.add_row("CUDA tensors", f"allocated {state['cuda_allocated_bytes'] / 2**30:.2f} GiB · peak {state['cuda_peak_bytes'] / 2**30:.2f} GiB")
+                dashboard.add_row("CUDA tensors", f"between updates {state['cuda_allocated_bytes'] / 2**30:.2f} GiB · update peak {state['update_peak_allocated_bytes'] / 2**30:.2f} GiB · lifetime peak {state['cuda_peak_bytes'] / 2**30:.2f} GiB")
             dashboard.add_row("Estimated remaining", str(timedelta(seconds=round(state["eta_seconds"]))))
         return Group(Panel(dashboard, title="Stage 1 training"), bar)
 
-    with Live(render(), console=console, refresh_per_second=4) as live:
+    from scripts.training.tracking import tracking_run
+    with tracking_run(output, metadata, config.to_dict(), mode=args.wandb_mode,
+                      project=args.wandb_project, entity=args.wandb_entity, name=args.wandb_name) as tracker, \
+            Live(render(), console=console, refresh_per_second=4) as live:
         def progress(event: dict) -> None:
             state.update(event)
             bar.update(task, completed=state["step"], total=state["total_steps"])
             live.update(render())
         result = train(model, tokenizer, train_items, validation_items, probe_items, config, output, spec, identity,
-                       resume=resume, allow_batch_change=args.allow_batch_change, progress=progress)
+                       resume=resume, allow_batch_change=args.allow_batch_change, progress=progress, event_sink=tracker.log)
+        tracker.summary(result)
         progress({"phase": "Complete", "step": result["step"]})
     (output / "run.json").write_text(json.dumps({**metadata, "status": "complete"}, indent=2) + "\n")
     console.print(f"[green]Run complete.[/green] Last checkpoint: {result['last_checkpoint']}")

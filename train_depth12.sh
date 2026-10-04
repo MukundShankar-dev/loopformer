@@ -11,6 +11,8 @@ if [[ ! -f .venv/bin/activate ]]; then
   exit 1
 fi
 source .venv/bin/activate
+export WANDB_MODE="${WANDB_MODE:-online}"
+export WANDB_PROJECT="${WANDB_PROJECT:-loopformer}"
 export CUBLAS_WORKSPACE_CONFIG=:4096:8
 config=configs/stage1_pointer_depth12_gaps.json
 run_dir=models/stage1_pointer/depth12-fixed-prompt-seed47-gaps
