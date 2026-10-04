@@ -1,0 +1,55 @@
+{
+  "trained_counts": {
+    "depths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "examples": 1125,
+    "trajectory_accuracy": 0.9875555555555555,
+    "accuracy": 0.9697777777777777,
+    "exact_stop_rate": 0.9804444444444445,
+    "joint_success_rate": 0.9697777777777777,
+    "early_stop_rate": 0.016888888888888887,
+    "cap_fallback_rate": 0.0
+  },
+  "held_out_counts": {
+    "depths": [
+      7,
+      9,
+      11
+    ],
+    "examples": 375,
+    "trajectory_accuracy": 0.9733333333333334,
+    "accuracy": 0.9173333333333333,
+    "exact_stop_rate": 0.9413333333333334,
+    "joint_success_rate": 0.9173333333333333,
+    "early_stop_rate": 0.048,
+    "cap_fallback_rate": 0.0
+  },
+  "unseen_depths": {
+    "depths": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "examples": 1000,
+    "trajectory_accuracy": 0.238,
+    "accuracy": 0.003,
+    "exact_stop_rate": 0.0,
+    "joint_success_rate": 0.0,
+    "early_stop_rate": 1.0,
+    "cap_fallback_rate": 0.0
+  }
+}
