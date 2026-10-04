@@ -42,6 +42,8 @@ The completed [mechanism diagnostics](docs/experiments/stage1_integrated_mechani
 
 ## What comes next
 
+The current checkpoint comparison runs with `bash compare_depth12.sh` on the CUDA desktop. See [evaluation instructions and outputs](docs/evaluation.md#depth-12-checkpoint-progression).
+
 The [loop-balanced loss ablation](docs/experiments/stage1_loopbalanced.md) and joint completion training did not improve farther-depth generalization. Further experiments should target a specific unresolved mechanism. [Terminal overscaling evaluation](docs/evaluation.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.
 
 The next major direction is **adaptive inference compute**. Offline oracle/heuristic analysis, opt-in stopped inference, synchronized latency recording, and a gated lightweight head trainer now have code and tests. [The adaptive-compute guide](docs/adaptive_compute.md) is the single source for methods and usage; no pretrained adaptive policy or speedup result has been verified. The original continuing-pointer tasks need explicit completion semantics before answer changes can be interpreted as damage.

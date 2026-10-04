@@ -399,3 +399,16 @@ Use the opt-in [diagnostic commands](diagnostics_and_performance.md#implemented-
 `bash probe_steps.sh` evaluates the existing fixed-prompt step-3250 checkpoint on 32 depth-16 development mappings, each with requested Steps 6, 7, 8, 9, 10, 12, and 16. Only Steps and the corresponding reference targets change; the rule table/start stay identical. `--dry-run` validates variants without loading weights or writing files. The shared evaluator records 20-loop symbol/stop traces and answer-position hidden norm, update norm and cosine to the previous state. `pairs.csv` measures common-prefix prediction agreement against the depth-16 variant, nominal correctness and first threshold crossing. These are offline stop decisions, not actual stopped latency. This controls map identity while testing requested-count/suffix-length effects; hidden-state scalar changes alone do not identify a mechanism.
 
 `bash eval_depth12.sh` evaluates the new selected sparse-count checkpoint via `eval_ckpts.sh`, then aggregates `cohorts.json`: trained requested counts 1–6/8/10/12; held-out requested counts 7/9/11; and unseen recurrent depths 13–20. Full and genuinely stopped evaluation remain separate. Threshold 0.5 and cap 24 are explicit, independent of individual task depth. The test split and seed-29 confirmation are not used. See the [run instructions](training_pointer.md#depth-12-with-held-out-counts-current-desktop-run).
+
+## Depth-12 checkpoint progression
+
+Run `bash compare_depth12.sh` on the CUDA desktop after pulling. It evaluates steps 4500, 5000, 5500 and 7500 of `models/stage1_pointer/depth12-fixed-prompt-seed47-gaps` on the same 1,000 seed-47 depth-13–20 development examples. It uses the existing full-loop evaluator, float32/eager, batch 16, and 24 forced loops. Learned stopping is bypassed. Step 5000 is deliberately rerun under the same invocation settings. No training or confirmation evaluation occurs.
+
+The timestamped `eval/pointer_loops/depth12-checkpoint-comparison-*/` directory contains each full evaluation, a combined `run.log`, and:
+
+- `depth_comparison.csv`: complete-trajectory accuracy, mean correct-prefix length and first-error counts by requested depth; `none` means no nominal error.
+- `conditional_transitions.csv`: probability of the next transition being correct given every earlier transition was correct, by requested depth and loop, with risk-set denominators. Empty rates mean no surviving examples.
+- `paired_examples.csv`: each example's trajectory outcome and correct-prefix change relative to step 5000.
+- `comparison.json`: input artifact hashes and evaluation provenance.
+
+Only loops through the requested depth contribute to these diagnostics. The aggregator rejects mismatched datasets, example identities/targets and core evaluation settings. This comparison tests whether additional optimization extends or shrinks R's reliable horizon; it does not identify the internal cause or establish that another epoch will help. Pretrained execution of this launcher remains pending. All four checkpoint binaries and the dataset must be present; missing files or evaluation failures stop the launcher. Existing artifacts are preserved.
