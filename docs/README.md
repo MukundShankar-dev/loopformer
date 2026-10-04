@@ -33,3 +33,5 @@ The [integrated mechanism report](experiments/stage1_integrated_mechanism.md) au
 The [learned-completion ablation](experiments/stage1_learned_completion.md) records the joint stop-head training and full-loop evaluation. Stop timing does not extend beyond trained depths, and forced-depth pointer generalization is worse than the matched CE-only checkpoint.
 
 The [fixed-prompt failure investigation](experiments/stage1_fixed_prompt_review.md) audits the new pretrained run, locates the stopping supervision gap, measures conditional transition failure and threshold limits, and relates the findings to primary literature.
+
+The [paired-Steps probe](experiments/stage1_paired_steps.md) controls mapping/start and confirms requested-count effects on late execution and failure to extend stop timing; it also records working-state drift without claiming a hidden-state fixed point.

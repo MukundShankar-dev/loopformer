@@ -17,7 +17,7 @@ run_dir=models/stage1_pointer/depth12-fixed-prompt-seed47-gaps
 
 if [[ ${1:-} == --dry-run ]]; then
   exec python -u -m scripts.training.train_pointer --config "$config" \
-    --device cuda --output "$run_dir" --dry-run
+    --device cuda --batch-size 4 --output "$run_dir" --dry-run
 fi
 extra=""
 if [[ ${1:-} == --smoke-test ]]; then
@@ -39,4 +39,4 @@ echo "Terminal log: $log"
 # A PTY preserves the live Rich dashboard while recording stdout and stderr.
 # --return propagates training failure; paths below are fixed repo-relative literals.
 exec script --quiet --return --flush --command \
-  "python -u -m scripts.training.train_pointer --config $config --device cuda --output $run_dir $extra" "$log"
+  "python -u -m scripts.training.train_pointer --config $config --device cuda --batch-size 4 --output $run_dir $extra" "$log"
