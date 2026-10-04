@@ -202,3 +202,37 @@ def test_packaged_cli_writes_and_verifies_with_source_provenance(tmp_path, token
     assert manifest["provenance"]["source_sha256"]
     assert all(name.startswith("scripts/dataset/") for name in manifest["provenance"]["source_sha256"])
     assert all(manifest["splits"][split]["count"] == 8 for split in SPLITS)
+
+
+def test_sparse_depth_generation_roundtrip(tmp_path, tokenizer, token_ids):
+    depths = [1, 2, 3, 4, 5, 6, 8, 10, 12]
+    config = DatasetConfig(seed=47, train_count=18, validation_count=12, test_count=12,
+                           depth_test_count=8, max_train_depth=12, max_eval_depth=20, train_depths=depths)
+    config.validate()
+    data = generate_dataset(config, tokenizer, token_ids)
+    assert {r['task_depth'] for r in data['train']} == set(depths)
+    assert {r['task_depth'] for r in data['validation']} == set(range(1,13))
+    assert {r['task_depth'] for r in data['depth_test']} == set(range(13,21))
+    out = tmp_path / 'sparse'
+    write_dataset(out, data, config, token_ids, {})
+    assert verify_dataset(out, tokenizer)['config']['train_depths'] == depths
+    for invalid in ([1,7,6], [1,1,12], [], [1,8], [0,12]):
+        with pytest.raises(ValueError):
+            replace(config, train_depths=invalid).validate()
+
+
+def test_sparse_training_cli_preview(tmp_path, tokenizer, token_ids):
+    root = Path(__file__).resolve().parents[1]
+    config = DatasetConfig(seed=47, train_count=18, validation_count=12, test_count=12,
+                           depth_test_count=8, max_train_depth=12, max_eval_depth=20,
+                           train_depths=[1,2,3,4,5,6,8,10,12])
+    dataset = tmp_path / 'data'
+    write_dataset(dataset, generate_dataset(config, tokenizer, token_ids), config, token_ids, {})
+    training = json.loads((root/'configs/stage1_pointer_depth12_gaps.json').read_text())
+    training.update(train_data=str(dataset/'train.jsonl'),validation_data=str(dataset/'validation.jsonl'))
+    path=tmp_path/'config.json';path.write_text(json.dumps(training))
+    output=tmp_path/'output'
+    result=subprocess.run([sys.executable,'-m','scripts.training.train_pointer','--config',str(path),
+                           '--output',str(output),'--dry-run'],cwd=root,text=True,capture_output=True)
+    assert result.returncode==0,result.stderr
+    assert 'Dry run passed' in result.stdout and not output.exists()

@@ -24,23 +24,32 @@ class DatasetConfig:
     min_depth: int = 1
     max_train_depth: int = 8
     max_eval_depth: int = 16
+    train_depths: list[int] | None = None
 
     def validate(self) -> None:
-        if any(type(value) is not int for value in asdict(self).values()):
+        if any(type(value) is not int for name, value in asdict(self).items() if name != "train_depths"):
             raise ValueError("Dataset configuration values must be integers")
         if self.seed < 0 or min(self.count(split) for split in SPLITS) < 1:
             raise ValueError("seed must be nonnegative and all split counts must be positive")
         if not 1 <= self.min_depth <= self.max_train_depth < self.max_eval_depth <= 25:
             raise ValueError("Require 1 <= min_depth <= max_train_depth < max_eval_depth <= 25")
 
+        if self.train_depths is not None:
+            if (not self.train_depths or any(type(d) is not int for d in self.train_depths)
+                    or sorted(set(self.train_depths)) != self.train_depths
+                    or min(self.train_depths) < self.min_depth or max(self.train_depths) != self.max_train_depth):
+                raise ValueError("train_depths must be sorted unique integers within bounds, ending at max_train_depth")
+
     def count(self, split: str) -> int:
         if split not in SPLITS:
             raise ValueError(f"Unknown split: {split}")
         return getattr(self, f"{split}_count")
 
-    def depths(self, split: str) -> range:
+    def depths(self, split: str) -> range | list[int]:
         if split not in SPLITS:
             raise ValueError(f"Unknown split: {split}")
+        if split == "train" and self.train_depths is not None:
+            return self.train_depths
         if split == "depth_test":
             return range(self.max_train_depth + 1, self.max_eval_depth + 1)
         return range(self.min_depth, self.max_train_depth + 1)

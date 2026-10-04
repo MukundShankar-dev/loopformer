@@ -2,9 +2,50 @@
 
 Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md), [loop-balanced ablation](experiments/stage1_loopbalanced.md), and [learned-completion ablation](experiments/stage1_learned_completion.md) have completed. The latter two did not improve the depth frontier. Dated commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
 
-## Fixed prompt memory: current desktop run
+## Depth 12 with held-out counts: current desktop run
 
-The [new config](../configs/stage1_pointer_depth6_fixed_prompt.json) differs from joint completion only by `recurrence_mode: fixed_prompt`. It retains fresh adapters, 30,000 seed-37 depth-1–6 examples, batch 4/accumulation 2, 3,750 updates, per-pass pointer CE, and completion BCE weight 0.1. See [the architecture and supervision contract](learned_loop_completion.md#fixed-prompt-memory-and-recurrent-working-state). The pretrained result is pending.
+The [depth-12 config](../configs/stage1_pointer_depth12_gaps.json) implements the coverage experiment motivated by the [fixed-prompt investigation](experiments/stage1_fixed_prompt_review.md). Input remains the original Rules/Start/Steps prompt. R and H receive no external clock or decoded state. Fresh adapters train on 30,000 seed-47 examples with requested depths **1–6, 8, 10, 12**, balanced within one example across the nine counts. All intermediate targets remain supervised. Validation/test have 125 examples at each depth 1–12; depth_test has 125 at each depth 13–20. Requested counts **7, 9, 11 are absent from training prompts and checkpoint selection**. Their intermediate loop positions are trained inside longer tasks, so this is count interpolation, not recurrent-depth extrapolation. Seed 29 remains untouched.
+
+From the repository root in WSL/Linux, first run the paired diagnostic on the existing step-3250 checkpoint (no training):
+
+```bash
+bash probe_steps.sh --dry-run
+bash probe_steps.sh
+```
+
+Then prepare the new run:
+
+```bash
+bash prepare_depth12.sh --dry-run
+bash prepare_depth12.sh
+bash train_depth12.sh --dry-run
+bash train_depth12.sh --smoke-test
+bash train_depth12.sh
+# When the full run completes:
+bash eval_depth12.sh
+```
+
+The dataset preview writes nothing. Generation uses the cached pinned tokenizer and refuses overwrite; rerunning preparation verifies the existing dataset. The complete regeneration command is:
+
+```bash
+python -m scripts.dataset --seed 47 --train-count 30000 \
+  --validation-count 1500 --test-count 1500 --depth-test-count 1000 \
+  --max-train-depth 12 --max-eval-depth 20 \
+  --train-depths 1 2 3 4 5 6 8 10 12 \
+  --output data/pointer/seed-47-depth12-gaps
+```
+
+Train configuration: microbatch **8**, accumulation **1**, validation batch **32**, BF16 autocast with float32 parameters/optimizer and float32 loss computations, SDPA attention, deterministic kernels disabled explicitly, learning rate 0.0002, one epoch and **3,750 updates**. Validation/checkpoint cadence is 500 updates plus the final update (best checkpoints are also retained). Depth bucketing shuffles full homogeneous update groups; mixed leftovers appear exactly once, and each example is visited once per epoch. This reduces useless padded loops without changing labels, though training order and floating-point behavior differ from the prior run. No speedup or CUDA fit has yet been measured here.
+
+Every BF16 launch first runs a backward-only compute probe at a full deepest-depth training microbatch, checking finite loss/gradients and frozen parameters without an optimizer update. Its time and peak VRAM are printed and saved in run metadata. The smoke run additionally performs up to ten optimizer updates and small validation; it writes a separate timestamped `-smoke-` run, never the full-run directory. It is not resumed into the full experiment. If the compute probe OOMs, reduce `batch_size` in the config (or use the trainer's explicit `--batch-size` override); the launcher will not silently alter the recipe. Batch 8 is a starting configuration, not a measured maximum for the desktop GPU.
+
+Full artifacts: `models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/`. Live Rich output and stderr are saved to a sibling timestamped launch log. Existing run directories are refused. `bash eval_depth12.sh` reuses the ordinary full-loop/completion evaluator on validation and depth_test at cap 24, and saves `cohorts.json` distinguishing trained counts, held-out counts, and unseen depths. Training validation excludes counts 7/9/11 from selection even though their metrics are visible. Evaluation uses the established float32/eager checkpoint path, so this also checks export usability; numerical identity with BF16 training readouts is not asserted. The ordinary naive evaluator still loads these artifacts.
+
+Optimizations in this recipe are compute precision, attention backend, depth grouping, validation batching/cadence, and batching metric transfers to CPU. Prefix layer computation reuse remains a separate unimplemented optimization. Checkpoints record sparse training counts and training compute settings, and resume rejects changes to those settings. No full pretrained training or evaluation has run locally.
+
+## Fixed prompt memory: completed depth-6 run
+
+The [new config](../configs/stage1_pointer_depth6_fixed_prompt.json) differs from joint completion only by `recurrence_mode: fixed_prompt`. It retains fresh adapters, 30,000 seed-37 depth-1–6 examples, batch 4/accumulation 2, 3,750 updates, per-pass pointer CE, and completion BCE weight 0.1. See [the architecture and supervision contract](learned_loop_completion.md#fixed-prompt-memory-and-recurrent-working-state). The [pretrained result and investigation](experiments/stage1_fixed_prompt_review.md) are complete.
 
 From the repository root in WSL/Linux:
 

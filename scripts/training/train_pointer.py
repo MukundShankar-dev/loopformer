@@ -22,6 +22,8 @@ def main() -> None:
     initialization.add_argument("--resume", type=Path, help="Resume optimizer/RNG/cursor with matching config")
     initialization.add_argument("--init-from", type=Path, help="Initialize adapters only; new optimizer/RNG/counter, compatible architecture required")
     parser.add_argument("--allow-batch-change", action="store_true", help="With --resume, allow batch/accumulation changes only when examples per optimizer update stay equal")
+    parser.add_argument("--batch-size", type=int, help="Explicit microbatch override")
+    parser.add_argument("--smoke-test", action="store_true", help="Ten disposable updates and small validation; writes a separate run")
     parser.add_argument("--download", action="store_true", help="Allow missing base model/tokenizer files to download")
     parser.add_argument("--dry-run", action="store_true", help="Validate config/data/tokenizer and print the budget; do not load model weights or write output")
     args = parser.parse_args()
@@ -49,6 +51,12 @@ def main() -> None:
     config = read_config(args.config)
     if args.device:
         config = replace(config, device=args.device)
+    if args.batch_size is not None:
+        config = replace(config, batch_size=args.batch_size)
+    if args.smoke_test:
+        if args.resume or args.init_from:
+            parser.error("Smoke test requires fresh initialization")
+        config = replace(config, max_steps=10, validation_per_depth=2, train_probe_per_depth=1)
     config.validate()
     if config.completion_loss_weight and args.init_from:
         parser.error("Completion training requires fresh adapters or --resume; --init-from is not supported")
@@ -62,9 +70,11 @@ def main() -> None:
             parser.error("MPS unavailable; choose --device cpu explicitly")
         if config.device == "cuda" and not torch.cuda.is_available():
             parser.error("CUDA unavailable; choose --device cpu explicitly")
+    if not args.dry_run and config.precision == "bf16" and not torch.cuda.is_bf16_supported():
+        parser.error("CUDA device does not support BF16")
     torch.set_num_threads(config.threads)
     torch.manual_seed(config.seed)
-    torch.use_deterministic_algorithms(True)
+    torch.use_deterministic_algorithms(config.deterministic)
     console = Console()
     console.print("[bold cyan]Stage 1 · shared recurrent pointer training[/bold cyan]")
     train_path, validation_path = root / config.train_data, root / config.validation_data
@@ -72,9 +82,9 @@ def main() -> None:
         train_tasks, validation_tasks = read_tasks(train_path, "train"), read_tasks(validation_path, "validation")
         if {task.mapping_sha256 for task in train_tasks} & {task.mapping_sha256 for task in validation_tasks}:
             raise ValueError("Training and validation contain overlapping rule tables")
-        selected = select_tasks(train_tasks, config.train_max_depth, config.seed, limit=config.train_limit)
+        selected = select_tasks(train_tasks, config.train_max_depth, config.seed, limit=config.train_limit, depths=config.train_depths)
         validation_selected = select_tasks(validation_tasks, config.validation_max_depth, config.seed + 1, per_depth=config.validation_per_depth)
-        probe_selected = select_tasks(selected, config.train_max_depth, config.seed + 2, per_depth=config.train_probe_per_depth)
+        probe_selected = select_tasks(selected, config.train_max_depth, config.seed + 2, per_depth=config.train_probe_per_depth, depths=config.train_depths)
         tokenizer = AutoTokenizer.from_pretrained(config.model, revision=config.revision, local_files_only=args.dry_run or not args.download)
         token_map = validate_symbols(tokenizer)
         if tokenizer.pad_token_id is None:
@@ -88,6 +98,8 @@ def main() -> None:
             "lora_rank": config.lora_rank, "lora_alpha": config.lora_alpha,
             "symbols": list(SYMBOLS), "token_ids": token_ids,
             "prompt_format": "dataset_raw", "loss_vocabulary": "symbols", "train_max_depth": config.train_max_depth}
+    if config.train_depths is not None:
+        spec["train_depths"] = config.train_depths
     if config.loss_reduction != "example_mean":
         spec["loss_reduction"] = config.loss_reduction
     if config.recurrence_mode != "full_sequence":
@@ -95,6 +107,8 @@ def main() -> None:
     if config.completion_loss_weight:
         spec["completion_head"] = {"intermediate": config.completion_head_hidden_size}
         spec["completion_loss_weight"] = config.completion_loss_weight
+    if config.precision != "float32" or config.attention != "eager":
+        spec["training_compute"] = {"precision": config.precision, "attention": config.attention}
     initialization_metadata = None
     if args.init_from:
         source_spec = validate_initialization(args.init_from, spec)
@@ -114,10 +128,11 @@ def main() -> None:
     table.add_column("Value")
     for label, value in (
         ("Model", f"{config.model} @ {config.revision}"),
-        ("Device / dtype", f"{config.device} / float32"),
+        ("Device / dtype", f"{config.device} / {config.precision} compute, float32 parameters · {config.attention} · deterministic={config.deterministic}"),
         ("Recurrence", config.recurrence_mode),
-        ("Training", f"{len(train_items):,} examples · depths 1–{config.train_max_depth} · {config.epochs} epochs"),
+        ("Training", f"{len(train_items):,} examples · depths {config.train_depths or list(range(1, config.train_max_depth + 1))} · {config.epochs} epochs"),
         ("Validation / train probe", f"{len(validation_items)} / {len(probe_items)} examples · validation depths 1–{config.validation_max_depth}"),
+        ("Depth bucketing / validation batch", f"{config.bucket_by_depth} / {config.validation_batch_size or config.batch_size}"),
         ("Batch / accumulation", f"{config.batch_size} × {config.gradient_accumulation} = {effective_batch} examples/update"),
         ("Updates / learning rate", f"{planned} / {config.learning_rate:g}"),
         ("Loss", f"26-symbol CE · {config.loss_reduction} · nominal targets only" +
@@ -135,7 +150,7 @@ def main() -> None:
     with console.status("Loading base and checking T=1 equivalence, weight sharing, and two-loop gradients…"):
         base = Qwen2ForCausalLM.from_pretrained(
             config.model, revision=config.revision, local_files_only=not args.download,
-            dtype=torch.float32, attn_implementation="eager", trust_remote_code=False,
+            dtype=torch.float32, attn_implementation=config.attention, trust_remote_code=False,
         ).to(config.device).eval()
         if max(len(item.input_ids) for item in [*train_items, *validation_items]) > base.config.max_position_embeddings:
             raise ValueError("Selected prompts exceed model context size")
@@ -145,6 +160,11 @@ def main() -> None:
             model.enable_completion(config.completion_head_hidden_size)
             gate["completion"] = validate_completion_gradients(model, probe)
             gate["trainable_parameters"] = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    if config.precision == "bf16":
+        from scripts.training.precision import validate_compute_batch
+        console.print("Checking BF16 loss/gradients at the deepest training microbatch…")
+        gate["compute_probe"] = validate_compute_batch(model, train_items, tokenizer.pad_token_id, token_ids, config)
+        console.print(f"[green]Compute probe passed[/green]: {gate['compute_probe']}")
     console.print(f"[green]Architecture/loss-path checks passed[/green] · {gate['trainable_parameters']:,} trainable parameters")
     spec["revision"] = getattr(base.config, "_commit_hash", None) or config.revision
     if args.init_from:

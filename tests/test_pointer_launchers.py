@@ -113,3 +113,16 @@ def test_training_launcher_preview_logs_and_no_overwrite(launcher_repo):
     repeated = subprocess.run(['bash', 'train_fixed_prompt.sh'], cwd=root, capture_output=True, text=True)
     assert repeated.returncode != 0 and 'already exists' in repeated.stderr
     assert (root / 'calls.jsonl').read_text() == before
+
+
+def test_depth12_smoke_is_separate_and_propagates_failure(launcher_repo):
+    root, _ = launcher_repo
+    shutil.copy(Path(__file__).resolve().parents[1] / 'train_depth12.sh', root)
+    target=root/'models/stage1_pointer/depth12-fixed-prompt-seed47-gaps'
+    result=subprocess.run(['bash','train_depth12.sh','--smoke-test'],cwd=root,
+                          env={**os.environ,'FAIL_TRAIN':'9'},capture_output=True,text=True)
+    assert result.returncode==9 and not target.exists()
+    calls=[json.loads(x) for x in (root/'calls.jsonl').read_text().splitlines()]
+    assert '--smoke-test' in calls[0]
+    assert calls[0][calls[0].index('--config')+1]=='configs/stage1_pointer_depth12_gaps.json'
+    assert '-smoke-' in calls[0][calls[0].index('--output')+1]

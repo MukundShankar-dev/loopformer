@@ -248,7 +248,7 @@ Evaluate a saved recurrent checkpoint without training or loading optimizer stat
 
 The evaluator saves actual `trajectories.csv`, per-example `decisions.csv`, and `summary.json`. Report stopped-answer accuracy, exact/early/late head stops, cap fallbacks, joint exact-stop-and-answer success, and by-depth rates separately. Reaching the cap at the correct depth does not count as a learned exact stop. Timing synchronizes CUDA/MPS and includes input-memory preparation, every executed R/C/head pass and threshold check; it excludes loading, tokenization and CSV export. Batch-1 stopped latency and batch-16 full-sweep throughput are different measurements and cannot establish a matched batching speedup.
 
-For the new fixed-prompt training run, `bash eval_ckpts.sh` selects its pointer-CE-selected checkpoint and runs both full sweeps and actual stopping on validation/depth-test. The wrapper's threshold 0.5 is diagnostic; confirmation still requires a threshold frozen on development. See [training and output paths](training_pointer.md#fixed-prompt-memory-current-desktop-run).
+For the new fixed-prompt training run, `bash eval_ckpts.sh` selects its pointer-CE-selected checkpoint and runs both full sweeps and actual stopping on validation/depth-test. The wrapper's threshold 0.5 is diagnostic; confirmation still requires a threshold frozen on development. See [training and output paths](training_pointer.md#fixed-prompt-memory-completed-depth-6-run).
 
 ### Run
 
@@ -393,3 +393,9 @@ Focused tests cover terminal execution through 64 steps, original-record preserv
 ## Failure and performance diagnostics
 
 Use the opt-in [diagnostic commands](diagnostics_and_performance.md#implemented-diagnostic-commands) for reference-checked first-error categories and conditional risk sets, paired suffix/depth-cue probes, and warmed performance attribution. New full-loop rows include A–Z-tie-broken target rank and top-three symbols. Old traces remain valid with absent confidence/rank fields left unknown. This does not change accuracy, loss, readout or stopping semantics.
+
+## Paired requested-count diagnostic and depth-12 cohorts
+
+`bash probe_steps.sh` evaluates the existing fixed-prompt step-3250 checkpoint on 32 depth-16 development mappings, each with requested Steps 6, 7, 8, 9, 10, 12, and 16. Only Steps and the corresponding reference targets change; the rule table/start stay identical. `--dry-run` validates variants without loading weights or writing files. The shared evaluator records 20-loop symbol/stop traces and answer-position hidden norm, update norm and cosine to the previous state. `pairs.csv` measures common-prefix prediction agreement against the depth-16 variant, nominal correctness and first threshold crossing. These are offline stop decisions, not actual stopped latency. This controls map identity while testing requested-count/suffix-length effects; hidden-state scalar changes alone do not identify a mechanism.
+
+`bash eval_depth12.sh` evaluates the new selected sparse-count checkpoint via `eval_ckpts.sh`, then aggregates `cohorts.json`: trained requested counts 1–6/8/10/12; held-out requested counts 7/9/11; and unseen recurrent depths 13–20. Full and genuinely stopped evaluation remain separate. Threshold 0.5 and cap 24 are explicit, independent of individual task depth. The test split and seed-29 confirmation are not used. See the [run instructions](training_pointer.md#depth-12-with-held-out-counts-current-desktop-run).

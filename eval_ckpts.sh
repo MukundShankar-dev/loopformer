@@ -50,9 +50,11 @@ checkpoint_mode(spec)
 if spec.get("format") not in ("loopformer-stage1-completion-v1", "loopformer-stage1-fixed-prompt-v1") or "completion_head" not in spec:
     raise SystemExit("Selected checkpoint has no trained completion head")
 PY
+data_root="${POINTER_DATA_ROOT:-data/pointer/seed-17}"
+loops="${POINTER_LOOPS:-20}"
 for split in validation depth_test; do
-  if [[ ! -f "data/pointer/seed-17/$split.jsonl" ]]; then
-    echo "Missing dataset: data/pointer/seed-17/$split.jsonl" >&2
+  if [[ ! -f "$data_root/$split.jsonl" ]]; then
+    echo "Missing dataset: $data_root/$split.jsonl" >&2
     exit 1
   fi
 done
@@ -66,13 +68,13 @@ run_evals() {
   for split in validation depth_test; do
     python -u -m scripts.eval.loop_test \
       --model "$checkpoint" \
-      --data "data/pointer/seed-17/$split.jsonl" \
-      --device cuda --batch-size 16 --loops 20 \
+      --data "$data_root/$split.jsonl" \
+      --device cuda --batch-size 16 --loops "$loops" \
       --output "$output/$split" || return $?
     python -u -m scripts.eval.loop_test \
       --model "$checkpoint" \
-      --data "data/pointer/seed-17/$split.jsonl" \
-      --device cuda --batch-size 1 --loops 20 \
+      --data "$data_root/$split.jsonl" \
+      --device cuda --batch-size 1 --loops "$loops" \
       --stop-policy completion --stop-threshold 0.5 \
       --output "$output/${split}-stopped" || return $?
   done
@@ -97,6 +99,9 @@ for split in ("validation", "depth_test"):
           f"cap fallback {timing['cap_fallback_rate']:.1%}; "
           f"mean loops {stopped['mean_loops']:.2f}")
 PY
+  if [[ ${POINTER_COHORTS:-} == depth12 ]]; then
+    python -m scripts.eval.depth_cohorts --results "$output" || return $?
+  fi
 }
 
 run_evals 2>&1 | tee "$output/run.log"

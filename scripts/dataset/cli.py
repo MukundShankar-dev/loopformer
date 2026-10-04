@@ -46,6 +46,7 @@ def main() -> None:
     parser.add_argument("--min-depth", type=int, default=1)
     parser.add_argument("--max-train-depth", type=int, default=8)
     parser.add_argument("--max-eval-depth", type=int, default=16)
+    parser.add_argument("--train-depths", type=int, nargs="+", help="Explicit training depths; validation/test retain every depth through max-train-depth")
     parser.add_argument("--output", type=Path, help="New directory; default data/pointer/seed-<seed>")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", nargs="?", const=5, type=int, choices=(5, 10), help="Preview up to 5 (default) or 10 examples spanning depths; write no dataset files")
@@ -75,7 +76,7 @@ def main() -> None:
 
     token_ids = validate_symbols(tokenizer)
     console.print(f"[green]PASS[/green] 26 unique single-token symbols in rule, start, and answer contexts; seed {config.seed}")
-    console.print(f"Training/instance depths: {config.min_depth}–{config.max_train_depth}; held-out depths: {config.max_train_depth + 1}–{config.max_eval_depth}")
+    console.print(f"Training depths: {list(config.depths('train'))}; validation/test: {config.min_depth}–{config.max_train_depth}; extrapolation depths: {config.max_train_depth + 1}–{config.max_eval_depth}")
     if args.dry_run is not None:
         distribution = Table(title="Configured dataset distribution (not preview frequencies)")
         for column in ("Split", "Total", "Steps: example count"):

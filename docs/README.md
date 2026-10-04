@@ -31,3 +31,5 @@ The [frozen rule-edit report](experiments/stage1_rule_edit_probe.md) compares re
 The [integrated mechanism report](experiments/stage1_integrated_mechanism.md) audits the completed three-checkpoint, same-mapping horizon and rule-edit diagnostic. It separates the strong local transition behavior from the later recurrent-history failure and records why the internal cause remains unresolved.
 
 The [learned-completion ablation](experiments/stage1_learned_completion.md) records the joint stop-head training and full-loop evaluation. Stop timing does not extend beyond trained depths, and forced-depth pointer generalization is worse than the matched CE-only checkpoint.
+
+The [fixed-prompt failure investigation](experiments/stage1_fixed_prompt_review.md) audits the new pretrained run, locates the stopping supervision gap, measures conditional transition failure and threshold limits, and relates the findings to primary literature.

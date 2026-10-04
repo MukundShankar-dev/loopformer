@@ -30,9 +30,9 @@ def loop_loss_weights(depths: list[int]) -> list[float]:
             for t in range(1, maximum + 1)]
 
 
-def training_selection_loss(metrics: dict, max_depth: int, reduction: str) -> float:
+def training_selection_loss(metrics: dict, max_depth: int, reduction: str, depths: list[int] | None = None) -> float:
     """Select on trained depths only; never include OOD tasks' early loops."""
-    eligible = [v for d, v in metrics["by_depth"].items() if int(d) <= max_depth]
+    eligible = [v for d, v in metrics["by_depth"].items() if int(d) in (depths if depths is not None else range(1, max_depth + 1))]
     if reduction == "example_mean":
         return sum(v["loss"] * v["examples"] for v in eligible) / sum(v["examples"] for v in eligible)
     if reduction != "loop_mean":

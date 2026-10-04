@@ -22,6 +22,12 @@ class TrainingConfig:
     recurrence_mode: str = "full_sequence"
     lora_rank: int = 8
     lora_alpha: int = 16
+    train_depths: list[int] | None = None
+    precision: str = "float32"
+    attention: str = "eager"
+    validation_batch_size: int | None = None
+    deterministic: bool = True
+    bucket_by_depth: bool = False
     train_max_depth: int = 4
     validation_max_depth: int = 8
     train_limit: int | None = None
@@ -44,6 +50,19 @@ class TrainingConfig:
     completion_head_hidden_size: int = 128
 
     def validate(self) -> None:
+        if self.precision not in ("float32", "bf16") or self.attention not in ("eager", "sdpa"):
+            raise ValueError("precision must be float32/bf16 and attention eager/sdpa")
+        if type(self.deterministic) is not bool or type(self.bucket_by_depth) is not bool:
+            raise ValueError("deterministic must be boolean")
+        if self.precision == "bf16" and self.device != "cuda":
+            raise ValueError("BF16 training requires CUDA; no silent precision fallback")
+        if self.validation_batch_size is not None and (type(self.validation_batch_size) is not int or self.validation_batch_size < 1):
+            raise ValueError("validation_batch_size must be a positive integer")
+        if self.train_depths is not None:
+            if (not self.train_depths or any(type(d) is not int for d in self.train_depths)
+                    or sorted(set(self.train_depths)) != self.train_depths
+                    or min(self.train_depths) < 1 or max(self.train_depths) != self.train_max_depth):
+                raise ValueError("train_depths must be sorted unique positive integers ending at train_max_depth")
         if self.recurrence_mode not in ("full_sequence", "fixed_prompt"):
             raise ValueError("recurrence_mode must be full_sequence or fixed_prompt")
         if self.loss_reduction not in ("example_mean", "loop_mean"):

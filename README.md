@@ -129,20 +129,23 @@ Progress and throughput appear in the terminal. Predictions and summaries go to 
 
 ## Train pointer execution
 
-On the CUDA desktop, preview and launch the fixed-prompt-memory experiment:
+On the CUDA desktop, prepare and launch the current depth-12 experiment:
 
 ```bash
-bash train_fixed_prompt.sh --dry-run
-bash train_fixed_prompt.sh
+bash prepare_depth12.sh --dry-run
+bash prepare_depth12.sh
+bash train_depth12.sh --dry-run
+bash train_depth12.sh --smoke-test
+bash train_depth12.sh
 ```
 
 Configs live in [`configs/`](configs/). The trainer uses raw dataset prompts and exact per-loop supervision. A compact Rich dashboard shows progress, ETA, losses, accuracy, and memory. Checkpoints and logs go to `models/stage1_pointer/`; model binaries are excluded from Git.
 
-This uses fresh adapters and the existing 30k data, with exact intermediate pointer targets and learned stopping. The live dashboard is also recorded to a timestamped terminal log. Follow the [current run instructions](docs/training_pointer.md#fixed-prompt-memory-current-desktop-run) for prerequisites, artifact paths, and implementation limits. Pretrained results for this architecture are pending.
+This uses fresh adapters and 30k seeded examples at requested depths 1–6, 8, 10, and 12; counts 7, 9, and 11 are held out. The live dashboard is also recorded to a timestamped terminal log. Follow the [current run instructions](docs/training_pointer.md#depth-12-with-held-out-counts-current-desktop-run) for prerequisites, artifact paths, and implementation limits. The new recipe uses BF16, SDPA and depth-grouped batches; desktop speed and quality remain unmeasured.
 
 ## Inspect recurrent checkpoints
 
-After the new run completes, `bash eval_ckpts.sh` evaluates its selected checkpoint on both development splits, saving full-loop traces and actual head-controlled stopping results. It records all output in a timestamped directory under `eval/pointer_loops/`.
+After the new run completes, `bash eval_depth12.sh` evaluates its selected checkpoint on both development splits, saving full-loop traces and actual head-controlled stopping results. It records all output in a timestamped directory under `eval/pointer_loops/`.
 
 Pass a complete saved step directory, including its adapter weights and tokenizer:
 

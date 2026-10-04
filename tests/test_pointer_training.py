@@ -526,3 +526,46 @@ def test_training_cli_dry_run_and_toy_update(tmp_path):
     rejected = subprocess.run([*eval_command, '--stop-policy', 'completion', '--stop-threshold', 'nan',
                                '--output', str(tmp_path / 'invalid')], cwd=ROOT, capture_output=True, text=True)
     assert rejected.returncode != 0 and not (tmp_path / 'invalid').exists()
+
+
+def test_sparse_selection_and_bucket_coverage():
+    from scripts.training.runner import epoch_order
+    from scripts.training.objective import training_selection_loss
+    tasks = [generate_example(i+300, 1+i%3, 'train', i) for i in range(33)]
+    selected = select_tasks(tasks, 3, 17, depths=[1,3])
+    assert {x.task_depth for x in selected} == {1,3}
+    encoded = [EncodedExample(x,[1,2],list(range(x.task_depth))) for x in selected]
+    order = epoch_order(encoded,4,17,True)
+    assert sorted(order) == list(range(len(encoded)))
+    assert order == epoch_order(encoded,4,17,True)
+    # Four full groups stay homogeneous; at most two remainder groups can mix.
+    assert sum(len({len(encoded[i].targets) for i in order[j:j+4]})>1 for j in range(0,len(order),4))<=2
+    metrics = {'by_depth':{'1':{'examples':5,'loss':2},'2':{'examples':999,'loss':100},'3':{'examples':5,'loss':4}}}
+    assert training_selection_loss(metrics,3,'example_mean',[1,3])==3
+
+
+@pytest.mark.parametrize('tiny_training', ['fixed_prompt'], indirect=True)
+def test_paired_recording_preserves_scores_and_sparse_training(tiny_training, tmp_path):
+    from scripts.eval.paired_steps import variants, paired_summary
+    model, tokenizer, config, items, spec, _ = tiny_training
+    model.enable_completion(8)
+    tasks = variants([generate_example(91,16,'depth_test',0)],1)
+    assert len({x.mapping_sha256 for x in tasks})==1
+    assert {x.task_depth for x in tasks}=={6,7,8,9,10,12,16}
+    # Tiny tokenizer need not satisfy real tokenizer symbol-context validation.
+    probe = [EncodedExample(t,tokenizer.encode(t.prompt),[SYMBOLS.index(x) for x in t.intermediate_states]) for t in tasks]
+    regular = evaluate(model,probe,spec['token_ids'],0,batch_size=2,loops=20)
+    recorded = evaluate(model,probe,spec['token_ids'],0,batch_size=2,loops=20,record_states=True,output=tmp_path/'trace.csv')
+    assert regular==recorded
+    assert len(paired_summary(tmp_path/'trace.csv'))==7
+    rows=list(csv.DictReader((tmp_path/'trace.csv').open()))
+    assert all(float(r['working_norm'])>0 for r in rows)
+    # Exercise sparse trained-count checkpoint selection and a separate eval batch.
+    config=replace(config,train_depths=[2],train_max_depth=2,completion_loss_weight=.1,
+                   completion_head_hidden_size=8,bucket_by_depth=True,validation_batch_size=3,max_steps=1)
+    selected=[x for x in items if len(x.targets)==2]
+    spec={**spec,'completion_head':{'intermediate':8},'train_depths':[2]}
+    output=tmp_path/'run';output.mkdir()
+    result=train(model,tokenizer,selected,items,selected,config,output,spec,resume_identity(config,{}))
+    expected=result['validation']['by_depth']['2']['loss']
+    assert result['validation']['selection_loss']==pytest.approx(expected)

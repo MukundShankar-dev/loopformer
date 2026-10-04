@@ -41,11 +41,12 @@ def read_tasks(path: Path, expected_split: str) -> list[PointerExample]:
 
 
 def select_tasks(tasks: list[PointerExample], max_depth: int, seed: int,
-                 *, limit: int | None = None, per_depth: int | None = None) -> list[PointerExample]:
+                 *, limit: int | None = None, per_depth: int | None = None,
+                 depths: list[int] | None = None) -> list[PointerExample]:
     """Shuffle within depth, then interleave depths so small prefixes are balanced."""
     groups = []
     rng = random.Random(seed)
-    for depth in range(1, max_depth + 1):
+    for depth in (depths if depths is not None else range(1, max_depth + 1)):
         group = [task for task in tasks if task.task_depth == depth]
         if not group:
             raise ValueError(f"No examples at required depth {depth}")

@@ -15,6 +15,7 @@ from scripts.recurrent_qwen.checkpoint import save_checkpoint
 from scripts.recurrent_qwen.model import RecurrentQwen
 from scripts.eval.pointer_task import synchronize
 from .config import TrainingConfig
+from .precision import autocast_context
 from .data import EncodedExample, collate
 from .evaluation import evaluate
 from .objective import (batch_metrics, combine_metrics, completion_loss, completion_metrics,
@@ -53,6 +54,10 @@ def resume_identity(config: TrainingConfig, data_identity: dict) -> dict:
     # A continuation can extend its budget or change reporting cadence. All
     # sampling, optimization, model, validation, and device settings must match.
     settings = config.to_dict()
+    for name, default in {"train_depths": None, "precision": "float32", "attention": "eager",
+                          "validation_batch_size": None, "deterministic": True, "bucket_by_depth": False}.items():
+        if settings[name] == default:
+            settings.pop(name)
     if settings["recurrence_mode"] == "full_sequence":
         settings.pop("recurrence_mode")
     # Historical checkpoints predate this field and used equal-example loss.
@@ -85,6 +90,31 @@ def validate_resume_identity(saved: dict, current: dict, *, allow_batch_change: 
                     "effective_batch": math.prod(new_batch.values()), "bitwise_equivalent": False}
     raise ValueError("Resume identity differs. --allow-batch-change permits only batch_size/"
                      "gradient_accumulation changes with the same product; all other identity fields must match.")
+
+
+def epoch_order(items: list[EncodedExample], batch_size: int, seed: int, bucket: bool) -> list[int]:
+    """Shuffle full depth-homogeneous update groups; mix only remainder groups.
+
+    Every example appears exactly once per epoch. This changes update order,
+    not targets or loss weighting, and is explicit in the resume identity.
+    """
+    rng = random.Random(seed)
+    if not bucket:
+        order = list(range(len(items)))
+        rng.shuffle(order)
+        return order
+    groups, remainder = [], []
+    for depth in sorted({len(item.targets) for item in items}):
+        indices = [i for i, item in enumerate(items) if len(item.targets) == depth]
+        rng.shuffle(indices)
+        stop = len(indices) // batch_size * batch_size
+        groups.extend(indices[i:i + batch_size] for i in range(0, stop, batch_size))
+        remainder.extend(indices[stop:])
+    rng.shuffle(remainder)
+    stop = len(remainder) // batch_size * batch_size
+    groups.extend(remainder[i:i + batch_size] for i in range(0, stop, batch_size))
+    rng.shuffle(groups)
+    return [i for group in groups for i in group] + remainder[stop:]
 
 
 def train(
@@ -130,24 +160,24 @@ def train(
         nonlocal best_loss, validation_seconds, evaluations, latest_validation
         begin = perf_counter()
         latest_validation = evaluate(
-            model, validation, token_ids, pad_id, batch_size=config.batch_size,
+            model, validation, token_ids, pad_id, batch_size=config.validation_batch_size or config.batch_size,
             loops=config.validation_max_depth, output=output / f"validation-step-{step:06d}.csv",
-            completion_loss_weight=config.completion_loss_weight,
+            completion_loss_weight=config.completion_loss_weight, precision=config.precision,
             progress=lambda done, total: progress({"phase": f"Validation {done}/{total}"}),
         )
         probe = evaluate(
-            model, train_probe, token_ids, pad_id, batch_size=config.batch_size,
+            model, train_probe, token_ids, pad_id, batch_size=config.validation_batch_size or config.batch_size,
             output=output / f"train-probe-step-{step:06d}.csv",
-            completion_loss_weight=config.completion_loss_weight,
+            completion_loss_weight=config.completion_loss_weight, precision=config.precision,
             progress=lambda done, total: progress({"phase": f"Train probe {done}/{total}"}),
         )
-        selection_loss = training_selection_loss(latest_validation, config.train_max_depth, config.loss_reduction)
+        selection_loss = training_selection_loss(latest_validation, config.train_max_depth, config.loss_reduction, config.train_depths)
         if config.completion_loss_weight:
             stop_selection = sum(v["completion"]["objective_loss"] * v["examples"]
                                  for d, v in latest_validation["by_depth"].items()
-                                 if int(d) <= config.train_max_depth) / sum(v["examples"]
+                                 if int(d) in (config.train_depths or range(1, config.train_max_depth + 1))) / sum(v["examples"]
                                  for d, v in latest_validation["by_depth"].items()
-                                 if int(d) <= config.train_max_depth)
+                                 if int(d) in (config.train_depths or range(1, config.train_max_depth + 1)))
             latest_validation["pointer_selection_loss"] = selection_loss
             latest_validation["completion_selection_loss"] = stop_selection
             latest_validation["joint_validation_loss"] = selection_loss + config.completion_loss_weight * stop_selection
@@ -189,8 +219,7 @@ def train(
         improved = validate()
         checkpoint(improved)
         while epoch < config.epochs and step < total_steps:
-            order = list(range(len(train_items)))
-            random.Random(config.seed + epoch).shuffle(order)
+            order = epoch_order(train_items, effective_batch, config.seed + epoch, config.bucket_by_depth)
             while offset < len(order) and step < total_steps:
                 group = [train_items[index] for index in order[offset:offset + effective_batch]]
                 model.train()
@@ -205,11 +234,12 @@ def train(
                 for start in range(0, len(group), config.batch_size):
                     items = group[start:start + config.batch_size]
                     batch = collate(items, pad_id, config.device)
-                    result = model(batch["input_ids"], batch["attention_mask"], num_loops=batch["targets"].shape[1])
-                    scores = symbolic_scores(result.loop_logits, token_ids)
+                    with autocast_context(config.device, config.precision):
+                        result = model(batch["input_ids"], batch["attention_mask"], num_loops=batch["targets"].shape[1])
+                    scores = symbolic_scores(result.loop_logits, token_ids).float()
                     loss, losses = step_loss(scores, batch["targets"], batch["target_mask"], loop_weights=weights)
                     if config.completion_loss_weight:
-                        halt_loss, halt_losses = completion_loss(result.stop_logits, batch["target_mask"])
+                        halt_loss, halt_losses = completion_loss(result.stop_logits.float(), batch["target_mask"])
                         loss = loss + config.completion_loss_weight * halt_loss
                         stop_parts.append(completion_metrics(result.stop_logits.detach(), batch["target_mask"],
                                                              halt_losses.detach(), halt_loss.detach()))

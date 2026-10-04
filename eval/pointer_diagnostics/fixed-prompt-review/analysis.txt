@@ -1,0 +1,214 @@
+validation {
+  "risk": {
+    "1": {
+      "eligible": 1000,
+      "correct": 1000
+    },
+    "2": {
+      "eligible": 875,
+      "correct": 874
+    },
+    "3": {
+      "eligible": 749,
+      "correct": 747
+    },
+    "4": {
+      "eligible": 623,
+      "correct": 618
+    },
+    "5": {
+      "eligible": 495,
+      "correct": 493
+    },
+    "6": {
+      "eligible": 369,
+      "correct": 365
+    },
+    "7": {
+      "eligible": 244,
+      "correct": 243
+    },
+    "8": {
+      "eligible": 121,
+      "correct": 120
+    }
+  },
+  "first_error_types": {
+    "off_path": 7,
+    "future_path": 3,
+    "earlier_path": 4,
+    "repeat_previous": 2
+  },
+  "threshold_separable_counts": {
+    "1": 125,
+    "2": 125,
+    "3": 125,
+    "4": 125,
+    "5": 125,
+    "6": 125,
+    "7": 125,
+    "8": 125
+  },
+  "pointer_at_stop": {
+    "correct_pointer_when_stopped": 988,
+    "total": 1000
+  },
+  "logits": {
+    "1": {
+      "pre": null,
+      "at": 11.234553337097168
+    },
+    "2": {
+      "pre": -11.085850715637207,
+      "at": 9.006138801574707
+    },
+    "3": {
+      "pre": -9.50977611541748,
+      "at": 7.5928192138671875
+    },
+    "4": {
+      "pre": -9.971881866455078,
+      "at": 8.446927070617676
+    },
+    "5": {
+      "pre": -8.966954231262207,
+      "at": 8.616069793701172
+    },
+    "6": {
+      "pre": -8.707352638244629,
+      "at": 8.282817840576172
+    },
+    "7": {
+      "pre": 6.645472049713135,
+      "at": 17.545053482055664
+    },
+    "8": {
+      "pre": 17.400348663330078,
+      "at": 21.29931640625
+    }
+  }
+}
+depth_test {
+  "risk": {
+    "1": {
+      "eligible": 1000,
+      "correct": 1000
+    },
+    "2": {
+      "eligible": 1000,
+      "correct": 999
+    },
+    "3": {
+      "eligible": 999,
+      "correct": 995
+    },
+    "4": {
+      "eligible": 995,
+      "correct": 989
+    },
+    "5": {
+      "eligible": 989,
+      "correct": 982
+    },
+    "6": {
+      "eligible": 982,
+      "correct": 971
+    },
+    "7": {
+      "eligible": 971,
+      "correct": 956
+    },
+    "8": {
+      "eligible": 956,
+      "correct": 889
+    },
+    "9": {
+      "eligible": 889,
+      "correct": 482
+    },
+    "10": {
+      "eligible": 391,
+      "correct": 46
+    },
+    "11": {
+      "eligible": 42,
+      "correct": 1
+    },
+    "12": {
+      "eligible": 1,
+      "correct": 0
+    }
+  },
+  "first_error_types": {
+    "off_path": 114,
+    "earlier_path": 194,
+    "repeat_previous": 487,
+    "future_path": 110
+  },
+  "threshold_separable_counts": {
+    "9": 125,
+    "10": 125,
+    "11": 110,
+    "12": 53,
+    "13": 0,
+    "14": 0,
+    "15": 0,
+    "16": 0
+  },
+  "pointer_at_stop": {
+    "correct_pointer_when_stopped": 985,
+    "total": 1000
+  },
+  "logits": {
+    "9": {
+      "pre": 22.476818084716797,
+      "at": 25.124019622802734
+    },
+    "10": {
+      "pre": 25.526710510253906,
+      "at": 26.576622009277344
+    },
+    "11": {
+      "pre": 27.517562866210938,
+      "at": 27.82225799560547
+    },
+    "12": {
+      "pre": 26.865549087524414,
+      "at": 26.784805297851562
+    },
+    "13": {
+      "pre": 27.569477081298828,
+      "at": 27.050670623779297
+    },
+    "14": {
+      "pre": 26.97598648071289,
+      "at": 26.512678146362305
+    },
+    "15": {
+      "pre": 27.058088302612305,
+      "at": 25.926753997802734
+    },
+    "16": {
+      "pre": 26.618106842041016,
+      "at": 25.38787269592285
+    }
+  }
+}
+CHECKPOINT VALIDATION depth7,8 fulltrajectory/exactstop out of32
+validation-step-000000 {7: [0, 0], 8: [0, 0]}
+validation-step-000250 {7: [0, 0], 8: [0, 0]}
+validation-step-000500 {7: [3, 0], 8: [0, 0]}
+validation-step-000750 {7: [25, 0], 8: [17, 0]}
+validation-step-001000 {7: [29, 0], 8: [20, 0]}
+validation-step-001250 {7: [28, 0], 8: [21, 0]}
+validation-step-001500 {7: [29, 0], 8: [23, 0]}
+validation-step-001750 {7: [30, 0], 8: [25, 0]}
+validation-step-002000 {7: [31, 0], 8: [27, 0]}
+validation-step-002250 {7: [32, 0], 8: [25, 0]}
+validation-step-002500 {7: [31, 0], 8: [29, 0]}
+validation-step-002750 {7: [32, 0], 8: [27, 0]}
+validation-step-003000 {7: [31, 0], 8: [28, 0]}
+validation-step-003250 {7: [32, 0], 8: [32, 0]}
+validation-step-003500 {7: [30, 0], 8: [12, 0]}
+validation-step-003750 {7: [32, 0], 8: [32, 0]}
+Optimistic shared-threshold bounds: {'1-6': {'best_exact': 750, 'examples': 750, 'logit_threshold': -0.1161201000213623}, '7-8': {'best_exact': 135, 'examples': 250, 'logit_threshold': 17.410029411315918}, '9-10': {'best_exact': 106, 'examples': 250, 'logit_threshold': 24.346561431884766}, '9-16': {'best_exact': 106, 'examples': 1000, 'logit_threshold': 24.346561431884766}, '1-16': {'best_exact': 763, 'examples': 2000, 'logit_threshold': 3.934731364250183}}
