@@ -160,3 +160,16 @@ def combine_metrics(parts: list[dict]) -> dict:
         "intermediate_accuracy": sum(item["accuracy"] * item["count"] for item in per_loop.values()) / steps,
         "per_loop": per_loop,
     }
+
+
+def forward_symbols(model, input_ids: Tensor, attention_mask: Tensor, token_ids: list[int], **kwargs):
+    """Shared selected-row projection; legacy test doubles keep their old API."""
+    from scripts.recurrent_qwen.model import RecurrentQwen
+    if isinstance(model, RecurrentQwen) or getattr(model, "supports_symbol_readout", False):
+        result = model(input_ids=input_ids, attention_mask=attention_mask,
+                       readout_token_ids=token_ids, **kwargs)
+        scores = torch.stack(result.loop_logits, dim=1).float()
+    else:
+        result = model(input_ids=input_ids, attention_mask=attention_mask, **kwargs)
+        scores = symbolic_scores(result.loop_logits, token_ids).float()
+    return result, scores

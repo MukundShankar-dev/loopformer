@@ -35,7 +35,9 @@ def read_tasks(path: Path, expected_split: str) -> list[PointerExample]:
         if task.split != expected_split:
             raise ValueError(f"Expected {expected_split} records in {path}")
         tasks.append(task)
-    if len({task.mapping_sha256 for task in tasks}) != len(tasks):
+    if len({task.example_id for task in tasks}) != len(tasks):
+        raise ValueError("Repeated example IDs in dataset")
+    if (expected_split == "train" or not manifest.get("config", {}).get("paired_horizons", False)) and len({task.mapping_sha256 for task in tasks}) != len(tasks):
         raise ValueError("Repeated rule tables in dataset")
     return tasks
 

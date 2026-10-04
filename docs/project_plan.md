@@ -15,6 +15,20 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-04 pipeline amendment:** The user authorized the [executor/controller
+upgrade](pipeline_upgrade.md) following the end-to-end review. This supersedes
+LoRA-only/no-bridge constraints for the new experimental branch: explicit
+count-free executor routing, an isolated recurrent controller, normalized learned
+re-entry, optional direct R supervision, full-R and full-model SFT controls,
+depth-independent cyclic datasets and exact compute optimizations are authorized.
+The public input remains one prompt; numeric progress features and oracle state
+re-entry remain excluded. The default new run unfreezes all R weights while
+keeping P/C frozen; full-model SFT is an explicitly separate capacity control.
+Implementation contracts must pass before the desktop smoke; CUDA fit and useful
+generalization remain empirical gates. Existing stage ordering, separate transfer
+claims and reserved confirmation data remain in force. The historical priorities
+below explain earlier decisions and do not select another continuation.
+
 **2026-10-04 coverage update:** After the fixed-prompt investigation, the user approved a broader-depth experiment and requested faster valid training rather than equivalence to the previous optimization trajectory. The [current runbook](training_pointer.md#depth-12-with-held-out-counts-current-desktop-run) prepares fresh training at requested counts 1–6/8/10/12, held-out count interpolation at 7/9/11, and recurrent-depth extrapolation at 13–20. A paired-Steps diagnostic precedes training. BF16/SDPA, larger microbatches and depth-grouped updates are explicit recipe changes; measured CUDA speed/fit and scientific improvement remain pending. Keep prompt-only inference and intermediate supervision; no external progress signal, confirmation evaluation or later stage is opened.
 
 

@@ -1,7 +1,7 @@
 """Qwen2 decoder surgery for the pinned Transformers implementation."""
 
 import math
-from typing import Callable, Literal
+from typing import Any, Callable, Literal
 
 import torch
 from torch import Tensor, nn
@@ -11,6 +11,9 @@ from transformers.masking_utils import create_causal_mask
 from .outputs import RecurrentOutput, answer_margin
 from .completion import CompletionHead
 from .memory import PromptMemory
+from .prefix import fixed_prefix_layer
+from torch.utils.checkpoint import checkpoint
+from .interfaces import PromptRouter, ReentryBridge, RecurrentController
 
 
 def _answer_readout(hidden: Tensor, positions: list[int]) -> Tensor:
@@ -25,6 +28,8 @@ class DecoderBlock(nn.Module):
     def __init__(self, layers: list[nn.Module]) -> None:
         super().__init__()
         self.layers = nn.ModuleList(layers)
+        self.prefix_reuse = False
+        self.gradient_checkpointing = False
 
     def forward(
         self,
@@ -37,7 +42,15 @@ class DecoderBlock(nn.Module):
         for index, layer in enumerate(self.layers):
             if memory is not None:
                 hidden = memory.layer_input(index, hidden)
-            hidden = layer(
+            if self.prefix_reuse and memory is not None:
+                hidden = fixed_prefix_layer(layer, hidden, position_embeddings, attention_mask,
+                                            memory, index, self.gradient_checkpointing)
+                continue
+            call = layer
+            if self.gradient_checkpointing and torch.is_grad_enabled():
+                def call(x, _layer=layer, **kwargs):
+                    return checkpoint(_layer, x, use_reentrant=False, **kwargs)
+            hidden = call(
                 hidden,
                 attention_mask=attention_mask,
                 position_ids=position_ids,
@@ -89,7 +102,13 @@ class RecurrentQwen(nn.Module):
         self.coda = DecoderBlock(layers[recurrent_end:])
         self.norm = base.model.norm
         self.lm_head = base.lm_head
-        self.completion_head: CompletionHead | None = None
+        self.completion_head: CompletionHead | RecurrentController | None = None
+        self.router = None
+        self.bridge = None
+        self.state_head = None
+        self.train_scope = "lora"
+        self.prefix_reuse = False
+        self.gradient_checkpointing = False
         self.train(base.training)
 
     def enable_completion(self, intermediate: int = 128) -> None:
@@ -98,6 +117,39 @@ class RecurrentQwen(nn.Module):
             raise ValueError("Completion head is already attached")
         self.completion_head = CompletionHead(self.config.hidden_size, intermediate).to(
             device=self.embed_tokens.weight.device, dtype=self.embed_tokens.weight.dtype)
+
+    def configure_executor(self, tokenizer: Any, *, train_scope: str = "recurrent",
+                           bridge: bool = True, direct_readout: bool = True,
+                           controller_size: int = 128, isolated: bool = True,
+                           prefix_reuse: bool = False, gradient_checkpointing: bool = False) -> None:
+        """Opt-in architecture; legacy forwards/checkpoints keep their semantics."""
+        if train_scope not in ("lora", "recurrent", "full"):
+            raise ValueError("train_scope must be lora, recurrent, or full")
+        if self.recurrence_mode != "fixed_prompt":
+            raise ValueError("Executor interfaces require fixed_prompt recurrence")
+        if train_scope != "lora" and any(".lora_" in name for name, _ in self.named_parameters()):
+            raise ValueError("Full-weight scopes require an unadapted base, not an attached LoRA model")
+        if prefix_reuse and self.config.attention_dropout != 0:
+            raise ValueError("Prefix reuse requires zero attention dropout for equivalent execution")
+        self.train_scope = train_scope
+        if train_scope == "recurrent":
+            self.recurrent.requires_grad_(True)
+        elif train_scope == "full":
+            self.requires_grad_(True)
+        device, dtype = self.embed_tokens.weight.device, self.embed_tokens.weight.dtype
+        if isolated:
+            self.router = PromptRouter(tokenizer)
+            if controller_size:
+                self.completion_head = RecurrentController(self.config.hidden_size, controller_size).to(device=device, dtype=dtype)
+        if bridge:
+            self.bridge = ReentryBridge(self.config.hidden_size).to(device=device, dtype=dtype)
+        if direct_readout:
+            self.state_head = nn.Linear(self.config.hidden_size, 26).to(device=device, dtype=dtype)
+        self.prefix_reuse = prefix_reuse
+        self.gradient_checkpointing = gradient_checkpointing
+        for block in (self.prelude, self.recurrent, self.coda):
+            block.prefix_reuse = prefix_reuse
+            block.gradient_checkpointing = gradient_checkpointing
 
     def forward(
         self,
@@ -113,6 +165,7 @@ class RecurrentQwen(nn.Module):
         logits_mode: Literal["answer", "all"] = "answer",
         stop_policy: Callable[[int, Tensor, Tensor], bool] | None = None,
         completion_threshold: float | None = None,
+        readout_token_ids: list[int] | None = None,
     ) -> RecurrentOutput:
         """Run complete prompt states through shared recurrence, without KV cache.
 
@@ -190,6 +243,20 @@ class RecurrentQwen(nn.Module):
         if labels is not None and labels.shape != (batch, num_loops):
             raise ValueError("labels must have shape [batch, num_loops]")
 
+        controller_initial = None
+        if self.router is not None:
+            if logits_mode != "answer":
+                raise ValueError("Isolated execution supports answer-position logits only")
+            # Controller prompt encoding is isolated even for full-model training.
+            with torch.no_grad():
+                context = self.embed_tokens(input_ids)
+                context_positions = torch.arange(sequence, device=device).unsqueeze(0)
+                context_mask = create_causal_mask(config=self.config, inputs_embeds=context,
+                    attention_mask=attention_mask, past_key_values=None, position_ids=context_positions)
+                context = self.prelude(context, context_mask, context_positions,
+                                       self.rotary_emb(context, context_positions))
+            controller_initial = _answer_readout(context, readout_positions)
+            input_ids, attention_mask, position_ids = self.router(input_ids, attention_mask)
         hidden = self.embed_tokens(input_ids)
         causal_mask = create_causal_mask(
             config=self.config,
@@ -202,23 +269,41 @@ class RecurrentQwen(nn.Module):
         block_args = (causal_mask, position_ids, position_embeddings)
         hidden = self.prelude(hidden, *block_args)
         initial_hidden = hidden if return_hidden_states else None
+        bridge_initial = _answer_readout(hidden, readout_positions)
+        controller_memory = (self.completion_head.initialize(controller_initial)
+                             if isinstance(self.completion_head, RecurrentController) else None)
         recurrent_memory = coda_memory = None
         if self.recurrence_mode == "fixed_prompt":
             write_mask = (torch.arange(sequence, device=device)[None, :] == answer_positions[:, None]).unsqueeze(-1)
             recurrent_memory, coda_memory = PromptMemory(write_mask), PromptMemory(write_mask)
-        states, logits, margins, stop_logits = [], [], [], []
+        states, logits, margins, stop_logits, state_logits = [], [], [], [], []
         for loop in range(num_loops):
+            if loop and self.bridge is not None:
+                working = self.bridge(_answer_readout(hidden, readout_positions), bridge_initial)
+                hidden = torch.where(write_mask, working[:, None, :], hidden)
             hidden = (self.recurrent(hidden, *block_args, memory=recurrent_memory)
                       if recurrent_memory is not None else self.recurrent(hidden, *block_args))
-            if self.completion_head is not None:
-                stop_logits.append(self.completion_head(_answer_readout(hidden, readout_positions)))
+            working = _answer_readout(hidden, readout_positions)
+            if isinstance(self.completion_head, RecurrentController):
+                stop, controller_memory = self.completion_head.advance(working, controller_memory)
+                stop_logits.append(stop)
+            elif self.completion_head is not None:
+                stop_logits.append(self.completion_head(working))
+            if self.state_head is not None:
+                state_logits.append(self.state_head(working))
             if return_hidden_states:
                 states.append(hidden)
-            # Frozen C stays differentiable: readout loss must reach R's adapters.
+            # C stays differentiable even when frozen: readout loss must reach R.
             decoded = self.norm(self.coda(hidden, *block_args, memory=coda_memory)
                                 if coda_memory is not None else self.coda(hidden, *block_args))
             readout = decoded if logits_mode == "all" else _answer_readout(decoded, readout_positions)
-            scores = self.lm_head(readout)
+            if readout_token_ids is None:
+                scores = self.lm_head(readout)
+            else:
+                if labels is not None:
+                    raise ValueError("Use full-vocabulary readout when requesting token-ID margins")
+                ids = torch.tensor(readout_token_ids, device=device)
+                scores = nn.functional.linear(readout, self.lm_head.weight.index_select(0, ids))
             logits.append(scores)
             if labels is not None:
                 answer_scores = _answer_readout(scores, readout_positions) if logits_mode == "all" else scores
@@ -233,6 +318,7 @@ class RecurrentQwen(nn.Module):
                     break
         return RecurrentOutput(
             loop_logits=tuple(logits),
+            state_logits=torch.stack(state_logits, dim=1) if state_logits else None,
             hidden_states=tuple(states) if return_hidden_states else None,
             initial_hidden_state=initial_hidden,
             margins=torch.stack(margins, dim=1) if margins else None,

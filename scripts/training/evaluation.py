@@ -12,6 +12,7 @@ from scripts.dataset.pointer import SYMBOLS
 from scripts.recurrent_qwen.model import RecurrentQwen
 from .data import EncodedExample, collate
 from .precision import autocast_context
+from .objective import forward_symbols
 from .objective import (batch_metrics, combine_metrics, completion_loss, completion_metrics,
                         combine_completion_metrics, step_loss, symbolic_scores)
 
@@ -44,8 +45,12 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
                 with scope("input_prepare_transfer"):
                     batch = collate(items, pad_id, device, loops)
                 with scope("forward"), autocast_context(device, precision):
-                    result = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], num_loops=batch["targets"].shape[1], **({"return_hidden_states": True} if record_states else {}))
+                    result, scores = forward_symbols(model, batch["input_ids"], batch["attention_mask"], token_ids, num_loops=batch["targets"].shape[1], **({"return_hidden_states": True} if record_states else {}))
                 state_values = None
+                direct_scores = getattr(result, "state_logits", None)
+                direct_predictions = direct_scores.argmax(-1).cpu().tolist() if direct_scores is not None else None
+                direct_losses = (step_loss(direct_scores.float(), batch["targets"], batch["target_mask"])[1].cpu().tolist()
+                                 if direct_scores is not None else None)
                 if record_states:
                     positions = batch["attention_mask"].sum(-1) - 1
                     indices = torch.arange(len(items), device=batch["input_ids"].device)
@@ -57,7 +62,6 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
                 if completion_enabled:
                     result_stop_logits = result.stop_logits.float()
                 with scope("loss"):
-                    scores = symbolic_scores(result.loop_logits, token_ids).float()
                     _, losses = step_loss(scores, batch["targets"], batch["target_mask"])
                     if completion_enabled:
                         stop_objective, stop_losses = completion_loss(result_stop_logits, batch["target_mask"])
@@ -113,6 +117,12 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
                                                         for j, value in enumerate(scores_t))) if target is not None else "",
                                 "top_symbols": " ".join(SYMBOLS[j] for j in sorted(range(len(scores_t)), key=lambda j: (-scores_t[j], j))[:3]),
                             })
+                            if direct_predictions is not None:
+                                direct = direct_predictions[row_index][t - 1]
+                                rows[-1].update(r_prediction=SYMBOLS[direct],
+                                    r_intermediate_correct=direct == target if target is not None else "",
+                                    r_c_agree=direct == prediction,
+                                    r_intermediate_loss=direct_losses[row_index][t - 1] if target is not None else "")
                             if record_states:
                                 rows[-1].update(dict(zip(("working_norm", "working_delta_norm", "working_cosine_previous"), state_values[row_index][t-1])))
                             if completion_enabled:
@@ -131,6 +141,15 @@ def evaluate(model: RecurrentQwen, examples: list[EncodedExample], token_ids: li
             summary["completion"] = combine_completion_metrics(stop_parts)
             for depth, values in stop_depth_parts.items():
                 summary["by_depth"][str(depth)]["completion"] = combine_completion_metrics(values)
+        if rows and "r_prediction" in rows[0]:
+            nominal = [r for r in rows if not r["post_completion"]]
+            summary["direct_state"] = {
+                "intermediate_accuracy": sum(r["r_intermediate_correct"] for r in nominal) / len(nominal),
+                "r_c_agreement": sum(r["r_c_agree"] for r in nominal) / len(nominal),
+                "transition_mean_loss": sum(r["r_intermediate_loss"] for r in nominal) / len(nominal),
+                "per_loop": {str(t): {
+                    "accuracy": sum(r["r_intermediate_correct"] for r in nominal if r["loop"] == t) / sum(r["loop"] == t for r in nominal),
+                    "count": sum(r["loop"] == t for r in nominal)} for t in sorted({r["loop"] for r in nominal})}}
         nominal_final = [row for row in rows if row["loop"] == row["task_depth"]]
         summary["final_accuracy"] = sum(row["final_correct"] for row in nominal_final) / len(nominal_final)
         summary["depth_by_loop"] = {}

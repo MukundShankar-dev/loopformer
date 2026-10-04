@@ -10,6 +10,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | --- | --- |
 | Research objectives, stage gates, transfer, and claim hierarchy | [Project plan](docs/project_plan.md) |
 | Implemented work and the next bounded milestone | [Status](docs/status.md) |
+| Current executor/controller upgrade and validation checklist | [Pipeline upgrade](docs/pipeline_upgrade.md) |
 | Recurrent model, gradients, and Stage 0 validation | [Architecture](docs/architecture.md) |
 | Pointer data, training, checkpoints, and depth comparison | [Pointer execution and training](docs/training_pointer.md) |
 | Metrics, ordinary and recurrent baselines, and terminal overscaling | [Evaluation](docs/evaluation.md) |
@@ -37,7 +38,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 ## Scientific constraints
 
 - Follow the stage gates in the project plan. The initial milestones are Stage 0 implementation and validation, then pointer data and validation, then Stage 1 training and evaluation. Preserve the plan's stop-and-report boundaries unless the user explicitly changes the scope.
-- Reuse one recurrent module and parameter set across all loops. Initially freeze all original Qwen parameters; train only recurrent LoRA and an optional bridge.
+- Reuse one recurrent module and parameter set across all loops. The initial experiment froze original Qwen parameters. The user-authorized executor upgrade additionally permits full R/full-model adaptation under explicit configs; see docs/pipeline_upgrade.md.
 - Require one-loop equivalence before training. Keep `use_cache=False` until recurrence is correct.
 - Preserve intermediate supervision and the interpretation of one loop as one transition. Do not silently substitute final-answer-only training.
 - Establish useful repair and overscaling damage before adding asymmetric retention. Validate single-family dynamics before multi-family training.

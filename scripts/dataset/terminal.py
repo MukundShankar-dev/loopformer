@@ -16,6 +16,8 @@ def absorbing_terminal(example: PointerExample) -> PointerExample:
     retroactively applied to the original task. Source IDs/seeds support pairing.
     """
     validate_example(example)
+    if example.final_state in [example.initial_state, *example.intermediate_states[:-1]]:
+        raise ValueError("Terminal transform requires a final state not visited earlier; cyclic tasks need exact-step evaluation")
     final = example.final_state
     pairs = [[source, final if source == final else target] for source, target in example.mapping]
     result = replace(

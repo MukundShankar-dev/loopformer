@@ -10,6 +10,27 @@ This document records choices that affect implementation or interpretation. The 
 - Preserve intermediate supervision and measure damage together with repair.
 - Keep documentation in Markdown under `docs/`, with `AGENTS.md` as the root agent guide.
 
+## Executor upgrade decision — 2026-10-04
+
+Following the user's explicit request, implement the [pipeline checklist](pipeline_upgrade.md).
+Separating a stateless classifier did not isolate control: its features and BCE
+were coupled to R. The replacement routes the count only to a recurrent controller
+and blocks both gradient and clipping interference. This trades a single shared
+latent state for explicit executor/controller memories; it does not supply a clock.
+
+Authorize full R adaptation, bridge normalization and direct state supervision as
+configurable interventions, with single-field controls and full-model SFT as a
+separate capacity test. These interventions are not individually established cures.
+Keep equal-example CE, log its per-loop mass, introduce explicit decay, and preserve
+raw-prompt inference and autonomous continuous unrolling.
+
+Replace depth-conditioned path sampling only in a versioned new dataset. Cycles
+and paired queries make graph structure independent of horizon; exact stopping
+and complete trajectories are required. The linked LoopCD paper supplies no
+justification for subtracting successive pointer targets: its early/late contrast
+predicts the same token. No such loss is introduced. Learned structured attention
+is added only as a positive learnability control, not a replacement architecture.
+
 ## Initial dependency baseline
 
 Use Python 3.11 with a local `venv` and pinned direct dependencies in [requirements.txt](../requirements.txt). Stage 0 adds PEFT, pytest, and Rich to the original PyTorch/Transformers/Hub baseline. Direct pins are not a transitive lock; validation JSON records every installed distribution. See [setup validation](setup.md#version-and-validation-status).

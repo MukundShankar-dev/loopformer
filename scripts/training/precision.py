@@ -23,7 +23,7 @@ def validate_compute_batch(model: "RecurrentQwen", items: list["EncodedExample"]
     """Backward at maximum training depth without updating any parameter."""
     from time import perf_counter
     from .data import collate
-    from .objective import symbolic_scores, step_loss, completion_loss
+    from .objective import forward_symbols, step_loss, completion_loss
     deepest = max(len(x.targets) for x in items)
     selected = [x for x in items if len(x.targets) == deepest][:config.batch_size]
     if len(selected) != config.batch_size:
@@ -34,9 +34,11 @@ def validate_compute_batch(model: "RecurrentQwen", items: list["EncodedExample"]
     torch.cuda.synchronize()
     start = perf_counter()
     with autocast_context(config.device, config.precision):
-        result = model(batch['input_ids'], batch['attention_mask'], num_loops=deepest)
-    scores = symbolic_scores(result.loop_logits, token_ids).float()
+        result, scores = forward_symbols(model, batch['input_ids'], batch['attention_mask'], token_ids, num_loops=deepest)
     loss, _ = step_loss(scores, batch['targets'], batch['target_mask'])
+    if config.state_loss_weight:
+        direct, _ = step_loss(result.state_logits.float(), batch['targets'], batch['target_mask'])
+        loss = loss + config.state_loss_weight * direct
     if config.completion_loss_weight:
         halt, _ = completion_loss(result.stop_logits.float(), batch['target_mask'])
         loss = loss + config.completion_loss_weight * halt
@@ -52,8 +54,13 @@ def validate_compute_batch(model: "RecurrentQwen", items: list["EncodedExample"]
     norm = torch.stack(gradients).norm().item()
     if norm <= 0:
         raise RuntimeError("Compute probe produced no gradient")
+    # A disposable zero-LR update allocates real FP32 Adam moments without
+    # changing model weights. Backward-only probes underestimate full-SFT memory.
+    optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],
+                                  lr=0.0, weight_decay=0.0, foreach=False)
+    optimizer.step()
     torch.cuda.synchronize()
     output = {'depth':deepest, 'batch_size':len(selected), 'loss':loss.item(), 'gradient_norm':norm,
-              'forward_backward_seconds':perf_counter()-start, 'cuda_peak_gib':torch.cuda.max_memory_allocated()/2**30}
+              'forward_backward_optimizer_seconds':perf_counter()-start, 'optimizer_states_included':True, 'cuda_peak_gib':torch.cuda.max_memory_allocated()/2**30}
     model.zero_grad(set_to_none=True)
     return output

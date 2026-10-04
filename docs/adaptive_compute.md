@@ -1,5 +1,10 @@
 # Adaptive inference compute roadmap
 
+For the current explicit-step executor/controller replacement, see the
+[pipeline upgrade](pipeline_upgrade.md). Its GRU learns requested-task completion;
+it does not establish the terminal repair/damage or matched-compute gates in this
+roadmap. Historical stopping policies and checkpoints retain their semantics.
+
 **Status: implementation substrate added; pretrained adaptive research remains unverified.** Offline oracle/heuristic analysis, target-free confidence export for future full-loop runs, opt-in causal stopping, synchronized batch-1 latency recording, and a gated lightweight halting-head trainer are implemented and tested on synthetic/tiny-model cases. No pretrained terminal sweep, adaptive latency comparison, fitted pretrained head, calibration result, or confirmed compute saving exists. The completed loop-balanced ablation is followed by [diagnosis and profiling](diagnostics_and_performance.md) before further pretrained experiments. This document is the canonical adaptive-compute design and usage guide; [the project plan](project_plan.md) retains the research gates.
 
 ## Core question

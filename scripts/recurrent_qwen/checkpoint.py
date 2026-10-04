@@ -1,4 +1,4 @@
-"""Portable recurrent adapters plus explicit base-model and tokenizer identity."""
+"""Portable trainable recurrent tensors plus explicit architecture/base identity."""
 
 import json
 from pathlib import Path
@@ -12,6 +12,7 @@ from .model import RecurrentQwen
 from scripts.dataset.pointer import SYMBOLS
 
 
+EXECUTOR_FORMAT = "loopformer-executor-v2"
 FORMAT = "loopformer-stage1-v1"
 COMPLETION_FORMAT = "loopformer-stage1-completion-v1"
 FIXED_PROMPT_FORMAT = "loopformer-stage1-fixed-prompt-v1"
@@ -20,9 +21,11 @@ FIXED_PROMPT_FORMAT = "loopformer-stage1-fixed-prompt-v1"
 def checkpoint_mode(spec: dict) -> str:
     """Legacy checkpoints mean full-sequence recurrence; never infer new modes."""
     mode = spec.get("recurrence_mode", "full_sequence")
-    if spec.get("format") not in (FORMAT, COMPLETION_FORMAT, FIXED_PROMPT_FORMAT):
+    if spec.get("format") not in (FORMAT, COMPLETION_FORMAT, FIXED_PROMPT_FORMAT, EXECUTOR_FORMAT):
         raise ValueError("Unsupported recurrent checkpoint format")
-    expected = "fixed_prompt" if spec["format"] == FIXED_PROMPT_FORMAT else "full_sequence"
+    if (spec["format"] == EXECUTOR_FORMAT) != ("executor" in spec):
+        raise ValueError("Executor architecture requires the versioned executor checkpoint format")
+    expected = "fixed_prompt" if spec["format"] in (FIXED_PROMPT_FORMAT, EXECUTOR_FORMAT) else "full_sequence"
     if mode != expected:
         raise ValueError("Checkpoint format and recurrence_mode disagree")
     return mode
@@ -51,14 +54,22 @@ def save_checkpoint(path: Path, model: RecurrentQwen, tokenizer: Any, spec: dict
         raise ValueError("Checkpoint spec and completion head disagree")
     if completion and expected_completion != {"intermediate": model.completion_head.intermediate}:
         raise ValueError("Checkpoint completion-head architecture differs from spec")
-    if not weights or any(not ((name.startswith("recurrent.") and ".lora_" in name) or
-                               (completion and name.startswith("completion_head."))) for name in weights):
+    new_architecture = "executor" in spec
+    if not new_architecture and (not weights or any(not ((name.startswith("recurrent.") and ".lora_" in name) or
+                               (completion and name.startswith("completion_head."))) for name in weights)):
         raise ValueError("Checkpoint expects recurrent LoRA and optional completion head only")
+    if new_architecture:
+        if spec["executor"]["train_scope"] != model.train_scope:
+            raise ValueError("Checkpoint training scope differs from model")
+        if not weights:
+            raise ValueError("Cannot save an empty executor")
     path.mkdir(parents=True, exist_ok=False)
     torch.save(cpu_tree(weights), path / "adapter_model.pt")
     torch.save(cpu_tree(training_state), path / "training_state.pt")
     tokenizer.save_pretrained(path)
     version = FIXED_PROMPT_FORMAT if model.recurrence_mode == "fixed_prompt" else (COMPLETION_FORMAT if completion else FORMAT)
+    if new_architecture:
+        version = EXECUTOR_FORMAT
     (path / "recurrent_config.json").write_text(json.dumps({**spec, "format": version}, indent=2) + "\n")
 
 
@@ -101,8 +112,12 @@ def load_recurrent_checkpoint(path: Path, *, device: str = "cpu", dtype: str = "
         dtype=getattr(torch, dtype), attn_implementation="eager", trust_remote_code=False,
     ).to(device).eval()
     model = RecurrentQwen(base, spec["recurrent_start"], spec["recurrent_end"], recurrence_mode=mode)
-    attach_recurrent_lora(model, rank=spec["lora_rank"], alpha=spec["lora_alpha"])
-    if completion:
+    executor = spec.get("executor")
+    if executor is None or executor["train_scope"] == "lora":
+        attach_recurrent_lora(model, rank=spec["lora_rank"], alpha=spec["lora_alpha"])
+    if executor is not None:
+        model.configure_executor(tokenizer, **executor)
+    if completion and model.completion_head is None:
         model.enable_completion(spec["completion_head"]["intermediate"])
     restore_adapters(model, path)
     model.eval()

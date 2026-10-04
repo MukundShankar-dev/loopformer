@@ -436,3 +436,46 @@ The same uploader can publish other completed diagnostic directories containing 
 Run `bash probe_depth12.sh --dry-run`, then `bash probe_depth12.sh`. The existing paired-Steps evaluator now accepts `--depths` and `--loops`; historical defaults remain unchanged. The new launcher fixes 32 depth-20 seed-47 development mappings, counts 12/14/16/18/20, 24 loops, batch 8, and checkpoints 5,000/7,500. All counts are two-digit inputs. It saves exact task variants, checkpoint/data/source hashes, per-loop predictions/stop logits and working-state norms/update norms/cosines under `eval/pointer_probes/depth12-paired-*/`. Each checkpoint gets W&B coverage; stdout/stderr share one local log. Missing checkpoints and failures stop the launcher.
 
 Interpret comparisons only within both prompts' nominal horizons; extra loops after a smaller requested count are stress observations. The largest requested count is the paired-summary anchor. No new training or stopping-policy calibration is performed. See the [checkpoint progression report](experiments/stage1_depth12_progression.md) for the reason to run this diagnostic.
+
+## Executor upgrade diagnostic bundle
+
+`bash eval_executor.sh [training-run-directory]` loads the selected checkpoint
+from the new run (default `models/stage1_pointer/executor_r-seed61`) and records
+all output beneath `eval/pointer_diagnostics/`. It runs:
+
+1. A **matched development panel**: 32 validation graphs/start states, requested
+   counts 6/8/12/16/24/32/64, exact reference targets including cycles. Compare
+   the same weights/cases under FP32/eager, FP32/SDPA, and BF16/SDPA.
+2. Full validation and depth-development execution through 64 loops, using
+   BF16/SDPA, batch 16, direct R/C diagnostics and working-state summaries.
+3. Actual batch-one stopping on both splits at threshold 0.5 and safety cap 64,
+   using FP32/SDPA. These latency results have a different precision/batching
+   scope from forced execution and are not a matched-compute speedup claim.
+
+The shared evaluator now exports optional `r_prediction`,
+`r_intermediate_correct`, and `r_c_agree` alongside existing C scores, exact targets,
+stop logits, confidence and state norms. No reference answer is supplied to the
+forward pass. `--precision`, `--attention`, and `--record-states` make forced-run
+compute explicit; defaults remain FP32/eager. Stopped timing currently requires
+FP32. Naive evaluation still reads C at externally requested depth; actual learned
+halting remains a separate measurement.
+
+The integrated panel adds first-error histograms, transition accuracy conditional
+on a correct prefix, local consistency with the model's previous prediction,
+R-correct/C-wrong and C-correct/R-wrong counts, matched-count disagreements and
+transient-length/cycle-period strata. Precision comparisons report prediction
+flips and maximum target-margin change on exactly matched rows. R/C disagreements
+localize observations; they do not prove which block caused an error. Repeated
+queries share graphs and should not be treated as independent statistical trials.
+
+Run the panel directly with `python -m scripts.eval.executor_diagnostic --model
+ <checkpoint> --device cuda --precision-check`. Raw trajectories, per-example
+summaries, pairs, loop risk tables, source/data/checkpoint hashes and JSON summaries
+are saved and published through the existing optional W&B integration. A missing
+checkpoint or failed stage stops the shell bundle. Confirmation data stays unused.
+
+The v2 cyclic dataset uses strict **exact-step execution**. Reaching the same symbol
+on an earlier cycle is not an exact stop. Do not reinterpret ordinary post-request
+lookups as terminal damage. Absorbing-terminal transformation rejects cases where
+the final state appeared earlier, since editing that edge would change nominal
+execution. Terminal repair/damage and cross-family claims remain deferred.

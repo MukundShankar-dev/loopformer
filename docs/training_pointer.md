@@ -619,3 +619,109 @@ Each training invocation creates a new W&B run, including a checkpoint continuat
 Plots use `optimizer_step` as their x-axis. Train and validation events at the same optimizer step are both retained. Logged signals include CE, completion loss and stop rates, per-loop/per-depth accuracy, fixed train-probe metrics, selection loss, learning rate, pre-clipping gradient norm, update time, throughput and ETA. SDK system monitoring supplies device utilization where supported. CUDA update peaks (allocated and reserved bytes) are measured from immediately before the forward pass through the optimizer update, with batch minimum/maximum depth recorded. The lifetime allocation peak is retained separately, including startup/validation. Between-update allocation is explicitly labeled and is not a capacity estimate. Reserved memory includes allocator caching; it is not live tensor usage.
 
 The recurrent model and scientific objective are unchanged. Tracking failures propagate rather than silently pretending a run was logged. The SDK context closes and marks exceptions as failures. Logging begins after data/model validation and startup gates, so initialization failures have no W&B run. Evaluation-only scripts continue to write their existing local artifacts; W&B does not retroactively capture completed runs.
+
+## Isolated executor upgrade — current desktop run
+
+The [pipeline upgrade](pipeline_upgrade.md) replaces the depth-12 continuation as
+current preparation. Start fresh; old checkpoints cannot initialize this changed
+architecture. Existing checkpoints and scripts remain usable for historical controls.
+
+```bash
+bash prepare_executor.sh --dry-run
+bash prepare_executor.sh
+bash train_executor.sh --dry-run
+bash train_executor.sh --smoke-test
+```
+
+The data command uses seed **61**, `graph-mode=mixture`, paired evaluation horizons, 36,000
+training queries on independent graphs at depths 1–6/8/10/12, 1,536 validation and 1,536 reserved test
+queries at depths 1–12, and 1,664 development depth queries at 13–64. Graph pools
+are disjoint between splits. Training contains 36,000 independent graph/start pairs;
+validation/test each have 128; the depth panel has 32. Repeated queries on a graph
+are correlated observations, not independent new graphs. Counts 7/9/11 remain
+held out from training. The generator mixes random functions, random permutations,
+and full 26-cycles independently of horizon. Its schema permits repeated states;
+strict per-loop execution and exact stop timing matter more than final-letter accuracy.
+
+The launcher contains every generation argument. The manifest records seeds,
+source/tokenizer identities and checksums; `python -m scripts.dataset --verify
+ data/pointer/seed-61-independent` replays records and checks reference targets.
+Existing v1 datasets keep their generator and non-repeating-path semantics.
+
+`configs/executor_r.json` trains **all R weights**, bridge, direct R readout and
+isolated recurrent controller; P/C and embeddings remain frozen. It uses batch
+4 × accumulation 4, one epoch / 2,250 updates, BF16/SDPA, differentiable prefix
+reuse and gradient checkpointing. AdamW LR warms up for 100 steps to 2e-5 then
+cosine-decays to 2e-6; weight decay is 0.01. `schedule_steps` is explicit and does
+not change on resume. This differs from the old batch-4 constant-LR recipe.
+
+The objective is C's exact per-loop symbolic CE plus 0.25 × direct R CE and
+0.1 × controller BCE. CE retains equal-example weighting, full BPTT and nominal
+loop targets only. The controller learns continue before d and stop at d; there
+is no claim of trained post-stop retention. Its features are detached and its
+gradients are clipped separately from the executor. Direct R predictions are
+observations and supervision, never inputs to the next loop.
+
+The smoke test makes ten disposable updates and saves a separate run. Startup
+checks include ordinary one-pass equivalence, sharing, gradient paths and a
+float32 two-pass dense-versus-prefix comparison. The deepest-microbatch probe
+includes a disposable **zero-LR Adam update** to allocate real optimizer moments
+without changing weights. It records the full peak; backward-only memory estimates
+are insufficient for full-weight training. CUDA fit and speed must be measured on
+the desktop. Full-R and full-model checkpoint/optimizer files are much larger than
+LoRA files; binaries stay Git-ignored. Static parameter accounting gives about
+180.1M trainable parameters for full R and 495.2M for full model. FP32 weights,
+gradients and Adam moments alone total approximately 3.86 GiB and 7.38 GiB,
+respectively; those are lower bounds excluding activations, workspaces and caches.
+
+After checking the smoke results, launch and then evaluate:
+
+```bash
+bash train_executor.sh
+bash eval_executor.sh
+```
+
+Training writes `models/stage1_pointer/executor_r-seed61/`. W&B defaults to online
+project `loopformer`; `WANDB_MODE=disabled` disables it. The Rich dashboard stays
+compact and a PTY log preserves stdout/stderr. JSONL/W&B add direct-state CE and
+accuracy, per-module gradient norms, direct CE mass by loop, LR, throughput and
+per-update allocated/reserved peaks. Validation also reports direct R accuracy
+and R/C agreement. Selection still uses **trained-depth C CE**, not deep diagnostic
+performance. No confirmation split is used by these launchers.
+
+### Prepared controls, not an automatic sweep
+
+All alternate configs differ from `executor_r.json` in one field:
+
+| Config | Change | Question |
+| --- | --- | --- |
+| `executor_full.json` | `train_scope=full` | Does allowing P/C/embedding adaptation help? |
+| `executor_lora.json` | `train_scope=lora` | Is full R capacity necessary under this recipe? |
+| `executor_no_bridge.json` | `reentry_bridge=false` | Does normalized re-entry help? |
+| `executor_no_direct.json` | `state_loss_weight=0` | Does local R supervision help? |
+
+Use `EXECUTOR_CONFIG=configs/executor_full.json bash train_executor.sh --smoke-test`
+for the full-model fit check; omit `--smoke-test` only after inspecting that check.
+The run name follows the config basename. These controls retain the same LR,
+examples and update budget; they do not establish each method's tuned optimum.
+Use `EXECUTOR_RUN` to select a new output directory. Never overwrite a prior run.
+A second training seed and frozen confirmation criteria remain necessary before
+claiming robust generalization.
+
+### Learned task-native positive control
+
+```bash
+python -m scripts.training.native_control \
+  --data data/pointer/seed-61-independent \
+  --output models/native_control/seed61-train17 \
+  --device cuda --wandb-mode online
+```
+
+This small model learns attention from a continuous state to supplied symbolic
+edge keys/values. It uses the same per-loop targets and shared evaluator, but an
+explicit text parser provides structured memory. It is a learnability control,
+not a Qwen result or a substitute for the desired model. No intermediate answer
+is injected. It trains 1,500 seeded with-replacement updates, then evaluates
+validation/depth development splits; it does not tune or select on depth metrics.
+The separate `native_model.pt` is not a recurrent-Qwen checkpoint. Its pretrained
+comparison outcome is unmeasured; only tiny-model learning mechanics are tested.

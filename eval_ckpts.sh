@@ -47,7 +47,7 @@ from pathlib import Path
 spec = json.loads((Path(sys.argv[1]) / "recurrent_config.json").read_text())
 from scripts.recurrent_qwen.checkpoint import checkpoint_mode
 checkpoint_mode(spec)
-if spec.get("format") not in ("loopformer-stage1-completion-v1", "loopformer-stage1-fixed-prompt-v1") or "completion_head" not in spec:
+if spec.get("format") not in ("loopformer-stage1-completion-v1", "loopformer-stage1-fixed-prompt-v1", "loopformer-executor-v2") or "completion_head" not in spec:
     raise SystemExit("Selected checkpoint has no trained completion head")
 PY
 data_root="${POINTER_DATA_ROOT:-data/pointer/seed-17}"

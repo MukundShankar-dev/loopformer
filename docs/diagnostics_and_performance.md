@@ -1,5 +1,11 @@
 # Diagnose recurrent failures and measure execution cost
 
+The current implementation is the [executor upgrade](pipeline_upgrade.md), with
+[matched diagnostics](evaluation.md#executor-upgrade-diagnostic-bundle). It adds
+R/C readouts, count controls, cycle strata and precision comparisons to the shared
+evaluator, and implements tested prefix reuse/selected projection. Earlier
+proposal and profiling sections below describe the historical pipeline.
+
 Status: initial diagnostics and short profiler implemented after the [negative loop-balanced ablation](experiments/stage1_loopbalanced.md). Offline first-failure analysis has run on retained traces. Paired model probes and pretrained CUDA profiling completed on the desktop; see the [results and limitations](experiments/baseline2500_diagnostics.md). The broader measurements below distinguish implemented interfaces from future work; no optimization or new training sweep has been run.
 
 ## Questions before another training change

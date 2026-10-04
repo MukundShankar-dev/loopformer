@@ -9,6 +9,7 @@ import torch
 
 from scripts.dataset.pointer import SYMBOLS
 from scripts.training.data import EncodedExample, collate
+from scripts.training.objective import forward_symbols
 from .adaptive_policy import HaltingHead, StoppingRule
 from .pointer_task import synchronize
 
@@ -44,14 +45,18 @@ def evaluate_stopping(model: torch.nn.Module, items: list[EncodedExample], token
                 synchronize(device)
                 start = perf_counter()
                 stopping = {"completion_threshold": threshold} if completion else {"stop_policy": rule}
-                result = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"],
-                               num_loops=loops, **stopping)
+                if completion:
+                    result, selected_scores = forward_symbols(model, batch["input_ids"], batch["attention_mask"],
+                                                              token_ids, num_loops=loops, **stopping)
+                else:
+                    result = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"],
+                                   num_loops=loops, **stopping)
                 synchronize(device)
                 latency = perf_counter() - start
                 latencies.append(latency)
                 predictions, features = [], []
                 for t, logits in enumerate(result.loop_logits, 1):
-                    allowed = logits[0, token_ids]
+                    allowed = selected_scores[0, t - 1] if completion else logits[0, token_ids]
                     prediction = int(allowed.argmax())
                     predicted = SYMBOLS[prediction]
                     predictions.append(predicted)

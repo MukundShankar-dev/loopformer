@@ -19,6 +19,8 @@ class PromptMemory:
     write_mask: Tensor
     layers: list[Tensor] = field(default_factory=list)
     output: Tensor | None = None
+    keys_values: list[tuple[Tensor, Tensor]] = field(default_factory=list)
+    layer_outputs: list[Tensor] = field(default_factory=list)
 
     def layer_input(self, index: int, hidden: Tensor) -> Tensor:
         if self.output is None:

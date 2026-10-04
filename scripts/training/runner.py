@@ -15,6 +15,7 @@ from scripts.recurrent_qwen.checkpoint import save_checkpoint
 from scripts.recurrent_qwen.model import RecurrentQwen
 from scripts.eval.pointer_task import synchronize
 from .config import TrainingConfig
+from .objective import forward_symbols
 from .precision import autocast_context
 from .data import EncodedExample, collate
 from .evaluation import evaluate
@@ -54,7 +55,10 @@ def resume_identity(config: TrainingConfig, data_identity: dict) -> dict:
     # A continuation can extend its budget or change reporting cadence. All
     # sampling, optimization, model, validation, and device settings must match.
     settings = config.to_dict()
-    for name, default in {"train_depths": None, "precision": "float32", "attention": "eager",
+    for name, default in {"train_scope": "lora", "isolated_controller": False, "reentry_bridge": False,
+                          "state_loss_weight": 0.0, "prefix_reuse": False, "gradient_checkpointing": False,
+                          "lr_schedule": "constant", "schedule_steps": None, "min_lr_ratio": 0.1,
+                          "train_depths": None, "precision": "float32", "attention": "eager",
                           "validation_batch_size": None, "deterministic": True, "bucket_by_depth": False}.items():
         if settings[name] == default:
             settings.pop(name)
@@ -115,6 +119,19 @@ def epoch_order(items: list[EncodedExample], batch_size: int, seed: int, bucket:
     groups.extend(remainder[i:i + batch_size] for i in range(0, stop, batch_size))
     rng.shuffle(groups)
     return [i for group in groups for i in group] + remainder[stop:]
+
+
+def clip_training_gradients(model: RecurrentQwen, max_norm: float, isolated: bool) -> torch.Tensor:
+    """Clip separated objectives independently so H cannot rescale R updates."""
+    parameters = [p for p in model.parameters() if p.requires_grad]
+    if isolated and model.completion_head is not None:
+        head = list(model.completion_head.parameters())
+        head_ids = {id(p) for p in head}
+        executor = [p for p in parameters if id(p) not in head_ids]
+        norms = [torch.nn.utils.clip_grad_norm_(group, max_norm, error_if_nonfinite=True, foreach=False)
+                 for group in (executor, head)]
+        return torch.stack(norms).norm()
+    return torch.nn.utils.clip_grad_norm_(parameters, max_norm, error_if_nonfinite=True, foreach=False)
 
 
 def train(
@@ -226,7 +243,11 @@ def train(
         log({"event": "objective", "loss_reduction": config.loss_reduction,
              "completion_loss_weight": config.completion_loss_weight,
              "loop_weights": weights.tolist() if weights is not None else None,
-             "training_examples": len(train_items)})
+             "training_examples": len(train_items),
+             "direct_ce_mass_by_loop": {
+                 str(t): sum((float(weights[t - 1]) if weights is not None else 1 / len(x.targets))
+                             for x in train_items if len(x.targets) >= t) / len(train_items)
+                 for t in range(1, max(len(x.targets) for x in train_items) + 1)}})
         progress({"step": step, "total_steps": total_steps, "phase": "Initial validation"})
         improved = validate()
         checkpoint(improved)
@@ -236,9 +257,12 @@ def train(
                 group = [train_items[index] for index in order[offset:offset + effective_batch]]
                 model.train()
                 optimizer.zero_grad(set_to_none=True)
-                parts, stop_parts = [], []
+                parts, stop_parts, state_parts = [], [], []
                 objective_sum = 0.0
                 rate = config.learning_rate * min(1.0, (step + 1) / max(1, config.warmup_steps))
+                if config.lr_schedule == "cosine" and step + 1 > config.warmup_steps:
+                    fraction = min(1.0, (step + 1 - config.warmup_steps) / (config.schedule_steps - config.warmup_steps))
+                    rate *= config.min_lr_ratio + (1 - config.min_lr_ratio) * (1 + math.cos(math.pi * fraction)) / 2
                 for param_group in optimizer.param_groups:
                     param_group["lr"] = rate
                 synchronize(torch.device(config.device))
@@ -249,9 +273,13 @@ def train(
                     items = group[start:start + config.batch_size]
                     batch = collate(items, pad_id, config.device)
                     with autocast_context(config.device, config.precision):
-                        result = model(batch["input_ids"], batch["attention_mask"], num_loops=batch["targets"].shape[1])
-                    scores = symbolic_scores(result.loop_logits, token_ids).float()
+                        result, scores = forward_symbols(model, batch["input_ids"], batch["attention_mask"], token_ids,
+                                                         num_loops=batch["targets"].shape[1])
                     loss, losses = step_loss(scores, batch["targets"], batch["target_mask"], loop_weights=weights)
+                    if config.state_loss_weight:
+                        state_loss, state_losses = step_loss(result.state_logits.float(), batch["targets"], batch["target_mask"], loop_weights=weights)
+                        loss = loss + config.state_loss_weight * state_loss
+                        state_parts.append(batch_metrics(result.state_logits, batch["targets"], batch["target_mask"], state_losses))
                     if config.completion_loss_weight:
                         halt_loss, halt_losses = completion_loss(result.stop_logits.float(), batch["target_mask"])
                         loss = loss + config.completion_loss_weight * halt_loss
@@ -269,7 +297,17 @@ def train(
                 for name, parameter in model.named_parameters():
                     if not parameter.requires_grad and parameter.grad is not None:
                         raise RuntimeError(f"Frozen parameter received a gradient: {name}")
-                norm = torch.nn.utils.clip_grad_norm_(parameters, config.max_grad_norm, error_if_nonfinite=True, foreach=False)
+                gradient_groups = {}
+                for name, parameter in model.named_parameters():
+                    if parameter.requires_grad:
+                        gradient_groups.setdefault(name.split(".")[0], 0.0)
+                    if parameter.grad is not None:
+                        group_name = name.split(".")[0]
+                        value = parameter.grad.detach().float().square().sum()
+                        gradient_groups[group_name] = gradient_groups.get(group_name, 0) + value
+                gradient_groups = {name: value.sqrt().item() if isinstance(value, torch.Tensor) else math.sqrt(value)
+                                   for name, value in gradient_groups.items()}
+                norm = clip_training_gradients(model, config.max_grad_norm, config.isolated_controller)
                 optimizer.step()
                 optimizer.zero_grad(set_to_none=True)
                 synchronize(torch.device(config.device))
@@ -284,6 +322,8 @@ def train(
                     offset = 0
                 metrics = combine_metrics(parts)
                 metrics["objective_loss"] = objective_sum / len(group)
+                if state_parts:
+                    metrics["direct_state"] = combine_metrics(state_parts)
                 if stop_parts:
                     metrics["completion"] = combine_completion_metrics(stop_parts)
                 update_memory = ({"update_peak_allocated_bytes": torch.cuda.max_memory_allocated(),
@@ -291,7 +331,7 @@ def train(
                                  if config.device == "cuda" else {})
                 event = {"event": "train", "batch_max_depth": max(len(item.targets) for item in group),
                          "batch_min_depth": min(len(item.targets) for item in group), **update_memory, "step": step, "next_epoch": epoch, "next_offset": offset,
-                         "train": metrics, "learning_rate": rate, "gradient_norm_before_clip": norm.item(),
+                         "train": metrics, "gradient_norm_by_module": gradient_groups, "learning_rate": rate, "gradient_norm_before_clip": norm.item(),
                          "update_seconds": seconds, "examples_per_second": len(group) / seconds,
                          "valid_transitions_per_second": sum(len(item.targets) for item in group) / seconds,
                          "eta_seconds": (total_steps - step) * (train_seconds / completed_here + validation_seconds / evaluations / config.eval_every),

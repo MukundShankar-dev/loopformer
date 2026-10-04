@@ -2,7 +2,15 @@
 
 **Status: both the historical joint run and fixed-prompt training/evaluation have completed on pretrained Qwen.** See the [fixed-prompt failure investigation](experiments/stage1_fixed_prompt_review.md): forced execution improves near the training horizon, but learned stopping still fails beyond trained depths. The [experiment report](experiments/stage1_learned_completion.md) records a negative result: at the 0.5 diagnostic threshold, the head stops early on every depth-9–16 example, and the jointly trained checkpoint has worse forced-depth pointer trajectories than the matched CE-only checkpoint. This is a Stage 1 ablation of the existing [pointer training](training_pointer.md), not the terminal-damage controller in [adaptive inference](adaptive_compute.md).
 
-## Task and model contract
+## Current replacement
+
+The [isolated executor upgrade](pipeline_upgrade.md) supersedes the joint stateless
+head for new runs: the controller has its own GRU memory, receives detached full
+prompt/executor features and cannot affect executor gradients or clipping. R sees
+a prompt view without Steps. The sections below describe the historical architectures;
+loading their checkpoints preserves those original coupled semantics.
+
+## Historical task and model contract
 
 The **only task input** is the existing raw dataset prompt:
 

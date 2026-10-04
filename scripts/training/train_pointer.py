@@ -115,6 +115,14 @@ def main() -> None:
         spec["completion_loss_weight"] = config.completion_loss_weight
     if config.precision != "float32" or config.attention != "eager":
         spec["training_compute"] = {"precision": config.precision, "attention": config.attention}
+    if (config.train_scope != "lora" or config.isolated_controller or config.reentry_bridge
+            or config.state_loss_weight or config.prefix_reuse or config.gradient_checkpointing):
+        spec["executor"] = {
+            "train_scope": config.train_scope, "isolated": config.isolated_controller,
+            "bridge": config.reentry_bridge, "direct_readout": config.state_loss_weight > 0,
+            "controller_size": config.completion_head_hidden_size if config.completion_loss_weight else 0,
+            "prefix_reuse": config.prefix_reuse, "gradient_checkpointing": config.gradient_checkpointing,
+        }
     initialization_metadata = None
     if args.init_from:
         source_spec = validate_initialization(args.init_from, spec)
@@ -135,7 +143,7 @@ def main() -> None:
     for label, value in (
         ("Model", f"{config.model} @ {config.revision}"),
         ("Device / dtype", f"{config.device} / {config.precision} compute, float32 parameters · {config.attention} · deterministic={config.deterministic}"),
-        ("Recurrence", config.recurrence_mode),
+        ("Recurrence", f"{config.recurrence_mode} · scope={config.train_scope} · isolated={config.isolated_controller} · bridge={config.reentry_bridge}"),
         ("Training", f"{len(train_items):,} examples · depths {config.train_depths or list(range(1, config.train_max_depth + 1))} · {config.epochs} epochs"),
         ("Validation / train probe", f"{len(validation_items)} / {len(probe_items)} examples · validation depths 1–{config.validation_max_depth}"),
         ("Depth bucketing / validation batch", f"{config.bucket_by_depth} / {config.validation_batch_size or config.batch_size}"),
@@ -146,7 +154,7 @@ def main() -> None:
         ("Prompt", "Dataset raw rules/start/steps · no few-shot examples"),
         ("Output", str(output.resolve())),
         ("Initialization", str(args.init_from) + " · adapters only, new optimizer" if args.init_from else
-         (str(args.resume) + " · resume" if args.resume else "Fresh adapters")),
+         (str(args.resume) + " · resume" if args.resume else f"Fresh {config.train_scope} adaptation")),
     ):
         table.add_row(label, value)
     console.print(table)
@@ -162,10 +170,17 @@ def main() -> None:
             raise ValueError("Selected prompts exceed model context size")
         probe = collate(train_items[:1], tokenizer.pad_token_id, config.device)
         model, gate = initialize(base, config, probe, token_ids)
+        if "executor" in spec:
+            model.configure_executor(tokenizer, **spec["executor"])
+            from scripts.training.executor_gates import validate_executor
+            gate["executor"] = validate_executor(model, probe, token_ids)
         if config.completion_loss_weight:
-            model.enable_completion(config.completion_head_hidden_size)
-            gate["completion"] = validate_completion_gradients(model, probe)
+            if model.completion_head is None:
+                model.enable_completion(config.completion_head_hidden_size)
+            if not config.isolated_controller:
+                gate["completion"] = validate_completion_gradients(model, probe)
             gate["trainable_parameters"] = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    gate["trainable_parameters"] = sum(p.numel() for p in model.parameters() if p.requires_grad)
     if config.precision == "bf16":
         from scripts.training.precision import validate_compute_batch
         console.print("Checking BF16 loss/gradients at the deepest training microbatch…")

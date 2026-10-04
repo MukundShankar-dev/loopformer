@@ -22,6 +22,9 @@ def main(*, overscaling: bool = False) -> None:
                         help=("Loops for every example; default 32; must exceed every task depth" if overscaling else
                               "Loops for every example; default deepest task; completion stopping requires an explicit safety cap"))
     parser.add_argument("--device", choices=("cpu", "mps", "cuda"), default="cpu")
+    parser.add_argument("--precision", choices=("float32", "bf16"), default="float32")
+    parser.add_argument("--attention", choices=("eager", "sdpa"), default="eager")
+    parser.add_argument("--record-states", action="store_true")
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--seed", type=int, default=17)
@@ -42,6 +45,10 @@ def main(*, overscaling: bool = False) -> None:
     from scripts.eval.tracking import add_tracking_arguments, report_saved_run
     add_tracking_arguments(parser)
     args = parser.parse_args()
+    if args.precision == "bf16" and args.device != "cuda":
+        parser.error("BF16 requires CUDA")
+    if args.stop_policy and args.precision != "float32":
+        parser.error("Stopped timing currently requires float32; compare BF16 in forced evaluation")
     if args.stop_policy and args.batch_size != 1:
         parser.error("Adaptive stopping requires --batch-size 1 for actual per-example compute savings")
     if args.stop_policy in ("margin", "entropy", "learned", "completion") and args.stop_threshold is None:
@@ -134,6 +141,7 @@ def main(*, overscaling: bool = False) -> None:
     loading_started = perf_counter()
     with console.status("Loading saved adapters, tokenizer, and frozen base…"):
         model, tokenizer, spec = load_recurrent_checkpoint(args.model, device=args.device, download=args.download)
+        model.config._attn_implementation = args.attention
         if args.stop_policy == "completion" and model.completion_head is None:
             parser.error("Selected checkpoint has no completion head")
         if tokenizer.pad_token_id is None:
@@ -147,7 +155,7 @@ def main(*, overscaling: bool = False) -> None:
         "checkpoint": str(args.model.resolve()), "model": spec,
         "data": str(args.data.resolve()), "data_sha256": sha256_file(args.data),
         "selected_examples": len(examples), "limit": args.limit, "test_mode": args.test is not None,
-        "loops": loops, "device": args.device, "dtype": "float32", "batch_size": args.batch_size,
+        "loops": loops, "device": args.device, "dtype": "float32", "compute_precision": args.precision, "attention": args.attention, "batch_size": args.batch_size,
         "seed": args.seed, "threads": args.threads, "use_cache": False, "deterministic_algorithms": True,
         "scoring": "allowed_symbol_argmax_at_each_loop", "prompt_format": "dataset_raw",
         "target_semantics": ("Absorbing final state; nominal CE only through d; post-nominal dynamics compare fixed final target" if overscaling else
@@ -218,7 +226,8 @@ def main(*, overscaling: bool = False) -> None:
 
         metrics = evaluate(model, items, spec["token_ids"], tokenizer.pad_token_id, batch_size=args.batch_size,
                            loops=loops, output=output / "trajectories.csv", progress=update,
-                           completion_loss_weight=spec.get("completion_loss_weight", 0.0))
+                           completion_loss_weight=spec.get("completion_loss_weight", 0.0),
+                           precision=args.precision, record_states=args.record_states)
     synchronize(device)
     elapsed = perf_counter() - began
     example_rows, diagnostics = summarize_trajectories(output / "trajectories.csv")

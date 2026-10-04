@@ -33,11 +33,13 @@ def show_summary(console: Console, manifest: dict) -> None:
         depths = ", ".join(f"{depth}: {count}" for depth, count in sorted(summary["depth_counts"].items(), key=lambda item: int(item[0])))
         table.add_row(split, f"{summary['count']:,}", depths, f"{summary['prompt_tokens_min']}–{summary['prompt_tokens_max']}")
     console.print(table)
-    console.print("[green]PASS[/green] Exact targets, tokenizer contexts, unique rule tables, split boundaries, and seed replay")
+    console.print("[green]PASS[/green] Exact targets, tokenizer contexts, declared graph sharing, disjoint split boundaries, and seed replay")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--graph-mode", choices=("unique_path", "mixture", "random_function", "permutation", "full_cycle"), default="unique_path")
+    parser.add_argument("--paired-horizons", action="store_true", help="Match each evaluation graph/start across depths; training graphs stay independent")
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--train-count", type=int, default=10_000)
     parser.add_argument("--validation-count", type=int, default=1_000)

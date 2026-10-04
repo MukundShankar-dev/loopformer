@@ -25,7 +25,13 @@ def initialize(base: Qwen2ForCausalLM, config: TrainingConfig, inputs: dict, tok
                          logits_to_keep=readout).logits[:, 0].clone()
     model = RecurrentQwen(base, config.recurrent_start, config.recurrent_end,
                           recurrence_mode=config.recurrence_mode).eval()
-    attach_recurrent_lora(model, rank=config.lora_rank, alpha=config.lora_alpha)
+    if config.train_scope == "lora":
+        attach_recurrent_lora(model, rank=config.lora_rank, alpha=config.lora_alpha)
+    elif config.train_scope == "recurrent":
+        model.recurrent.requires_grad_(True)
+    else:
+        model.requires_grad_(True)
+    model.train_scope = config.train_scope
     with torch.no_grad():
         actual = model(x, mask, num_loops=1).logits
         torch.testing.assert_close(actual, reference, atol=1e-5, rtol=1e-5)
@@ -53,7 +59,7 @@ def initialize(base: Qwen2ForCausalLM, config: TrainingConfig, inputs: dict, tok
         raise RuntimeError("Later-loop gradient does not reach earlier states")
     for name, parameter in model.named_parameters():
         if parameter.requires_grad:
-            if ".lora_" not in name or not name.startswith("recurrent.") or parameter.grad is None or not torch.isfinite(parameter.grad).all():
+            if ((config.train_scope == "lora" and (".lora_" not in name or not name.startswith("recurrent."))) or parameter.grad is None or not torch.isfinite(parameter.grad).all()):
                 raise RuntimeError(f"Invalid trainable parameter/gradient: {name}")
         elif parameter.grad is not None:
             raise RuntimeError(f"Frozen parameter received a gradient: {name}")

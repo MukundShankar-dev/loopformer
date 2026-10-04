@@ -21,6 +21,7 @@ from rich.text import Text
 from scripts.dataset.pointer import PointerExample
 from scripts.recurrent_qwen.checkpoint import load_recurrent_checkpoint
 from scripts.recurrent_qwen.model import RecurrentQwen
+from scripts.training.objective import forward_symbols
 from .pointer_task import load_examples, sha256_file, summarize_results, synchronize
 
 
@@ -47,9 +48,9 @@ def evaluate_recurrent_batches(model: RecurrentQwen, tokenizer: Any, examples: l
         synchronize(device)
         began = perf_counter()
         with torch.inference_mode():
-            result = model(**inputs, num_loops=loops)
+            result, scores = forward_symbols(model, inputs["input_ids"], inputs["attention_mask"], spec["token_ids"], num_loops=loops)
             predictions = [
-                int(result.loop_logits[example.task_depth - 1][row, spec["token_ids"]].argmax())
+                int(scores[row, example.task_depth - 1].argmax())
                 for row, example in enumerate(batch)
             ]
         synchronize(device)

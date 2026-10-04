@@ -4,6 +4,25 @@ Last updated: 2026-10-04.
 
 ## Current priority
 
+The user authorized the [pipeline upgrade](pipeline_upgrade.md). Implementation
+now includes an isolated recurrent controller, count-free executor view, normalized
+re-entry, optional direct R supervision, full-R/full-model training controls,
+depth-independent cyclic data, differentiable prefix reuse, selected-symbol
+projection, cosine decay and a matched diagnostic bundle. The existing depth-12
+run remains a historical reference; no artifacts were deleted or overwritten.
+
+The next bounded action is the [new data preview and disposable desktop smoke](training_pointer.md#isolated-executor-upgrade--current-desktop-run).
+Do not continue the old checkpoint into this architecture. No new pretrained
+training, CUDA fit measurement, precision comparison, or generalization result
+has run locally. The user launches those on the desktop after the smoke check.
+Seed 29 and the new test split remain reserved. Implementation validation: the full suite passed **196 tests with one CUDA-only
+skip**; final focused checks passed **96 tests with one CUDA-only skip**, followed
+by **31 training/executor tests** after the last integration changes. This covers
+controller-update isolation, dense/reused gradients, full-weight reload, CLI
+training/stopping/diagnostics and the native-control CLI. The pinned-tokenizer
+five-example data preview, compilation, shell syntax and local links passed.
+See the upgrade checklist; the following sections retain historical evidence.
+
 The [depth-12 paired-count probe](experiments/stage1_depth12_paired_counts.md) is complete and its two W&B uploads were verified through the API. At checkpoint 5,000, identical maps yield 30/32 correct loop-14 readouts with Steps 18 versus 8/32 with Steps 20 (22 losses, no gains). All counts are two-digit. R is therefore sensitive to requested count even on the same nominal prefix; this does not uniquely identify the internal mechanism. Later-loop failure persists even for the better count variant, and step 7,500 is worse across all tested counts. The prior [checkpoint progression](experiments/stage1_depth12_progression.md) also argues against unchanged-epoch continuation. A count-invariance objective on common intermediate readouts is a candidate to design, not an implemented/selected training recipe. No new training or confirmation run is authorized by these results alone. The following paragraphs preserve historical context.
 
 The fixed-prompt desktop run and both evaluation modes have completed. The [failure investigation](experiments/stage1_fixed_prompt_review.md) finds stronger forced execution at depths 7–9 than the previous joint run, a sharp first-error rise at loops 9–10, and persistent early stopping: all deep examples stop at five or six while 98.5% still have the correct intermediate pointer. Threshold calibration cannot solve it. The loss has no continue labels at loop six or later and no requested training depths above six. The user approved the broader-depth experiment. Sparse training counts, paired-Steps diagnostics, BF16/SDPA, depth-grouped updates and desktop launchers are now implemented; see the [runbook](training_pointer.md#depth-12-with-held-out-counts-current-desktop-run). CUDA fit/speed and the new scientific results remain unverified. The historical context below is retained.
@@ -16,7 +35,7 @@ The [architecture cross-check](architecture.md#literature-cross-check-2026-09-30
 
 The integrated suite saves answer-position R/C vectors and per-layer active-rule attention summaries for offline inspection. Its expanded implementation passed **133 local tests**, including the sequential three-checkpoint tiny-model run and matched-metric checks. The 1,296-prompt original/variant preflight and 256-prompt horizon preflight passed with the cached pinned tokenizer. The pretrained desktop run completed in about 7m49s; all saved artifact, data, and source hashes match locally, and all 3,264 native predictions/targets match the earlier six full evaluations. Adapter binaries and saved tokenizers remain on the CUDA desktop, so their contents have not been independently hashed here.
 
-## Latest evidence
+## Historical evidence and implementation milestones
 
 W&B logging to `loopformer` and per-update CUDA memory peaks are implemented; see [training observability](training_pointer.md#wb-experiment-logging). The depth-12 launcher enables online tracking, while dry runs remain side-effect free. Validation: 20 tracking/training tests passed, including the real offline SDK lifecycle, tiny-model training, resume equivalence and CLI checks; five launcher tests passed. Desktop online/CUDA verification is pending; no new training recipe is selected.
 
@@ -44,9 +63,9 @@ The user subsequently requested deletion of the completed loop-balanced run and 
 
 At the user's request, superseded pre-30k recurrent runs/evaluations and redundant 30k checkpoint directories were pruned locally (about 29.6 MiB). Historical tracked evidence remains in Git history; historical report paths may refer to pruned artifacts. The current 30k logs and six full evaluations remain. Checkpoints 2250, 2500, 2750, 3000, 3250, and 3750 are retained for comparison. Ordinary-Qwen baseline results, Stage 0 evidence, all datasets, and new/unknown runs are preserved. [Desktop cleanup](training_pointer.md#artifact-cleanup) also removes ignored weights and optimizer files that Git cannot remove on pull; it has not been executed remotely.
 
-## Constraints and deferred work
+## Historical constraints and deferred work
 
-Frozen pretrained base, shared recurrent q/v LoRA, intermediate supervision, and `use_cache=False` remain unchanged. The updated startup gate passed on the desktop with zero reported T=1 logit error. Batch changes can preserve optimizer/cursor state via explicit same-effective-batch resume, but bitwise numerical equivalence is not claimed. See [architecture](architecture.md) and [training](training_pointer.md).
+The historical runs used a frozen pretrained base and shared q/v LoRA. The authorized executor upgrade changes trainability explicitly; intermediate supervision and disabled generation caching remain required. The updated startup gate passed on the desktop with zero reported T=1 logit error. Batch changes can preserve optimizer/cursor state via explicit same-effective-batch resume, but bitwise numerical equivalence is not claimed. See [architecture](architecture.md) and [training](training_pointer.md).
 
 Overscaling execution, shortcut diagnostics, asymmetric training, multi-family transfer, and knowledge-retention benchmarks remain deferred. Gate 1 lacks predeclared thresholds and independent confirmation; Gate 2 lacks pretrained terminal-dynamics evidence. Supporting historical evidence lives in [the original CUDA report](experiments/stage1_cuda_5k.md) and the [documentation index](README.md).
 

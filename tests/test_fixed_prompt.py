@@ -134,7 +134,8 @@ def test_completion_stops_without_depth_input_and_reports_cap(base):
         rows, decisions, summary = evaluate_stopping(model, items, list(range(3, 29)), 0, loops=4, policy='completion')
     finally:
         hook.remove()
-    assert all(set(k) == {'input_ids', 'attention_mask', 'num_loops', 'completion_threshold'} for k in seen)
+    assert all(set(k) == {'input_ids', 'attention_mask', 'num_loops', 'completion_threshold', 'readout_token_ids'} for k in seen)
+    assert all(k['readout_token_ids'] == list(range(3, 29)) for k in seen)
     assert all(k['num_loops'] == 4 for k in seen)
     assert [r['executed_loops'] for r in decisions] == [1, 1]
     assert summary['completion']['exact_stop_rate'] == .5

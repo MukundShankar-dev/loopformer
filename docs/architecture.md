@@ -196,3 +196,58 @@ The opt-in [controlled probes](diagnostics_and_performance.md#controlled-restart
 ## Depth-12 execution settings
 
 The broader-depth recipe retains the fixed-prompt model, shared LoRA, completion head and exact per-loop labels. Optional `attention: sdpa` selects PyTorch SDPA through Qwen's existing attention interface. Optional `precision: bf16` uses CUDA autocast only during forward computation; original/trainable parameter storage, AdamW state, pointer CE and completion BCE stay float32. No tensors are detached from the training recurrence. The startup one-pass equivalence gate remains float32, and BF16 launches additionally check a full deepest-depth backward pass for finite gradients and frozen base parameters. CUDA support is required explicitly. Defaults remain float32/eager/deterministic for old configs. SDPA output/adapter-gradient agreement is tested locally on a tiny CPU model; CUDA BF16 validation is deferred to the desktop probe/smoke run. Fixed prompt memory still uses dense layers; no projected-memory cache was added.
+
+## Isolated executor interfaces — 2026-10-04
+
+The user-authorized [pipeline upgrade](pipeline_upgrade.md) adds opt-in interfaces
+while preserving the legacy full-sequence and fixed-prompt models.
+
+```text
+raw Rules/Start/Steps prompt
+  ├─ remove Steps line → P → R → [bridge → same R] … → C → symbolic logits
+  └─ full prompt → P (no gradient) → controller initial memory
+                                  ↑ detached R working state after each loop
+                                  GRU → stop logit
+```
+
+Routing is deterministic token/text plumbing, not a learned lookup or a numeric
+counter. It requires the raw dataset format. The executor's count line is removed;
+masked gaps preserve the public answer index and compact RoPE indices remove
+count-token-length leakage. The controller reads the full prompt representation,
+has its own GRU memory, and never receives t, d, remaining depth or reference
+states as numerical features. Its output cannot enter R. BCE gradients and
+clipping cannot rescale executor updates. Full-model training may change the
+shared P weights through pointer loss, so controller prompt features can still
+change between optimizer updates.
+
+The bridge acts only before loops 2..T. It normalizes the returned working vector
+by RMS, restores the initial executor-state RMS scale, and applies a learned gain
+and identity-initialized linear projection. It does not freeze states or enforce
+contraction. A direct learned linear A–Z head on R adds optional local CE;
+C's symbolic output remains the primary answer path. Neither decoded output is
+fed back. T=1 equivalence is with ordinary Qwen on the **executor view**, not with
+ordinary Qwen on the unmodified full prompt.
+
+`train_scope` supports LoRA, all recurrent-block weights, or all model weights.
+Full R is the default new experiment; full model is a separate config. The new
+`loopformer-executor-v2` checkpoint stores all trainable tensors in the historical
+`adapter_model.pt` filename and records the architecture explicitly. That filename
+no longer implies LoRA-only contents. The shared loader reconstructs the correct
+trainability and interfaces; naive/full-loop/learned-stop evaluation reuse it.
+Legacy checkpoint interpretation is unchanged.
+
+Differentiable prefix reuse computes full R/C layers on pass one, retaining
+prefix K/V and outputs within that forward. Later loops compute only the writable
+query and replace its K/V; prefix tensors are **not detached**. This is separate
+from Hugging Face's generation cache, which remains disabled. Non-reentrant
+checkpointing recomputes layer activations during backward. Reuse requires zero
+attention dropout. Selected-row LM projection computes the same 26 answer logits
+without materializing the whole vocabulary; full-vocabulary output remains
+available for legacy callers and equivalence tests.
+
+Tiny-model tests compare dense/reused outputs and all parameter gradients for
+LoRA/full R/full model under eager and SDPA, including checkpointing and different
+prompt lengths. Other tests cover count invariance, separate gradients, bridge
+T=1 behavior, save/reload and complete training/evaluation wiring. These prove
+implementation contracts to numerical tolerance, not pretrained learnability or
+unbounded algorithmic correctness. Pretrained CUDA startup checks remain required.

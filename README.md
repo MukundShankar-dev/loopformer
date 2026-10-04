@@ -133,33 +133,40 @@ Progress and throughput appear in the terminal. Predictions and summaries go to 
 
 ## Train pointer execution
 
-On the CUDA desktop, prepare and launch the current depth-12 experiment:
+On the CUDA desktop, prepare the new depth-independent dataset and check the
+isolated executor pipeline:
 
 ```bash
-bash prepare_depth12.sh --dry-run
-bash prepare_depth12.sh
-bash train_depth12.sh --dry-run
-bash train_depth12.sh --smoke-test
-bash train_depth12.sh
+bash prepare_executor.sh --dry-run
+bash prepare_executor.sh
+bash train_executor.sh --dry-run
+bash train_executor.sh --smoke-test
 ```
 
-Configs live in [`configs/`](configs/). The trainer uses raw dataset prompts and exact per-loop supervision. A compact Rich dashboard shows progress, ETA, losses, accuracy, and memory. Checkpoints and logs go to `models/stage1_pointer/`; model binaries are excluded from Git.
+After inspecting the smoke results, run `bash train_executor.sh`, then
+`bash eval_executor.sh`. The default trains all recurrent-block weights with an
+isolated controller and per-loop supervision. Full-model and LoRA controls are
+also available. See the [current run instructions](docs/training_pointer.md#isolated-executor-upgrade--current-desktop-run)
+for configuration, exact data reproduction and output locations.
 
-This uses fresh adapters and 30k seeded examples at requested depths 1–6, 8, 10, and 12; counts 7, 9, and 11 are held out. The live dashboard is also recorded to a timestamped terminal log. Follow the [current run instructions](docs/training_pointer.md#depth-12-with-held-out-counts-current-desktop-run) for prerequisites, artifact paths, and implementation limits. The new recipe uses BF16, SDPA and depth-grouped batches; desktop speed and quality remain unmeasured.
+A compact Rich dashboard shows progress, ETA, losses and memory. W&B uses project
+`loopformer`. Checkpoints and logs go to `models/stage1_pointer/`; model binaries
+are excluded from Git. CUDA fit, speed and quality need the new desktop smoke/run.
 
 ## Inspect recurrent checkpoints
 
-After the new run completes, `bash eval_depth12.sh` evaluates its selected checkpoint on both development splits, saving full-loop traces and actual head-controlled stopping results. It records all output in a timestamped directory under `eval/pointer_loops/`.
+`bash eval_executor.sh` runs matched-count/precision diagnostics, full-loop evaluation and actual learned stopping on development data. Results and terminal logs go under `eval/pointer_diagnostics/`. The older depth-12 scripts remain available for historical runs.
 
 Pass a complete saved step directory, including its adapter weights and tokenizer:
 
 ```bash
 python -m scripts.eval.loop_test \
-  --model models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500 \
-  --device cuda --loops 8 --test
+  --model models/stage1_pointer/executor_r-seed61/step-000750 \
+  --data data/pointer/seed-61-independent/validation.jsonl \
+  --device cuda --loops 12 --test
 ```
 
-This requires the complete checkpoint on the training desktop; local metadata alone is insufficient. Remove `--test` for all 1,000 test examples. Outputs go to `eval/pointer_loops/`. This reads the model after every recurrent loop; the ordinary three-shot prompt is not used. See [full-loop evaluation](docs/evaluation.md) for commands and metrics.
+This requires the complete checkpoint on the training desktop; local metadata alone is insufficient. Remove `--test` for all 1,536 validation queries. Outputs go to `eval/pointer_loops/`. This reads the model after every recurrent loop; the ordinary three-shot prompt is not used. See [full-loop evaluation](docs/evaluation.md) for commands and metrics.
 
 ## Deferred overscaling experiments
 

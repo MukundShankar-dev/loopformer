@@ -4,6 +4,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 
 | Need | Canonical document |
 | --- | --- |
+| Current executor/controller implementation checklist | [Pipeline upgrade](pipeline_upgrade.md) |
 | Recurrent model, parameter sharing, gradient behavior, Stage 0 validation protocol | [Architecture](architecture.md) |
 | Pointer data, training, checkpoints, resume, and historical depth-6 comparison commands | [Pointer execution and training](training_pointer.md) |
 | Metrics, ordinary baseline, full-loop evaluation, and deferred terminal overscaling | [Evaluation](evaluation.md) |
@@ -39,3 +40,5 @@ The [paired-Steps probe](experiments/stage1_paired_steps.md) controls mapping/st
 The [depth-12 checkpoint progression](experiments/stage1_depth12_progression.md) finds regression after step 5,000 and motivates a matched-count probe before further training.
 
 The [depth-12 paired-count probe](experiments/stage1_depth12_paired_counts.md) demonstrates late execution sensitivity to requested count on identical mappings, alongside persistent later-loop failure.
+
+The [end-to-end reassessment](experiments/pipeline_reassessment.md) separates established implementation evidence from missing architecture, objective, data and optimization controls. The user subsequently authorized its [implementation checklist](pipeline_upgrade.md); the report retains the pre-change evidence.

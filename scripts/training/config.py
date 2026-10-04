@@ -20,6 +20,15 @@ class TrainingConfig:
     recurrent_start: int = 6
     recurrent_end: int = 18
     recurrence_mode: str = "full_sequence"
+    train_scope: str = "lora"
+    isolated_controller: bool = False
+    reentry_bridge: bool = False
+    state_loss_weight: float = 0.0
+    prefix_reuse: bool = False
+    gradient_checkpointing: bool = False
+    lr_schedule: str = "constant"
+    schedule_steps: int | None = None
+    min_lr_ratio: float = 0.1
     lora_rank: int = 8
     lora_alpha: int = 16
     train_depths: list[int] | None = None
@@ -50,6 +59,19 @@ class TrainingConfig:
     completion_head_hidden_size: int = 128
 
     def validate(self) -> None:
+        if self.train_scope not in ("lora", "recurrent", "full"):
+            raise ValueError("train_scope must be lora/recurrent/full")
+        for name in ("isolated_controller", "reentry_bridge", "prefix_reuse", "gradient_checkpointing"):
+            if type(getattr(self, name)) is not bool:
+                raise ValueError(f"{name} must be boolean")
+        if (self.train_scope != "lora" or self.isolated_controller or self.reentry_bridge or self.state_loss_weight or self.prefix_reuse or self.gradient_checkpointing) and self.recurrence_mode != "fixed_prompt":
+            raise ValueError("Executor interfaces require fixed_prompt")
+        if not math.isfinite(self.state_loss_weight) or self.state_loss_weight < 0:
+            raise ValueError("state_loss_weight must be finite and nonnegative")
+        if self.lr_schedule not in ("constant", "cosine") or not math.isfinite(self.min_lr_ratio) or not 0 <= self.min_lr_ratio <= 1:
+            raise ValueError("Invalid learning-rate schedule")
+        if self.lr_schedule == "cosine" and (type(self.schedule_steps) is not int or self.schedule_steps <= self.warmup_steps):
+            raise ValueError("Cosine requires explicit schedule_steps > warmup_steps (preserved on resume)")
         if self.precision not in ("float32", "bf16") or self.attention not in ("eager", "sdpa"):
             raise ValueError("precision must be float32/bf16 and attention eager/sdpa")
         if type(self.deterministic) is not bool or type(self.bucket_by_depth) is not bool:
@@ -79,8 +101,8 @@ class TrainingConfig:
             value = getattr(self, name)
             if value is not None and (type(value) is not int or value < 1):
                 raise ValueError(f"{name} must be null or a positive integer")
-        if not 1 <= self.train_max_depth <= self.validation_max_depth <= 25:
-            raise ValueError("Require 1 <= train_max_depth <= validation_max_depth <= 25")
+        if not 1 <= self.train_max_depth <= self.validation_max_depth <= 256:
+            raise ValueError("Require 1 <= train_max_depth <= validation_max_depth <= 2566")
         if not 0 <= self.recurrent_start < self.recurrent_end:
             raise ValueError("Invalid recurrent layer range")
         if type(self.seed) is not int or not 0 <= self.seed < 2**63 or type(self.warmup_steps) is not int or self.warmup_steps < 0:

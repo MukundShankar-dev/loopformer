@@ -127,9 +127,9 @@ def generate_example(seed: int, depth: int, split: str, index: int) -> PointerEx
 
 def validate_example(example: PointerExample) -> None:
     """Reparse the actual prompt and independently recompute every saved target."""
-    if example.schema_version != 1 or example.family != "pointer":
+    if example.schema_version not in (1, 2) or example.family != "pointer":
         raise ValueError("Unsupported pointer record schema/family")
-    if type(example.task_depth) is not int or not 1 <= example.task_depth < len(SYMBOLS):
+    if type(example.task_depth) is not int or not 1 <= example.task_depth <= (25 if example.schema_version == 1 else 256):
         raise ValueError("Invalid task depth")
     if any(len(pair) != 2 for pair in example.mapping):
         raise ValueError("Every mapping entry must have two symbols")
@@ -146,5 +146,44 @@ def validate_example(example: PointerExample) -> None:
     states = execute(parsed, example.initial_state, example.task_depth)
     if states != example.intermediate_states or example.final_state != states[-1]:
         raise ValueError("Intermediate/final labels disagree with reference execution")
-    if len(set([example.initial_state, *states])) != example.task_depth + 1:
+    if example.schema_version == 1 and len(set([example.initial_state, *states])) != example.task_depth + 1:
         raise ValueError("Nominal path must not repeat a state")
+
+
+def generate_unconditioned_example(seed: int, depth: int, split: str, index: int,
+                                   graph_mode: str = "mixture") -> PointerExample:
+    """Sample the graph/start/order before using depth; permit cyclic execution.
+
+    Equal-probability mixture: random function, random permutation, full cycle.
+    All three have 26 rules; graph selection never consults requested horizon.
+    """
+    if type(depth) is not int or not 1 <= depth <= 256 or type(seed) is not int or seed < 0:
+        raise ValueError("Need nonnegative seed and depth in 1..256")
+    rng = random.Random(seed)
+    kinds = ("random_function", "permutation", "full_cycle")
+    kind = rng.choice(kinds) if graph_mode == "mixture" else graph_mode
+    if kind not in kinds:
+        raise ValueError("Unknown depth-independent graph mode")
+    if kind == "random_function":
+        mapping = {s: rng.choice(SYMBOLS) for s in SYMBOLS}
+    else:
+        order = rng.sample(SYMBOLS, len(SYMBOLS))
+        mapping = (dict(zip(SYMBOLS, order)) if kind == "permutation" else
+                   {s: order[(i + 1) % len(order)] for i, s in enumerate(order)})
+    start = rng.choice(SYMBOLS)
+    pairs = [[s, mapping[s]] for s in SYMBOLS]
+    rng.shuffle(pairs)
+    states = execute(mapping, start, depth)
+    return PointerExample(2, f"{split}-{index:06d}-{seed:016x}", "pointer", split, seed,
+        depth, pairs, mapping_fingerprint(mapping), start, states, states[-1],
+        render_prompt(pairs, start, depth))
+
+
+def orbit_structure(mapping: dict[str, str], start: str) -> dict[str, int]:
+    """Length before the first cycle and cycle period, independent of horizon."""
+    seen = {}
+    state = start
+    while state not in seen:
+        seen[state] = len(seen)
+        state = mapping[state]
+    return {"transient_length": seen[state], "cycle_period": len(seen) - seen[state]}
