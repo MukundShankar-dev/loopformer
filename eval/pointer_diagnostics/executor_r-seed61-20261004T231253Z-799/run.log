@@ -1,0 +1,164 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<03:36,  1.34it/s]Loading weights:  84%|████████▍ | 243/290 [00:00<00:00, 382.04it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 304.99it/s]
+float32-eager ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+float32-sdpa ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+bf16-sdpa ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: setting up run yxdgfl94
+wandb: Syncing run panel
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/yxdgfl94
+wandb: updating run metadata; uploading summary; uploading artifact evaluation-yxdgfl94; uploading artifact run-yxdgfl94-tablesloop_risk-1eX96w; uploading artifact run-yxdgfl94-tablespairs-hC3Aig
+wandb: uploading artifact evaluation-yxdgfl94; uploading artifact run-yxdgfl94-tablesloop_risk-1eX96w; uploading artifact run-yxdgfl94-tablespairs-hC3Aig
+wandb: uploading history steps 0-1, summary
+wandb: 🚀 View run panel at: https://wandb.ai/mukunds/loopformer/runs/yxdgfl94
+wandb: ⭐️ View project at: https://wandb.ai/mukunds/loopformer
+wandb: Synced 4 W&B file(s), 2 media file(s), 9 artifact file(s) and 0 other file(s)
+Saved matched-count, orbit, first-error, R/C and precision diagnostics: eval/pointer_diagnostics/executor_r-seed61-20261004T231253Z-799/panel
+Pointer task · full recurrent loop evaluation
+1,536 examples · 64 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_diagnostics/executor_r-seed61-20261004T231253Z-799/validation
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  38%|███▊      | 111/290 [00:00<00:00, 1105.29it/s]Loading weights:  95%|█████████▍| 275/290 [00:00<00:00, 1415.97it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1404.59it/s]
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1536/1536 0:04:50 0:00:00 5.28 q/s · 337.96 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 1     │ 128      │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 2     │ 128      │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 3     │ 128      │ 99.74%        │ 99.22%            │ 99.22%         │
+│ 4     │ 128      │ 99.61%        │ 99.22%            │ 99.22%         │
+│ 5     │ 128      │ 99.53%        │ 99.22%            │ 99.22%         │
+│ 6     │ 128      │ 99.48%        │ 99.22%            │ 99.22%         │
+│ 7     │ 128      │ 99.44%        │ 99.22%            │ 99.22%         │
+│ 8     │ 128      │ 99.41%        │ 99.22%            │ 99.22%         │
+│ 9     │ 128      │ 99.31%        │ 98.44%            │ 98.44%         │
+│ 10    │ 128      │ 99.22%        │ 98.44%            │ 98.44%         │
+│ 11    │ 128      │ 99.15%        │ 98.44%            │ 98.44%         │
+│ 12    │ 128      │ 99.09%        │ 98.44%            │ 98.44%         │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 99.09% · final accuracy: 99.09%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_diagnostics/executor_r-seed61-20261004T231253Z-799/validation
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: setting up run s6igozvp
+wandb: Syncing run validation
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/s6igozvp
+wandb: updating run metadata; uploading artifact evaluation-s6igozvp; uploading artifact run-s6igozvp-tablesdepth_by_loop-8EEusg; uploading artifact run-s6igozvp-tablesexamples-0h3Img
+wandb: uploading artifact evaluation-s6igozvp; uploading artifact run-s6igozvp-tablesdepth_by_loop-8EEusg; uploading artifact run-s6igozvp-tablesexamples-0h3Img
+wandb: uploading artifact evaluation-s6igozvp; uploading artifact run-s6igozvp-tablesexamples-0h3Img
+wandb: uploading requirements.txt; uploading media/table/tables/depth_by_loop_0_0cff84c67b58f6ce1eee.table.json; uploading media/table/tables/examples_1_e95e7e23dde967f8b0b4.table.json; uploading wandb-summary.json; uploading config.yaml (+ 1 more)
+wandb: 🚀 View run validation at: https://wandb.ai/mukunds/loopformer/runs/s6igozvp
+wandb: ⭐️ View project at: https://wandb.ai/mukunds/loopformer
+wandb: Synced 4 W&B file(s), 2 media file(s), 9 artifact file(s) and 0 other file(s)
+Pointer task · adaptive stopping
+1,536 examples · up to 64 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and nominal-prefix scoring
+Results: /home/mukund/loopformer/eval/pointer_diagnostics/executor_r-seed61-20261004T231253Z-799/validation-stopped
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  59%|█████▉    | 171/290 [00:00<00:00, 1688.23it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1755.68it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1536/1536 0:03:57 0:00:00
+Stopped accuracy: 24.48%; mean loops: 3.70; p95 latency: 0.2746s
+Saved stopped trajectories.csv, decisions.csv, summary.json to /home/mukund/loopformer/eval/pointer_diagnostics/executor_r-seed61-20261004T231253Z-799/validation-stopped
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: setting up run ajfxinl0
+wandb: Syncing run validation-stopped
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/ajfxinl0
+wandb: updating run metadata; uploading artifact evaluation-ajfxinl0; uploading artifact run-ajfxinl0-tablesdecisions-0CQSQA
+wandb: uploading artifact evaluation-ajfxinl0; uploading artifact run-ajfxinl0-tablesdecisions-0CQSQA
+wandb: uploading wandb-metadata.json; uploading requirements.txt; uploading media/table/tables/decisions_0_be750b404fd9157c0c2f.table.json; uploading wandb-summary.json; uploading config.yaml
+wandb: 🚀 View run validation-stopped at: https://wandb.ai/mukunds/loopformer/runs/ajfxinl0
+wandb: ⭐️ View project at: https://wandb.ai/mukunds/loopformer
+wandb: Synced 4 W&B file(s), 1 media file(s), 6 artifact file(s) and 0 other file(s)
+Pointer task · full recurrent loop evaluation
+1,664 examples · 64 loops each · cuda · float32 · batch 16
+Raw dataset prompts · A–Z readout · cache disabled · nominal CE through requested depth
+Results: /home/mukund/loopformer/eval/pointer_diagnostics/executor_r-seed61-20261004T231253Z-799/depth_test
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  35%|███▍      | 101/290 [00:00<00:00, 1008.66it/s]Loading weights:  96%|█████████▌| 279/290 [00:00<00:00, 1460.41it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1444.19it/s]
+Evaluating ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1664/1664 0:05:26 0:00:00 5.09 q/s · 325.91 example-loops/s
+                     Nominal execution by task depth                     
+┏━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Depth ┃ Examples ┃ Step accuracy ┃ All steps correct ┃ Final accuracy ┃
+┡━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ 13    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 14    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 15    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 16    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 17    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 18    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 19    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 20    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 21    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 22    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 23    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 24    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 25    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 26    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 27    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 28    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 29    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 30    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 31    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 32    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 33    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 34    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 35    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 36    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 37    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 38    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 39    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 40    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 41    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 42    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 43    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 44    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 45    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 46    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 47    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 48    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 49    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 50    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 51    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 52    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 53    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 54    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 55    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 56    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 57    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 58    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 59    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 60    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 61    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 62    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 63    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+│ 64    │ 32       │ 100.00%       │ 100.00%           │ 100.00%        │
+└───────┴──────────┴───────────────┴───────────────────┴────────────────┘
+All steps correct: 100.00% · final accuracy: 100.00%
+Saved trajectories.csv, examples.csv, depth_by_loop.csv, and summary.json to /home/mukund/loopformer/eval/pointer_diagnostics/executor_r-seed61-20261004T231253Z-799/depth_test
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: setting up run j6xgnr22
+wandb: Syncing run depth_test
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/j6xgnr22
+wandb: updating run metadata; uploading summary; uploading artifact evaluation-j6xgnr22; uploading artifact run-j6xgnr22-tablesdepth_by_loop-HaTxcQ; uploading artifact run-j6xgnr22-tablesexamples-FBi0KQ
+wandb: uploading artifact evaluation-j6xgnr22; uploading artifact run-j6xgnr22-tablesdepth_by_loop-HaTxcQ; uploading artifact run-j6xgnr22-tablesexamples-FBi0KQ
+wandb: uploading artifact evaluation-j6xgnr22
+wandb: uploading history steps 0-1, summary
+wandb: 🚀 View run depth_test at: https://wandb.ai/mukunds/loopformer/runs/j6xgnr22
+wandb: ⭐️ View project at: https://wandb.ai/mukunds/loopformer
+wandb: Synced 4 W&B file(s), 2 media file(s), 9 artifact file(s) and 0 other file(s)
+Pointer task · adaptive stopping
+1,664 examples · up to 64 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and nominal-prefix scoring
+Results: /home/mukund/loopformer/eval/pointer_diagnostics/executor_r-seed61-20261004T231253Z-799/depth_test-stopped
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:50,  5.73it/s]Loading weights:  42%|████▏     | 123/290 [00:00<00:00, 534.94it/s]Loading weights:  72%|███████▏  | 208/290 [00:00<00:00, 648.10it/s]Loading weights:  98%|█████████▊| 283/290 [00:00<00:00, 646.68it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 578.22it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1664/1664 0:04:08 0:00:00
+Stopped accuracy: 13.94%; mean loops: 3.94; p95 latency: 0.2592s
+Saved stopped trajectories.csv, decisions.csv, summary.json to /home/mukund/loopformer/eval/pointer_diagnostics/executor_r-seed61-20261004T231253Z-799/depth_test-stopped
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: setting up run gowuzrqr
+wandb: Syncing run depth_test-stopped
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/gowuzrqr
+wandb: updating run metadata; uploading artifact evaluation-gowuzrqr; uploading artifact run-gowuzrqr-tablesdecisions-oy2O0Q
+wandb: uploading artifact evaluation-gowuzrqr; uploading artifact run-gowuzrqr-tablesdecisions-oy2O0Q
+wandb: uploading artifact run-gowuzrqr-tablesdecisions-oy2O0Q
+wandb: uploading history steps 0-0, summary
+wandb: 🚀 View run depth_test-stopped at: https://wandb.ai/mukunds/loopformer/runs/gowuzrqr
+wandb: ⭐️ View project at: https://wandb.ai/mukunds/loopformer
+wandb: Synced 4 W&B file(s), 1 media file(s), 6 artifact file(s) and 0 other file(s)

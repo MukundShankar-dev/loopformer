@@ -41,3 +41,6 @@ data/
 
 # W&B SDK cache; keep wandb_run.json provenance trackable.
 wandb/
+
+# Oversized local launcher log; keep it out of GitHub while retaining it locally.
+/models/stage1_pointer/executor_r-seed61-launch-20261004T210218Z-581.log
