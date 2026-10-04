@@ -16,14 +16,15 @@ def initialize(base: Qwen2ForCausalLM, config: TrainingConfig, inputs: dict, tok
     base.config.use_cache = False
     x = inputs["input_ids"][:1]
     mask = inputs["attention_mask"][:1]
-    position = int(mask.sum().item()) - 1
+    position = int(torch.arange(mask.shape[1], device=mask.device).masked_fill(~mask[0].bool(), -1).max().item())
     with torch.no_grad():
         # Match the wrapper's one-position LM-head projection. Projecting the
         # entire prompt first can introduce shape-dependent rounding on CUDA.
         readout = torch.tensor([position], device=x.device)
         reference = base(input_ids=x, attention_mask=mask, use_cache=False,
                          logits_to_keep=readout).logits[:, 0].clone()
-    model = RecurrentQwen(base, config.recurrent_start, config.recurrent_end).eval()
+    model = RecurrentQwen(base, config.recurrent_start, config.recurrent_end,
+                          recurrence_mode=config.recurrence_mode).eval()
     attach_recurrent_lora(model, rank=config.lora_rank, alpha=config.lora_alpha)
     with torch.no_grad():
         actual = model(x, mask, num_loops=1).logits
@@ -38,12 +39,16 @@ def initialize(base: Qwen2ForCausalLM, config: TrainingConfig, inputs: dict, tok
         hook.remove()
     if len(calls) != 2 or calls[0] != calls[1]:
         raise RuntimeError("Recurrent weights are not shared")
+    if config.recurrence_mode == "fixed_prompt":
+        prefix = torch.arange(mask.shape[1], device=mask.device)[None, :] < position
+        torch.testing.assert_close(result.hidden_states[0][prefix], result.hidden_states[1][prefix], atol=0, rtol=0)
     for hidden in result.hidden_states:
         hidden.retain_grad()
     scores = symbolic_scores(result.loop_logits, token_ids)
     # The last-loop loss alone must propagate through both recurrent states.
     torch.nn.functional.cross_entropy(scores[:, -1], inputs["targets"][:1, 0]).backward()
-    hidden_norms = [hidden.grad.norm().item() if hidden.grad is not None else 0 for hidden in result.hidden_states]
+    hidden_norms = [(hidden.grad[:, position].norm() if config.recurrence_mode == "fixed_prompt" else hidden.grad.norm()).item()
+                    if hidden.grad is not None else 0 for hidden in result.hidden_states]
     if not all(value > 0 for value in hidden_norms):
         raise RuntimeError("Later-loop gradient does not reach earlier states")
     for name, parameter in model.named_parameters():
@@ -54,6 +59,7 @@ def initialize(base: Qwen2ForCausalLM, config: TrainingConfig, inputs: dict, tok
             raise RuntimeError(f"Frozen parameter received a gradient: {name}")
     model.zero_grad(set_to_none=True)
     return model, {"passed": True, "t1_max_logit_error": error, "shared_weights": True,
+                   "recurrence_mode": config.recurrence_mode,
                    "frozen_gradients": 0, "hidden_gradient_norms": hidden_norms,
                    "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad)}
 
@@ -70,7 +76,10 @@ def validate_completion_gradients(model: RecurrentQwen, inputs: dict) -> dict:
     mask = torch.tensor([[True, True]], device=result.stop_logits.device)
     loss, _ = completion_loss(result.stop_logits, mask)
     loss.backward()
-    hidden_norms = [hidden.grad.norm().item() if hidden.grad is not None else 0.0
+    mask_input = inputs["attention_mask"][0]
+    position = int(torch.arange(len(mask_input), device=mask_input.device).masked_fill(~mask_input.bool(), -1).max().item())
+    hidden_norms = [(hidden.grad[:, position].norm() if model.recurrence_mode == "fixed_prompt" else hidden.grad.norm()).item()
+                    if hidden.grad is not None else 0.0
                     for hidden in result.hidden_states]
     if not all(value > 0 for value in hidden_norms):
         raise RuntimeError("Completion loss does not reach every recurrent state")

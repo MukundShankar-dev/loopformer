@@ -240,7 +240,15 @@ The checkpoint's `recurrent_config.json` selects recurrent loading. The evaluato
 
 ## Full-loop checkpoint evaluation
 
-Evaluate a saved recurrent checkpoint without training or loading optimizer state. The CLI reuses the trainer's per-loop evaluation and exact nominal targets. It records every frozen-coda readout; predictions are never fed back as input tokens. This measures latent recurrent execution, not a generated explanation. Fixed-depth behavior remains the default; opt-in stopping and its methods are documented only in the [adaptive-compute guide](adaptive_compute.md).
+Evaluate a saved recurrent checkpoint without training or loading optimizer state. The CLI reuses the trainer's per-loop evaluation and exact nominal targets. It records every frozen-coda readout; predictions are never fed back as input tokens. This measures latent recurrent execution, not a generated explanation. Fixed-depth behavior remains the default. The checkpoint selects full-sequence or fixed-prompt recurrence automatically. Historical adaptive policies are documented in the [adaptive-compute guide](adaptive_compute.md); the separate prompt-only completion policy is below.
+
+### Prompt-only completion stopping
+
+`--stop-policy completion --stop-threshold 0.5 --loops 20 --batch-size 1` uses the checkpoint's own hidden-state completion head. An explicit positive loop cap and threshold in (0,1) are required; the cap is not derived from task depth. The head receives no parsed depth or loop number and may stop too early. `--head` selects a different, historical adaptive policy and is not accepted here. A cap below requested depth is allowed and reported as truncated execution/fallback, rather than silently increasing it.
+
+The evaluator saves actual `trajectories.csv`, per-example `decisions.csv`, and `summary.json`. Report stopped-answer accuracy, exact/early/late head stops, cap fallbacks, joint exact-stop-and-answer success, and by-depth rates separately. Reaching the cap at the correct depth does not count as a learned exact stop. Timing synchronizes CUDA/MPS and includes input-memory preparation, every executed R/C/head pass and threshold check; it excludes loading, tokenization and CSV export. Batch-1 stopped latency and batch-16 full-sweep throughput are different measurements and cannot establish a matched batching speedup.
+
+For the new fixed-prompt training run, `bash eval_ckpts.sh` selects its pointer-CE-selected checkpoint and runs both full sweeps and actual stopping on validation/depth-test. The wrapper's threshold 0.5 is diagnostic; confirmation still requires a threshold frozen on development. See [training and output paths](training_pointer.md#fixed-prompt-memory-current-desktop-run).
 
 ### Run
 

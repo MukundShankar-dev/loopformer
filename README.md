@@ -112,7 +112,7 @@ The existing seed-17 dataset **already reaches depth 16** for development evalua
 | `test.jsonl` | 1,000 | 1–8 | 125 |
 | `depth_test.jsonl` | 1,000 | 9–16 | 125 |
 
-The depth-6 training config selects only depths 1–6 from `train.jsonl`. Its `validation_max_depth: 8` controls training-time monitoring; the paired depth evaluator separately reads `depth_test.jsonl` and runs through depth 16. See [dataset details](docs/training_pointer.md) and [paired evaluation](docs/training_pointer.md).
+Current training uses the separate seed-37 30k dataset at depths 1–6. `validation_max_depth: 8` controls monitoring; the full evaluator also reads seed-17 `depth_test.jsonl` at depths 9–16. See [dataset and training details](docs/training_pointer.md).
 
 ## Evaluate a model
 
@@ -129,18 +129,20 @@ Progress and throughput appear in the terminal. Predictions and summaries go to 
 
 ## Train pointer execution
 
-Preview the initial training configuration before launching it:
+On the CUDA desktop, preview and launch the fixed-prompt-memory experiment:
 
 ```bash
-python -m scripts.training.train_pointer --config configs/stage1_pointer.json --dry-run
-python -m scripts.training.train_pointer --config configs/stage1_pointer.json --device cuda
+bash train_fixed_prompt.sh --dry-run
+bash train_fixed_prompt.sh
 ```
 
 Configs live in [`configs/`](configs/). The trainer uses raw dataset prompts and exact per-loop supervision. A compact Rich dashboard shows progress, ETA, losses, accuracy, and memory. Checkpoints and logs go to `models/stage1_pointer/`; model binaries are excluded from Git.
 
-The next experiment uses `configs/stage1_pointer_depth6_loopbalanced.json`: fresh adapters on the existing 30,000 mappings, with equal loss weight per loop position. Follow the [loop-balanced training commands](docs/training_pointer.md#loop-balanced-loss-experiment), starting with the dry-run. The [training guide](docs/training_pointer.md) also covers checkpoint selection, resume, tmux, and [old-artifact cleanup](docs/training_pointer.md#artifact-cleanup).
+This uses fresh adapters and the existing 30k data, with exact intermediate pointer targets and learned stopping. The live dashboard is also recorded to a timestamped terminal log. Follow the [current run instructions](docs/training_pointer.md#fixed-prompt-memory-current-desktop-run) for prerequisites, artifact paths, and implementation limits. Pretrained results for this architecture are pending.
 
 ## Inspect recurrent checkpoints
+
+After the new run completes, `bash eval_ckpts.sh` evaluates its selected checkpoint on both development splits, saving full-loop traces and actual head-controlled stopping results. It records all output in a timestamped directory under `eval/pointer_loops/`.
 
 Pass a complete saved step directory, including its adapter weights and tokenizer:
 

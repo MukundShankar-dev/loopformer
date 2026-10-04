@@ -2,6 +2,24 @@
 
 Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md), [loop-balanced ablation](experiments/stage1_loopbalanced.md), and [learned-completion ablation](experiments/stage1_learned_completion.md) have completed. The latter two did not improve the depth frontier. Dated commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
 
+## Fixed prompt memory: current desktop run
+
+The [new config](../configs/stage1_pointer_depth6_fixed_prompt.json) differs from joint completion only by `recurrence_mode: fixed_prompt`. It retains fresh adapters, 30,000 seed-37 depth-1–6 examples, batch 4/accumulation 2, 3,750 updates, per-pass pointer CE, and completion BCE weight 0.1. See [the architecture and supervision contract](learned_loop_completion.md#fixed-prompt-memory-and-recurrent-working-state). The pretrained result is pending.
+
+From the repository root in WSL/Linux:
+
+```bash
+bash train_fixed_prompt.sh --dry-run
+bash train_fixed_prompt.sh
+
+# After training completes:
+bash eval_ckpts.sh
+```
+
+The preview validates existing data/tokenizer and writes nothing. The training launcher requires the existing `.venv`, cached pinned model, generated datasets, and Linux `script` utility (normally installed by util-linux). A PTY preserves the Rich dashboard/ETA while recording stdout/stderr to `models/stage1_pointer/depth6-fixed-prompt-seed37-launch-<UTC>-<pid>.log`. The new run directory is `models/stage1_pointer/depth6-fixed-prompt-seed37/`; an existing directory is an error, never an implicit resume or overwrite. Each run performs the pretrained equivalence/gradient gate before updates. The reference implementation uses dense full-sequence layer kernels; speed or lower memory use has not been measured.
+
+`eval_ckpts.sh` selects `best_checkpoint.json` from that run. It evaluates validation and depth-test with full 20-loop traces (batch 16) and actual head-controlled stopping (cap 20, diagnostic threshold 0.5, batch 1), with failure propagation and one combined `run.log`. Outputs go to a timestamped `eval/pointer_loops/depth6-fixed-prompt-seed37-best-*/` directory. Weights/tokenizers must be on the evaluation device; metadata alone cannot load a checkpoint. Selection remains trained-depth pointer CE, not unseen-depth or stopping performance.
+
 ## Learned completion training: completed protocol
 
 The [config](../configs/stage1_pointer_depth6_completion.json) matches the fresh 30k depth-6 batch-4 baseline's data selection, seed, optimizer, effective batch, and update budget. It adds a 128-wide hidden-state stop head and weight `0.1` on the continue/stop loss. The exact intermediate A–Z target is still decoded by frozen C after **every** recurrent pass and supervised by the existing 26-symbol CE. The head receives only the recurrent answer-position state. `Steps` appears in the raw prompt; the trainer's label mask uses task depth, but no loop/depth scalar is passed to R or the head. The first run must use fresh adapters; do not pass `--init-from` or `--resume`.
@@ -18,7 +36,7 @@ python -m scripts.training.train_pointer \
   --output models/stage1_pointer/depth6-completion-seed37
 ```
 
-The output directory must be new. The live dashboard shows pointer objective/accuracy and completion loss, exact-stop rate, and early-stop rate at the diagnostic probability threshold 0.5. `metrics.jsonl` keeps each update's two loss terms, validation summaries, and selection loss; validation CSVs append stop logits, probabilities, nominal labels, and BCE through each task's depth. Checkpoints use `loopformer-stage1-completion-v1` and include both LoRA and head weights in `adapter_model.pt`; historical checkpoints remain `loopformer-stage1-v1`. The existing `naive_test` and `loop_test` can load new checkpoints for **forced-depth pointer evaluation**. `loop_test` also records head probabilities and diagnostic stop timing for all executed passes, without actually stopping execution. Actual self-stopped inference and threshold selection are not yet implemented, so the 0.5 diagnostic rate does not establish deployed stopping accuracy. The 30k training data are absent from this Mac checkout; the new real-data dry run has not been verified here.
+The output directory must be new. The live dashboard shows pointer objective/accuracy and completion loss, exact-stop rate, and early-stop rate at the diagnostic probability threshold 0.5. `metrics.jsonl` keeps each update's two loss terms, validation summaries, and selection loss; validation CSVs append stop logits, probabilities, nominal labels, and BCE through each task's depth. These historical checkpoints use `loopformer-stage1-completion-v1` and include both LoRA and head weights in `adapter_model.pt`. `naive_test` and default `loop_test` perform forced-depth pointer evaluation; the latter also records head probabilities. Actual stopping is now available through `--stop-policy completion`, while threshold selection and pretrained stopped results remain pending. The 30k training data are absent from this Mac checkout.
 
 After training, resolve the pointer-CE-selected checkpoint and run full development sweeps on the same validation and depth-test sets used for the baseline. In bash under WSL:
 

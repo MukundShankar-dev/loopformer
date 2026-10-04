@@ -53,6 +53,8 @@ def resume_identity(config: TrainingConfig, data_identity: dict) -> dict:
     # A continuation can extend its budget or change reporting cadence. All
     # sampling, optimization, model, validation, and device settings must match.
     settings = config.to_dict()
+    if settings["recurrence_mode"] == "full_sequence":
+        settings.pop("recurrence_mode")
     # Historical checkpoints predate this field and used equal-example loss.
     if settings["loss_reduction"] == "example_mean":
         settings.pop("loss_reduction")
@@ -93,6 +95,8 @@ def train(
 ) -> dict:
     """Accumulate the configured objective; checkpoint only completed updates."""
     config.validate()
+    if model.recurrence_mode != config.recurrence_mode:
+        raise ValueError("Training config and model recurrence mode disagree")
     if (model.completion_head is not None) != (config.completion_loss_weight > 0):
         raise ValueError("Training config and model completion head disagree")
     token_ids, pad_id = spec["token_ids"], tokenizer.pad_token_id

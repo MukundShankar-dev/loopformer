@@ -1,8 +1,9 @@
 """Stopped pointer inference, composed by the existing full-loop checkpoint CLI."""
 
-from pathlib import Path
+import math
 from statistics import mean
 from time import perf_counter
+from typing import Callable
 
 import torch
 
@@ -14,16 +15,22 @@ from .pointer_task import synchronize
 
 def evaluate_stopping(model: torch.nn.Module, items: list[EncodedExample], token_ids: list[int], pad_id: int,
                       *, loops: int, policy: str, k: int = 2, threshold: float = .5,
-                      head: HaltingHead | None = None) -> tuple[list[dict], list[dict], dict]:
+                      head: HaltingHead | None = None,
+                      progress: Callable[[int, int], None] | None = None) -> tuple[list[dict], list[dict], dict]:
     """Execute batch-1 recurrence until stop; measure synchronized per-example time.
 
     Timing includes prelude, recurrent steps, coda readouts and policy; excludes
     loading, tokenization, CPU export and CSV writes. No hidden state is reused
-    across examples. Complete trajectory accuracy only scores observed nominal
-    steps; every policy waits at least until the example's task depth.
+    across examples. Complete trajectory accuracy requires every nominal step
+    to have been executed correctly. Historical policies wait until task depth; completion uses only the
+    checkpoint's hidden-state head and can stop before depth or hit a smaller cap.
     """
-    if not items or loops < max(len(item.targets) for item in items):
+    completion = policy == "completion"
+    if not items or loops < 1 or (not completion and loops < max(len(item.targets) for item in items)):
         raise ValueError("Loop budget must cover every selected task")
+    if completion and (getattr(model, "completion_head", None) is None or head is not None or
+                       not math.isfinite(threshold) or not 0 < threshold < 1):
+        raise ValueError("Completion stopping requires the checkpoint head and threshold in (0,1)")
     device = next(model.parameters()).device
     was_training = model.training
     model.eval()
@@ -31,13 +38,14 @@ def evaluate_stopping(model: torch.nn.Module, items: list[EncodedExample], token
     try:
         with torch.inference_mode():
             for item in items:
-                batch = collate([item], pad_id, str(device), loops)
-                rule = StoppingRule(policy, depth=len(item.targets), budget=loops,
-                                    token_ids=token_ids, k=k, threshold=threshold, head=head)
+                batch = collate([item], pad_id, str(device))
+                rule = None if completion else StoppingRule(policy, depth=len(item.targets), budget=loops,
+                                                            token_ids=token_ids, k=k, threshold=threshold, head=head)
                 synchronize(device)
                 start = perf_counter()
+                stopping = {"completion_threshold": threshold} if completion else {"stop_policy": rule}
                 result = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"],
-                               num_loops=loops, stop_policy=rule)
+                               num_loops=loops, **stopping)
                 synchronize(device)
                 latency = perf_counter() - start
                 latencies.append(latency)
@@ -59,17 +67,30 @@ def evaluate_stopping(model: torch.nn.Module, items: list[EncodedExample], token
                                          "final_correct": predicted == item.task.final_state,
                                          "predicted_margin": margin, "answer_entropy": entropy,
                                          "stopped": t == len(result.loop_logits)})
+                    if completion:
+                        trajectories[-1].update(stop_logit=result.stop_logits[0, t - 1].item(),
+                                                stop_probability=result.stop_logits[0, t - 1].sigmoid().item())
                 stopped = len(predictions)
-                if stopped < len(item.targets):
+                if not completion and stopped < len(item.targets):
                     raise RuntimeError("Stopping before nominal task depth")
+                probability = result.stop_logits[0, -1].sigmoid().item() if completion else rule.last_probability
                 decisions.append({"example_id": item.task.example_id, "task_depth": len(item.targets),
                                   "budget": loops, "executed_loops": stopped, "policy": policy,
                                   "prediction": predictions[-1], "target": item.task.final_state,
                                   "correct": predictions[-1] == item.task.final_state,
                                   "complete_trajectory": predictions[:len(item.targets)] == list(item.task.intermediate_states),
                                   "predicted_margin": features[-1][0], "answer_entropy": features[-1][1],
-                                  "stop_probability": rule.last_probability if rule.last_probability is not None else "",
+                                  "stop_probability": probability if probability is not None else "",
                                   "latency_seconds": latency})
+                if completion:
+                    signaled = probability >= threshold
+                    depth = len(item.targets)
+                    decisions[-1].update(stop_reason="head" if signaled else "cap",
+                        exact_stop=signaled and stopped == depth, early_stop=signaled and stopped < depth,
+                        late_stop=signaled and stopped > depth, cap_fallback=not signaled,
+                        joint_success=signaled and stopped == depth and predictions[-1] == item.task.final_state)
+                if progress:
+                    progress(len(decisions), len(items))
     finally:
         model.train(was_training)
     ordered_latency = sorted(latencies)
@@ -88,4 +109,13 @@ def evaluate_stopping(model: torch.nn.Module, items: list[EncodedExample], token
                "p50_latency_seconds": percentile(ordered_latency, 50),
                "p95_latency_seconds": percentile(ordered_latency, 95),
                "timing_scope": "Synchronized per-example model forward and stopping callback; batch 1; excludes tokenization, loading, and CSV export"}
+    if completion:
+        def rates(rows: list[dict]) -> dict:
+            return {"examples": len(rows), "accuracy": mean(row["correct"] for row in rows),
+                    **{name + "_rate": mean(row[name] for row in rows)
+                       for name in ("exact_stop", "early_stop", "late_stop", "cap_fallback", "joint_success")}}
+        summary["completion"] = rates(decisions)
+        summary["by_depth"] = {str(d): rates([row for row in decisions if row["task_depth"] == d])
+                               for d in sorted({row["task_depth"] for row in decisions})}
+        summary["timing_scope"] = "Synchronized batch-1 forward including memory preparation, every coda readout, completion head and threshold check; excludes tokenization, loading and export"
     return trajectories, decisions, summary

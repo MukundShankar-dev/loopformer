@@ -4,6 +4,7 @@ import argparse
 from datetime import datetime, timezone
 from importlib.metadata import version
 import json
+import math
 from pathlib import Path
 import platform
 import subprocess
@@ -19,7 +20,7 @@ def main(*, overscaling: bool = False) -> None:
     parser.add_argument("--data", type=Path, default=root / "data/pointer/seed-17/test.jsonl")
     parser.add_argument("--loops", type=int, default=32 if overscaling else None,
                         help=("Loops for every example; default 32; must exceed every task depth" if overscaling else
-                              "Loops for every example; default deepest selected task; must cover all targets"))
+                              "Loops for every example; default deepest task; completion stopping requires an explicit safety cap"))
     parser.add_argument("--device", choices=("cpu", "mps", "cuda"), default="cpu")
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--threads", type=int, default=4)
@@ -31,7 +32,7 @@ def main(*, overscaling: bool = False) -> None:
     if overscaling:
         subset.add_argument("--dry-run", nargs="?", type=int, const=5, choices=(5, 10),
                             help="Preview terminal transformations and exact targets; no model loading or writes")
-    parser.add_argument("--stop-policy", choices=("requested_depth", "stability", "margin", "entropy", "learned"),
+    parser.add_argument("--stop-policy", choices=("requested_depth", "stability", "margin", "entropy", "learned", "completion"),
                         help="Adaptive batch-1 inference; default keeps historical fixed-depth exports")
     parser.add_argument("--stop-k", type=int, default=2, help="Consecutive predictions for stability stopping")
     parser.add_argument("--stop-threshold", type=float,
@@ -41,8 +42,15 @@ def main(*, overscaling: bool = False) -> None:
     args = parser.parse_args()
     if args.stop_policy and args.batch_size != 1:
         parser.error("Adaptive stopping requires --batch-size 1 for actual per-example compute savings")
-    if args.stop_policy in ("margin", "entropy", "learned") and args.stop_threshold is None:
+    if args.stop_policy in ("margin", "entropy", "learned", "completion") and args.stop_threshold is None:
         parser.error("Confidence and learned policies require a development-selected --stop-threshold")
+    if args.stop_policy == "completion":
+        if args.loops is None:
+            parser.error("Completion stopping requires an explicit depth-independent --loops safety cap")
+        if not math.isfinite(args.stop_threshold) or not 0 < args.stop_threshold < 1:
+            parser.error("Completion --stop-threshold must be in (0,1)")
+        if overscaling:
+            parser.error("Completion stopping evaluates original explicit-step tasks, not terminal overscaling")
     if args.stop_k < 1 or (args.stop_policy == "learned") != (args.head is not None):
         parser.error("Learned stopping requires --head; other policies cannot use it; --stop-k must be positive")
     category = ("pointer_adaptive_terminal" if overscaling else "pointer_adaptive") if args.stop_policy else ("pointer_overscaling" if overscaling else "pointer_loops")
@@ -89,7 +97,7 @@ def main(*, overscaling: bool = False) -> None:
         }
     loops = args.loops or max(item.task_depth for item in examples)
     deepest = max(item.task_depth for item in examples)
-    if loops < deepest:
+    if loops < deepest and args.stop_policy != "completion":
         parser.error("--loops must cover the deepest selected task; no targets are truncated")
     if overscaling and loops <= deepest:
         parser.error("Overscaling requires --loops greater than the deepest selected task")
@@ -124,6 +132,8 @@ def main(*, overscaling: bool = False) -> None:
     loading_started = perf_counter()
     with console.status("Loading saved adapters, tokenizer, and frozen base…"):
         model, tokenizer, spec = load_recurrent_checkpoint(args.model, device=args.device, download=args.download)
+        if args.stop_policy == "completion" and model.completion_head is None:
+            parser.error("Selected checkpoint has no completion head")
         if tokenizer.pad_token_id is None:
             raise ValueError("Checkpoint tokenizer requires a pad token")
         items = encode_tasks(examples, tokenizer, dict(zip(spec["symbols"], spec["token_ids"], strict=True)),
@@ -165,15 +175,20 @@ def main(*, overscaling: bool = False) -> None:
     if args.stop_policy:
         metadata["scoring"] = "allowed_symbol_argmax_at_stopped_loop"
         metadata["loss_reduction"] = None
-        metadata["stopping_semantics"] = "Causal target-free policy; t>=task_depth; batch 1; max-loop fallback"
+        metadata["stopping_semantics"] = ("Checkpoint hidden-state head only; no parsed-depth input or minimum depth; batch 1; explicit safety cap"
+                                          if args.stop_policy == "completion" else
+                                          "Causal target-free policy; t>=task_depth; batch 1; max-loop fallback")
         from scripts.eval.adaptive_inference import evaluate_stopping
         from scripts.eval.adaptive_head import load_head
         head = load_head(args.head, checkpoint=args.model) if args.head else None
-        with console.status("Running stopped recurrent inference…"):
+        with Progress(TextColumn("Stopping evaluation"), BarColumn(), TextColumn("{task.completed:.0f}/{task.total:.0f}"),
+                      TimeElapsedColumn(), TimeRemainingColumn(), console=console) as progress:
+            task = progress.add_task("Stopping evaluation", total=len(items))
             trajectory_rows, decision_rows, adaptive = evaluate_stopping(
                 model, items, spec["token_ids"], tokenizer.pad_token_id,
                 loops=loops, policy=args.stop_policy, k=args.stop_k,
-                threshold=args.stop_threshold if args.stop_threshold is not None else .5, head=head)
+                threshold=args.stop_threshold if args.stop_threshold is not None else .5, head=head,
+                progress=lambda done, total: progress.update(task, completed=done))
         write_csv(output / "trajectories.csv", trajectory_rows)
         write_csv(output / "decisions.csv", decision_rows)
         summary_path.write_text(json.dumps({**metadata, **adaptive, "status": "complete",

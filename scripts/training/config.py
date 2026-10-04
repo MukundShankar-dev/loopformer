@@ -19,6 +19,7 @@ class TrainingConfig:
     threads: int = 4
     recurrent_start: int = 6
     recurrent_end: int = 18
+    recurrence_mode: str = "full_sequence"
     lora_rank: int = 8
     lora_alpha: int = 16
     train_max_depth: int = 4
@@ -43,6 +44,8 @@ class TrainingConfig:
     completion_head_hidden_size: int = 128
 
     def validate(self) -> None:
+        if self.recurrence_mode not in ("full_sequence", "fixed_prompt"):
+            raise ValueError("recurrence_mode must be full_sequence or fixed_prompt")
         if self.loss_reduction not in ("example_mean", "loop_mean"):
             raise ValueError("loss_reduction must be example_mean or loop_mean")
         positive = ("threads", "lora_rank", "lora_alpha", "train_max_depth", "validation_max_depth",

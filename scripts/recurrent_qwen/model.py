@@ -1,5 +1,6 @@
 """Qwen2 decoder surgery for the pinned Transformers implementation."""
 
+import math
 from typing import Callable, Literal
 
 import torch
@@ -9,6 +10,7 @@ from transformers.masking_utils import create_causal_mask
 
 from .outputs import RecurrentOutput, answer_margin
 from .completion import CompletionHead
+from .memory import PromptMemory
 
 
 def _answer_readout(hidden: Tensor, positions: list[int]) -> Tensor:
@@ -30,8 +32,11 @@ class DecoderBlock(nn.Module):
         attention_mask: Tensor | None,
         position_ids: Tensor,
         position_embeddings: tuple[Tensor, Tensor],
+        memory: PromptMemory | None = None,
     ) -> Tensor:
-        for layer in self.layers:
+        for index, layer in enumerate(self.layers):
+            if memory is not None:
+                hidden = memory.layer_input(index, hidden)
             hidden = layer(
                 hidden,
                 attention_mask=attention_mask,
@@ -40,7 +45,7 @@ class DecoderBlock(nn.Module):
                 past_key_values=None,
                 use_cache=False,
             )
-        return hidden
+        return memory.block_output(hidden) if memory is not None else hidden
 
 
 class RecurrentQwen(nn.Module):
@@ -53,11 +58,15 @@ class RecurrentQwen(nn.Module):
     """
 
     def __init__(
-        self, base: Qwen2ForCausalLM, recurrent_start: int = 6, recurrent_end: int = 18
+        self, base: Qwen2ForCausalLM, recurrent_start: int = 6, recurrent_end: int = 18,
+        *, recurrence_mode: str = "full_sequence",
     ) -> None:
         super().__init__()
         if not isinstance(base, Qwen2ForCausalLM):
             raise TypeError("Stage 0 requires Qwen2ForCausalLM")
+        if recurrence_mode not in ("full_sequence", "fixed_prompt"):
+            raise ValueError("recurrence_mode must be full_sequence or fixed_prompt")
+        self.recurrence_mode = recurrence_mode
         layers = list(base.model.layers)
         if not 0 <= recurrent_start < recurrent_end <= len(layers):
             raise ValueError("Require 0 <= recurrent_start < recurrent_end <= layer count")
@@ -103,6 +112,7 @@ class RecurrentQwen(nn.Module):
         return_hidden_states: bool = False,
         logits_mode: Literal["answer", "all"] = "answer",
         stop_policy: Callable[[int, Tensor, Tensor], bool] | None = None,
+        completion_threshold: float | None = None,
     ) -> RecurrentOutput:
         """Run complete prompt states through shared recurrence, without KV cache.
 
@@ -114,11 +124,21 @@ class RecurrentQwen(nn.Module):
         explicitly if final-answer margins, rather than step margins, are wanted.
         Optional stop_policy(t, h_t, answer_logits_t) is inference-only, batch 1,
         and may return True to end after loop t. It never sees labels.
+        completion_threshold enables the checkpoint's hidden-state-only head,
+        independent of task depth, under the num_loops safety cap (batch 1).
+        fixed_prompt keeps only the final unmasked position writable; returned
+        full-shaped states contain fixed first-pass prefix outputs for diagnostics.
         """
         if type(num_loops) is not int or num_loops < 1:
             raise ValueError("num_loops must be a positive integer")
         if stop_policy is not None and (self.training or torch.is_grad_enabled() or input_ids.shape[0] != 1 or labels is not None or logits_mode != "answer"):
             raise ValueError("Stopping requires eval/no_grad, batch 1, no labels, and answer logits")
+        if completion_threshold is not None:
+            if (not math.isfinite(completion_threshold) or not 0 < completion_threshold < 1 or
+                    self.completion_head is None or stop_policy is not None):
+                raise ValueError("Completion stopping requires a head, threshold in (0,1), and no other stop policy")
+            if self.training or torch.is_grad_enabled() or input_ids.shape[0] != 1 or labels is not None or logits_mode != "answer":
+                raise ValueError("Completion stopping requires eval/no_grad, batch 1, no labels, and answer logits")
         if logits_mode not in ("answer", "all"):
             raise ValueError("logits_mode must be 'answer' or 'all'")
         if input_ids.ndim != 2 or input_ids.dtype != torch.long or 0 in input_ids.shape:
@@ -160,6 +180,10 @@ class RecurrentQwen(nn.Module):
         rows = torch.arange(batch, device=device)
         if not attention_mask[rows, answer_positions].bool().all():
             raise ValueError("Answer positions cannot point to padding")
+        if self.recurrence_mode == "fixed_prompt":
+            last = torch.arange(sequence, device=device).expand(batch, -1).masked_fill(~attention_mask.bool(), -1).max(-1).values
+            if not torch.equal(answer_positions, last):
+                raise ValueError("fixed_prompt requires the final unmasked position as its working state")
         readout_positions = answer_positions.tolist()
         if (labels is None) != (allowed_token_ids is None):
             raise ValueError("Provide both labels and allowed_token_ids to compute margins")
@@ -178,15 +202,21 @@ class RecurrentQwen(nn.Module):
         block_args = (causal_mask, position_ids, position_embeddings)
         hidden = self.prelude(hidden, *block_args)
         initial_hidden = hidden if return_hidden_states else None
+        recurrent_memory = coda_memory = None
+        if self.recurrence_mode == "fixed_prompt":
+            write_mask = (torch.arange(sequence, device=device)[None, :] == answer_positions[:, None]).unsqueeze(-1)
+            recurrent_memory, coda_memory = PromptMemory(write_mask), PromptMemory(write_mask)
         states, logits, margins, stop_logits = [], [], [], []
         for loop in range(num_loops):
-            hidden = self.recurrent(hidden, *block_args)
+            hidden = (self.recurrent(hidden, *block_args, memory=recurrent_memory)
+                      if recurrent_memory is not None else self.recurrent(hidden, *block_args))
             if self.completion_head is not None:
                 stop_logits.append(self.completion_head(_answer_readout(hidden, readout_positions)))
             if return_hidden_states:
                 states.append(hidden)
             # Frozen C stays differentiable: readout loss must reach R's adapters.
-            decoded = self.norm(self.coda(hidden, *block_args))
+            decoded = self.norm(self.coda(hidden, *block_args, memory=coda_memory)
+                                if coda_memory is not None else self.coda(hidden, *block_args))
             readout = decoded if logits_mode == "all" else _answer_readout(decoded, readout_positions)
             scores = self.lm_head(readout)
             logits.append(scores)
@@ -195,6 +225,12 @@ class RecurrentQwen(nn.Module):
                 margins.append(answer_margin(answer_scores, labels[:, loop], allowed_token_ids))
             if stop_policy is not None and stop_policy(loop + 1, hidden, scores):
                 break
+            if completion_threshold is not None:
+                probability = stop_logits[-1].sigmoid().item()
+                if not math.isfinite(probability):
+                    raise FloatingPointError("Nonfinite completion probability")
+                if probability >= completion_threshold:
+                    break
         return RecurrentOutput(
             loop_logits=tuple(logits),
             hidden_states=tuple(states) if return_hidden_states else None,

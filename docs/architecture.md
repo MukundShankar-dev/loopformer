@@ -6,6 +6,8 @@ The [inference smoke test](../scripts/smoke_test_qwen.py) exercises ordinary Qwe
 
 ## Recurrent computation
 
+The following full-sequence recurrence remains the historical default. The new `fixed_prompt` mode is an explicit checkpoint/configuration choice, described below; loading an old checkpoint never changes its recurrence.
+
 Inspection of Transformers 5.17.0 confirmed `Qwen2ForCausalLM`, `Qwen2Model`, and tensor-returning `Qwen2DecoderLayer.forward`. The Qwen2.5-0.5B-Instruct checkpoint has 24 layers, hidden size 896, 14 attention heads, two KV heads, full attention, default RoPE, and tied embedding/head weights.
 
 The configurable default split is layers 0–5 for P, 6–17 for shared R, and 18–23 for C:
@@ -19,6 +21,16 @@ h_0 -> R -> h_1 -> R -> h_2 -> ... -> h_T
 `RecurrentQwen` groups the original decoder objects into `prelude`, `recurrent`, and `coda` (`DecoderBlock` modules), without copying weights or retaining duplicate registered paths. Embeddings, RoPE, final RMSNorm, and the LM head are reused; tied weights remain tied. Construction freezes and clears gradients on the supplied base **in place**. Adapter injection subsequently mutates its shared middle layers, so compute unadapted reference logits first or load a separate reference.
 
 The next iteration consumes the recurrent state, never the coda output or a decoded token. P runs once; intermediate C reads expose predictions without modifying the recurrent trajectory. There is no bridge: direct middle-to-middle recurrence passes Stage 0. This does not establish useful recurrent task execution or imply that `h_0` decodes to a start symbol.
+
+### Fixed prompt memory (2026-10-04)
+
+`RecurrentQwen(..., recurrence_mode="fixed_prompt")` keeps the final unmasked prompt position writable and holds all other positions to their layer-specific first-pass context. [PromptMemory](../scripts/recurrent_qwen/memory.py) stores differentiable inputs and outputs separately for R and C within one forward call. Every R loop and C readout reuses those values; only the answer-position R output feeds the next R pass. No loop/depth scalar, generated token, reference symbol, new prompt or extra positional coordinate enters that update. The final unmasked answer position is enforced at the API boundary.
+
+Memory tensors remain in the autograd graph, so later losses reach adapters that formed the context as well as earlier working states. They are discarded after the forward and recomputed with current parameters for the next batch. This reference implementation still executes dense sequence layers and restores fixed context at each layer; it does not implement a KV cache or claim an inference/training speedup. Returned `[B,S,H]` states contain a fixed first-pass prefix and the evolving working position. Full-state norm summaries therefore have different semantics from the old full-sequence recurrence.
+
+One-pass equivalence, prefix invariance, parameter sharing, and the loss gradient path pass tiny-model tests. An independent recomputation reference matches both logits and adapter gradients. The pretrained startup gate is still required. New checkpoints use `loopformer-stage1-fixed-prompt-v1` with explicit `recurrence_mode: fixed_prompt`; the loader and adapter restore reject conflicting modes. Historical formats retain their old behavior. See [design, supervision and commands](learned_loop_completion.md#fixed-prompt-memory-and-recurrent-working-state).
+
+`completion_threshold` activates the checkpoint's hidden-state head during eval/no-grad, batch 1. It stops on the first threshold crossing under `num_loops` as a safety cap, without receiving task depth. It cannot be combined with the older numeric-feature `stop_policy`. Intermediate C readouts are retained on this correctness path; timing includes their overhead. The CLI uses `--stop-policy completion` to select this distinct path.
 
 ### Literature cross-check (2026-09-30)
 

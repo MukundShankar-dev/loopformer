@@ -52,6 +52,8 @@ def main() -> None:
     config.validate()
     if config.completion_loss_weight and args.init_from:
         parser.error("Completion training requires fresh adapters or --resume; --init-from is not supported")
+    if config.recurrence_mode != "full_sequence" and args.init_from:
+        parser.error("fixed_prompt training requires fresh adapters or matching --resume")
     output = args.output or root / "models/stage1_pointer" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
     if output.exists() and not args.dry_run:
         parser.error("Output directory already exists; choose a new --output")
@@ -88,6 +90,8 @@ def main() -> None:
             "prompt_format": "dataset_raw", "loss_vocabulary": "symbols", "train_max_depth": config.train_max_depth}
     if config.loss_reduction != "example_mean":
         spec["loss_reduction"] = config.loss_reduction
+    if config.recurrence_mode != "full_sequence":
+        spec["recurrence_mode"] = config.recurrence_mode
     if config.completion_loss_weight:
         spec["completion_head"] = {"intermediate": config.completion_head_hidden_size}
         spec["completion_loss_weight"] = config.completion_loss_weight
@@ -111,6 +115,7 @@ def main() -> None:
     for label, value in (
         ("Model", f"{config.model} @ {config.revision}"),
         ("Device / dtype", f"{config.device} / float32"),
+        ("Recurrence", config.recurrence_mode),
         ("Training", f"{len(train_items):,} examples · depths 1–{config.train_max_depth} · {config.epochs} epochs"),
         ("Validation / train probe", f"{len(validation_items)} / {len(probe_items)} examples · validation depths 1–{config.validation_max_depth}"),
         ("Batch / accumulation", f"{config.batch_size} × {config.gradient_accumulation} = {effective_batch} examples/update"),

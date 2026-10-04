@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.fixture
-def tiny_training(tmp_path):
+def tiny_training(tmp_path, request):
     from tokenizers import Tokenizer
     from tokenizers.models import WordLevel
     from tokenizers.pre_tokenizers import Whitespace
@@ -47,7 +47,8 @@ def tiny_training(tmp_path):
     base_path = tmp_path / 'base'
     base.save_pretrained(base_path)
     tokenizer.save_pretrained(base_path)
-    config = replace(TrainingConfig(), model=str(base_path), revision='main', recurrent_start=1,
+    config = replace(TrainingConfig(), recurrence_mode=getattr(request, 'param', 'full_sequence'),
+                     model=str(base_path), revision='main', recurrent_start=1,
                      recurrent_end=2, lora_rank=2, lora_alpha=4, train_max_depth=2,
                      validation_max_depth=3, epochs=2, gradient_accumulation=2,
                      eval_every=2, save_every=1, warmup_steps=0, learning_rate=.001)
@@ -59,6 +60,8 @@ def tiny_training(tmp_path):
     spec = {'base_model': str(base_path), 'revision': 'main', 'recurrent_start': 1, 'recurrent_end': 2,
             'lora_rank': 2, 'lora_alpha': 4, 'symbols': list(SYMBOLS), 'token_ids': token_ids,
             'prompt_format': 'dataset_raw', 'loss_vocabulary': 'symbols', 'train_max_depth': 2}
+    if config.recurrence_mode != 'full_sequence':
+        spec['recurrence_mode'] = config.recurrence_mode
     model, gate = initialize(base, config, collate(items[:1], 0, 'cpu'), token_ids)
     return model, tokenizer, config, items, spec, gate
 
@@ -132,6 +135,7 @@ def test_config_and_subset_are_explicit_and_reproducible():
             bad.validate()
 
 
+@pytest.mark.parametrize('tiny_training', ['full_sequence', 'fixed_prompt'], indirect=True)
 def test_gates_checkpoint_roundtrip_and_gradient_scope(tiny_training, tmp_path):
     model, tokenizer, config, items, spec, gate = tiny_training
     assert gate['passed'] and all(norm > 0 for norm in gate['hidden_gradient_norms'])
@@ -160,6 +164,7 @@ def test_gates_checkpoint_roundtrip_and_gradient_scope(tiny_training, tmp_path):
     assert [row['executed_loops'] for row in rows] == [2, 2]
 
 
+@pytest.mark.parametrize('tiny_training', ['full_sequence', 'fixed_prompt'], indirect=True)
 def test_completion_head_receives_only_hidden_state_and_roundtrips(tiny_training, tmp_path):
     from scripts.training.gates import validate_completion_gradients
     model, tokenizer, config, items, spec, _ = tiny_training
@@ -186,7 +191,7 @@ def test_completion_head_receives_only_hidden_state_and_roundtrips(tiny_training
     path = tmp_path / 'completion_checkpoint'
     save_checkpoint(path, model, tokenizer, spec, {})
     restored, _, restored_spec = load_recurrent_checkpoint(path)
-    assert restored_spec['format'] == 'loopformer-stage1-completion-v1'
+    assert restored_spec['format'] == ('loopformer-stage1-fixed-prompt-v1' if config.recurrence_mode == 'fixed_prompt' else 'loopformer-stage1-completion-v1')
     with torch.no_grad():
         after = restored(batch['input_ids'], batch['attention_mask'], num_loops=2)
     torch.testing.assert_close(after.stop_logits, result.stop_logits, rtol=0, atol=0)
@@ -194,6 +199,7 @@ def test_completion_head_receives_only_hidden_state_and_roundtrips(tiny_training
         torch.testing.assert_close(before, current, rtol=0, atol=0)
 
 
+@pytest.mark.parametrize('tiny_training', ['full_sequence', 'fixed_prompt'], indirect=True)
 def test_completion_training_logs_and_resume(tiny_training, tmp_path):
     model, tokenizer, config, items, spec, _ = tiny_training
     model.enable_completion(8)
@@ -475,3 +481,48 @@ def test_training_cli_dry_run_and_toy_update(tmp_path):
     assert loop_summary['status'] == 'complete'
     assert 'first_stop_exact_rate' in loop_summary['completion']
     assert 'stop_probability' in (completion_loops / 'trajectories.csv').read_text().splitlines()[0]
+
+    fixed_config = replace(completion_config, recurrence_mode='fixed_prompt')
+    config_path.write_text(json.dumps(fixed_config.to_dict()))
+    fixed = tmp_path / 'fixed'
+    fixed_command = [*command, '--output', str(fixed)]
+    subprocess.run([*fixed_command, '--dry-run'], cwd=ROOT, capture_output=True, text=True, check=True)
+    assert not fixed.exists()
+    subprocess.run(fixed_command, cwd=ROOT, capture_output=True, text=True, check=True)
+    fixed_checkpoint = fixed / 'step-000001'
+    fixed_run = json.loads((fixed / 'run.json').read_text())
+    assert fixed_run['gate']['passed'] and fixed_run['gate']['completion']['passed']
+    fixed_spec = json.loads((fixed_checkpoint / 'recurrent_config.json').read_text())
+    assert fixed_spec['format'] == 'loopformer-stage1-fixed-prompt-v1'
+    assert fixed_spec['recurrence_mode'] == 'fixed_prompt'
+    config_path.write_text(json.dumps(replace(fixed_config, max_steps=2).to_dict()))
+    subprocess.run([*command, '--output', str(tmp_path / 'fixed_resume'), '--resume', str(fixed_checkpoint)],
+                   cwd=ROOT, capture_output=True, text=True, check=True)
+    naive = tmp_path / 'fixed_naive'
+    subprocess.run([sys.executable, '-m', 'scripts.eval.naive_test', '--model', str(fixed_checkpoint),
+                    '--data', str(tmp_path / 'validation.jsonl'), '--output', str(naive), '--test'],
+                   cwd=ROOT, capture_output=True, text=True, check=True)
+    assert json.loads((naive / 'summary.json').read_text())['total'] == 3
+    full, stopped = tmp_path / 'fixed_full', tmp_path / 'fixed_stopped'
+    eval_command = [sys.executable, '-m', 'scripts.eval.loop_test', '--model', str(fixed_checkpoint),
+                    '--data', str(tmp_path / 'validation.jsonl'), '--device', 'cpu', '--loops', '4']
+    subprocess.run([*eval_command, '--batch-size', '2', '--output', str(full)],
+                   cwd=ROOT, capture_output=True, text=True, check=True)
+    subprocess.run([*eval_command, '--stop-policy', 'completion', '--stop-threshold', '0.5', '--output', str(stopped)],
+                   cwd=ROOT, capture_output=True, text=True, check=True)
+    with (full / 'trajectories.csv').open() as f:
+        trace = list(csv.DictReader(f))
+    with (stopped / 'decisions.csv').open() as f:
+        decisions = list(csv.DictReader(f))
+    for row in decisions:
+        trajectory = [r for r in trace if r['example_id'] == row['example_id']]
+        expected = next((r for r in trajectory if float(r['stop_probability']) >= .5), trajectory[-1])
+        assert row['executed_loops'] == expected['loop']
+        assert row['prediction'] == expected['prediction']
+        assert row['stop_reason'] == ('head' if float(expected['stop_probability']) >= .5 else 'cap')
+    stopped_summary = json.loads((stopped / 'summary.json').read_text())
+    assert stopped_summary['status'] == 'complete'
+    assert 'cap_fallback_rate' in stopped_summary['completion']
+    rejected = subprocess.run([*eval_command, '--stop-policy', 'completion', '--stop-threshold', 'nan',
+                               '--output', str(tmp_path / 'invalid')], cwd=ROOT, capture_output=True, text=True)
+    assert rejected.returncode != 0 and not (tmp_path / 'invalid').exists()
