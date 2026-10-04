@@ -1,0 +1,4 @@
+Paired Steps: 32 rule tables × 7 counts = 224 prompts; 20 loops each
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:37,  7.80it/s]Loading weights:  43%|████▎     | 125/290 [00:00<00:00, 630.98it/s]Loading weights:  72%|███████▏  | 208/290 [00:00<00:00, 694.25it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 707.65it/s]
+Paired Steps ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+Saved paired predictions, stop logits and working-state norms/deltas: eval/pointer_probes/paired-steps-20261004T150542Z-407
