@@ -20,6 +20,7 @@ class RecurrentOutput:
     hidden_states: tuple[Tensor, ...] | None = None
     initial_hidden_state: Tensor | None = None
     margins: Tensor | None = None
+    stop_logits: Tensor | None = None  # [batch, executed_loops], when completion is enabled.
 
     @property
     def logits(self) -> Tensor:

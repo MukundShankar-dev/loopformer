@@ -1,6 +1,24 @@
 # Train recurrent pointer execution
 
-Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md) has completed; the [loop-balanced ablation](experiments/stage1_loopbalanced.md) is also complete, without an improved depth frontier. The immediate priority is [diagnosis and profiling](diagnostics_and_performance.md). Other dated training and depth-comparison commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for toy-model checks.
+Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md) has completed; the [loop-balanced ablation](experiments/stage1_loopbalanced.md) is also complete, without an improved depth frontier. The new [learned-completion training ablation](learned_loop_completion.md) is implemented but has not run on pretrained Qwen. Other dated training and depth-comparison commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
+
+## Learned completion training: next authorized run
+
+The [config](../configs/stage1_pointer_depth6_completion.json) matches the fresh 30k depth-6 batch-4 baseline's data selection, seed, optimizer, effective batch, and update budget. It adds a 128-wide hidden-state stop head and weight `0.1` on the continue/stop loss. The exact intermediate A–Z target is still decoded by frozen C after **every** recurrent pass and supervised by the existing 26-symbol CE. The head receives only the recurrent answer-position state. `Steps` appears in the raw prompt; the trainer's label mask uses task depth, but no loop/depth scalar is passed to R or the head. The first run must use fresh adapters; do not pass `--init-from` or `--resume`.
+
+On the CUDA desktop, from the repository root, first verify that `data/pointer/seed-37-depth6-30k/train.jsonl` and `data/pointer/seed-17/validation.jsonl` are present, then preview and run:
+
+```bash
+python -m scripts.training.train_pointer \
+  --config configs/stage1_pointer_depth6_completion.json --device cuda \
+  --output models/stage1_pointer/depth6-completion-seed37 --dry-run
+
+python -m scripts.training.train_pointer \
+  --config configs/stage1_pointer_depth6_completion.json --device cuda \
+  --output models/stage1_pointer/depth6-completion-seed37
+```
+
+The output directory must be new. The live dashboard shows pointer objective/accuracy and completion loss, exact-stop rate, and early-stop rate at the diagnostic probability threshold 0.5. `metrics.jsonl` keeps each update's two loss terms, validation summaries, and selection loss; validation CSVs append stop logits, probabilities, nominal labels, and BCE through each task's depth. Checkpoints use `loopformer-stage1-completion-v1` and include both LoRA and head weights in `adapter_model.pt`; historical checkpoints remain `loopformer-stage1-v1`. The existing `naive_test` and `loop_test` can load new checkpoints for **forced-depth pointer evaluation**. Actual self-stopped inference and threshold selection are not yet implemented, so the 0.5 diagnostic rate does not establish deployed stopping accuracy. The 30k training data are absent from this Mac checkout; the new real-data dry run has not been verified here.
 
 ## Preview, then run
 

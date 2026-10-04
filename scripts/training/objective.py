@@ -73,6 +73,58 @@ def step_loss(scores: Tensor, targets: Tensor, mask: Tensor, *, loop_weights: Te
     return (losses.sum(-1) / mask.sum(-1)).mean(), losses
 
 
+def completion_loss(stop_logits: Tensor, mask: Tensor) -> tuple[Tensor, Tensor]:
+    """Continue at 1..d-1, stop at d; average the two classes per example.
+
+    A padded pass t>d has no loss. The depth is used only to construct labels;
+    neither depth nor loop index is passed to the completion head.
+    """
+    if stop_logits.ndim != 2 or mask.shape != stop_logits.shape or mask.dtype != torch.bool:
+        raise ValueError("Expected stop logits and boolean target mask [batch, loops]")
+    if not mask.any(-1).all() or not (mask.int().cumprod(-1).bool() == mask).all():
+        raise ValueError("Each example needs a nonempty contiguous target prefix")
+    if not torch.isfinite(stop_logits).all():
+        raise FloatingPointError("Non-finite stop logits")
+    depths = mask.sum(-1)
+    stop = torch.zeros_like(stop_logits)
+    stop.scatter_(1, (depths - 1).unsqueeze(-1), 1)
+    losses = F.binary_cross_entropy_with_logits(stop_logits, stop, reduction="none") * mask
+    final = losses.gather(1, (depths - 1).unsqueeze(-1)).squeeze(-1)
+    prior = (losses.sum(-1) - final) / (depths - 1).clamp_min(1)
+    per_example = torch.where(depths > 1, (prior + final) / 2, final)
+    return per_example.mean(), losses
+
+
+def completion_metrics(stop_logits: Tensor, mask: Tensor, losses: Tensor, objective: Tensor) -> dict:
+    """Additive counts for microbatch-safe diagnostic aggregation."""
+    depths = mask.sum(-1)
+    positive = stop_logits.gather(1, (depths - 1).unsqueeze(-1)).squeeze(-1) >= 0
+    first = (stop_logits >= 0).int().argmax(-1) + 1
+    has_stop = (stop_logits >= 0).any(-1)
+    exact = has_stop & (first == depths)
+    return {"examples": len(depths), "objective_loss_sum": objective.item() * len(depths),
+            "stop_loss_sum": losses.sum().item(),
+            "stop_label_count": mask.sum().item(), "stop_positive_correct": positive.sum().item(),
+            "continue_correct": ((stop_logits < 0) & mask).sum().item() - (~positive).sum().item(),
+            "continue_count": (depths - 1).sum().item(), "first_stop_exact": exact.sum().item(),
+            "first_stop_early": (has_stop & (first < depths)).sum().item(),
+            "first_stop_late_or_missing": (~has_stop | (first > depths)).sum().item()}
+
+
+def combine_completion_metrics(parts: list[dict]) -> dict:
+    if not parts:
+        raise ValueError("Need completion metric parts")
+    total = sum(part["examples"] for part in parts)
+    continues = sum(part["continue_count"] for part in parts)
+    return {"loss_per_label": sum(part["stop_loss_sum"] for part in parts) / sum(part["stop_label_count"] for part in parts),
+            "objective_loss": sum(part["objective_loss_sum"] for part in parts) / total,
+            "stop_at_depth_accuracy": sum(part["stop_positive_correct"] for part in parts) / total,
+            "continue_accuracy": sum(part["continue_correct"] for part in parts) / continues if continues else None,
+            "first_stop_exact_rate": sum(part["first_stop_exact"] for part in parts) / total,
+            "first_stop_early_rate": sum(part["first_stop_early"] for part in parts) / total,
+            "first_stop_late_or_missing_rate": sum(part["first_stop_late_or_missing"] for part in parts) / total}
+
+
 def batch_metrics(scores: Tensor, targets: Tensor, mask: Tensor, losses: Tensor) -> dict:
     """Detached numerator/count statistics, safe to aggregate unequal batches."""
     correct = (scores.detach().argmax(-1) == targets) & mask

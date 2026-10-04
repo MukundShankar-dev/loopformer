@@ -8,6 +8,7 @@ from transformers import Qwen2ForCausalLM
 from transformers.masking_utils import create_causal_mask
 
 from .outputs import RecurrentOutput, answer_margin
+from .completion import CompletionHead
 
 
 def _answer_readout(hidden: Tensor, positions: list[int]) -> Tensor:
@@ -79,7 +80,15 @@ class RecurrentQwen(nn.Module):
         self.coda = DecoderBlock(layers[recurrent_end:])
         self.norm = base.model.norm
         self.lm_head = base.lm_head
+        self.completion_head: CompletionHead | None = None
         self.train(base.training)
+
+    def enable_completion(self, intermediate: int = 128) -> None:
+        """Attach a trainable stop readout without changing recurrent inputs."""
+        if self.completion_head is not None:
+            raise ValueError("Completion head is already attached")
+        self.completion_head = CompletionHead(self.config.hidden_size, intermediate).to(
+            device=self.embed_tokens.weight.device, dtype=self.embed_tokens.weight.dtype)
 
     def forward(
         self,
@@ -169,9 +178,11 @@ class RecurrentQwen(nn.Module):
         block_args = (causal_mask, position_ids, position_embeddings)
         hidden = self.prelude(hidden, *block_args)
         initial_hidden = hidden if return_hidden_states else None
-        states, logits, margins = [], [], []
+        states, logits, margins, stop_logits = [], [], [], []
         for loop in range(num_loops):
             hidden = self.recurrent(hidden, *block_args)
+            if self.completion_head is not None:
+                stop_logits.append(self.completion_head(_answer_readout(hidden, readout_positions)))
             if return_hidden_states:
                 states.append(hidden)
             # Frozen C stays differentiable: readout loss must reach R's adapters.
@@ -189,4 +200,5 @@ class RecurrentQwen(nn.Module):
             hidden_states=tuple(states) if return_hidden_states else None,
             initial_hidden_state=initial_hidden,
             margins=torch.stack(margins, dim=1) if margins else None,
+            stop_logits=torch.stack(stop_logits, dim=1) if stop_logits else None,
         )

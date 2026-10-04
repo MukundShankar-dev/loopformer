@@ -42,7 +42,7 @@ def main() -> None:
     from scripts.recurrent_qwen.checkpoint import restore_adapters
     from scripts.training.config import read_config
     from scripts.training.data import collate, encode_tasks, read_tasks, select_tasks
-    from scripts.training.gates import initialize
+    from scripts.training.gates import initialize, validate_completion_gradients
     from scripts.training.initialization import validate_initialization
     from scripts.training.runner import resume_identity, train, validate_resume_identity
 
@@ -50,6 +50,8 @@ def main() -> None:
     if args.device:
         config = replace(config, device=args.device)
     config.validate()
+    if config.completion_loss_weight and args.init_from:
+        parser.error("Completion training requires fresh adapters or --resume; --init-from is not supported")
     output = args.output or root / "models/stage1_pointer" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
     if output.exists() and not args.dry_run:
         parser.error("Output directory already exists; choose a new --output")
@@ -86,6 +88,9 @@ def main() -> None:
             "prompt_format": "dataset_raw", "loss_vocabulary": "symbols", "train_max_depth": config.train_max_depth}
     if config.loss_reduction != "example_mean":
         spec["loss_reduction"] = config.loss_reduction
+    if config.completion_loss_weight:
+        spec["completion_head"] = {"intermediate": config.completion_head_hidden_size}
+        spec["completion_loss_weight"] = config.completion_loss_weight
     initialization_metadata = None
     if args.init_from:
         source_spec = validate_initialization(args.init_from, spec)
@@ -110,7 +115,8 @@ def main() -> None:
         ("Validation / train probe", f"{len(validation_items)} / {len(probe_items)} examples · validation depths 1–{config.validation_max_depth}"),
         ("Batch / accumulation", f"{config.batch_size} × {config.gradient_accumulation} = {effective_batch} examples/update"),
         ("Updates / learning rate", f"{planned} / {config.learning_rate:g}"),
-        ("Loss", f"26-symbol CE · {config.loss_reduction} · nominal targets only"),
+        ("Loss", f"26-symbol CE · {config.loss_reduction} · nominal targets only" +
+         (f" + {config.completion_loss_weight:g} × hidden-state completion BCE" if config.completion_loss_weight else "")),
         ("Prompt", "Dataset raw rules/start/steps · no few-shot examples"),
         ("Output", str(output.resolve())),
         ("Initialization", str(args.init_from) + " · adapters only, new optimizer" if args.init_from else
@@ -130,6 +136,10 @@ def main() -> None:
             raise ValueError("Selected prompts exceed model context size")
         probe = collate(train_items[:1], tokenizer.pad_token_id, config.device)
         model, gate = initialize(base, config, probe, token_ids)
+        if config.completion_loss_weight:
+            model.enable_completion(config.completion_head_hidden_size)
+            gate["completion"] = validate_completion_gradients(model, probe)
+            gate["trainable_parameters"] = sum(p.numel() for p in model.parameters() if p.requires_grad)
     console.print(f"[green]Architecture/loss-path checks passed[/green] · {gate['trainable_parameters']:,} trainable parameters")
     spec["revision"] = getattr(base.config, "_commit_hash", None) or config.revision
     if args.init_from:
@@ -180,10 +190,16 @@ def main() -> None:
             values = state["train"]
             dashboard.add_row("Training", f"objective {values['objective_loss']:.4f} · example CE {values['loss']:.4f} · step accuracy {values['intermediate_accuracy']:.1%} · trajectory {values['trajectory_accuracy']:.1%}")
             dashboard.add_row("Loop losses", "  ".join(f"L{t}: {value['loss']:.3f}" for t, value in values["per_loop"].items()))
+            if "completion" in values:
+                stop = values["completion"]
+                dashboard.add_row("Completion", f"loss {stop['objective_loss']:.4f} · exact stop {stop['first_stop_exact_rate']:.1%} · early {stop['first_stop_early_rate']:.1%}")
         if "validation" in state:
             values = state["validation"]
             dashboard.add_row("Validation", f"loss {values['loss']:.4f} · step accuracy {values['intermediate_accuracy']:.1%} · trajectory {values['trajectory_accuracy']:.1%}")
             dashboard.add_row("Checkpoint selection", f"{config.loss_reduction} · trained-depth loss {values['selection_loss']:.4f}")
+            if "completion" in values:
+                stop = values["completion"]
+                dashboard.add_row("Validation stop", f"loss {stop['objective_loss']:.4f} · exact {stop['first_stop_exact_rate']:.1%} · early {stop['first_stop_early_rate']:.1%}")
         if "train_probe" in state:
             dashboard.add_row("Fixed train probe", f"trajectory {state['train_probe']['trajectory_accuracy']:.1%}")
         if "gradient_norm_before_clip" in state:

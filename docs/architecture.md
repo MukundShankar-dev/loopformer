@@ -110,6 +110,10 @@ Depth-stage initialization is separate from resume: `scripts/training/initializa
 
 [Adaptive inference compute](adaptive_compute.md) owns the implemented opt-in stopping interface and its remaining research gates. `RecurrentQwen.forward(stop_policy=...)` accepts a causal callback in eval/no-grad batch-1 mode, reads the shared recurrent state after each loop, and returns the executed prefix. The default fixed-depth forward and training gradients remain unchanged. A separate lightweight head may consume target-free confidence/history features; no pretrained head or adaptive benefit has been established.
 
+## Explicit-step learned completion ablation
+
+The separate [completion training path](learned_loop_completion.md) adds an optional LayerNorm → Linear → GELU → Linear head to `RecurrentQwen`. At each loop it reads only `h_t` at the answer position and returns `stop_logits[B,T]` alongside the unchanged coda logits. It does not receive the loop index or parsed requested depth. The trainer jointly optimizes the existing intermediate 26-symbol CE and a weighted binary continue/stop objective; the latter is supervised only through each example's nominal depth and backpropagates through R. No predicted or reference symbol is inserted into recurrence. Fixed-depth outputs of a head-equipped checkpoint still use the same R/C readout; the self-stopped inference path is not yet implemented. The head and adapters use a versioned checkpoint, while historical adapter-only checkpoints remain loadable. Tiny-model checks passed; pretrained training has not run.
+
 ---
 
 ## Stage 0 validation protocol (completed)

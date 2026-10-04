@@ -17,7 +17,9 @@ from scripts.eval.pointer_task import synchronize
 from .config import TrainingConfig
 from .data import EncodedExample, collate
 from .evaluation import evaluate
-from .objective import batch_metrics, combine_metrics, step_loss, symbolic_scores, loop_loss_weights, training_selection_loss
+from .objective import (batch_metrics, combine_metrics, completion_loss, completion_metrics,
+                        combine_completion_metrics, step_loss, symbolic_scores, loop_loss_weights,
+                        training_selection_loss)
 
 
 def memory_usage(device: str) -> dict:
@@ -54,6 +56,9 @@ def resume_identity(config: TrainingConfig, data_identity: dict) -> dict:
     # Historical checkpoints predate this field and used equal-example loss.
     if settings["loss_reduction"] == "example_mean":
         settings.pop("loss_reduction")
+    if settings["completion_loss_weight"] == 0:
+        settings.pop("completion_loss_weight")
+        settings.pop("completion_head_hidden_size")
     for name in ("epochs", "max_steps", "eval_every", "save_every"):
         settings.pop(name)
     return {"config": settings, "data": data_identity}
@@ -88,6 +93,8 @@ def train(
 ) -> dict:
     """Accumulate the configured objective; checkpoint only completed updates."""
     config.validate()
+    if (model.completion_head is not None) != (config.completion_loss_weight > 0):
+        raise ValueError("Training config and model completion head disagree")
     token_ids, pad_id = spec["token_ids"], tokenizer.pad_token_id
     weights = (torch.tensor(loop_loss_weights([len(item.targets) for item in train_items]),
                             device=config.device, dtype=next(model.parameters()).dtype)
@@ -121,14 +128,25 @@ def train(
         latest_validation = evaluate(
             model, validation, token_ids, pad_id, batch_size=config.batch_size,
             loops=config.validation_max_depth, output=output / f"validation-step-{step:06d}.csv",
+            completion_loss_weight=config.completion_loss_weight,
             progress=lambda done, total: progress({"phase": f"Validation {done}/{total}"}),
         )
         probe = evaluate(
             model, train_probe, token_ids, pad_id, batch_size=config.batch_size,
             output=output / f"train-probe-step-{step:06d}.csv",
+            completion_loss_weight=config.completion_loss_weight,
             progress=lambda done, total: progress({"phase": f"Train probe {done}/{total}"}),
         )
         selection_loss = training_selection_loss(latest_validation, config.train_max_depth, config.loss_reduction)
+        if config.completion_loss_weight:
+            stop_selection = sum(v["completion"]["objective_loss"] * v["examples"]
+                                 for d, v in latest_validation["by_depth"].items()
+                                 if int(d) <= config.train_max_depth) / sum(v["examples"]
+                                 for d, v in latest_validation["by_depth"].items()
+                                 if int(d) <= config.train_max_depth)
+            latest_validation["pointer_selection_loss"] = selection_loss
+            latest_validation["completion_selection_loss"] = stop_selection
+            latest_validation["joint_validation_loss"] = selection_loss + config.completion_loss_weight * stop_selection
         latest_validation["selection_loss"] = selection_loss
         latest_validation["selection_reduction"] = config.loss_reduction
         improved = selection_loss < best_loss
@@ -160,6 +178,7 @@ def train(
 
     try:
         log({"event": "objective", "loss_reduction": config.loss_reduction,
+             "completion_loss_weight": config.completion_loss_weight,
              "loop_weights": weights.tolist() if weights is not None else None,
              "training_examples": len(train_items)})
         progress({"step": step, "total_steps": total_steps, "phase": "Initial validation"})
@@ -172,7 +191,7 @@ def train(
                 group = [train_items[index] for index in order[offset:offset + effective_batch]]
                 model.train()
                 optimizer.zero_grad(set_to_none=True)
-                parts = []
+                parts, stop_parts = [], []
                 objective_sum = 0.0
                 rate = config.learning_rate * min(1.0, (step + 1) / max(1, config.warmup_steps))
                 for param_group in optimizer.param_groups:
@@ -185,11 +204,19 @@ def train(
                     result = model(batch["input_ids"], batch["attention_mask"], num_loops=batch["targets"].shape[1])
                     scores = symbolic_scores(result.loop_logits, token_ids)
                     loss, losses = step_loss(scores, batch["targets"], batch["target_mask"], loop_weights=weights)
+                    if config.completion_loss_weight:
+                        halt_loss, halt_losses = completion_loss(result.stop_logits, batch["target_mask"])
+                        loss = loss + config.completion_loss_weight * halt_loss
+                        stop_parts.append(completion_metrics(result.stop_logits.detach(), batch["target_mask"],
+                                                             halt_losses.detach(), halt_loss.detach()))
                     (loss * len(items) / len(group)).backward()
                     objective_sum += loss.detach().item() * len(items)
                     parts.append(batch_metrics(scores, batch["targets"], batch["target_mask"], losses))
+                    train_metrics = {**combine_metrics(parts), "objective_loss": objective_sum / (start + len(items))}
+                    if stop_parts:
+                        train_metrics["completion"] = combine_completion_metrics(stop_parts)
                     progress({"phase": f"Epoch {epoch + 1}/{config.epochs} · accumulation {min(start + len(items), len(group))}/{len(group)}",
-                              "train": {**combine_metrics(parts), "objective_loss": objective_sum / (start + len(items))}, "learning_rate": rate})
+                              "train": train_metrics, "learning_rate": rate})
                     del result, scores, loss, losses
                 for name, parameter in model.named_parameters():
                     if not parameter.requires_grad and parameter.grad is not None:
@@ -209,6 +236,8 @@ def train(
                     offset = 0
                 metrics = combine_metrics(parts)
                 metrics["objective_loss"] = objective_sum / len(group)
+                if stop_parts:
+                    metrics["completion"] = combine_completion_metrics(stop_parts)
                 event = {"event": "train", "step": step, "next_epoch": epoch, "next_offset": offset,
                          "train": metrics, "learning_rate": rate, "gradient_norm_before_clip": norm.item(),
                          "update_seconds": seconds, "examples_per_second": len(group) / seconds,

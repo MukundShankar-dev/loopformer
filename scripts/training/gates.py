@@ -7,6 +7,7 @@ from scripts.recurrent_qwen.model import RecurrentQwen
 from scripts.recurrent_qwen.lora_utils import attach_recurrent_lora
 from .config import TrainingConfig
 from .objective import symbolic_scores
+from .objective import completion_loss
 
 
 def initialize(base: Qwen2ForCausalLM, config: TrainingConfig, inputs: dict, token_ids: list[int]) -> tuple[RecurrentQwen, dict]:
@@ -55,3 +56,41 @@ def initialize(base: Qwen2ForCausalLM, config: TrainingConfig, inputs: dict, tok
     return model, {"passed": True, "t1_max_logit_error": error, "shared_weights": True,
                    "frozen_gradients": 0, "hidden_gradient_norms": hidden_norms,
                    "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad)}
+
+
+def validate_completion_gradients(model: RecurrentQwen, inputs: dict) -> dict:
+    """Check the stop-only path reaches the shared recurrence and head."""
+    if model.completion_head is None:
+        raise ValueError("Attach the completion head before checking its gradients")
+    model.zero_grad(set_to_none=True)
+    result = model(inputs["input_ids"][:1], inputs["attention_mask"][:1],
+                   num_loops=2, return_hidden_states=True)
+    for hidden in result.hidden_states:
+        hidden.retain_grad()
+    mask = torch.tensor([[True, True]], device=result.stop_logits.device)
+    loss, _ = completion_loss(result.stop_logits, mask)
+    loss.backward()
+    hidden_norms = [hidden.grad.norm().item() if hidden.grad is not None else 0.0
+                    for hidden in result.hidden_states]
+    if not all(value > 0 for value in hidden_norms):
+        raise RuntimeError("Completion loss does not reach every recurrent state")
+    head_grads = 0
+    adapter_grads = 0
+    for name, parameter in model.named_parameters():
+        if parameter.requires_grad:
+            if parameter.grad is None or not torch.isfinite(parameter.grad).all():
+                raise RuntimeError(f"Invalid completion-path gradient: {name}")
+            if name.startswith("completion_head."):
+                head_grads += int(parameter.grad.abs().sum() > 0)
+            elif name.startswith("recurrent.") and ".lora_" in name:
+                adapter_grads += int(parameter.grad.abs().sum() > 0)
+            else:
+                raise RuntimeError(f"Unexpected trainable parameter: {name}")
+        elif parameter.grad is not None:
+            raise RuntimeError(f"Frozen parameter received a completion gradient: {name}")
+    if not head_grads or not adapter_grads:
+        raise RuntimeError("Completion gradient must update the head and recurrent adapters")
+    model.zero_grad(set_to_none=True)
+    return {"passed": True, "head_tensors_with_gradient": head_grads,
+            "adapter_tensors_with_gradient": adapter_grads,
+            "hidden_gradient_norms": hidden_norms}

@@ -13,6 +13,7 @@ from scripts.dataset.pointer import SYMBOLS
 
 
 FORMAT = "loopformer-stage1-v1"
+COMPLETION_FORMAT = "loopformer-stage1-completion-v1"
 
 
 def cpu_tree(value: Any) -> Any:
@@ -31,12 +32,19 @@ def save_checkpoint(path: Path, model: RecurrentQwen, tokenizer: Any, spec: dict
     """Write a new checkpoint directory; metadata is the final completion marker."""
     path.mkdir(parents=True, exist_ok=False)
     weights = {name: parameter for name, parameter in model.named_parameters() if parameter.requires_grad}
-    if not weights or any(not name.startswith("recurrent.") or ".lora_" not in name for name in weights):
-        raise ValueError("Checkpoint expects only recurrent LoRA to be trainable")
+    completion = model.completion_head is not None
+    expected_completion = spec.get("completion_head")
+    if completion != (expected_completion is not None):
+        raise ValueError("Checkpoint spec and completion head disagree")
+    if completion and expected_completion != {"intermediate": model.completion_head.intermediate}:
+        raise ValueError("Checkpoint completion-head architecture differs from spec")
+    if not weights or any(not ((name.startswith("recurrent.") and ".lora_" in name) or
+                               (completion and name.startswith("completion_head."))) for name in weights):
+        raise ValueError("Checkpoint expects recurrent LoRA and optional completion head only")
     torch.save(cpu_tree(weights), path / "adapter_model.pt")
     torch.save(cpu_tree(training_state), path / "training_state.pt")
     tokenizer.save_pretrained(path)
-    (path / "recurrent_config.json").write_text(json.dumps({**spec, "format": FORMAT}, indent=2) + "\n")
+    (path / "recurrent_config.json").write_text(json.dumps({**spec, "format": COMPLETION_FORMAT if completion else FORMAT}, indent=2) + "\n")
 
 
 def restore_adapters(model: RecurrentQwen, path: Path) -> None:
@@ -55,8 +63,15 @@ def restore_adapters(model: RecurrentQwen, path: Path) -> None:
 def load_recurrent_checkpoint(path: Path, *, device: str = "cpu", dtype: str = "float32",
                               download: bool = False) -> tuple[RecurrentQwen, Any, dict]:
     spec = json.loads((path / "recurrent_config.json").read_text())
-    if spec.get("format") != FORMAT or spec.get("prompt_format") != "dataset_raw" or spec.get("loss_vocabulary") != "symbols":
+    if spec.get("format") not in (FORMAT, COMPLETION_FORMAT) or spec.get("prompt_format") != "dataset_raw" or spec.get("loss_vocabulary") != "symbols":
         raise ValueError("Unsupported recurrent checkpoint format/prompt/loss")
+    completion = spec["format"] == COMPLETION_FORMAT
+    if completion and (not isinstance(spec.get("completion_head"), dict) or
+                       type(spec["completion_head"].get("intermediate")) is not int or
+                       spec["completion_head"]["intermediate"] < 1):
+        raise ValueError("Invalid saved completion-head architecture")
+    if not completion and "completion_head" in spec:
+        raise ValueError("Legacy checkpoint cannot contain a completion head")
     if spec.get("symbols") != list(SYMBOLS) or len(set(spec.get("token_ids", []))) != len(SYMBOLS):
         raise ValueError("Checkpoint requires the complete A–Z symbol vocabulary")
     tokenizer = AutoTokenizer.from_pretrained(path, local_files_only=True, trust_remote_code=False)
@@ -69,6 +84,8 @@ def load_recurrent_checkpoint(path: Path, *, device: str = "cpu", dtype: str = "
     ).to(device).eval()
     model = RecurrentQwen(base, spec["recurrent_start"], spec["recurrent_end"])
     attach_recurrent_lora(model, rank=spec["lora_rank"], alpha=spec["lora_alpha"])
+    if completion:
+        model.enable_completion(spec["completion_head"]["intermediate"])
     restore_adapters(model, path)
     model.eval()
     return model, tokenizer, spec

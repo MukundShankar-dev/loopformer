@@ -14,6 +14,8 @@ Recurrent execution → depth generalization → overscaling dynamics → adapti
 
 Stopping and asymmetric training address related but distinct questions. Stopping can avoid a dangerous transition; Stage 3 asks whether that transition can become safer while retaining repair. Adaptive success does not pass the asymmetric-training gate, and stability without useful computation remains insufficient.
 
+The separate [learned loop-completion training ablation](learned_loop_completion.md) concerns the *existing explicit-step task*: a head with no numeric loop/depth features is trained to stop after the count stated in the prompt, jointly with intermediate transition supervision. Its training path is implemented but has no pretrained run or self-stopped inference result. It is distinct from this guide's post-hoc adaptive controller and is not evidence of compute savings.
+
 ## Existing substrate and boundaries
 
 Extend the current components rather than building a second evaluation framework:

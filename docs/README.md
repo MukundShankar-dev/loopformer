@@ -8,6 +8,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 | Pointer data, training, checkpoints, resume, and historical depth-6 comparison commands | [Pointer execution and training](training_pointer.md) |
 | Metrics, ordinary baseline, full-loop evaluation, and deferred terminal overscaling | [Evaluation](evaluation.md) |
 | Adaptive analysis, oracle/heuristic stopping, implemented interfaces, and remaining gates | [Adaptive inference compute](adaptive_compute.md) |
+| Implemented prompt-only completion training and remaining self-stop evaluation | [Learned loop completion](learned_loop_completion.md) |
 | Python environment and pretrained Stage 0 checks | [Setup](setup.md) |
 | Windows/WSL2/CUDA installation and artifact migration | [Desktop setup](windows_cuda_setup.md) |
 | Failure diagnostics and performance profiling proposal | [Diagnostics and performance](diagnostics_and_performance.md) |

@@ -17,7 +17,9 @@ from scripts.training.config import TrainingConfig, read_config
 from scripts.training.data import EncodedExample, collate, select_tasks
 from scripts.training.evaluation import evaluate
 from scripts.training.gates import initialize
-from scripts.training.objective import batch_metrics, combine_metrics, step_loss, symbolic_scores
+from scripts.training.objective import (batch_metrics, combine_metrics, completion_loss,
+                                        completion_metrics, combine_completion_metrics,
+                                        step_loss, symbolic_scores)
 from scripts.training.runner import resume_identity, train, validate_resume_identity
 from scripts.eval.recurrent_pointer import evaluate_recurrent_batches
 
@@ -88,6 +90,35 @@ def test_loss_exact_weighting_mask_and_accumulation():
         step_loss(scores.detach() * float('nan'), targets, mask)
 
 
+def test_completion_labels_mask_and_accumulation():
+    logits = torch.tensor([[0.2, 40., 40.], [0.4, 0.6, 40.], [-1., -2., 0.9]], requires_grad=True)
+    mask = torch.tensor([[True, False, False], [True, True, False], [True, True, True]])
+    loss, losses = completion_loss(logits, mask)
+    bce = torch.nn.functional.binary_cross_entropy_with_logits
+    expected = (bce(logits[0, 0], torch.ones(())) +
+                (bce(logits[1, 0], torch.zeros(())) + bce(logits[1, 1], torch.ones(()))) / 2 +
+                (torch.stack([bce(logits[2, 0], torch.zeros(())), bce(logits[2, 1], torch.zeros(()))]).mean() +
+                 bce(logits[2, 2], torch.ones(()))) / 2) / 3
+    torch.testing.assert_close(loss, expected)
+    loss.backward()
+    reference = logits.grad.clone()
+    assert reference[0, 1] == reference[0, 2] == reference[1, 2] == 0
+    logits.grad = None
+    parts = []
+    for lo, hi in ((0, 2), (2, 3)):
+        subloss, sublosses = completion_loss(logits[lo:hi], mask[lo:hi])
+        (subloss * (hi - lo) / 3).backward()
+        parts.append(completion_metrics(logits[lo:hi].detach(), mask[lo:hi],
+                                        sublosses.detach(), subloss.detach()))
+    torch.testing.assert_close(logits.grad, reference)
+    metrics = combine_completion_metrics(parts)
+    assert metrics['objective_loss'] == pytest.approx(loss.item())
+    assert metrics['stop_at_depth_accuracy'] == 1
+    assert metrics['first_stop_early_rate'] == pytest.approx(1 / 3)
+    with pytest.raises(ValueError, match='contiguous'):
+        completion_loss(logits, torch.tensor([[True, False, True], [True, True, False], [True, True, True]]))
+
+
 def test_config_and_subset_are_explicit_and_reproducible():
     config = read_config(ROOT / 'configs/stage1_pointer_overfit.json')
     assert config.train_limit == 32 and config.train_max_depth == 4
@@ -127,6 +158,70 @@ def test_gates_checkpoint_roundtrip_and_gradient_scope(tiny_training, tmp_path):
         assert row['generated_tokens'] == 0
     assert [row['readout_loop'] for row in rows] == [1, 2]
     assert [row['executed_loops'] for row in rows] == [2, 2]
+
+
+def test_completion_head_receives_only_hidden_state_and_roundtrips(tiny_training, tmp_path):
+    from scripts.training.gates import validate_completion_gradients
+    model, tokenizer, config, items, spec, _ = tiny_training
+    batch = collate(items[:2], 0, 'cpu')
+    with torch.no_grad():
+        original = model(batch['input_ids'], batch['attention_mask'], num_loops=2)
+    model.enable_completion(8)
+    spec = {**spec, 'completion_head': {'intermediate': 8}, 'completion_loss_weight': 0.1}
+    seen = []
+    hook = model.completion_head.register_forward_pre_hook(lambda module, args: seen.append(args[0].detach().clone()))
+    try:
+        result = model(batch['input_ids'], batch['attention_mask'], num_loops=2, return_hidden_states=True)
+    finally:
+        hook.remove()
+    assert result.stop_logits.shape == (2, 2)
+    assert len(seen) == 2
+    for t in range(2):
+        expected = torch.stack([result.hidden_states[t][row, len(item.input_ids) - 1]
+                                for row, item in enumerate(items[:2])])
+        torch.testing.assert_close(seen[t], expected)
+        torch.testing.assert_close(result.loop_logits[t], original.loop_logits[t], rtol=0, atol=0)
+    gate = validate_completion_gradients(model, batch)
+    assert gate['passed'] and gate['head_tensors_with_gradient'] > 0 and gate['adapter_tensors_with_gradient'] > 0
+    path = tmp_path / 'completion_checkpoint'
+    save_checkpoint(path, model, tokenizer, spec, {})
+    restored, _, restored_spec = load_recurrent_checkpoint(path)
+    assert restored_spec['format'] == 'loopformer-stage1-completion-v1'
+    with torch.no_grad():
+        after = restored(batch['input_ids'], batch['attention_mask'], num_loops=2)
+    torch.testing.assert_close(after.stop_logits, result.stop_logits, rtol=0, atol=0)
+    for before, current in zip(result.loop_logits, after.loop_logits):
+        torch.testing.assert_close(before, current, rtol=0, atol=0)
+
+
+def test_completion_training_logs_and_resume(tiny_training, tmp_path):
+    model, tokenizer, config, items, spec, _ = tiny_training
+    model.enable_completion(8)
+    config = replace(config, completion_loss_weight=0.1, completion_head_hidden_size=8, max_steps=1)
+    spec = {**spec, 'completion_head': {'intermediate': 8}, 'completion_loss_weight': 0.1}
+    identity = resume_identity(config, {'data': 'completion-test'})
+    output = tmp_path / 'joint'
+    output.mkdir()
+    train(model, tokenizer, items, items[:2], items[:2], config, output, spec, identity)
+    events = [json.loads(line) for line in (output / 'metrics.jsonl').read_text().splitlines()]
+    training = next(event for event in events if event['event'] == 'train')
+    validation = next(event for event in events if event['event'] == 'validation' and event['step'] == 1)
+    assert training['train']['completion']['objective_loss'] > 0
+    assert validation['validation']['completion']['objective_loss'] > 0
+    assert 'completion_selection_loss' in validation['validation']
+    assert validation['validation']['selection_loss'] == validation['validation']['pointer_selection_loss']
+    assert validation['validation']['joint_validation_loss'] == pytest.approx(
+        validation['validation']['selection_loss'] + 0.1 * validation['validation']['completion_selection_loss'])
+    assert 'stop_probability' in (output / 'validation-step-000001.csv').read_text().splitlines()[0]
+    saved = output / 'step-000001'
+    resumed, _, _ = load_recurrent_checkpoint(saved)
+    state = torch.load(saved / 'training_state.pt', weights_only=True)
+    next_config = replace(config, max_steps=2)
+    continuation = tmp_path / 'continuation'
+    continuation.mkdir()
+    summary = train(resumed, tokenizer, items, items[:2], items[:2], next_config,
+                    continuation, spec, identity, resume=state)
+    assert summary['step'] == 2
 
 
 def test_nominal_metrics_exclude_post_completion(tiny_training, tmp_path):
@@ -350,3 +445,23 @@ def test_training_cli_dry_run_and_toy_update(tmp_path):
     config_path.write_text(json.dumps(replace(balanced_config, max_steps=2).to_dict()))
     subprocess.run([*command, '--output', str(tmp_path / 'balanced_resume'), '--resume', str(balanced / 'step-000001')],
                    cwd=ROOT, capture_output=True, text=True, check=True)
+
+    completion_config = replace(deeper_config, completion_loss_weight=0.1,
+                                completion_head_hidden_size=8)
+    config_path.write_text(json.dumps(completion_config.to_dict()))
+    completion = tmp_path / 'completion'
+    completion_command = [*command, '--output', str(completion)]
+    subprocess.run([*completion_command, '--dry-run'], cwd=ROOT, capture_output=True, text=True, check=True)
+    assert not completion.exists()
+    subprocess.run(completion_command, cwd=ROOT, capture_output=True, text=True, check=True)
+    completion_run = json.loads((completion / 'run.json').read_text())
+    assert completion_run['gate']['completion']['passed']
+    completion_spec = json.loads((completion / 'step-000001/recurrent_config.json').read_text())
+    assert completion_spec['format'] == 'loopformer-stage1-completion-v1'
+    assert completion_spec['completion_head']['intermediate'] == 8
+    completion_eval = tmp_path / 'completion_naive_eval'
+    subprocess.run([sys.executable, '-m', 'scripts.eval.naive_test', '--model',
+                    str(completion / 'step-000001'), '--data', str(tmp_path / 'validation.jsonl'),
+                    '--output', str(completion_eval), '--test'], cwd=ROOT,
+                   capture_output=True, text=True, check=True)
+    assert json.loads((completion_eval / 'summary.json').read_text())['total'] == 3

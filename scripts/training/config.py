@@ -39,6 +39,8 @@ class TrainingConfig:
     save_every: int = 100
     loss_vocabulary: str = "symbols"
     loss_reduction: str = "example_mean"
+    completion_loss_weight: float = 0.0
+    completion_head_hidden_size: int = 128
 
     def validate(self) -> None:
         if self.loss_reduction not in ("example_mean", "loop_mean"):
@@ -49,6 +51,8 @@ class TrainingConfig:
         for name in positive:
             if type(getattr(self, name)) is not int or getattr(self, name) < 1:
                 raise ValueError(f"{name} must be a positive integer")
+        if type(self.completion_head_hidden_size) is not int or self.completion_head_hidden_size < 1:
+            raise ValueError("completion_head_hidden_size must be a positive integer")
         for name in ("train_limit", "max_steps"):
             value = getattr(self, name)
             if value is not None and (type(value) is not int or value < 1):
@@ -65,6 +69,8 @@ class TrainingConfig:
             value = getattr(self, name)
             if not math.isfinite(value) or value < 0 or (name != "weight_decay" and value == 0):
                 raise ValueError(f"Invalid {name}")
+        if not math.isfinite(self.completion_loss_weight) or self.completion_loss_weight < 0:
+            raise ValueError("completion_loss_weight must be finite and nonnegative")
 
     def to_dict(self) -> dict:
         return asdict(self)
