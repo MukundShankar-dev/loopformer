@@ -1,0 +1,14 @@
+{
+  "id": "rime43rr",
+  "url": "https://wandb.ai/mukunds/loopformer/runs/rime43rr",
+  "project": "loopformer",
+  "entity": "mukunds",
+  "mode": "online",
+  "sdk_version": "0.30.0",
+  "artifact_sha256": {
+    "summary.json": "015633e7fde50996acc9c04afbd3d8c6e95d4f4776483e4352588cd051f155ee",
+    "depth_by_loop.csv": "1c278883565ea01c276ca678e85cd305bc12f5c857895da7cf69c0f75f9d3728",
+    "examples.csv": "7558b3f9683016a0aa4f72ff398d10aeb4fabd4c2c6e1384284513eca927e4d5",
+    "trajectories.csv": "26b2725724572f424abd2bae05e7bfcd17b563c9aa74e52b1fb572b013b85ec5"
+  }
+}

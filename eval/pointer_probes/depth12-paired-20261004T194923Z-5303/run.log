@@ -1,0 +1,26 @@
+Paired Steps: 32 rule tables × 5 counts = 160 prompts; 24 loops each
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:42,  6.83it/s]Loading weights:  35%|███▍      | 101/290 [00:00<00:00, 465.91it/s]Loading weights:  55%|█████▍    | 159/290 [00:00<00:00, 511.15it/s]Loading weights:  75%|███████▍  | 217/290 [00:00<00:00, 530.26it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 520.42it/s]
+Paired Steps ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+Saved paired predictions, stop logits and working-state norms/deltas: eval/pointer_probes/depth12-paired-20261004T194923Z-5303/step-005000
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: Syncing run step-005000
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/p7ttylit
+wandb: updating run metadata; uploading artifact evaluation-p7ttylit; uploading artifact run-p7ttylit-tablesexamples-OxhZvg; uploading artifact run-p7ttylit-tablespairs-vvaZTg
+wandb: uploading artifact evaluation-p7ttylit; uploading artifact run-p7ttylit-tablesexamples-OxhZvg; uploading artifact run-p7ttylit-tablespairs-vvaZTg
+wandb: uploading config.yaml; uploading wandb-metadata.json; uploading requirements.txt; uploading media/table/tables/examples_0_2764e152f959aab78535.table.json; uploading media/table/tables/pairs_1_5dbed356031c5bffb4da.table.json (+ 1 more)
+wandb: 🚀 View run step-005000 at: https://wandb.ai/mukunds/loopformer/runs/p7ttylit
+wandb: ⭐️ View project at: https://wandb.ai/mukunds/loopformer
+wandb: Synced 4 W&B file(s), 2 media file(s), 9 artifact file(s) and 0 other file(s)
+Paired Steps: 32 rule tables × 5 counts = 160 prompts; 24 loops each
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:30,  9.33it/s]Loading weights:  79%|███████▉  | 229/290 [00:00<00:00, 1302.64it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1121.74it/s]
+Paired Steps ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+Saved paired predictions, stop logits and working-state norms/deltas: eval/pointer_probes/depth12-paired-20261004T194923Z-5303/step-007500
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: Syncing run step-007500
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/9owhtbxq
+wandb: updating run metadata; uploading artifact evaluation-9owhtbxq; uploading artifact run-9owhtbxq-tablesexamples-GAmC5w; uploading artifact run-9owhtbxq-tablespairs-YtBfHg
+wandb: uploading artifact evaluation-9owhtbxq; uploading artifact run-9owhtbxq-tablesexamples-GAmC5w; uploading artifact run-9owhtbxq-tablespairs-YtBfHg
+wandb: uploading media/table/tables/examples_0_c27242b6cdaf606692cb.table.json; uploading media/table/tables/pairs_1_ae8fc64a86b7048beb90.table.json; uploading wandb-summary.json; uploading config.yaml; uploading wandb-metadata.json (+ 1 more)
+wandb: 🚀 View run step-007500 at: https://wandb.ai/mukunds/loopformer/runs/9owhtbxq
+wandb: ⭐️ View project at: https://wandb.ai/mukunds/loopformer
+wandb: Synced 4 W&B file(s), 2 media file(s), 9 artifact file(s) and 0 other file(s)

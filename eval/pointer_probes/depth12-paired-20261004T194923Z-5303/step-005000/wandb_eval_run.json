@@ -1,0 +1,14 @@
+{
+  "id": "p7ttylit",
+  "url": "https://wandb.ai/mukunds/loopformer/runs/p7ttylit",
+  "project": "loopformer",
+  "entity": "mukunds",
+  "mode": "online",
+  "sdk_version": "0.30.0",
+  "artifact_sha256": {
+    "summary.json": "24a0206c31b621e6181d84d53c903e9018de471696fd13301907107acc141672",
+    "examples.csv": "b0a5335c9724ce6b1e2069dfc8b6a45aa5fdf79f85668425a872184dcea65638",
+    "pairs.csv": "0cf5eebe502a50af8258169ae4bcd8bd322892f240cbf1bc1f32c7fb279870b9",
+    "trajectories.csv": "b05e1134cd2bd7e4647fd7e1f60ed94d29a725d4d03c37a0b7b87b188cf844df"
+  }
+}

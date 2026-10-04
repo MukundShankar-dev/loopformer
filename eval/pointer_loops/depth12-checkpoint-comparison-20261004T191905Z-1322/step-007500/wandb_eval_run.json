@@ -1,0 +1,14 @@
+{
+  "id": "flufivhf",
+  "url": "https://wandb.ai/mukunds/loopformer/runs/flufivhf",
+  "project": "loopformer",
+  "entity": "mukunds",
+  "mode": "online",
+  "sdk_version": "0.30.0",
+  "artifact_sha256": {
+    "summary.json": "0f2098d16980ddc72f06cb3bbbc5611e26b45674b98da1b185ee83e77093e199",
+    "depth_by_loop.csv": "9bf46bb60a31f7392ef30fb76c57cb301e53a952660f2fb2af7a8db3bf5caf5b",
+    "examples.csv": "567536e44b3a56c97c742935c21008f6800a91a3a9c3e2cb30e4d5a4e32eba2a",
+    "trajectories.csv": "f747af524b173272990c1358fcec172e44ab95bd141872780f4a6465d69e6bae"
+  }
+}

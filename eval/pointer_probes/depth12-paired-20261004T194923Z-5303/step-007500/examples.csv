@@ -1,0 +1,161 @@
+example_id,split,seed,task_depth,initial_state,targets,predictions,executed_loops,trajectory_correct,nominal_final_correct,first_error_loop,correct_prefix_length,first_final_correct_loop,nominal_repeated_predictions
+depth_test-000007-f8450f6ddb4ff39c-steps-12,depth_test,17889722059304465308,12,M,A E H W D Q K B G Z S T,A E H W D Q K B G Z S T T X X C C C C C C C C C,24,True,True,,12,12,0
+depth_test-000007-f8450f6ddb4ff39c-steps-14,depth_test,17889722059304465308,14,M,A E H W D Q K B G Z S T X U,A E H W D Q K B G Z S T T X X X C C C C C C C C,24,False,False,13,12,,1
+depth_test-000007-f8450f6ddb4ff39c-steps-16,depth_test,17889722059304465308,16,M,A E H W D Q K B G Z S T X U I O,A E H W D Q K B G Z S T T X X X C C C C C C C C,24,False,False,13,12,,3
+depth_test-000007-f8450f6ddb4ff39c-steps-18,depth_test,17889722059304465308,18,M,A E H W D Q K B G Z S T X U I O V J,A E H W D Q K B G Z S T T X X X C C C C C C C C,24,False,False,13,12,,4
+depth_test-000007-f8450f6ddb4ff39c-steps-20,depth_test,17889722059304465308,20,M,A E H W D Q K B G Z S T X U I O V J C Y,A E H W D Q K B G Z S T T X X X A A A C C C C C,24,False,False,13,12,,5
+depth_test-000015-afa68bc2cde456dc-steps-12,depth_test,12656957471565567708,12,E,S X C W N F H Y V J D K,S X C W N F H Y V J D K U U S S C C C C C C C C,24,True,True,,12,12,0
+depth_test-000015-afa68bc2cde456dc-steps-14,depth_test,12656957471565567708,14,E,S X C W N F H Y V J D K U I,S X C W N F H Y V J D K U V S S C C C C C C C C,24,False,False,14,13,,0
+depth_test-000015-afa68bc2cde456dc-steps-16,depth_test,12656957471565567708,16,E,S X C W N F H Y V J D K U I Q L,S X C W N F H Y V J D K U D S C C C C C C C C C,24,False,False,14,13,,0
+depth_test-000015-afa68bc2cde456dc-steps-18,depth_test,12656957471565567708,18,E,S X C W N F H Y V J D K U I Q L O T,S X C W N F H Y V J D K U U S S S C C C C C C C,24,False,False,14,13,,3
+depth_test-000015-afa68bc2cde456dc-steps-20,depth_test,12656957471565567708,20,E,S X C W N F H Y V J D K U I Q L O T M Z,S X C W N F H Y V J D K V V A A A A A A C C C C,24,False,False,13,12,,6
+depth_test-000023-ad081a1bfb4cf0c3-steps-12,depth_test,12468244275857780931,12,B,V C O P H Q J R I E S Z,V C O P H Q J R I E S Z Z E S S S S S C C C C C,24,True,True,,12,12,0
+depth_test-000023-ad081a1bfb4cf0c3-steps-14,depth_test,12468244275857780931,14,B,V C O P H Q J R I E S Z D Y,V C O P H Q J R I E S Z Z E S S S S C C C C C C,24,False,False,13,12,,1
+depth_test-000023-ad081a1bfb4cf0c3-steps-16,depth_test,12468244275857780931,16,B,V C O P H Q J R I E S Z D Y X L,V C O P H Q J R I E S Z Z S S S S S C C C C C C,24,False,False,13,12,,3
+depth_test-000023-ad081a1bfb4cf0c3-steps-18,depth_test,12468244275857780931,18,B,V C O P H Q J R I E S Z D Y X L K A,V C O P H Q J R I E S Z Z Z S S S S C C C C C C,24,False,False,13,12,,5
+depth_test-000023-ad081a1bfb4cf0c3-steps-20,depth_test,12468244275857780931,20,B,V C O P H Q J R I E S Z D Y X L K A M T,V C O P H Q J R I E S Z Z X A A A A A C C C C C,24,False,False,13,12,,5
+depth_test-000031-8bbac11e0f3714b8-steps-12,depth_test,10068572251788612792,12,W,N F X L P I Z M C E O J,N F X L P I Z M C E O J D D D D C C C C C C C C,24,True,True,,12,12,0
+depth_test-000031-8bbac11e0f3714b8-steps-14,depth_test,10068572251788612792,14,W,N F X L P I Z M C E O J D B,N F X L P I Z M C E O J D D D D A C C C C C C C,24,False,False,14,13,,1
+depth_test-000031-8bbac11e0f3714b8-steps-16,depth_test,10068572251788612792,16,W,N F X L P I Z M C E O J D B Q U,N F X L P I Z M C E O J D D D D D D D C C C C C,24,False,False,14,13,,3
+depth_test-000031-8bbac11e0f3714b8-steps-18,depth_test,10068572251788612792,18,W,N F X L P I Z M C E O J D B Q U A S,N F X L P I Z M C E O J D D D S D C C C C C C C,24,False,False,14,13,16,2
+depth_test-000031-8bbac11e0f3714b8-steps-20,depth_test,10068572251788612792,20,W,N F X L P I Z M C E O J D B Q U A S R Y,N F X L P I Z M C E O J J X A A A A A A D D D D,24,False,False,13,12,,6
+depth_test-000039-7ec26e9fbe7f28d6-steps-12,depth_test,9133984626635647190,12,E,Y U D H X N A S V M J W,Y U D H X N A S V M J W B I Z Z Z C C C C C C C,24,True,True,,12,12,0
+depth_test-000039-7ec26e9fbe7f28d6-steps-14,depth_test,9133984626635647190,14,E,Y U D H X N A S V M J W B I,Y U D H X N A S V M J W B B Z Z Z C C C C C C C,24,False,False,14,13,,1
+depth_test-000039-7ec26e9fbe7f28d6-steps-16,depth_test,9133984626635647190,16,E,Y U D H X N A S V M J W B I T L,Y U D H X N A S V M J W B B Z Z Z C C C C C C C,24,False,False,14,13,,2
+depth_test-000039-7ec26e9fbe7f28d6-steps-18,depth_test,9133984626635647190,18,E,Y U D H X N A S V M J W B I T L O F,Y U D H X N A S V M J W B I Z Z Z C C C C C C C,24,False,False,15,14,,2
+depth_test-000039-7ec26e9fbe7f28d6-steps-20,depth_test,9133984626635647190,20,E,Y U D H X N A S V M J W B I T L O F G C,Y U D H X N A S V M J W B Z Z Z A A A A C C C C,24,False,False,14,13,21,5
+depth_test-000047-c8b986a4ecfd84d2-steps-12,depth_test,14463739721185854674,12,F,V L T S A Q Y D E J M R,V L T S A Q Y D E J M R K K L L L C C C C C C C,24,True,True,,12,12,0
+depth_test-000047-c8b986a4ecfd84d2-steps-14,depth_test,14463739721185854674,14,F,V L T S A Q Y D E J M R K B,V L T S A Q Y D E J M R K K L L L C C C C C C C,24,False,False,14,13,,1
+depth_test-000047-c8b986a4ecfd84d2-steps-16,depth_test,14463739721185854674,16,F,V L T S A Q Y D E J M R K B U W,V L T S A Q Y D E J M R K K L L L C C C C C C C,24,False,False,14,13,,2
+depth_test-000047-c8b986a4ecfd84d2-steps-18,depth_test,14463739721185854674,18,F,V L T S A Q Y D E J M R K B U W P N,V L T S A Q Y D E J M R K K L L L C C C C C C C,24,False,False,14,13,,3
+depth_test-000047-c8b986a4ecfd84d2-steps-20,depth_test,14463739721185854674,20,F,V L T S A Q Y D E J M R K B U W P N X I,V L T S A Q Y D E J M R K K L L A A A A C C C C,24,False,False,14,13,,5
+depth_test-000055-2940aaf4cd7cdf2f-steps-12,depth_test,2972563722460782383,12,S,E D I Z H B A C X N W O,E D I Z H B A C X N W O O B B B B B C C C C C C,24,True,True,,12,12,0
+depth_test-000055-2940aaf4cd7cdf2f-steps-14,depth_test,2972563722460782383,14,S,E D I Z H B A C X N W O J V,E D I Z H B A C X N W O O B B B B B C C C C C C,24,False,False,13,12,,1
+depth_test-000055-2940aaf4cd7cdf2f-steps-16,depth_test,2972563722460782383,16,S,E D I Z H B A C X N W O J V L T,E D I Z H B A C X N W O O B B B B B C C C C C C,24,False,False,13,12,,3
+depth_test-000055-2940aaf4cd7cdf2f-steps-18,depth_test,2972563722460782383,18,S,E D I Z H B A C X N W O J V L T R U,E D I Z H B A C X N W O O O B B B B C C C C C C,24,False,False,13,12,,5
+depth_test-000055-2940aaf4cd7cdf2f-steps-20,depth_test,2972563722460782383,20,S,E D I Z H B A C X N W O J V L T R U G Q,E D I Z H B A C X N W O O B B B B B B C C C C C,24,False,False,13,12,,6
+depth_test-000063-5aec19010db484e7-steps-12,depth_test,6551639050232825063,12,M,W A D J Y R O U H Q F X,W A D J Y R O U H Q F X Z X X X X D D C C C C C,24,True,True,,12,12,0
+depth_test-000063-5aec19010db484e7-steps-14,depth_test,6551639050232825063,14,M,W A D J Y R O U H Q F X Z T,W A D J Y R O U H Q F X X X X X X X D D D D D D,24,False,False,13,12,,2
+depth_test-000063-5aec19010db484e7-steps-16,depth_test,6551639050232825063,16,M,W A D J Y R O U H Q F X Z T P K,W A D J Y R O U H Q F X X X X X X X D D D D D D,24,False,False,13,12,,4
+depth_test-000063-5aec19010db484e7-steps-18,depth_test,6551639050232825063,18,M,W A D J Y R O U H Q F X Z T P K G N,W A D J Y R O U H Q F X Z X X X X X D D D C C C,24,False,False,14,13,,4
+depth_test-000063-5aec19010db484e7-steps-20,depth_test,6551639050232825063,20,M,W A D J Y R O U H Q F X Z T P K G N E I,W A D J Y R O U H Q F X X X X X X X X A D D D D,24,False,False,13,12,,7
+depth_test-000071-6d46665badb022e1-steps-12,depth_test,7874093542445949665,12,X,O A R D Q V E J I Y K T,O A R D Q V E J I Y K T P P P C C C C C C C C C,24,True,True,,12,12,0
+depth_test-000071-6d46665badb022e1-steps-14,depth_test,7874093542445949665,14,X,O A R D Q V E J I Y K T P C,O A R D Q V E J I Y K T P P P Y C C C C C C C C,24,False,False,14,13,17,1
+depth_test-000071-6d46665badb022e1-steps-16,depth_test,7874093542445949665,16,X,O A R D Q V E J I Y K T P C H B,O A R D Q V E J I Y K T P P P C C C C C C C C C,24,False,False,14,13,,2
+depth_test-000071-6d46665badb022e1-steps-18,depth_test,7874093542445949665,18,X,O A R D Q V E J I Y K T P C H B L F,O A R D Q V E J I Y K T P P P C C C C C C C C C,24,False,False,14,13,,4
+depth_test-000071-6d46665badb022e1-steps-20,depth_test,7874093542445949665,20,X,O A R D Q V E J I Y K T P C H B L F S U,O A R D Q V E J I Y K T P P C C C C C C C C C C,24,False,False,14,13,,6
+depth_test-000079-3d4c9a4f780cafed-steps-12,depth_test,4417075000650805229,12,E,A Q I Y D N P H L M X O,A Q I Y D N P H L M X O S Y Y Y Y Y Y C C C C C,24,True,True,,12,12,0
+depth_test-000079-3d4c9a4f780cafed-steps-14,depth_test,4417075000650805229,14,E,A Q I Y D N P H L M X O S W,A Q I Y D N P H L M X O O Y Y Y Y Y Y C C C C C,24,False,False,13,12,,1
+depth_test-000079-3d4c9a4f780cafed-steps-16,depth_test,4417075000650805229,16,E,A Q I Y D N P H L M X O S W K B,A Q I Y D N P H L M X O O Y Y Y Y Y C C C C C C,24,False,False,13,12,,3
+depth_test-000079-3d4c9a4f780cafed-steps-18,depth_test,4417075000650805229,18,E,A Q I Y D N P H L M X O S W K B T J,A Q I Y D N P H L M X O S Y Y Y Y Y Y C C C C C,24,False,False,14,13,,4
+depth_test-000079-3d4c9a4f780cafed-steps-20,depth_test,4417075000650805229,20,E,A Q I Y D N P H L M X O S W K B T J Z V,A Q I Y D N P H L M X O O Y Y Y Y A A A A A C C,24,False,False,13,12,,6
+depth_test-000087-6fcd10f82d1fe8c5-steps-12,depth_test,8056113966530685125,12,E,R B F I G C P H A Z T O,R B F I G C P H A Z T O S X X X X X X C C C C C,24,True,True,,12,12,0
+depth_test-000087-6fcd10f82d1fe8c5-steps-14,depth_test,8056113966530685125,14,E,R B F I G C P H A Z T O S X,R B F I G C P H A Z T O S X X X X X C C C C C C,24,True,True,,14,14,0
+depth_test-000087-6fcd10f82d1fe8c5-steps-16,depth_test,8056113966530685125,16,E,R B F I G C P H A Z T O S X K U,R B F I G C P H A Z T O S X X X X X C C C C C C,24,False,False,15,14,,2
+depth_test-000087-6fcd10f82d1fe8c5-steps-18,depth_test,8056113966530685125,18,E,R B F I G C P H A Z T O S X K U L J,R B F I G C P H A Z T O S X X X X X C C C C C C,24,False,False,15,14,,4
+depth_test-000087-6fcd10f82d1fe8c5-steps-20,depth_test,8056113966530685125,20,E,R B F I G C P H A Z T O S X K U L J N Y,R B F I G C P H A Z T O S X X X X A D D D D D D,24,False,False,15,14,,4
+depth_test-000095-0b6c0a7c3f4deb1e-steps-12,depth_test,823044360656251678,12,J,E C P Y S H O N V A D Z,E C P Y S H O N V A D Z F M E C C C C C C C C C,24,True,True,,12,12,0
+depth_test-000095-0b6c0a7c3f4deb1e-steps-14,depth_test,823044360656251678,14,J,E C P Y S H O N V A D Z F G,E C P Y S H O N V A D Z M M E C C C C C C C C C,24,False,False,13,12,,1
+depth_test-000095-0b6c0a7c3f4deb1e-steps-16,depth_test,823044360656251678,16,J,E C P Y S H O N V A D Z F G I X,E C P Y S H O N V A D Z M M C C C C C C C C C C,24,False,False,13,12,,2
+depth_test-000095-0b6c0a7c3f4deb1e-steps-18,depth_test,823044360656251678,18,J,E C P Y S H O N V A D Z F G I X K L,E C P Y S H O N V A D Z F M M C C C C C C C C C,24,False,False,14,13,,3
+depth_test-000095-0b6c0a7c3f4deb1e-steps-20,depth_test,823044360656251678,20,J,E C P Y S H O N V A D Z F G I X K L M Q,E C P Y S H O N V A D Z M M M C C C C C C C C C,24,False,False,13,12,,6
+depth_test-000103-4161274a49be3d47-steps-12,depth_test,4711089885224516935,12,K,Y P N V C S J W Z F U H,Y P N V C S J W Z F U H T T T T T T T T C C C C,24,True,True,,12,12,0
+depth_test-000103-4161274a49be3d47-steps-14,depth_test,4711089885224516935,14,K,Y P N V C S J W Z F U H Q D,Y P N V C S J W Z F U H T T T T T T T C C C C C,24,False,False,13,12,,1
+depth_test-000103-4161274a49be3d47-steps-16,depth_test,4711089885224516935,16,K,Y P N V C S J W Z F U H Q D R I,Y P N V C S J W Z F U H T T T T T T C C C C C C,24,False,False,13,12,,3
+depth_test-000103-4161274a49be3d47-steps-18,depth_test,4711089885224516935,18,K,Y P N V C S J W Z F U H Q D R I T A,Y P N V C S J W Z F U H T T T T T T T C C C C C,24,False,False,13,12,,5
+depth_test-000103-4161274a49be3d47-steps-20,depth_test,4711089885224516935,20,K,Y P N V C S J W Z F U H Q D R I T A G E,Y P N V C S J W Z F U H Z T A A A A A A C C C C,24,False,False,13,12,,5
+depth_test-000111-352e9a6da4b29550-steps-12,depth_test,3832170128644150608,12,A,F M N S I D R U E W B X,F M N S I D R U E W B X J G Z L L L C C C C C C,24,True,True,,12,12,0
+depth_test-000111-352e9a6da4b29550-steps-14,depth_test,3832170128644150608,14,A,F M N S I D R U E W B X J G,F M N S I D R U E W B X J J J S S S C C C C C C,24,False,False,14,13,,1
+depth_test-000111-352e9a6da4b29550-steps-16,depth_test,3832170128644150608,16,A,F M N S I D R U E W B X J G Z C,F M N S I D R U E W B X J G J L S S C C C C C C,24,False,False,15,14,19,0
+depth_test-000111-352e9a6da4b29550-steps-18,depth_test,3832170128644150608,18,A,F M N S I D R U E W B X J G Z C K L,F M N S I D R U E W B X J G Z Z S S S C C C C C,24,False,False,16,15,,2
+depth_test-000111-352e9a6da4b29550-steps-20,depth_test,3832170128644150608,20,A,F M N S I D R U E W B X J G Z C K L P Y,F M N S I D R U E W B X J J J X X A A A A A A A,24,False,False,14,13,,5
+depth_test-000119-2dfb5e231c8bd53a-steps-12,depth_test,3313345455756924218,12,J,C R S I A D M N B G T W,C R S I A D M N B G T W O P P P P P C C C C C C,24,True,True,,12,12,0
+depth_test-000119-2dfb5e231c8bd53a-steps-14,depth_test,3313345455756924218,14,J,C R S I A D M N B G T W O P,C R S I A D M N B G T W O O P P P O C C C C C C,24,False,False,14,13,15,1
+depth_test-000119-2dfb5e231c8bd53a-steps-16,depth_test,3313345455756924218,16,J,C R S I A D M N B G T W O P X L,C R S I A D M N B G T W O O P P O C C C C C C C,24,False,False,14,13,,2
+depth_test-000119-2dfb5e231c8bd53a-steps-18,depth_test,3313345455756924218,18,J,C R S I A D M N B G T W O P X L Q V,C R S I A D M N B G T W O O P P P C C C C C C C,24,False,False,14,13,,3
+depth_test-000119-2dfb5e231c8bd53a-steps-20,depth_test,3313345455756924218,20,J,C R S I A D M N B G T W O P X L Q V K E,C R S I A D M N B G T W O O O O O A A C C C C C,24,False,False,14,13,,5
+depth_test-000127-5d88543b952c9d9d-steps-12,depth_test,6739729457242480029,12,T,V L W U P O G B I Y N C,V L W U P O G B I Y N C H O O O O O O O O C C C,24,True,True,,12,12,0
+depth_test-000127-5d88543b952c9d9d-steps-14,depth_test,6739729457242480029,14,T,V L W U P O G B I Y N C H E,V L W U P O G B I Y N C H O O O O O O O C C C C,24,False,False,14,13,,0
+depth_test-000127-5d88543b952c9d9d-steps-16,depth_test,6739729457242480029,16,T,V L W U P O G B I Y N C H E D S,V L W U P O G B I Y N C H O O O O O O O C C C C,24,False,False,14,13,,2
+depth_test-000127-5d88543b952c9d9d-steps-18,depth_test,6739729457242480029,18,T,V L W U P O G B I Y N C H E D S J X,V L W U P O G B I Y N C H O O O O O O O C C C C,24,False,False,14,13,,4
+depth_test-000127-5d88543b952c9d9d-steps-20,depth_test,6739729457242480029,20,T,V L W U P O G B I Y N C H E D S J X Q M,V L W U P O G B I Y N C C O O O O O O O D D D D,24,False,False,13,12,,7
+depth_test-000135-1cfa47484d13a19d-steps-12,depth_test,2088059753095995805,12,W,Y M I F Q B S A N R D O,Y M I F Q J X L H G Z P P P C C C C C C C C C C,24,False,False,6,5,,0
+depth_test-000135-1cfa47484d13a19d-steps-14,depth_test,2088059753095995805,14,W,Y M I F Q B S A N R D O X L,Y M I F Q J X L H G Z P P P A A C C C C C C C C,24,False,False,6,5,8,2
+depth_test-000135-1cfa47484d13a19d-steps-16,depth_test,2088059753095995805,16,W,Y M I F Q B S A N R D O X L H G,Y M I F Q J X L H G Z P P P A C C C C C C C C C,24,False,False,6,5,10,2
+depth_test-000135-1cfa47484d13a19d-steps-18,depth_test,2088059753095995805,18,W,Y M I F Q B S A N R D O X L H G Z P,Y M I F Q J X L H G Z P P P A C C C C C C C C C,24,False,False,6,5,12,4
+depth_test-000135-1cfa47484d13a19d-steps-20,depth_test,2088059753095995805,20,W,Y M I F Q B S A N R D O X L H G Z P V J,Y M I F Q J X L H G Z P P P X A A A C C C C C D,24,False,False,6,5,6,5
+depth_test-000143-817d6e6c4f9892b6-steps-12,depth_test,9330735414452458166,12,R,P Z H D B S C J U M G F,P Z H D B S C J U M G F T O B B B B C C C C C C,24,True,True,,12,12,0
+depth_test-000143-817d6e6c4f9892b6-steps-14,depth_test,9330735414452458166,14,R,P Z H D B S C J U M G F T O,P Z H D B S C J U M G F T T S S B B C C C C C C,24,False,False,14,13,,1
+depth_test-000143-817d6e6c4f9892b6-steps-16,depth_test,9330735414452458166,16,R,P Z H D B S C J U M G F T O X K,P Z H D B S C J U M G F T S S S S S C C C C C C,24,False,False,14,13,,2
+depth_test-000143-817d6e6c4f9892b6-steps-18,depth_test,9330735414452458166,18,R,P Z H D B S C J U M G F T O X K V N,P Z H D B S C J U M G F T O B B S S C C C C C C,24,False,False,15,14,,2
+depth_test-000143-817d6e6c4f9892b6-steps-20,depth_test,9330735414452458166,20,R,P Z H D B S C J U M G F T O X K V N Q E,P Z H D B S C J U M G F T T S B A A A A C C C C,24,False,False,14,13,,4
+depth_test-000151-a30cf218dfdabb9e-steps-12,depth_test,11749031716551572382,12,U,D V H A B W S T E M L Y,D V H A B W S T E M L Y Y Y V V V V C C C C C C,24,True,True,,12,12,0
+depth_test-000151-a30cf218dfdabb9e-steps-14,depth_test,11749031716551572382,14,U,D V H A B W S T E M L Y X G,D V H A B W S T E M L Y Y Y Y V V V C C C C C C,24,False,False,13,12,,2
+depth_test-000151-a30cf218dfdabb9e-steps-16,depth_test,11749031716551572382,16,U,D V H A B W S T E M L Y X G N P,D V H A B W S T E M L Y Y Y V V V V C C C C C C,24,False,False,13,12,,3
+depth_test-000151-a30cf218dfdabb9e-steps-18,depth_test,11749031716551572382,18,U,D V H A B W S T E M L Y X G N P K Q,D V H A B W S T E M L Y Y Y V V V V V C C C C C,24,False,False,13,12,,5
+depth_test-000151-a30cf218dfdabb9e-steps-20,depth_test,11749031716551572382,20,U,D V H A B W S T E M L Y X G N P K Q O J,D V H A B W S T E M L Y Y Y V V V V V V V V C C,24,False,False,13,12,,7
+depth_test-000159-37cb24e342dfe134-steps-12,depth_test,4020347650856444212,12,I,C L K T F U A W R D N Q,C L K T F U A W R D N Q M V V V V V V V V C C C,24,True,True,,12,12,0
+depth_test-000159-37cb24e342dfe134-steps-14,depth_test,4020347650856444212,14,I,C L K T F U A W R D N Q M H,C L K T F U A W R D N Q M V V V V V V V C C C C,24,False,False,14,13,,0
+depth_test-000159-37cb24e342dfe134-steps-16,depth_test,4020347650856444212,16,I,C L K T F U A W R D N Q M H V B,C L K T F U A W R D N Q M V V V V V V V V C C C,24,False,False,14,13,,2
+depth_test-000159-37cb24e342dfe134-steps-18,depth_test,4020347650856444212,18,I,C L K T F U A W R D N Q M H V B X E,C L K T F U A W R D N Q M V V V V V V V V C C C,24,False,False,14,13,,4
+depth_test-000159-37cb24e342dfe134-steps-20,depth_test,4020347650856444212,20,I,C L K T F U A W R D N Q M H V B X E G J,C L K T F U A W R D N Q M V V V V V V V V V C C,24,False,False,14,13,,6
+depth_test-000167-bdefdf3e0db2c809-steps-12,depth_test,13686403250213013513,12,D,Q L C O S W X Z H P B F,Q L C O S W X Z H P B F A A M M M C C C C C C C,24,True,True,,12,12,0
+depth_test-000167-bdefdf3e0db2c809-steps-14,depth_test,13686403250213013513,14,D,Q L C O S W X Z H P B F A I,Q L C O S W X Z H P B F A A M M M M C C C C C C,24,False,False,14,13,,1
+depth_test-000167-bdefdf3e0db2c809-steps-16,depth_test,13686403250213013513,16,D,Q L C O S W X Z H P B F A I M G,Q L C O S W X Z H P B F A M M M M M C C C C C C,24,False,False,14,13,,2
+depth_test-000167-bdefdf3e0db2c809-steps-18,depth_test,13686403250213013513,18,D,Q L C O S W X Z H P B F A I M G V E,Q L C O S W X Z H P B F A A M M M M M C C C C C,24,False,False,14,13,,4
+depth_test-000167-bdefdf3e0db2c809-steps-20,depth_test,13686403250213013513,20,D,Q L C O S W X Z H P B F A I M G V E Y N,Q L C O S W X Z H P B F A A M M M M M V V V V V,24,False,False,14,13,,5
+depth_test-000175-ef52f368035a6ebf-steps-12,depth_test,17245113551213457087,12,O,M V H F B I C Q J R U G,M V H F B I C Q J V B B V V V V V V C C C C C C,24,False,False,10,9,,1
+depth_test-000175-ef52f368035a6ebf-steps-14,depth_test,17245113551213457087,14,O,M V H F B I C Q J R U G D L,M V H F B I C Q J R U G B B V V V C C C C C C C,24,False,False,13,12,,1
+depth_test-000175-ef52f368035a6ebf-steps-16,depth_test,17245113551213457087,16,O,M V H F B I C Q J R U G D L T N,M V H F B I C Q J R U G B V V V V V C C C C C C,24,False,False,13,12,,2
+depth_test-000175-ef52f368035a6ebf-steps-18,depth_test,17245113551213457087,18,O,M V H F B I C Q J R U G D L T N X K,M V H F B I C Q J R U G D B V V V V V C C C C C,24,False,False,14,13,,3
+depth_test-000175-ef52f368035a6ebf-steps-20,depth_test,17245113551213457087,20,O,M V H F B I C Q J R U G D L T N X K A W,M V H F B I C Q J R U G B V V V V V V V V V V D,24,False,False,13,12,,6
+depth_test-000183-40bcebfb4a8b158d-steps-12,depth_test,4664862778568938893,12,I,X J S E G F A T B H P Z,X J S E G F A T B H P Z N R R R R R C C C C C C,24,True,True,,12,12,0
+depth_test-000183-40bcebfb4a8b158d-steps-14,depth_test,4664862778568938893,14,I,X J S E G F A T B H P Z N R,X J S E G F A T B H P Z N R R R R R C C C C C C,24,True,True,,14,14,0
+depth_test-000183-40bcebfb4a8b158d-steps-16,depth_test,4664862778568938893,16,I,X J S E G F A T B H P Z N R C K,X J S E G F A T B H P Z N R R R R R C C C C C C,24,False,False,15,14,,2
+depth_test-000183-40bcebfb4a8b158d-steps-18,depth_test,4664862778568938893,18,I,X J S E G F A T B H P Z N R C K V M,X J S E G F A T B H P Z N R R R R R C C C C C C,24,False,False,15,14,,4
+depth_test-000183-40bcebfb4a8b158d-steps-20,depth_test,4664862778568938893,20,I,X J S E G F A T B H P Z N R C K V M O D,X J S E G F A T B H P Z Z R R R R R C C C C C C,24,False,False,13,12,,6
+depth_test-000191-4472da16569fe10e-steps-12,depth_test,4932244331401568526,12,S,F V D Y B I O A W T L P,F V D Y B I O A W T L P Z V E E E C C C C C C C,24,True,True,,12,12,0
+depth_test-000191-4472da16569fe10e-steps-14,depth_test,4932244331401568526,14,S,F V D Y B I O A W T L P Z X,F V D Y B I O A W T L P Z Y E E E C C C C C C C,24,False,False,14,13,,0
+depth_test-000191-4472da16569fe10e-steps-16,depth_test,4932244331401568526,16,S,F V D Y B I O A W T L P Z X J N,F V D Y B I O A W T L P Y V V E C C C C C C C C,24,False,False,13,12,,1
+depth_test-000191-4472da16569fe10e-steps-18,depth_test,4932244331401568526,18,S,F V D Y B I O A W T L P Z X J N Q E,F V D Y B I O A W T L P Z V V E E C C C C C C C,24,False,False,14,13,16,2
+depth_test-000191-4472da16569fe10e-steps-20,depth_test,4932244331401568526,20,S,F V D Y B I O A W T L P Z X J N Q E M K,F V D Y B I O A W T L P P A A A A A A A C C C C,24,False,False,13,12,,7
+depth_test-000199-9fb2f198bac2378c-steps-12,depth_test,11507525636155651980,12,A,Z Y T H P F W S G D Q O,Z Y T H P F W S G D Q O I I L L C C C C C C C C,24,True,True,,12,12,0
+depth_test-000199-9fb2f198bac2378c-steps-14,depth_test,11507525636155651980,14,A,Z Y T H P F W S G D Q O I L,Z Y T H P F W S G D Q O I I L A C C C C C C C C,24,False,False,14,13,15,1
+depth_test-000199-9fb2f198bac2378c-steps-16,depth_test,11507525636155651980,16,A,Z Y T H P F W S G D Q O I L X J,Z Y T H P F W S G D Q O I I L C C C C C C C C C,24,False,False,14,13,,1
+depth_test-000199-9fb2f198bac2378c-steps-18,depth_test,11507525636155651980,18,A,Z Y T H P F W S G D Q O I L X J U V,Z Y T H P F W S G D Q O I I L L C C C C C C C C,24,False,False,14,13,,3
+depth_test-000199-9fb2f198bac2378c-steps-20,depth_test,11507525636155651980,20,A,Z Y T H P F W S G D Q O I L X J U V E K,Z Y T H P F W S G D Q O I I L A A D D D D D D D,24,False,False,14,13,,4
+depth_test-000207-96b1c9a00cc4f3bd-steps-12,depth_test,10858681865813160893,12,I,H W E R J X B Y K A U Q,H W E R J X B Y K A U Q F C Y Y Y C C C C C C C,24,True,True,,12,12,0
+depth_test-000207-96b1c9a00cc4f3bd-steps-14,depth_test,10858681865813160893,14,I,H W E R J X B Y K A U Q F D,H W E R J X B Y K A U Q F C Y Y C C C C C C C C,24,False,False,14,13,,0
+depth_test-000207-96b1c9a00cc4f3bd-steps-16,depth_test,10858681865813160893,16,I,H W E R J X B Y K A U Q F D T S,H W E R J X B Y K A U Q Q C C C C C C C C C C C,24,False,False,13,12,,3
+depth_test-000207-96b1c9a00cc4f3bd-steps-18,depth_test,10858681865813160893,18,I,H W E R J X B Y K A U Q F D T S O N,H W E R J X B Y K A U Q F C C Y C C C C C C C C,24,False,False,14,13,,2
+depth_test-000207-96b1c9a00cc4f3bd-steps-20,depth_test,10858681865813160893,20,I,H W E R J X B Y K A U Q F D T S O N C G,H W E R J X B Y K A U Q Q C C C C C C C C C C C,24,False,False,13,12,,7
+depth_test-000215-70523f60c0d93c3b-steps-12,depth_test,8093601165123075131,12,R,V J Y Q K Z H D I E P G,V J Y Q K Z H D I E P G D D C C C C C C C C C C,24,True,True,,12,12,0
+depth_test-000215-70523f60c0d93c3b-steps-14,depth_test,8093601165123075131,14,R,V J Y Q K Z H D I E P G U O,V J Y Q K Z H D I E P G D Z C C C C C C C C C C,24,False,False,13,12,,0
+depth_test-000215-70523f60c0d93c3b-steps-16,depth_test,8093601165123075131,16,R,V J Y Q K Z H D I E P G U O A W,V J Y Q K Z H D I E P G D Z Z C C C C C C C C C,24,False,False,13,12,,1
+depth_test-000215-70523f60c0d93c3b-steps-18,depth_test,8093601165123075131,18,R,V J Y Q K Z H D I E P G U O A W M L,V J Y Q K Z H D I E P G D D Z C C C C C C C C C,24,False,False,13,12,,3
+depth_test-000215-70523f60c0d93c3b-steps-20,depth_test,8093601165123075131,20,R,V J Y Q K Z H D I E P G U O A W M L S N,V J Y Q K Z H D I E P P P Z Z C C C C C C C C C,24,False,False,12,11,,7
+depth_test-000223-33413413e4553e94-steps-12,depth_test,3693290429460332180,12,Q,W B J P F I Y X H E K T,W B J P F I Y X H E K T C C S C C C C C C C C C,24,True,True,,12,12,0
+depth_test-000223-33413413e4553e94-steps-14,depth_test,3693290429460332180,14,Q,W B J P F I Y X H E K T C S,W B J P F I Y X H E K T C C C C C C C C C C C C,24,False,False,14,13,,1
+depth_test-000223-33413413e4553e94-steps-16,depth_test,3693290429460332180,16,Q,W B J P F I Y X H E K T C S Z N,W B J P F I Y X H E K T C C C C C C C C D D D D,24,False,False,14,13,,3
+depth_test-000223-33413413e4553e94-steps-18,depth_test,3693290429460332180,18,Q,W B J P F I Y X H E K T C S Z N V A,W B J P F I Y X H E K T C C S S C C C C C C C C,24,False,False,14,13,,3
+depth_test-000223-33413413e4553e94-steps-20,depth_test,3693290429460332180,20,Q,W B J P F I Y X H E K T C S Z N V A O R,W B J P F I Y X H E K T C C C C A A A A A D D D,24,False,False,14,13,,6
+depth_test-000231-3535ecf30e2fb713-steps-12,depth_test,3834231186435061523,12,F,R V D X Y L S A H Q J C,R V D X Y L S A H Q J C G G P C C C C C C C C C,24,True,True,,12,12,0
+depth_test-000231-3535ecf30e2fb713-steps-14,depth_test,3834231186435061523,14,F,R V D X Y L S A H Q J C G K,R V D X Y L S A H Q J C C P P C C C C C C C D D,24,False,False,13,12,,1
+depth_test-000231-3535ecf30e2fb713-steps-16,depth_test,3834231186435061523,16,F,R V D X Y L S A H Q J C G K E P,R V D X Y L S A H Q J C C C C C C C C D D D D D,24,False,False,13,12,,4
+depth_test-000231-3535ecf30e2fb713-steps-18,depth_test,3834231186435061523,18,F,R V D X Y L S A H Q J C G K E P I W,R V D X Y L S A H Q J C C G P C C C C C C C D D,24,False,False,13,12,,3
+depth_test-000231-3535ecf30e2fb713-steps-20,depth_test,3834231186435061523,20,F,R V D X Y L S A H Q J C G K E P I W B N,R V D X Y L S A H Q J C C C C C C V D D D D D D,24,False,False,13,12,,6
+depth_test-000239-97f6fe32ee243ca3-steps-12,depth_test,10950219038695111843,12,W,Z N R V I T F P K Y A X,Z N R V I T F P K Y A X S S S S C C C C C C C C,24,True,True,,12,12,0
+depth_test-000239-97f6fe32ee243ca3-steps-14,depth_test,10950219038695111843,14,W,Z N R V I T F P K Y A X S U,Z N R V I T F P K Y A X S S S A C C C C C C C C,24,False,False,14,13,,1
+depth_test-000239-97f6fe32ee243ca3-steps-16,depth_test,10950219038695111843,16,W,Z N R V I T F P K Y A X S U G C,Z N R V I T F P K Y A X S S S S C C C C C C C C,24,False,False,14,13,17,3
+depth_test-000239-97f6fe32ee243ca3-steps-18,depth_test,10950219038695111843,18,W,Z N R V I T F P K Y A X S U G C E M,Z N R V I T F P K Y A X S S S A C C C C C C C C,24,False,False,14,13,,3
+depth_test-000239-97f6fe32ee243ca3-steps-20,depth_test,10950219038695111843,20,W,Z N R V I T F P K Y A X S U G C E M B D,Z N R V I T F P K Y A X S S S A A C C C C C C C,24,False,False,14,13,,5
+depth_test-000247-5afea0d5b51ec526-steps-12,depth_test,6556854947225191718,12,J,N L U R A K C E X H T V,N L U R A K C E X H T V O O R R R R R C C C C C,24,True,True,,12,12,0
+depth_test-000247-5afea0d5b51ec526-steps-14,depth_test,6556854947225191718,14,J,N L U R A K C E X H T V O M,N L U R A K C E X H T V O O R R R R R C C C C C,24,False,False,14,13,,1
+depth_test-000247-5afea0d5b51ec526-steps-16,depth_test,6556854947225191718,16,J,N L U R A K C E X H T V O M I P,N L U R A K C E X H T V O O R R R R R C C C C C,24,False,False,14,13,,2
+depth_test-000247-5afea0d5b51ec526-steps-18,depth_test,6556854947225191718,18,J,N L U R A K C E X H T V O M I P Q S,N L U R A K C E X H T V O O R R R R C C C C C C,24,False,False,14,13,,4
+depth_test-000247-5afea0d5b51ec526-steps-20,depth_test,6556854947225191718,20,J,N L U R A K C E X H T V O M I P Q S W G,N L U R A K C E X H T V O O O R R R C C C C C C,24,False,False,14,13,,5
+depth_test-000255-e560ad2abe113fd7-steps-12,depth_test,16528401031538753495,12,B,Q S R L Y X C I G U F M,Q S R L Y X C I G U F M N E E S S S S C C D D D,24,True,True,,12,12,0
+depth_test-000255-e560ad2abe113fd7-steps-14,depth_test,16528401031538753495,14,B,Q S R L Y X C I G U F M N E,Q S R L Y X C I G U F M N E S S S S D D D D D D,24,True,True,,14,14,0
+depth_test-000255-e560ad2abe113fd7-steps-16,depth_test,16528401031538753495,16,B,Q S R L Y X C I G U F M N E P H,Q S R L Y X C I G U F M N M S S S D D D D D D D,24,False,False,14,13,,1
+depth_test-000255-e560ad2abe113fd7-steps-18,depth_test,16528401031538753495,18,B,Q S R L Y X C I G U F M N E P H T V,Q S R L Y X C I G U F M N E E S S S V D D D D D,24,False,False,15,14,19,3
+depth_test-000255-e560ad2abe113fd7-steps-20,depth_test,16528401031538753495,20,B,Q S R L Y X C I G U F M N E P H T V K J,Q S R L Y X C I G U F M N M M M M V V D D D D D,24,False,False,14,13,,4
