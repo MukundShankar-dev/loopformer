@@ -1,0 +1,17 @@
+example_id,task_depth,budget,executed_loops,policy,prediction,target,correct,complete_trajectory,predicted_margin,answer_entropy,stop_probability,latency_seconds,stop_reason,exact_stop,early_stop,late_stop,cap_fallback,joint_success
+depth_test-000000-dc21aaad5d34fd2c,13,64,13,completion,P,P,True,True,11.073783874511719,0.0011157692642882466,0.9995418787002563,1.6066743630000246,head,True,False,False,False,True
+depth_test-000001-dc21aaad5d34fd2c,14,64,12,completion,T,F,False,False,9.87176513671875,0.00556750874966383,0.9247148633003235,0.6044913119999364,head,False,True,False,False,False
+depth_test-000002-dc21aaad5d34fd2c,15,64,12,completion,T,D,False,False,9.87176513671875,0.00556750874966383,0.9998304843902588,0.7044374370000241,head,False,True,False,False,False
+depth_test-000003-dc21aaad5d34fd2c,16,64,12,completion,T,M,False,False,9.87176513671875,0.00556750874966383,0.9991810917854309,0.46910779100005584,head,False,True,False,False,False
+depth_test-000004-dc21aaad5d34fd2c,17,64,12,completion,T,Q,False,False,9.87176513671875,0.00556750874966383,0.7444904446601868,0.45021352300000217,head,False,True,False,False,False
+depth_test-000005-dc21aaad5d34fd2c,18,64,13,completion,P,A,False,False,11.073783874511719,0.0011157692642882466,0.9998476505279541,0.6020917820000022,head,False,True,False,False,False
+depth_test-000006-dc21aaad5d34fd2c,19,64,12,completion,T,N,False,False,9.87176513671875,0.00556750874966383,0.8086676597595215,0.7711869830000069,head,False,True,False,False,False
+depth_test-000007-dc21aaad5d34fd2c,20,64,11,completion,C,I,False,False,9.104716300964355,0.009305635467171669,0.9009259343147278,0.37906859199995324,head,False,True,False,False,False
+depth_test-000008-dc21aaad5d34fd2c,21,64,12,completion,T,X,False,False,9.87176513671875,0.00556750874966383,0.9798480868339539,0.44929769099996975,head,False,True,False,False,False
+depth_test-000009-dc21aaad5d34fd2c,22,64,12,completion,T,R,False,False,9.87176513671875,0.00556750874966383,0.7664186358451843,0.4794605929999989,head,False,True,False,False,False
+depth_test-000010-dc21aaad5d34fd2c,23,64,13,completion,P,G,False,False,11.073783874511719,0.0011157692642882466,0.9922680258750916,0.5007728570000154,head,False,True,False,False,False
+depth_test-000011-dc21aaad5d34fd2c,24,64,12,completion,T,U,False,False,9.87176513671875,0.00556750874966383,0.8690523505210876,0.5373581469999635,head,False,True,False,False,False
+depth_test-000012-dc21aaad5d34fd2c,25,64,12,completion,T,W,False,False,9.87176513671875,0.00556750874966383,0.9994331002235413,0.5380093859999988,head,False,True,False,False,False
+depth_test-000013-dc21aaad5d34fd2c,26,64,13,completion,P,J,False,False,11.073783874511719,0.0011157692642882466,0.9998383522033691,0.5668630659999963,head,False,True,False,False,False
+depth_test-000014-dc21aaad5d34fd2c,27,64,13,completion,P,E,False,False,11.073783874511719,0.0011157692642882466,0.9998099207878113,0.4372788530000662,head,False,True,False,False,False
+depth_test-000015-dc21aaad5d34fd2c,28,64,13,completion,P,H,False,False,11.073783874511719,0.0011157692642882466,0.9956947565078735,0.5043583990000116,head,False,True,False,False,False

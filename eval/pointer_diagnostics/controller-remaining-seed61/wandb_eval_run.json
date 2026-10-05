@@ -1,0 +1,13 @@
+{
+  "id": "v1i06r1b",
+  "url": "https://wandb.ai/mukunds/loopformer/runs/v1i06r1b",
+  "project": "loopformer",
+  "entity": "mukunds",
+  "mode": "online",
+  "sdk_version": "0.30.0",
+  "artifact_sha256": {
+    "summary.json": "7e9be65a9190d792972a73199a17943fe9e0eba5b0f8a23fe1782eeb0ac2ed04",
+    "comparison.csv": "fd8b14eeaa28e221e54dbbe3d5c05cfcf2d3817a6f8ce588a01814c218f4d509",
+    "paired_comparison.csv": "1d08203daf617b084c91c994db792450152fb41ad002dd7c3f564274becaf3b1"
+  }
+}

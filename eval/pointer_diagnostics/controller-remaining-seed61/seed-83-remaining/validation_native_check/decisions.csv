@@ -1,0 +1,17 @@
+example_id,task_depth,budget,executed_loops,policy,prediction,target,correct,complete_trajectory,predicted_margin,answer_entropy,stop_probability,latency_seconds,stop_reason,exact_stop,early_stop,late_stop,cap_fallback,joint_success
+validation-000587-c59e46b5e046eac3-steps-1,1,16,1,completion,A,A,True,True,14.917608261108398,1.1020881174772512e-05,0.9995587468147278,0.8481911530000161,head,True,False,False,False,True
+validation-000587-c59e46b5e046eac3-steps-2,2,16,2,completion,O,O,True,True,12.853321075439453,7.688447658438236e-05,0.9982206225395203,0.08195365199992466,head,True,False,False,False,True
+validation-000587-c59e46b5e046eac3-steps-3,3,16,3,completion,M,M,True,True,10.884435653686523,0.0009918480645865202,0.9995841383934021,0.1613316450000184,head,True,False,False,False,True
+validation-000587-c59e46b5e046eac3-steps-4,4,16,4,completion,G,G,True,True,9.28054428100586,0.0045304689556360245,0.9997772574424744,0.12921296599995458,head,True,False,False,False,True
+validation-000587-c59e46b5e046eac3-steps-5,5,16,5,completion,H,H,True,True,9.919554710388184,0.004735711961984634,0.9998152852058411,0.17551723600001878,head,True,False,False,False,True
+validation-000587-c59e46b5e046eac3-steps-6,6,16,6,completion,O,O,True,True,8.753683090209961,0.005286175757646561,0.999806821346283,0.21413778400005867,head,True,False,False,False,True
+validation-000587-c59e46b5e046eac3-steps-7,7,16,7,completion,M,M,True,True,9.691316604614258,0.006048111245036125,0.9999089241027832,0.19919329000003927,head,True,False,False,False,True
+validation-000587-c59e46b5e046eac3-steps-8,8,16,8,completion,G,G,True,True,9.333414077758789,0.005761282052844763,0.9998526573181152,0.22123185200007356,head,True,False,False,False,True
+validation-000587-c59e46b5e046eac3-steps-9,9,16,7,completion,M,H,False,False,9.691316604614258,0.006048111245036125,0.8429036736488342,0.309234343000071,head,False,True,False,False,False
+validation-000587-c59e46b5e046eac3-steps-10,10,16,9,completion,H,O,False,False,9.792764663696289,0.005228993482887745,0.6130523681640625,0.2718306980000307,head,False,True,False,False,False
+validation-000587-c59e46b5e046eac3-steps-11,11,16,11,completion,M,M,True,True,9.68852424621582,0.006088645197451115,0.9780495762825012,0.4160643220000111,head,True,False,False,False,True
+validation-000587-c59e46b5e046eac3-steps-12,12,16,11,completion,M,G,False,False,9.68852424621582,0.006088645197451115,0.5437336564064026,0.3179366189999655,head,False,True,False,False,False
+validation-000587-c59e46b5e046eac3-steps-13,13,16,12,completion,G,H,False,False,9.334856986999512,0.005767408758401871,0.7184886336326599,0.32201901299993096,head,False,True,False,False,False
+validation-000587-c59e46b5e046eac3-steps-14,14,16,12,completion,G,O,False,False,9.334856986999512,0.005767408758401871,0.9963986873626709,0.3969021379999731,head,False,True,False,False,False
+validation-000587-c59e46b5e046eac3-steps-15,15,16,11,completion,M,M,True,False,9.68852424621582,0.006088645197451115,0.9675236344337463,0.4076465809999945,head,False,True,False,False,False
+validation-000587-c59e46b5e046eac3-steps-16,16,16,12,completion,G,G,True,False,9.334856986999512,0.005767408758401871,0.9998619556427002,0.32720518299993273,head,False,True,False,False,False

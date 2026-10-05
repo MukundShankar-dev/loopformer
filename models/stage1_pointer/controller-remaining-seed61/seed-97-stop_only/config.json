@@ -1,0 +1,21 @@
+{
+  "source": "models/stage1_pointer/executor_r-seed61/step-002250",
+  "data": "data/pointer/seed-61-independent",
+  "device": "cuda",
+  "seed": 83,
+  "train_graphs": 2048,
+  "validation_graphs": 128,
+  "extraction_batch_size": 16,
+  "batch_size": 256,
+  "steps": 3000,
+  "warmup_steps": 100,
+  "learning_rate": 0.0003,
+  "min_lr_ratio": 0.1,
+  "eval_every": 100,
+  "log_every": 10,
+  "evaluation_max_depth": 16,
+  "optimizer_seed": 97,
+  "remaining_readout": true,
+  "remaining_loss_weight": 0.0,
+  "remaining_scale": 12.0
+}

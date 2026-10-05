@@ -1,0 +1,56 @@
+{
+  "status": "complete",
+  "comparison": {
+    "training_config": "configs/controller_seed61.json",
+    "features_cache": "models/stage1_pointer/controller-seed61/features.pt",
+    "output": "models/stage1_pointer/controller-remaining-seed61",
+    "optimizer_seeds": [
+      83,
+      89,
+      97
+    ],
+    "remaining_loss_weight": 1.0,
+    "remaining_scale": 12.0
+  },
+  "features_cache": "models/stage1_pointer/controller-seed61/features.pt",
+  "runs": [
+    {
+      "name": "seed-83-stop_only",
+      "path": "models/stage1_pointer/controller-remaining-seed61/seed-83-stop_only",
+      "optimizer_seed": 83,
+      "arm": "stop_only"
+    },
+    {
+      "name": "seed-83-remaining",
+      "path": "models/stage1_pointer/controller-remaining-seed61/seed-83-remaining",
+      "optimizer_seed": 83,
+      "arm": "remaining"
+    },
+    {
+      "name": "seed-89-stop_only",
+      "path": "models/stage1_pointer/controller-remaining-seed61/seed-89-stop_only",
+      "optimizer_seed": 89,
+      "arm": "stop_only"
+    },
+    {
+      "name": "seed-89-remaining",
+      "path": "models/stage1_pointer/controller-remaining-seed61/seed-89-remaining",
+      "optimizer_seed": 89,
+      "arm": "remaining"
+    },
+    {
+      "name": "seed-97-stop_only",
+      "path": "models/stage1_pointer/controller-remaining-seed61/seed-97-stop_only",
+      "optimizer_seed": 97,
+      "arm": "stop_only"
+    },
+    {
+      "name": "seed-97-remaining",
+      "path": "models/stage1_pointer/controller-remaining-seed61/seed-97-remaining",
+      "optimizer_seed": 97,
+      "arm": "remaining"
+    }
+  ],
+  "smoke_test": false,
+  "selection": "within-run trained-count exact stop then BCE; all seeds reported"
+}
