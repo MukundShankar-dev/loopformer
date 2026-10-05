@@ -1,0 +1,202 @@
+{
+  "status": "complete",
+  "best_step": 2700,
+  "validation": {
+    "trained": {
+      "questions": 1152,
+      "exact_stop": 0.953125,
+      "early_stop": 0.028645833333333332,
+      "late_stop": 0.018229166666666668,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.9513888888888888,
+      "joint_success": 0.9453125,
+      "loss": 0.03364673629403114
+    },
+    "interpolation": {
+      "questions": 384,
+      "exact_stop": 0.4583333333333333,
+      "early_stop": 0.3776041666666667,
+      "late_stop": 0.1640625,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.5286458333333334,
+      "joint_success": 0.4557291666666667,
+      "loss": 0.42611515522003174
+    },
+    "extrapolation": {
+      "questions": 512,
+      "exact_stop": 0.1875,
+      "early_stop": 0.810546875,
+      "late_stop": 0.001953125,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.34765625,
+      "joint_success": 0.181640625,
+      "loss": 0.734662652015686
+    },
+    "depth_1": {
+      "questions": 128,
+      "exact_stop": 1.0,
+      "early_stop": 0.0,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 1.0,
+      "joint_success": 1.0,
+      "loss": 0.0008720983751118183
+    },
+    "depth_2": {
+      "questions": 128,
+      "exact_stop": 1.0,
+      "early_stop": 0.0,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 1.0,
+      "joint_success": 1.0,
+      "loss": 0.014393896795809269
+    },
+    "depth_3": {
+      "questions": 128,
+      "exact_stop": 0.9921875,
+      "early_stop": 0.0,
+      "late_stop": 0.0078125,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.984375,
+      "joint_success": 0.984375,
+      "loss": 0.020630989223718643
+    },
+    "depth_4": {
+      "questions": 128,
+      "exact_stop": 0.9921875,
+      "early_stop": 0.0,
+      "late_stop": 0.0078125,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.984375,
+      "joint_success": 0.984375,
+      "loss": 0.01811293326318264
+    },
+    "depth_5": {
+      "questions": 128,
+      "exact_stop": 0.984375,
+      "early_stop": 0.0078125,
+      "late_stop": 0.0078125,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.984375,
+      "joint_success": 0.9765625,
+      "loss": 0.028804391622543335
+    },
+    "depth_6": {
+      "questions": 128,
+      "exact_stop": 0.9375,
+      "early_stop": 0.0234375,
+      "late_stop": 0.0390625,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.9375,
+      "joint_success": 0.9296875,
+      "loss": 0.0523531511425972
+    },
+    "depth_7": {
+      "questions": 128,
+      "exact_stop": 0.8515625,
+      "early_stop": 0.125,
+      "late_stop": 0.0234375,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.859375,
+      "joint_success": 0.84375,
+      "loss": 0.04887586832046509
+    },
+    "depth_8": {
+      "questions": 128,
+      "exact_stop": 0.90625,
+      "early_stop": 0.0625,
+      "late_stop": 0.03125,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.90625,
+      "joint_success": 0.8984375,
+      "loss": 0.05492941290140152
+    },
+    "depth_9": {
+      "questions": 128,
+      "exact_stop": 0.0,
+      "early_stop": 1.0,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.140625,
+      "joint_success": 0.0,
+      "loss": 0.5780590772628784
+    },
+    "depth_10": {
+      "questions": 128,
+      "exact_stop": 0.875,
+      "early_stop": 0.0703125,
+      "late_stop": 0.0546875,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.875,
+      "joint_success": 0.859375,
+      "loss": 0.0688263475894928
+    },
+    "depth_11": {
+      "questions": 128,
+      "exact_stop": 0.5234375,
+      "early_stop": 0.0078125,
+      "late_stop": 0.46875,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.5859375,
+      "joint_success": 0.5234375,
+      "loss": 0.6514106392860413
+    },
+    "depth_12": {
+      "questions": 128,
+      "exact_stop": 0.890625,
+      "early_stop": 0.09375,
+      "late_stop": 0.015625,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.890625,
+      "joint_success": 0.875,
+      "loss": 0.04389737546443939
+    },
+    "depth_13": {
+      "questions": 128,
+      "exact_stop": 0.75,
+      "early_stop": 0.2421875,
+      "late_stop": 0.0078125,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.7578125,
+      "joint_success": 0.7265625,
+      "loss": 0.03558783605694771
+    },
+    "depth_14": {
+      "questions": 128,
+      "exact_stop": 0.0,
+      "early_stop": 1.0,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.171875,
+      "joint_success": 0.0,
+      "loss": 0.47817569971084595
+    },
+    "depth_15": {
+      "questions": 128,
+      "exact_stop": 0.0,
+      "early_stop": 1.0,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.21875,
+      "joint_success": 0.0,
+      "loss": 1.1012294292449951
+    },
+    "depth_16": {
+      "questions": 128,
+      "exact_stop": 0.0,
+      "early_stop": 1.0,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.2421875,
+      "joint_success": 0.0,
+      "loss": 1.3236578702926636
+    }
+  },
+  "best_checkpoint": "models/stage1_pointer/controller-seed61/best",
+  "extraction_seconds": 858.0117181679998,
+  "training_and_export_seconds": 49.31012167299923,
+  "wall_seconds": 908.3706654130001,
+  "frozen_executor_source_sha256": "5a53372639924222266e457e1b1c586aeaa8db7340192c449cb7f8fd288c4e95",
+  "exported_checkpoint_sha256": "d5987abb52e5d620213d07d36450407e3a06e0f63e818abaf2912a883b312c5b"
+}

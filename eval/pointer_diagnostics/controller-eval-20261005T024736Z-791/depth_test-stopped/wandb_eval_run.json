@@ -1,0 +1,13 @@
+{
+  "id": "pfitveis",
+  "url": "https://wandb.ai/mukunds/loopformer/runs/pfitveis",
+  "project": "loopformer",
+  "entity": "mukunds",
+  "mode": "online",
+  "sdk_version": "0.30.0",
+  "artifact_sha256": {
+    "summary.json": "8e41aacec5be0e750efe6cb12a00df01be61526406e2f8e6e751545675926005",
+    "decisions.csv": "c00e430de807534ef290535c189c7ec19576d8e06467640668b1967ae4f9b943",
+    "trajectories.csv": "ec70073d3ef78037f193ef9b1703b3a7b420d78534410345d6cc2b271f4055a5"
+  }
+}
