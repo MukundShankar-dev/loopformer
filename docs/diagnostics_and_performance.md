@@ -1,5 +1,119 @@
 # Diagnose recurrent failures and measure execution cost
 
+## Controller diagnostic — current desktop command
+
+The [seed-61 audit](experiments/stage1_executor_seed61.md) shows strong forced
+execution and unsuccessful stopping. The user authorized a bounded diagnosis
+with the executor frozen, before another production training run.
+
+On the CUDA desktop, with the existing data and full checkpoint:
+
+```bash
+git pull --ff-only
+bash diagnose_controller.sh
+```
+
+The wrapper selects `executor_r-seed61/best_checkpoint.json`, requires the local
+weights, and runs `scripts.eval.controller_diagnostic`. It logs stdout/stderr to
+`eval/pointer_diagnostics/controller-<run>-<timestamp>-<pid>.log`, propagates failures,
+and shows Rich phase progress/ETA refreshed once per second. The log contains
+terminal redraw sequences at this bounded rate. W&B defaults to online project
+`loopformer`; `WANDB_MODE=disabled bash diagnose_controller.sh` disables upload.
+W&B receives the completed metrics and CSVs retrospectively, not live fit curves
+or upload-time GPU statistics presented as experiment utilization. Local results
+are saved before upload, so a tracking failure does not discard the experiment.
+
+### Panel and isolation
+
+Using seed 71, choose 64 distinct **validation** rule tables and partition them
+before making count variants: 32 fit graphs, eight probe-selection graphs, and
+24 held-out diagnostic graphs. Every graph/start gets every requested count 1–16
+and runs all 16 loops, including after a requested stop. This balances both count
+and elapsed-loop labels instead of conditioning on examples that have not stopped.
+All three groups remain development data. The reserved test split is untouched.
+
+Extraction uses the existing recurrent model, selected-symbol readout, FP32/SDPA
+and batch 16. Scoped hooks observe the actual prelude input to the controller,
+initialized memory, R observation at each loop, controller memory and stop logits.
+They cannot replace activations. A separate controller copy must replay the saved
+inputs and match the live logits/memories (absolute tolerance 2e-5, relative 1e-4).
+The source checkpoint hash is checked before/after extraction. All Qwen weights
+stay frozen; no source checkpoint is overwritten or promoted.
+
+### Checks and metrics
+
+1. **Count access:** linear and small MLP probes decode requested count from the
+   full-prompt prelude vector and initialized controller memory. Standardize using
+   fit graphs only; select probe weights by dev CE; report graph-held-out accuracy
+   and confusion matrices. A shuffled-fit-label linear probe is a negative control.
+2. **Memory:** separate linear/MLP count probes at loops 1, 4, 8, 12 and 16, plus
+   elapsed-loop probes on pooled memories. All counts occur at every loop. Separate
+   per-loop count probes allow the representation to change with recurrence.
+3. **Tiny-set learning:** compare the original controller to copies trained from
+   its existing weights and from fresh initialization. Each fit uses eight of the
+   fit graphs at the nine original training counts (72 questions). Full-batch AdamW,
+   LR 0.001, no weight decay, norm clip 1, 1,000 updates. Use the existing per-example
+   class-balanced completion BCE: continue before N, stop at N, ignore t>N. Train
+   on cached frozen inputs with full controller BPTT and select by tiny-fit loss.
+   The controller never receives numeric N/t/countdown, reference states, or probe
+   predictions. The BCE has unit weight in this standalone diagnostic optimizer;
+   this is not an unchanged continuation of the original joint optimizer.
+
+Report first stop at probability >=0.5, early/late/missing stop, stopped-answer
+accuracy, and correct-answer-at-exact-stop. The threshold is fixed, not calibrated
+on held-out graphs. Distinguish original trained counts, interpolation counts
+7/9/11, and extrapolation counts 13–16, and distinguish tiny-fit versus new graphs.
+A missing stop at the budget is never an exact-stop success. Stop curves include
+forced continuation beyond the first stop; their later crossings are not actual
+inference stopping decisions. Cached replay supports first-crossing simulation
+because this controller cannot change the executor and never feeds back its decision.
+No inference-speedup claim is made from cached fits.
+
+Each diagnostic probe runs 400 updates, LR 0.003, and checks dev CE every 25.
+The linear/MLP classifiers see all count classes, including 13–16; they measure
+count accessibility across graphs, **not unseen-count generalization**. Only the
+controller-fit count split measures that. Probe success does not establish causal
+use; failure does not prove the information is absent. Failure of a 1,000-update
+tiny fit does not prove architectural impossibility. These controls narrow the
+next hypothesis without selecting a production controller or retraining R.
+
+### Outputs and reuse
+
+The output directory contains:
+
+- `summary.json`: provenance, settings, probe and stopping aggregates, limitations.
+- `panel.csv`, `tasks.jsonl`: exact graph partitions and prompts.
+- `probes.csv`, `probe_confusion.csv`: selected probe results and confusion counts.
+- `controller_fit.csv`: fit loss, exact stopping, learning rate and gradient norms.
+- `decisions.csv`, `stopping_by_depth.csv`, `trajectories.csv`: original/continued/fresh
+  controller outcomes and stop probabilities by requested count and loop.
+- `features.pt`: frozen vectors and original controller weights for reuse.
+- `continued_tiny.pt`, `fresh_tiny.pt`: diagnostic-only controller copies, **not**
+  complete recurrent checkpoints accepted by the ordinary evaluator.
+- `wandb_eval_run.json`: upload identity and artifact checksums when tracking is enabled.
+
+Push the JSON/JSONL/CSV files and sibling log. `.pt` caches and weights are already
+Git-ignored; no large binary upload is needed for the initial review. No additional
+requirements are needed. CUDA runtime and pretrained outcomes remain unmeasured
+until the desktop run; local validation uses a tiny random Qwen model.
+
+The extraction can be reused without loading Qwen or its checkpoint:
+
+```bash
+python -m scripts.eval.controller_diagnostic \
+  --features-cache eval/pointer_diagnostics/<completed-run>/features.pt \
+  --device cuda
+```
+
+Cache reuse retains its original graph partitions, count range and extraction
+provenance; it does not resample using extraction CLI flags. Fit settings are
+recorded separately. This is an optional follow-up, not needed for the first run.
+
+## Historical diagnostics
+
+The sections below retain the earlier executor-failure investigation. The current
+controller command above supersedes their suggested next action.
+
 The current implementation is the [executor upgrade](pipeline_upgrade.md), with
 [matched diagnostics](evaluation.md#executor-upgrade-diagnostic-bundle). It adds
 R/C readouts, count controls, cycle strata and precision comparisons to the shared

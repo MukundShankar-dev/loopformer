@@ -251,3 +251,21 @@ prompt lengths. Other tests cover count invariance, separate gradients, bridge
 T=1 behavior, save/reload and complete training/evaluation wiring. These prove
 implementation contracts to numerical tolerance, not pretrained learnability or
 unbounded algorithmic correctness. Pretrained CUDA startup checks remain required.
+
+
+## Frozen controller diagnosis
+
+The [controller diagnostic](diagnostics_and_performance.md#controller-diagnostic--current-desktop-command)
+uses scoped read-only hooks on the existing `RecurrentController` modules. It
+captures the input/output of `context`, the input of `observation`, and the GRU
+output. The normal model forward and recurrent executor are unchanged. Cached
+observations have shape `[questions, loops, hidden_width]`; controller memories
+are `[questions, loops, controller_width]`. Prompt context has no loop axis.
+
+Replay initializes the controller once and advances its own memory through every
+cached R state. The existing stop loss constructs labels from requested depth;
+neither these labels nor probe predictions enter the controller's forward. The
+source model and original controller stay frozen; tiny-set fits update copies.
+Diagnostic classifiers are separate measurement tools and are never installed in
+the inference model. The only new binaries are ignored caches and controller
+copies in the diagnostic output directory; no checkpoint format changes.

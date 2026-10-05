@@ -11,17 +11,37 @@ depth-independent cyclic data, differentiable prefix reuse, selected-symbol
 projection, cosine decay and a matched diagnostic bundle. The existing depth-12
 run remains a historical reference; no artifacts were deleted or overwritten.
 
-The next bounded action is the [new data preview and disposable desktop smoke](training_pointer.md#isolated-executor-upgrade--current-desktop-run).
-Do not continue the old checkpoint into this architecture. No new pretrained
-training, CUDA fit measurement, precision comparison, or generalization result
-has run locally. The user launches those on the desktop after the smoke check.
-Seed 29 and the new test split remain reserved. Implementation validation: the full suite passed **196 tests with one CUDA-only
-skip**; final focused checks passed **96 tests with one CUDA-only skip**, followed
-by **31 training/executor tests** after the last integration changes. This covers
-controller-update isolation, dense/reused gradients, full-weight reload, CLI
-training/stopping/diagnostics and the native-control CLI. The pinned-tokenizer
-five-example data preview, compilation, shell syntax and local links passed.
-See the upgrade checklist; the following sections retain historical evidence.
+The first full executor run and evaluation have completed on the desktop. The
+[audited seed-61 report](experiments/stage1_executor_seed61.md) finds 99.09% complete
+validation trajectories and 100% deep trajectories, with important sampling limits:
+the deep split contains only 32 independent graphs repeated at 52 horizons. All
+saved deep transitions pass independent reference execution; data hashes replay,
+splits have no graph overlap, and the matched precision panel agrees. Existing
+64-loop validation traces are fully correct on 125/128 graphs. Learned stopping
+still fails: 10.74% exact stops on validation and none on deep queries, which all
+stop at loop 3 or 4. This is strong executor development evidence, not end-to-end
+completion or independent confirmation.
+
+Retain step 2,250. The user selected the focused controller diagnosis with R frozen.
+The [one-command diagnostic](diagnostics_and_performance.md#controller-diagnostic--current-desktop-command)
+is implemented: `bash diagnose_controller.sh` on the desktop. It measures count
+access and memory, then compares continued/fresh tiny controller fits without
+changing R. Pretrained diagnostic results remain unrun; expanding the independent
+graph evaluation remains separate follow-up work.
+The reserved test split and seed 29 remain untouched. No pretrained inference was
+rerun on the Mac; this review audited saved artifacts and reproduced dataset bytes.
+The full run took 127.9 minutes and peaked at 4.43 GiB allocated CUDA memory.
+Implementation validation remains 196 tests with one CUDA-only skip; final focused
+checks passed 96 tests with one skip, followed by 31 training/executor tests.
+Controller diagnostic validation: 35 focused tests passed, including the offline
+W&B uploader with local IPC permitted. After the final scoring/logging additions,
+10 diagnostic tests passed, covering real cyclic early/late answer coincidences,
+missing-stop semantics, replay equivalence, hook cleanup, graph-disjoint probe
+selection, tiny-fit gradients, extraction/cache-reuse CLI and launcher failures.
+Local file/heading links and shell syntax passed. No pretrained controller
+features or fits have run on this Mac.
+
+The following sections retain historical evidence.
 
 The [depth-12 paired-count probe](experiments/stage1_depth12_paired_counts.md) is complete and its two W&B uploads were verified through the API. At checkpoint 5,000, identical maps yield 30/32 correct loop-14 readouts with Steps 18 versus 8/32 with Steps 20 (22 losses, no gains). All counts are two-digit. R is therefore sensitive to requested count even on the same nominal prefix; this does not uniquely identify the internal mechanism. Later-loop failure persists even for the better count variant, and step 7,500 is worse across all tested counts. The prior [checkpoint progression](experiments/stage1_depth12_progression.md) also argues against unchanged-epoch continuation. A count-invariance objective on common intermediate readouts is a candidate to design, not an implemented/selected training recipe. No new training or confirmation run is authorized by these results alone. The following paragraphs preserve historical context.
 

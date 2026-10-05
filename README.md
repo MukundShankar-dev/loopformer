@@ -18,39 +18,27 @@ frozen coda
 readout
 ```
 
-One recurrent block and its LoRA adapters are reused across all loops. Original pretrained weights stay frozen. The prelude runs once; the frozen coda reads each loop's state for supervision and evaluation. The next loop consumes the recurrent hidden state, rather than the coda output or a decoded answer. See [architecture](docs/architecture.md).
+One recurrent block is reused across all loops. The current experiment trains all weights in that block while keeping the prelude and coda frozen; older experiments used LoRA. The executor’s prompt context stays fixed across loops; the frozen coda reads each loop's state for supervision and evaluation. The next loop consumes the recurrent hidden state, rather than the coda output or a decoded answer. See [architecture](docs/architecture.md).
 
-## Verified so far
+## Current result and next command
 
-| Evidence | Scope and limits |
-| --- | --- |
-| [One-loop equivalence](docs/experiments/stage0_validation.md), shared-weight and gradient-scope tests | Validated model surgery; useful task execution needs separate evidence. |
-| [Fresh 30k depth-6 experiment](docs/experiments/stage1_fresh30k.md) | Strong unseen-mapping trajectories and bounded extension beyond training depth; one training run on development evaluation sets. |
-| [Joint learned-completion ablation](docs/experiments/stage1_learned_completion.md) | Stop timing and pointer execution do not extend as well as the CE-only reference; one development run. |
-| [Evaluation and reproducibility](docs/evaluation.md) | Seeded data, exact intermediate supervision, full per-loop exports, source/data/checkpoint provenance, selection discipline, synchronized timing and throughput. |
-| [Recorded contract-test validation](docs/status.md) | Architecture, data, training and metric contracts; tests do not establish empirical research gates. |
+The [seed-61 executor audit](docs/experiments/stage1_executor_seed61.md) finds strong
+execution through 64 loops after training through 12, on a limited set of 26-state
+graphs. Learned stopping still fails. The next diagnostic freezes the executor and
+checks count information, controller memory, and small controller-only fits:
 
-For the fresh 30k run, **step 2500** achieved the following complete-trajectory accuracy (every nominal intermediate state correct):
+```bash
+git pull --ff-only
+bash diagnose_controller.sh
+```
 
-| Task depth | 1–6 | 7 | 8 | 9 | 10 | 11 | 12 | 13–16 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Accuracy | 98.0% | 94.4% | 94.4% | 73.6% | 41.6% | 14.4% | 1.6% | 0% |
+Run on the CUDA desktop with the complete `executor_r-seed61` checkpoint and data.
+Results go to `eval/pointer_diagnostics/controller-*`; metrics also upload to W&B
+project `loopformer`. See [what it measures and which artifacts to push](docs/diagnostics_and_performance.md#controller-diagnostic--current-desktop-command).
 
-Depths 1–6 aggregate 750 examples; each individual depth has 125. Step 2500 is the working depth-generalization checkpoint among three fully evaluated candidates; step 3250 remains the trained-loss-selected reference. Seed-17 evaluations are development diagnostics, and seed 29 remains reserved for confirmation. This supports execution beyond the training depth followed by degradation at greater task depths. It does not establish arbitrary-depth execution, general reasoning, or post-completion overscaling damage.
-
-The completed [mechanism diagnostics](docs/experiments/stage1_integrated_mechanism.md) and [learned-completion ablation](docs/experiments/stage1_learned_completion.md) narrow the failure but do not identify its internal cause. [Current status](docs/status.md) records the evidence and remaining gates.
-
-## What comes next
-
-Training supports [W&B logging](docs/training_pointer.md#wb-experiment-logging) to the `loopformer` project, with local metrics retained. [Standalone evaluations](docs/evaluation.md#wb-coverage-for-standalone-evaluations) also support W&B, including publishing saved results without rerunning inference.
-
-The checkpoint comparison is complete; later training reduced depth generalization. The next diagnostic is `bash probe_depth12.sh` on the CUDA desktop. See [results](docs/experiments/stage1_depth12_progression.md) and [run instructions](docs/evaluation.md#matched-requested-counts-after-depth-12-training).
-
-The [loop-balanced loss ablation](docs/experiments/stage1_loopbalanced.md) and joint completion training did not improve farther-depth generalization. Further experiments should target a specific unresolved mechanism. [Terminal overscaling evaluation](docs/evaluation.md) already provides repair/damage and continuous-survival metrics, but pretrained terminal sweeps remain deferred. Asymmetric dynamics and transfer remain planned.
-
-The next major direction is **adaptive inference compute**. Offline oracle/heuristic analysis, opt-in stopped inference, synchronized latency recording, and a gated lightweight head trainer now have code and tests. [The adaptive-compute guide](docs/adaptive_compute.md) is the single source for methods and usage; no pretrained adaptive policy or speedup result has been verified. The original continuing-pointer tasks need explicit completion semantics before answer changes can be interpreted as damage.
-
-Start with the [research plan](docs/project_plan.md), [current status](docs/status.md), [evaluation guide](docs/evaluation.md), and [documentation index](docs/README.md).
+Start with the [research plan](docs/project_plan.md), [current status](docs/status.md),
+and [documentation index](docs/README.md). Historical experiments remain in the
+linked reports; development results are not independent confirmation.
 
 ## Setup
 
@@ -82,7 +70,7 @@ Activate `.venv` in each new terminal. The commands below default to CPU unless 
 export CUBLAS_WORKSPACE_CONFIG=:4096:8
 ```
 
-## Pointer dataset: preview and reproduce
+## Original pointer dataset: preview and reproduce
 
 Dataset code lives in [`scripts/dataset/`](scripts/dataset/). Preview five examples without writing files:
 
@@ -107,7 +95,7 @@ python -m scripts.dataset \
 python -m scripts.dataset --verify data/pointer/seed-17
 ```
 
-The existing seed-17 dataset **already reaches depth 16** for development evaluation. The current fresh-training experiment uses a separate [30k seed-37 dataset](docs/training_pointer.md#loop-balanced-loss-experiment). Generated files are excluded from Git, so use the reproduction command above only if the dataset is missing on a new machine.
+The existing seed-17 dataset **already reaches depth 16** for development evaluation. The current executor uses the separate seed-61 dataset created by `bash prepare_executor.sh`; see [its run instructions](docs/training_pointer.md#isolated-executor-upgrade--current-desktop-run). Generated files are excluded from Git, so use the reproduction command above only if the dataset is missing on a new machine.
 
 | File under `data/pointer/seed-17/` | Examples | Depths | Examples per depth |
 | --- | ---: | --- | ---: |
@@ -116,7 +104,7 @@ The existing seed-17 dataset **already reaches depth 16** for development evalua
 | `test.jsonl` | 1,000 | 1–8 | 125 |
 | `depth_test.jsonl` | 1,000 | 9–16 | 125 |
 
-Current training uses the separate seed-37 30k dataset at depths 1–6. `validation_max_depth: 8` controls monitoring; the full evaluator also reads seed-17 `depth_test.jsonl` at depths 9–16. See [dataset and training details](docs/training_pointer.md).
+The current seed-61 run has 36,000 training questions at requested counts 1–6, 8, 10 and 12; its deep development queries span 13–64. See [dataset and training details](docs/training_pointer.md).
 
 ## Evaluate a model
 

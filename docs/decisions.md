@@ -147,3 +147,18 @@ Routine implementation details can be resolved within the authorized scope. Do n
 **W&B observability — 2026-10-04.** At the user's request, add optional SDK tracking to project `loopformer`, enabled by the current depth-12 launcher. Preserve local metrics and checkpoints, and log scalar scientific/resource metrics plus run provenance without automatically uploading weights or source. A continuation creates a distinct tracking run linked by its parent checkpoint; optimizer steps remain the chart axis. Logging configuration is outside scientific resume identity. Per-update CUDA peak allocation replaces between-update allocation as the useful batch-capacity diagnostic, while the lifetime peak remains recorded. No architecture, objective, batch or training-budget change is implied.
 
 **Post-depth-12 progression — 2026-10-04.** Matched full-loop evaluation shows 238 complete deep trajectories at step 5,000 versus 63 at step 7,500. Retain the selected reference and postpone unchanged-epoch continuation. Use the existing paired-Steps evaluator on identical seed-47 depth-20 maps and two-digit counts at both checkpoints to test requested-count sensitivity. This is a diagnostic intervention, not changed inference/training. Publish standalone evaluation metrics and CSVs through a shared retrospective W&B uploader; do not report uploader system usage as inference utilization.
+
+
+## 2026-10-04 — Diagnose stopping with a frozen executor
+
+After the seed-61 result, the user authorized one controller diagnostic suite.
+Preserve R at the selected step 2,250. Extract actual controller input/memory
+vectors once; probe count access and elapsed-loop information on graph-disjoint
+development partitions. Compare original, continued tiny-fit and fresh tiny-fit
+controllers with the existing stop supervision, with no numeric progress feature.
+Fit copies only, keep the stop threshold fixed, and report exact stopping rather
+than equating cyclic answer coincidences with success. Probes are measurement
+instruments, not model inputs; this does not authorize a parsed-count controller,
+a new production model, a broader training sweep or confirmation evaluation.
+The [diagnostic guide](diagnostics_and_performance.md#controller-diagnostic--current-desktop-command)
+owns the configuration, artifact contract and limitations.

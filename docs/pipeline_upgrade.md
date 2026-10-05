@@ -70,9 +70,10 @@ training run, checkpoint reload, full-loop evaluation, actual stopping and the
 integrated panel. Full R/full model and optimized/dense gradient contracts are
 covered. The offline W&B SDK tests pass when local IPC is allowed.
 
-This checklist marks implementation, not pretrained scientific outcomes. CUDA
-fit/speed, the full new data generation on the desktop, the new training run,
-the native-control comparison, multi-seed reproducibility and confirmation remain
-unrun. Start with the [desktop preview/smoke](training_pointer.md#isolated-executor-upgrade--current-desktop-run).
-Old artifacts were preserved. Neither the root launchers nor the diagnostic panel
-uses the reserved test split.
+The first pretrained desktop run and diagnostic bundle have now completed; see
+[the audited result](experiments/stage1_executor_seed61.md). Forced execution is
+strong, including on the small deep cohort, while learned stopping still fails.
+The dataset replay and saved CUDA resource measurements were checked. The native
+control comparison, multi-seed reproducibility and independent confirmation remain
+unrun. Neither the root launchers nor the diagnostic panel uses the reserved test
+split. Old artifacts were preserved.
