@@ -1,5 +1,110 @@
 # Diagnose recurrent failures and measure execution cost
 
+## Controller training audit — current desktop command
+
+After the [remaining-work comparison](experiments/controller_remaining_seed61.md),
+inspect fitting and supervision before changing the model or training recipe.
+This audit performs **zero optimizer updates** and does not load Qwen, regenerate
+features, change inference, or touch confirmation splits.
+
+```bash
+git pull --ff-only
+bash audit_controller.sh
+```
+
+The launcher activates `.venv`, defaults to CUDA, displays Rich progress/ETA and
+saves stdout/stderr in a timestamped sibling log under `eval/pointer_diagnostics/`.
+It exits on failure. Results go into a fresh `controller-training-audit-<timestamp>/`
+directory. W&B defaults to online project `loopformer`, using the existing
+retrospective uploader; all local results are saved before upload. Use
+`WANDB_MODE=disabled bash audit_controller.sh` to disable tracking.
+
+### Required local artifacts and scope
+
+Keep `data/pointer/seed-61-independent/`, the original
+`models/stage1_pointer/controller-seed61/features.pt`, and all six runs under
+`models/stage1_pointer/controller-remaining-seed61/`. Each run needs its existing
+metadata, `best_controller.pt`, `best_remaining_readout.pt`, and
+`last_controller_state.pt`. These ignored tensors already exist on the training
+desktop; pulled metadata on the Mac is insufficient. Missing inputs fail instead
+of triggering downloads, extraction or retraining. The exported full Qwen/R
+weights are not loaded or required by this audit.
+
+All three seeds and both arms are included. Both **best and final** saved heads
+are evaluated, without picking a new winner. Full fit evaluation covers all
+18,432 cached training questions (2,048 graphs × nine counts) and 2,048 validation
+questions (128 graphs × counts 1–16). Training and validation graphs are disjoint.
+The deep 13–64 extraction is not repeated; this audit targets training mechanics
+and the nearby generalization failure.
+
+The gradient panel uses seed **107** to select 32 graphs independently from each
+split, retaining all count variants. Every checkpoint sees the same panel. Report
+training, validation trained counts, validation interpolation and validation
+extrapolation separately. Held-out-count gradients use labels only for retrospective
+measurement; they never drive updates, selection, or threshold calibration.
+
+### Measurements and interpretation
+
+- Full-panel fit reuses the existing first-crossing evaluator: exact/early/late/
+  missing stops, answer accuracy and joint correctness by count/cohort, plus initial,
+  trajectory, terminal and decrement errors for the numerical readout. A correct
+  letter at the wrong loop remains a failure, including cyclic coincidences.
+- Per-example records identify the first remaining-work error, with loop zero
+  distinguished from recurrent loops. Numerical correctness uses absolute error
+  <=0.5; observational zero crossing is the first predicted value <=0.5 after a
+  loop. Neither criterion changes the deployed stop head or its 0.5 threshold.
+- Cross-tabs pair exact stopping with initial-count accuracy, complete nominal
+  numerical-trajectory accuracy, and exact zero-crossing timing. Summaries include
+  conditional stop accuracy with explicit denominator counts and the mean first
+  numerical-error loop among failures. Correct numerical
+  decoding with incorrect stopping is visible instead of hidden in separate means.
+- Gradient measurements decompose the **existing** loss into stop BCE, initial
+  remaining-work error, interior remaining-work error, and terminal error. The
+  latter three retain the original per-example `1/(N+1)` and `1/12²` scaling and
+  sum to the original auxiliary loss. Gradients retain full controller BPTT.
+- Record raw norms and pairwise cosine similarities for initialization, observation,
+  GRU, stop readout, numerical readout, and the combined controller. Save both each
+  fixed minibatch and the example-weighted panel-mean gradient; a norm of the mean
+  is different from an average of norms. Zero-norm cosines are blank, not zero.
+- The actual weighted controller objective and its hypothetical norm-1 clipping
+  factor are included. In stop-only controls the numerical gradients into memory
+  are explicitly **counterfactual** and receive zero weight in that objective.
+  Their passive numerical readout was fitted separately during the original run.
+
+These are raw gradients at saved checkpoints, **not Adam parameter updates** or a
+reconstruction of historical optimizer batches. Gradient batch size defaults to
+64, versus original training batch 256. Conflicting gradients can motivate a
+controlled experiment but do not prove that conflict caused failure; decodability
+does not prove that a scalar countdown drives the native stop policy.
+
+### Outputs and verification
+
+- `summary.json`, `run.json`: per-checkpoint fit summaries, settings, limitations,
+  source/input hashes and explicit no-mutation checks.
+- `fit_metrics.csv`, `predictions.csv`: full train/validation metrics and example
+  records, including first numerical error and wrong-time correct letters.
+- `countdown_stop_crosstab.csv`: paired numerical correctness versus stop timing.
+- `gradient_panel.csv`: exact sampled graph/count identities.
+- `loss_components.csv`, `gradient_norms.csv`, `gradient_cosines.csv`: per-batch and
+  panel-mean objective contributions, norms, clipping factors and alignment.
+
+The audit validates cache/data/panel identity and graph separation, matches the
+original controller against cached logits on bounded samples, and verifies best
+checkpoint/readout selection steps and saved validation metrics. It asserts
+bitwise unchanged in-memory weights and untouched parameter gradient buffers,
+and rehashes input files after execution. Existing outputs cannot be overwritten.
+
+Preview with no artifacts, writes or model loading:
+
+```bash
+bash audit_controller.sh --dry-run
+```
+
+The launcher forwards CLI options, for example `--device cpu`, `--checkpoints best`,
+`--gradient-graphs 16`, or `--output eval/pointer_diagnostics/controller-audit-recheck`.
+Defaults constitute the intended full audit; reducing graph counts changes the
+measurement panel and is recorded. No additional dependencies are required.
+
 ## Controller diagnostic — current desktop command
 
 The [seed-61 audit](experiments/stage1_executor_seed61.md) shows strong forced

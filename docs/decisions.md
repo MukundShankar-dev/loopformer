@@ -196,3 +196,20 @@ report all seeds, unseen counts and deep results without choosing the best seed.
 Reuse cached observations, extend existing scoring, and verify bounded native
 stopping against replay. Implementation is local-tested; pretrained effectiveness
 and CUDA runtime are unmeasured. See the [runbook](training_pointer.md#remaining-work-comparison--current-desktop-run).
+
+
+## 2026-10-05 — Audit controller fitting before another training recipe
+
+The user requested implementation of a single no-update audit after the matched
+remaining-work comparison failed to improve stopping generalization. Inspect all
+six runs at selected and final checkpoints; reuse frozen cached inputs rather
+than launching Qwen or updating parameters. Evaluate the full training and
+validation panels, and record a smaller deterministic graph panel for objective
+and module gradient norms/alignment. Keep initial, recurrent and terminal numeric
+loss contributions separate while preserving the original objective weighting.
+Pair numerical errors with exact stopping so cyclic answer coincidences and
+independent readout/stop-head failures remain distinguishable. No new checkpoint
+is selected and no wider training coverage is authorized by this audit. The
+[diagnostic guide](diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
+owns commands, artifacts and limits; scalar gradient measurements are diagnostic,
+not proof of a causal mechanism or proposed optimizer changes.

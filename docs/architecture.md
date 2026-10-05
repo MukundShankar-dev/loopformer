@@ -310,3 +310,25 @@ A scalar regression loss encourages an interpretable numerical representation;
 it does not prove a counting algorithm or remove the bounded GRU's possible
 extrapolation limitations. Count interpolation and longer-depth results remain
 separate empirical questions.
+
+
+## Read-only controller training audit
+
+The [training audit](diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
+reuses cached `[B,H]` context and `[B,T,H]` executor observations and the existing
+`replay`/`evaluate_controller` functions. It loads only saved controller and
+numerical-readout weights. Forward inputs, initialization and recurrent memory
+updates are unchanged; no target, decoded number or external counter enters them.
+
+`controller_audit_metrics.loss_components` decomposes the existing scalar objective
+into stop, initial (t=0), interior (0<t<N) and terminal (t=N) terms, retaining
+original normalization. `torch.autograd.grad` observes each component's parameter
+gradients without populating `.grad`, clipping tensors or creating an optimizer.
+Controller states stay differentiable through the full rollout; frozen feature
+inputs retain their existing detach boundaries. Weight-zero controls additionally
+measure explicitly counterfactual auxiliary gradients, which are excluded from
+the recorded actual controller objective. No numerical readout replaces stopping.
+
+Best/final selection is an inspection label, not checkpoint promotion. Full-panel
+fit and gradient diagnostics remain development evidence. Parameter tensors and
+input hashes are checked unchanged after the audit, and no new weights are saved.

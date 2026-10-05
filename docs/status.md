@@ -4,14 +4,38 @@ Last updated: 2026-10-05.
 
 ## Current priority
 
-The user approved the [remaining-work comparison](training_pointer.md#remaining-work-comparison--current-desktop-run).
-It is implemented: `bash train_controller_remaining.sh` trains three matched
-stop-only/auxiliary pairs from the original controller with R frozen, reuses the
-existing training cache, extracts deep observations once, and reports all six
-selected controllers plus bounded native/replay checks. The added numerical
-readout is training/diagnostic only; inference still has no count/time input or
-programmed countdown. Selection remains trained-count exact stopping then BCE.
-The new pretrained comparison is unrun; no confirmation split is opened.
+The no-update [controller training audit](diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
+is implemented. Next desktop command: **`bash audit_controller.sh`**. It checks all
+six remaining-work comparison runs at their selected and final checkpoints using
+full cached train/validation panels, fixed graph panels for per-objective/module
+gradients, and paired numerical-readout/stopping cross-tabs. No Qwen extraction,
+optimizer updates, new checkpoint selection or confirmation data. Desktop results
+and CUDA runtime remain unmeasured. Validation: 28 audit/remaining-work/controller
+training tests passed in 68.54 seconds; after the final conditional summaries and
+manifest checks, all 10 audit tests passed again in 8.63 seconds. Synthetic CLI
+coverage verifies both arms and best/final checkpoints, objective-gradient
+reconstruction, readout alignment, no mutation, no-overwrite behavior and launcher
+failure propagation. Dry-run, shell syntax, 242 local file links and whitespace
+checks passed. No pretrained audit ran locally.
+
+
+The [remaining-work comparison has completed](experiments/controller_remaining_seed61.md)
+on three matched optimizer seeds. Auxiliary supervision improves numerical
+readout and familiar-range decrement accuracy but leaves exact stopping essentially
+unchanged: trained 95.54%→95.31%, held-out 7/9/11 46.61%→46.70%, deep
+1.703%→1.723%. Every run fails at count nine and every count 14–64. Before any
+loop, auxiliary count-nine estimates average 7.59–7.73; sampled count-64 estimates
+average about 12.4, followed by stops around fourteen. Audit the training recipe
+before attributing those readouts to an architectural limitation: gradients are
+clipped on 94–97% of logged auxiliary updates, and initial-count supervision is
+diluted by the trajectory average. Neither observation proves the cause. Correct
+long-range recurrence from a correct initial state is not yet established. Keep R frozen;
+no new training recipe or confirmation run is selected. All 22,272 decisions,
+384,192 numerical trace rows, 72 paired aggregates and bounded native checks were
+audited; see the report for limits and exact cohort definitions.
+
+Implementation remains `bash train_controller_remaining.sh`: its commands now
+reproduce a completed protocol and must not overwrite existing outputs.
 Validation: 28 focused remaining-work, controller-training and controller-diagnostic
 tests passed in 81.11 seconds. Contracts include exact masked targets, full memory
 gradients with detached executor inputs, bitwise CPU stop-only equivalence with a
@@ -27,7 +51,7 @@ Update 2,700 improves trained-count validation exact stopping from 14.32% to
 all at count 13; every count 14–64 fails, stopping at loops 10–15. Memory count
 decoding at loop 12 improves from 6.25% to 67.71%, so immediate forgetting alone
 no longer explains the failure. Retain that checkpoint as evidence; the authorized
-comparison above is the next bounded experiment. No confirmation evaluation is selected. The report audits all native stopping
+comparison above has now completed. No confirmation evaluation is selected. The report audits all native stopping
 decisions, cyclic coincidences, cache/native agreement, and diagnostic readouts.
 The paragraphs below retain the preceding experiment context.
 

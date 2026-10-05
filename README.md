@@ -31,17 +31,23 @@ reaches 95.3% exact stopping on trained counts, but 45.8% on held-out counts
 7/9/11 and zero beyond count 13. R remains frozen; controller generalization is
 still unresolved.
 
-The next comparison tests additional remaining-work supervision for the controller.
-On the CUDA desktop, using the existing data, source checkpoint and feature cache:
+The [matched remaining-work comparison](docs/experiments/controller_remaining_seed61.md)
+improves the controller's numerical readout but leaves stopping generalization
+essentially unchanged. Unfamiliar counts are already misestimated before looping;
+the next step is to audit training fit and supervision before changing the model.
+
+Run the read-only training audit on the desktop with the existing cached features
+and saved controller weights:
 
 ```bash
 git pull --ff-only
-bash train_controller_remaining.sh
+bash audit_controller.sh
 ```
 
-This trains three matched pairs and evaluates them with R frozen. See the
-[runbook](docs/training_pointer.md#remaining-work-comparison--current-desktop-run)
-for the objectives, diagnostics, artifacts and optional preview/smoke test.
+This evaluates all six runs, compares training and validation errors, and measures
+loss gradients without updating weights or loading Qwen. Results and logs go to
+`eval/pointer_diagnostics/` and W&B. See the [audit guide](docs/diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
+for required artifacts, metrics and options.
 
 Start with the [research plan](docs/project_plan.md), [current status](docs/status.md),
 and [documentation index](docs/README.md). Historical experiments remain in the

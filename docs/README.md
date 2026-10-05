@@ -12,7 +12,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 | Prompt-only completion, fixed prompt memory, and learned-stop evaluation | [Learned loop completion](learned_loop_completion.md) |
 | Python environment and pretrained Stage 0 checks | [Setup](setup.md) |
 | Windows/WSL2/CUDA installation and artifact migration | [Desktop setup](windows_cuda_setup.md) |
-| Current frozen-controller diagnostic and historical performance investigations | [Diagnostics and performance](diagnostics_and_performance.md) |
+| Current no-update controller training audit and historical performance investigations | [Diagnostics and performance](diagnostics_and_performance.md) |
 | Resolved and open design choices | [Decisions](decisions.md) |
 
 The adaptive-compute guide is the **single source for that extension**. The research plan states its place in the stage sequence; evaluation documents shared metric conventions; status records current evidence. Stage 3 asymmetric dynamics and Stages 4–6 transfer remain planned in the research plan. No separate phase-guide directory is needed.
@@ -53,6 +53,7 @@ The [controller-only training report](experiments/controller_seed61_training.md)
 records substantially improved familiar-count stopping and memory decodability,
 but count-specific interpolation failures and no exact stopping beyond count 13.
 
-The implemented [remaining-work comparison](training_pointer.md#remaining-work-comparison--current-desktop-run)
-adds matched controller-only arms and progress diagnostics; pretrained results
-are pending.
+The [completed remaining-work comparison](experiments/controller_remaining_seed61.md)
+finds better numerical readout but essentially unchanged stopping across three
+paired seeds. Initial unfamiliar-count estimates are already wrong before
+recurrence. The [training audit](diagnostics_and_performance.md#controller-training-audit--current-desktop-command) checks fitting and objective gradients before another architecture or recipe change.

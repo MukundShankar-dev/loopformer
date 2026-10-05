@@ -2,11 +2,20 @@
 
 Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md), [loop-balanced ablation](experiments/stage1_loopbalanced.md), and [learned-completion ablation](experiments/stage1_learned_completion.md) have completed. The latter two did not improve the depth frontier. Dated commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
 
+## Audit the completed controller runs
+
+The next command is `bash audit_controller.sh`, using the saved comparison heads
+and original cached features. This performs no training updates. See the
+[audit guide](diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
+for required local files, all measured quantities and interpretation limits.
+
 ## Remaining-work comparison — current desktop run
 
 The user approved this comparison after the [controller-only result](experiments/controller_seed61_training.md):
 familiar-count exact stopping improved, but count nine and counts above thirteen
-still fail. The new objective is implemented; its pretrained effect is unmeasured.
+still fail. The [matched run is complete](experiments/controller_remaining_seed61.md):
+numerical readout improved, but stopping generalization did not. The commands below
+record the completed protocol; do not rerun into the existing output.
 
 On the CUDA desktop, from the repository root:
 
@@ -128,9 +137,10 @@ python -m scripts.eval.controller_comparison \
 
 Local validation: 28 focused tests passed, including native/replay agreement,
 masked-label and gradient contracts, passive-readout equivalence and failure
-propagation. No new dependencies. CUDA runtime, improvement and length generalization remain
-to be measured; the previous 49-second controller optimization is not a timing
-promise for six runs with auxiliary diagnostics and new deep extraction.
+propagation. No new dependencies. The completed CUDA comparison took 475.2 seconds
+across the six training invocations plus 296.2 seconds for shared deep extraction,
+excluding some orchestration/native-check/upload time. See the report for the
+negative stopping result and numerical diagnostic interpretation.
 
 ## Separate controller training — current desktop run
 
