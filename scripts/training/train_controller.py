@@ -21,6 +21,7 @@ from scripts.recurrent_qwen.interfaces import RecurrentController
 from scripts.training.controller import ControllerConfig, evaluate_controller, export_checkpoint, learning_rate, selection_key, select_graphs
 from scripts.training.data import read_tasks
 from scripts.training.objective import completion_loss
+from scripts.training.controller_remaining import remaining_predictions, remaining_loss
 from scripts.training.tracking import tracking_run
 
 
@@ -139,17 +140,28 @@ def main() -> None:
         'selection': 'maximize trained-count development exact stopping; tie-break by its class-balanced BCE',
         'optimization_scope': 'controller_only', 'trained_depths': trained_depths,
         'trainable_parameters': sum(p.numel() for p in head.parameters()),
+        'remaining_readout_parameters': head.intermediate + 1 if config.remaining_readout else 0,
+        'remaining_gradient_scope': ('controller_and_readout' if config.remaining_loss_weight else 'detached_readout_only')
+                                   if config.remaining_readout else None,
         'cached_tensor_bytes': sum(t.numel() * t.element_size() for group in features.values() for t in group.values())}
     (output / 'run.json').write_text(json.dumps(metadata, indent=2) + '\n')
     head = head.to(config.device).requires_grad_(True)
+    optimizer_seed = config.seed if config.optimizer_seed is None else config.optimizer_seed
+    torch.manual_seed(optimizer_seed)
+    remaining_readout = torch.nn.Linear(head.intermediate, 1).to(config.device) if config.remaining_readout else None
+    if remaining_readout is not None:
+        console.print(f'Remaining-work readout · weight {config.remaining_loss_weight:g} · fixed scale {config.remaining_scale:g}'
+                      + (' · detached measurement control' if config.remaining_loss_weight == 0 else ' · trains controller memory'))
     console.print(f'Frozen features ready · {sum(p.numel() for p in head.parameters()):,} controller parameters · starting optimizer')
-    torch.manual_seed(config.seed)
+    torch.manual_seed(optimizer_seed)
     optimizer = torch.optim.AdamW(head.parameters(), lr=config.learning_rate, weight_decay=0.0)
+    readout_optimizer = (torch.optim.AdamW(remaining_readout.parameters(), lr=config.learning_rate, weight_decay=0.0)
+                         if remaining_readout is not None else None)
     context = features['train']['context'].to(config.device)
     working = features['train']['working'].to(config.device)
     depths = torch.tensor([t.task_depth for t in train_tasks], device=config.device)
     masks = torch.arange(working.shape[1], device=config.device)[None, :] < depths[:, None]
-    generator = torch.Generator().manual_seed(config.seed)
+    generator = torch.Generator().manual_seed(optimizer_seed)
     order, offset = torch.empty(0, dtype=torch.long), 0
     best_key, best_step, best_metrics = (float('inf'), float('inf')), 0, None
     validation_history = []
@@ -163,7 +175,8 @@ def main() -> None:
 
         def validate(step: int) -> dict:
             nonlocal best_key, best_step, best_metrics
-            metrics, rows = evaluate_controller(head, features['validation'], validation_tasks, trained_depths, config.device)
+            metrics, rows = evaluate_controller(head, features['validation'], validation_tasks, trained_depths, config.device,
+                remaining_readout=remaining_readout, remaining_scale=config.remaining_scale)
             record({'event': 'validation', 'step': step, 'validation': metrics})
             validation_history.extend({'step': step, 'cohort': name, **values} for name, values in metrics.items())
             write_csv(output / 'validation_history.csv', validation_history)
@@ -172,7 +185,10 @@ def main() -> None:
             key = selection_key(metrics)
             if key < best_key:
                 best_key, best_step, best_metrics = key, step, metrics
-                torch.save({k: v.detach().cpu() for k, v in head.state_dict().items()}, output / 'best_controller.pt')
+                torch.save({k: v.detach().cpu().clone() for k, v in head.state_dict().items()}, output / 'best_controller.pt')
+                if remaining_readout is not None:
+                    torch.save({'state_dict': remaining_readout.state_dict(), 'scale': config.remaining_scale,
+                                'step': step, 'width': head.intermediate}, output / 'best_remaining_readout.pt')
                 write_csv(output / 'best_decisions.csv', rows)
                 (output / 'best_selection.json').write_text(json.dumps({'step': step, 'metrics': metrics}, indent=2) + '\n')
             return metrics
@@ -198,27 +214,54 @@ def main() -> None:
                 for group in optimizer.param_groups:
                     group['lr'] = lr
                 optimizer.zero_grad(set_to_none=True)
-                logits, _, _ = replay(head, context[idx], working[idx])
-                loss, _ = completion_loss(logits, masks[idx])
-                loss.backward()
+                logits, initial, memories = replay(head, context[idx], working[idx])
+                stop_loss, _ = completion_loss(logits, masks[idx])
+                auxiliary = None
+                loss = stop_loss
+                if remaining_readout is not None:
+                    readout_optimizer.zero_grad(set_to_none=True)
+                    for group in readout_optimizer.param_groups:
+                        group['lr'] = lr
+                    predicted = remaining_predictions(remaining_readout, initial, memories, config.remaining_scale,
+                                                       detach=config.remaining_loss_weight == 0)
+                    auxiliary = remaining_loss(predicted, depths[idx], config.remaining_scale)
+                    loss = stop_loss + config.remaining_loss_weight * auxiliary
+                # At weight zero the auxiliary trains only a detached measurement probe.
+                backward_loss = loss + auxiliary if auxiliary is not None and config.remaining_loss_weight == 0 else loss
+                backward_loss.backward()
                 norm = torch.nn.utils.clip_grad_norm_(head.parameters(), 1.0, error_if_nonfinite=True)
                 optimizer.step()
+                if readout_optimizer is not None:
+                    torch.nn.utils.clip_grad_norm_(remaining_readout.parameters(), 1.0, error_if_nonfinite=True)
+                    readout_optimizer.step()
                 if step % config.log_every == 0 or step == 1 or step == config.steps:
                     with torch.no_grad():
                         exact = (logits >= 0).any(-1) & ((logits >= 0).int().argmax(-1) + 1 == depths[idx])
-                    record({'event': 'train', 'step': step, 'train': {'loss': loss.item(), 'exact_stop': exact.float().mean().item()},
+                    record({'event': 'train', 'step': step, 'train': {'loss': loss.item(), 'stop_loss': stop_loss.item(),
+                            **({'remaining_loss': auxiliary.item()} if auxiliary is not None else {}),
+                            'exact_stop': exact.float().mean().item()},
                         'learning_rate': lr, 'gradient_norm_before_clip': float(norm),
                         'training_elapsed_seconds': perf_counter() - training_began,
                         'cuda_peak_bytes': torch.cuda.max_memory_allocated() if config.device == 'cuda' else None})
                 if step % config.eval_every == 0 or step == config.steps:
                     latest = validate(step)
                     last_validation_step = step
-                    torch.save({'head': head.state_dict(), 'optimizer': optimizer.state_dict(), 'step': step}, output / 'last_controller_state.pt')
+                    torch.save({'head': head.state_dict(), 'optimizer': optimizer.state_dict(), 'step': step,
+                                'remaining_readout': remaining_readout.state_dict() if remaining_readout is not None else None,
+                                'remaining_optimizer': readout_optimizer.state_dict() if readout_optimizer is not None else None},
+                               output / 'last_controller_state.pt')
                 if step % config.log_every == 0 or step == config.steps:
                     progress.update(bar, completed=step,
                         description=f'Controller · val@{last_validation_step} {latest["trained"]["exact_stop"]:.1%}')
         # Publish only the selected controller with the original frozen executor.
         head.load_state_dict(torch.load(output / 'best_controller.pt', map_location=config.device, weights_only=True))
+        if remaining_readout is not None:
+            saved_readout = torch.load(output / 'best_remaining_readout.pt', map_location=config.device, weights_only=True)
+            remaining_readout.load_state_dict(saved_readout['state_dict'])
+            traces = []
+            evaluate_controller(head, features['validation'], validation_tasks, trained_depths, config.device,
+                remaining_readout=remaining_readout, remaining_scale=config.remaining_scale, traces=traces)
+            write_csv(output / 'remaining_trajectories.csv', traces)
         provenance = {'source_checkpoint_sha256': identity['source_sha256'], 'step': best_step,
                       'optimization_scope': 'controller_only', 'trained_depths': trained_depths,
                       'config': config.to_dict(), 'selection': metadata['selection']}

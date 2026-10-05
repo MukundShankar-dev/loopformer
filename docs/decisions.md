@@ -176,3 +176,23 @@ so the existing evaluators can test actual stopping. Reuse the diagnostic for
 memory probes after training; diagnostic head copies are never promoted implicitly.
 The [runbook](training_pointer.md#separate-controller-training--current-desktop-run)
 owns the exact bounded recipe and validation evidence.
+
+
+## 2026-10-05 — matched remaining-work supervision for the controller
+
+The user approved testing a numerical remaining-work readout after controller-only
+training improved familiar-count exact stopping to 95.31% but failed at count
+nine and every count 14–64. Keep the executor, graph panel, trained requests,
+controller architecture and stopping policy fixed. Compare stop-only training
+with stop-plus-remaining regression for three paired optimizer seeds, starting
+from the same original controller. A detached regression probe in the control
+arm measures progress without modifying its gradients or clipping.
+
+This is stronger task-specific supervision: N−t targets include intermediate
+values absent as requested counts. They are loss labels only; no external clock,
+gold state, numerical feedback or programmed decrement is permitted. Numerical
+predictions cannot stop the model. Select by trained-count exact stops and BCE;
+report all seeds, unseen counts and deep results without choosing the best seed.
+Reuse cached observations, extend existing scoring, and verify bounded native
+stopping against replay. Implementation is local-tested; pretrained effectiveness
+and CUDA runtime are unmeasured. See the [runbook](training_pointer.md#remaining-work-comparison--current-desktop-run).

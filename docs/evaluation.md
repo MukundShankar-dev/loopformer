@@ -479,3 +479,17 @@ on an earlier cycle is not an exact stop. Do not reinterpret ordinary post-reque
 lookups as terminal damage. Absorbing-terminal transformation rejects cases where
 the final state appeared earlier, since editing that edge would change nominal
 execution. Terminal repair/damage and cross-family claims remain deferred.
+
+
+## Matched controller remaining-work comparison
+
+The [current runbook](training_pointer.md#remaining-work-comparison--current-desktop-run)
+extends the existing `evaluate_controller`/first-crossing metrics across six
+controller-only runs. Validation uses the shared 16-loop cache; deep replay uses
+one shared 64-loop extraction. Every seed, exact-stop/joint outcome, numerical
+error and paired difference is reported. Numerical diagnostic zero crossings
+never replace the stop head. Readout traces sample eight predefined graphs per
+panel; complete decisions and aggregates cover all queries. Both arms of the
+lowest predeclared seed additionally execute bounded native learned-stop checks
+through `scripts.eval.loop_test`. These guard checkpoint/replay fidelity, not
+statistical confirmation. Cached replay cannot support adaptive latency claims.

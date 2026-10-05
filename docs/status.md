@@ -1,8 +1,35 @@
 # Project status
 
-Last updated: 2026-10-04.
+Last updated: 2026-10-05.
 
 ## Current priority
+
+The user approved the [remaining-work comparison](training_pointer.md#remaining-work-comparison--current-desktop-run).
+It is implemented: `bash train_controller_remaining.sh` trains three matched
+stop-only/auxiliary pairs from the original controller with R frozen, reuses the
+existing training cache, extracts deep observations once, and reports all six
+selected controllers plus bounded native/replay checks. The added numerical
+readout is training/diagnostic only; inference still has no count/time input or
+programmed countdown. Selection remains trained-count exact stopping then BCE.
+The new pretrained comparison is unrun; no confirmation split is opened.
+Validation: 28 focused remaining-work, controller-training and controller-diagnostic
+tests passed in 81.11 seconds. Contracts include exact masked targets, full memory
+gradients with detached executor inputs, bitwise CPU stop-only equivalence with a
+passive readout, unchanged non-controller checkpoint tensors, native/replay
+agreement, deep-cache reuse, all-seed reporting and launcher failure propagation.
+Shell syntax, 285 local Markdown links and whitespace checks passed. No new
+pretrained run or CUDA benchmark was performed locally.
+
+
+The [controller-only run has completed](experiments/controller_seed61_training.md).
+Update 2,700 improves trained-count validation exact stopping from 14.32% to
+95.31%; held-out counts 7/9/11 score 45.83%. Native deep exact success is 28/1,664,
+all at count 13; every count 14–64 fails, stopping at loops 10–15. Memory count
+decoding at loop 12 improves from 6.25% to 67.71%, so immediate forgetting alone
+no longer explains the failure. Retain that checkpoint as evidence; the authorized
+comparison above is the next bounded experiment. No confirmation evaluation is selected. The report audits all native stopping
+decisions, cyclic coincidences, cache/native agreement, and diagnostic readouts.
+The paragraphs below retain the preceding experiment context.
 
 The user authorized the [pipeline upgrade](pipeline_upgrade.md). Implementation
 now includes an isolated recurrent controller, count-free executor view, normalized

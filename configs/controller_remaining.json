@@ -1,0 +1,8 @@
+{
+  "training_config": "configs/controller_seed61.json",
+  "features_cache": "models/stage1_pointer/controller-seed61/features.pt",
+  "output": "models/stage1_pointer/controller-remaining-seed61",
+  "optimizer_seeds": [83, 89, 97],
+  "remaining_loss_weight": 1.0,
+  "remaining_scale": 12.0
+}

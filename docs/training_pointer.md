@@ -2,13 +2,143 @@
 
 Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md), [loop-balanced ablation](experiments/stage1_loopbalanced.md), and [learned-completion ablation](experiments/stage1_learned_completion.md) have completed. The latter two did not improve the depth frontier. Dated commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
 
+## Remaining-work comparison — current desktop run
+
+The user approved this comparison after the [controller-only result](experiments/controller_seed61_training.md):
+familiar-count exact stopping improved, but count nine and counts above thirteen
+still fail. The new objective is implemented; its pretrained effect is unmeasured.
+
+On the CUDA desktop, from the repository root:
+
+```bash
+git pull --ff-only
+bash train_controller_remaining.sh
+```
+
+This single launcher trains **six controllers**, evaluates every selected
+controller, and writes a paired comparison. No data regeneration or R updates.
+It requires the existing seed-61 dataset, the complete original
+`executor_r-seed61/step-002250` checkpoint, and
+`models/stage1_pointer/controller-seed61/features.pt` from the completed run.
+The cache stays local and ignored by Git. A missing/mismatched cache fails clearly;
+it does not silently launch another extraction for training.
+
+Optional `--dry-run` prints the six configurations without model/cache loading or
+writes. `--smoke-test` makes one ten-update pair in a distinct timestamped directory,
+reuses the full cached training/validation panels, and skips the deep panel. It
+still runs bounded native validation checks. Old output directories are preserved;
+a full comparison refuses to overwrite its output.
+
+### Matched arms and numerical supervision
+
+[configs/controller_remaining.json](../configs/controller_remaining.json) composes
+[the original training config](../configs/controller_seed61.json). Graph sampling
+remains seed 83; optimizer seeds **83, 89, 97** change minibatch order and initialize
+the small numerical readout. Every run starts from the **original executor's
+controller**, not the selected controller-only update 2,700. Each pair uses the
+same initialization, ordering, cached features, 3,000 updates, batch 256 and LR
+schedule. These are optimization-seed replicates on one graph split, not three
+independent datasets or random initializations of the whole controller.
+
+Both arms attach a linear 128→1 measurement readout to initial/controller memory:
+
+- `stop_only`: existing stop BCE trains the controller. Numerical regression
+  trains the readout on **detached** memory, so it cannot influence the controller.
+- `remaining`: stop BCE plus weight-1 numerical regression trains controller
+  memory and the readout. Executor/prelude observations remain detached.
+
+The readout predicts remaining work in units of steps. For requested N, targets
+are N, N−1, …, 0 at loops **0 through N inclusive**. Later loops are masked out.
+The regression loss is squared error divided by fixed scale **12²**, averaged
+within each example and then across examples. Scale 12 is global; it is never
+replaced by an example's N. The controller and readout use separate AdamW
+optimizers and separate norm-1 clipping; passive readout gradients therefore
+cannot change stop-only clipping. The controller retains full recurrence BPTT.
+
+This explicitly teaches a task-specific countdown representation. Requested
+counts 7/9/11 remain excluded from training, although those numerical values
+occur as intermediate remaining-work labels in longer trained requests. N and t
+are used only to construct labels. No count, time feature, gold memory, predicted
+number or hard-coded decrement enters the recurrent forward. The normal learned
+stop head remains the inference policy at threshold 0.5. Auxiliary predictions
+never gate execution. The additional readout stays outside the portable model;
+`best/` loads unchanged through existing evaluators.
+
+### Selection, diagnostics and outputs
+
+Selection remains **trained-count validation exact stopping, then stop BCE**.
+Remaining-work errors, count 7/9/11 results and deep results never select a
+checkpoint. All three seeds and paired differences are reported; the suite does
+not pick a winning seed. Validation metrics are recorded every 100 updates.
+
+Alongside exact/early/late/missing stops and joint answer-and-timing success, the
+suite records, by count and cohort:
+
+- initial remaining-work MAE and fraction within half a step of N;
+- remaining-work MAE through the nominal trajectory, and error at its end;
+- deviation of successive predictions from a decrement of one;
+- first diagnostic zero crossing (prediction ≤0.5 after loop one), missing
+  crossing rate, and agreement with the actual head's first stop;
+- stop rate when predicted remaining work is within ±0.5 of zero, plus its
+  denominator. A nonexistent denominator is null, not zero.
+
+The numerical zero crossing is a diagnostic, never a replacement stopping rule.
+Low regression error does not establish causal use of a counting representation.
+All-loop trajectories include post-stop counterfactual replay; post-request
+remaining-work targets are blank, not fabricated negative countdown labels.
+
+Training outputs are under `models/stage1_pointer/controller-remaining-seed61/`:
+`comparison.json`, exact per-run configs, and six `seed-<seed>-<arm>/` runs.
+Each run keeps the ordinary controller artifacts plus `remaining_trajectories.csv`
+for every validation query at its selected update, and ignored
+`best_remaining_readout.pt`. The latter is saved alongside the selected head and
+is required only for further numerical diagnostics, not native stopping.
+
+Evaluation outputs are under `eval/pointer_diagnostics/controller-remaining-seed61/`:
+
+- `comparison.csv`, `paired_comparison.csv`, `summary.json`: every run/count/cohort,
+  paired exact-stop differences, means and sample SD across seeds, provenance.
+- Per-run decisions for all validation and deep queries; numerical traces for
+  the first **eight graph identities** of each panel, selected without outcomes.
+  All aggregates use the entire panel, not just this trace sample.
+- An ignored `deep_features.pt`: original frozen executor observations through
+  loop 64 on all 1,664 deep queries, extracted **once** in batches of 16, then
+  replayed by all six controllers. Validation reuses the original training cache.
+- Bounded native checks: both arms of the lowest predeclared seed run the first
+  16 queries of each cached validation/deep panel through the existing learned-stop CLI.
+  Predictions, executed loops, exact/joint scores and missing-stop flags must
+  agree with cached replay on shared queries. Validation uses its cached cap 16;
+  deep uses 64. Exact native-check tasks are saved as JSONL in the evaluation root.
+
+Cached comparisons are not measured adaptive inference latency. The deep split
+remains 32 graphs repeated at counts 13–64. Seed 29 and the reserved test split
+remain untouched. Six training runs log live to W&B `loopformer`; aggregate
+comparison metrics/tables upload afterward. Full per-run traces and native-check
+artifacts remain local/Git evidence. The shell captures stdout/stderr in
+`controller-remaining-launch-*.log` and stops on any failed command.
+
+To repeat only evaluation into a new output while reusing deep extraction:
+
+```bash
+python -m scripts.eval.controller_comparison \
+  --run models/stage1_pointer/controller-remaining-seed61 \
+  --deep-features-cache eval/pointer_diagnostics/controller-remaining-seed61/deep_features.pt \
+  --output eval/pointer_diagnostics/controller-remaining-recheck
+```
+
+Local validation: 28 focused tests passed, including native/replay agreement,
+masked-label and gradient contracts, passive-readout equivalence and failure
+propagation. No new dependencies. CUDA runtime, improvement and length generalization remain
+to be measured; the previous 49-second controller optimization is not a timing
+promise for six runs with auxiliary diagnostics and new deep extraction.
+
 ## Separate controller training — current desktop run
 
 The [controller diagnostic](experiments/controller_seed61_diagnostic.md) found
 accessible initial count information and successful tiny-set learning, but weak
 held-out stopping. The user authorized broader controller-only training with the
-successful executor fixed. This is implemented; pretrained outcomes of this new
-run remain unmeasured.
+successful executor fixed. This run has [completed and been audited](experiments/controller_seed61_training.md).
+The commands below reproduce that protocol; do not rerun into the existing output.
 
 From the repository root on the CUDA desktop:
 

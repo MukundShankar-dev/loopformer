@@ -13,6 +13,7 @@ from scripts.eval.controller_features import replay
 from scripts.eval.controller_learning import aggregate_stops, stop_rows
 from scripts.eval.executor_diagnostic import matched_tasks
 from scripts.training.objective import completion_loss
+from scripts.training.controller_remaining import remaining_predictions, remaining_metrics, remaining_trace_rows
 
 
 @dataclass(frozen=True)
@@ -32,6 +33,10 @@ class ControllerConfig:
     eval_every: int = 100
     log_every: int = 10
     evaluation_max_depth: int = 16
+    optimizer_seed: int | None = None
+    remaining_readout: bool = False
+    remaining_loss_weight: float = 0.0
+    remaining_scale: float = 12.0
 
     def validate(self) -> None:
         for key in ('train_graphs', 'validation_graphs', 'extraction_batch_size', 'batch_size',
@@ -46,6 +51,13 @@ class ControllerConfig:
             raise ValueError('Invalid seed/warmup budget')
         if not math.isfinite(self.learning_rate) or self.learning_rate <= 0 or not 0 <= self.min_lr_ratio <= 1:
             raise ValueError('Invalid learning rate/schedule')
+
+        if self.optimizer_seed is not None and (type(self.optimizer_seed) is not int or not 0 <= self.optimizer_seed < 2**63):
+            raise ValueError('Invalid optimizer seed')
+        if (type(self.remaining_readout) is not bool or not math.isfinite(self.remaining_loss_weight)
+                or self.remaining_loss_weight < 0 or not math.isfinite(self.remaining_scale)
+                or self.remaining_scale <= 0 or (self.remaining_loss_weight and not self.remaining_readout)):
+            raise ValueError('Invalid remaining-work readout, weight or scale')
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -71,16 +83,22 @@ def selection_key(metrics: dict) -> tuple[float, float]:
 
 
 def evaluate_controller(head, features: dict[str, Tensor], tasks: list, trained_depths: list[int],
-                        device: str, batch_size: int = 256) -> tuple[dict, list[dict]]:
+                        device: str, batch_size: int = 256, *, remaining_readout=None,
+                        remaining_scale: float = 12.0, traces: list[dict] | None = None) -> tuple[dict, list[dict]]:
     """Cached first-crossing evaluation; gold labels cannot enter replay."""
     head.eval()
-    logits = []
+    logits, remaining = [], []
     with torch.no_grad():
         for start in range(0, len(tasks), batch_size):
-            scores, _, _ = replay(head, features['context'][start:start + batch_size].to(device),
+            scores, initial, memory = replay(head, features['context'][start:start + batch_size].to(device),
                                  features['working'][start:start + batch_size].to(device))
             logits.append(scores.cpu())
+            if remaining_readout is not None:
+                remaining.append(remaining_predictions(remaining_readout, initial, memory, remaining_scale).cpu())
     logits = torch.cat(logits)
+    predicted_remaining = torch.cat(remaining) if remaining else None
+    if traces is not None and predicted_remaining is not None:
+        traces.extend(remaining_trace_rows(predicted_remaining, logits, tasks))
     metadata = [{'example_id': t.example_id, 'depth': t.task_depth} for t in tasks]
     rows = stop_rows(logits, features['predictions'], tasks, metadata, 'controller')
     depths = torch.tensor([t.task_depth for t in tasks])
@@ -94,6 +112,8 @@ def evaluate_controller(head, features: dict[str, Tensor], tasks: list, trained_
         if chosen.any():
             selected = [r for r, valid in zip(rows, chosen.tolist(), strict=True) if valid]
             metrics[name] = {**aggregate_stops(selected), 'loss': completion_loss(logits[chosen], mask[chosen])[0].item()}
+            if predicted_remaining is not None:
+                metrics[name].update(remaining_metrics(predicted_remaining[chosen], logits[chosen], depths[chosen]))
     return metrics, rows
 
 

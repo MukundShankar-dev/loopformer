@@ -287,3 +287,26 @@ use `requires_grad` to infer the export payload, which would omit the frozen
 trained R. Source tensors/tokenizer/config remain untouched; metadata records
 controller-only optimization and the source hash. The joint trainer must not use
 this export as an optimizer-resume checkpoint.
+
+
+## Controller remaining-work supervision — 2026-10-05
+
+The [matched comparison](training_pointer.md#remaining-work-comparison--current-desktop-run)
+adds a training-only `Linear(controller_width, 1)` readout without changing
+`RecurrentController.initialize` or `advance`. `replay` returns initial memory
+`[B,M]` and subsequent memory `[B,T,M]`; concatenating them gives `[B,T+1,M]`.
+The shared linear readout, multiplied by fixed scale 12, predicts `[B,T+1]`
+remaining work. Only the objective constructs targets N−t for t=0..N. There is
+no teacher forcing, numerical feedback, clock input, hard-coded state update or
+readout-dependent stopping. Full controller BPTT remains intact; input features
+are detached at the existing prompt/observation interfaces.
+
+The stop-only arm detaches memory before numerical regression. Its readout has a
+separate optimizer and gradient clipping, so measurement does not alter controller
+updates. The auxiliary arm lets regression gradients train memory. Export still
+replaces exactly `completion_head.*`; the numerical readout is saved separately
+with the matching selection step/scale and discarded for ordinary inference.
+A scalar regression loss encourages an interpretable numerical representation;
+it does not prove a counting algorithm or remove the bounded GRU's possible
+extrapolation limitations. Count interpolation and longer-depth results remain
+separate empirical questions.

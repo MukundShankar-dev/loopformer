@@ -26,17 +26,22 @@ The [seed-61 executor audit](docs/experiments/stage1_executor_seed61.md) finds s
 execution beyond trained depth on a limited set of 26-state graphs. The
 [controller diagnostic](docs/experiments/controller_seed61_diagnostic.md) isolates
 poor stopping despite accessible initial count information and successful tiny fits.
-The next run trains only the controller, keeping the successful executor fixed:
+The [completed controller-only run](docs/experiments/controller_seed61_training.md)
+reaches 95.3% exact stopping on trained counts, but 45.8% on held-out counts
+7/9/11 and zero beyond count 13. R remains frozen; controller generalization is
+still unresolved.
+
+The next comparison tests additional remaining-work supervision for the controller.
+On the CUDA desktop, using the existing data, source checkpoint and feature cache:
 
 ```bash
 git pull --ff-only
-bash train_controller.sh && bash eval_controller.sh
+bash train_controller_remaining.sh
 ```
 
-Run on the CUDA desktop with the existing seed-61 data and complete executor
-checkpoint. Training writes `models/stage1_pointer/controller-seed61/`; evaluation
-writes `eval/pointer_diagnostics/controller-eval-*`. Both support W&B `loopformer`.
-See [configuration, artifacts and optional smoke test](docs/training_pointer.md#separate-controller-training--current-desktop-run).
+This trains three matched pairs and evaluates them with R frozen. See the
+[runbook](docs/training_pointer.md#remaining-work-comparison--current-desktop-run)
+for the objectives, diagnostics, artifacts and optional preview/smoke test.
 
 Start with the [research plan](docs/project_plan.md), [current status](docs/status.md),
 and [documentation index](docs/README.md). Historical experiments remain in the

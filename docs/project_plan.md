@@ -15,6 +15,17 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-05 controller-supervision amendment:** The user authorized the
+[matched remaining-work comparison](training_pointer.md#remaining-work-comparison--current-desktop-run).
+Keep the successful executor frozen and compare existing stop supervision with
+additional numerical N−t targets read from controller memory, including loop
+zero. Those targets are training labels only, never forward inputs or programmed
+updates. This deliberately supplies stronger task-specific supervision; report
+it distinctly from learning solely through stop/continue labels. Hold requested
+counts, graph splits, update budgets and inference policy fixed, report every
+paired optimization seed, and preserve development-only selection. No wider
+training-depth range, confirmation run or later research stage is opened.
+
 **2026-10-04 pipeline amendment:** The user authorized the [executor/controller
 upgrade](pipeline_upgrade.md) following the end-to-end review. This supersedes
 LoRA-only/no-bridge constraints for the new experimental branch: explicit
