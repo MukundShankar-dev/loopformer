@@ -269,3 +269,21 @@ source model and original controller stay frozen; tiny-set fits update copies.
 Diagnostic classifiers are separate measurement tools and are never installed in
 the inference model. The only new binaries are ignored caches and controller
 copies in the diagnostic output directory; no checkpoint format changes.
+
+
+## Controller-only training and portable export
+
+The [separate controller run](training_pointer.md#separate-controller-training--current-desktop-run)
+freezes the selected executor and caches normal FP32 forward observations. Only
+a copy of its `RecurrentController` enters the optimizer. The controller consumes
+cached full-prompt context and R vectors, carries its own differentiable memory,
+and receives no numeric time/depth feature. Per-loop continue/stop labels remain
+supervision only. Cache replay is checked against the original live controller.
+
+The portable `best/` checkpoint uses the existing `loopformer-executor-v2` format.
+Export copies the original saved tensor dictionary and replaces exactly the
+`completion_head.*` keys after name, shape and finiteness validation. It does not
+use `requires_grad` to infer the export payload, which would omit the frozen
+trained R. Source tensors/tokenizer/config remain untouched; metadata records
+controller-only optimization and the source hash. The joint trainer must not use
+this export as an optimizer-resume checkpoint.

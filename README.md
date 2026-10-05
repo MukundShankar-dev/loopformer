@@ -20,21 +20,23 @@ readout
 
 One recurrent block is reused across all loops. The current experiment trains all weights in that block while keeping the prelude and coda frozen; older experiments used LoRA. The executor’s prompt context stays fixed across loops; the frozen coda reads each loop's state for supervision and evaluation. The next loop consumes the recurrent hidden state, rather than the coda output or a decoded answer. See [architecture](docs/architecture.md).
 
-## Current result and next command
+## Current result and diagnostics
 
 The [seed-61 executor audit](docs/experiments/stage1_executor_seed61.md) finds strong
-execution through 64 loops after training through 12, on a limited set of 26-state
-graphs. Learned stopping still fails. The next diagnostic freezes the executor and
-checks count information, controller memory, and small controller-only fits:
+execution beyond trained depth on a limited set of 26-state graphs. The
+[controller diagnostic](docs/experiments/controller_seed61_diagnostic.md) isolates
+poor stopping despite accessible initial count information and successful tiny fits.
+The next run trains only the controller, keeping the successful executor fixed:
 
 ```bash
 git pull --ff-only
-bash diagnose_controller.sh
+bash train_controller.sh && bash eval_controller.sh
 ```
 
-Run on the CUDA desktop with the complete `executor_r-seed61` checkpoint and data.
-Results go to `eval/pointer_diagnostics/controller-*`; metrics also upload to W&B
-project `loopformer`. See [what it measures and which artifacts to push](docs/diagnostics_and_performance.md#controller-diagnostic--current-desktop-command).
+Run on the CUDA desktop with the existing seed-61 data and complete executor
+checkpoint. Training writes `models/stage1_pointer/controller-seed61/`; evaluation
+writes `eval/pointer_diagnostics/controller-eval-*`. Both support W&B `loopformer`.
+See [configuration, artifacts and optional smoke test](docs/training_pointer.md#separate-controller-training--current-desktop-run).
 
 Start with the [research plan](docs/project_plan.md), [current status](docs/status.md),
 and [documentation index](docs/README.md). Historical experiments remain in the

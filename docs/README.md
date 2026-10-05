@@ -42,3 +42,9 @@ The [depth-12 checkpoint progression](experiments/stage1_depth12_progression.md)
 The [depth-12 paired-count probe](experiments/stage1_depth12_paired_counts.md) demonstrates late execution sensitivity to requested count on identical mappings, alongside persistent later-loop failure.
 
 The [end-to-end reassessment](experiments/pipeline_reassessment.md) separates established implementation evidence from missing architecture, objective, data and optimization controls. The user subsequently authorized its [implementation checklist](pipeline_upgrade.md); the report retains the pre-change evidence.
+
+
+The [frozen-controller diagnostic](experiments/controller_seed61_diagnostic.md)
+finds accessible initial count information, poor later count decoding, and perfect
+tiny-set fitting with limited held-out timing generalization. It motivates a
+separate controller-training phase with the successful executor frozen.

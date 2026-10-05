@@ -22,12 +22,20 @@ still fails: 10.74% exact stops on validation and none on deep queries, which al
 stop at loop 3 or 4. This is strong executor development evidence, not end-to-end
 completion or independent confirmation.
 
-Retain step 2,250. The user selected the focused controller diagnosis with R frozen.
-The [one-command diagnostic](diagnostics_and_performance.md#controller-diagnostic--current-desktop-command)
-is implemented: `bash diagnose_controller.sh` on the desktop. It measures count
-access and memory, then compares continued/fresh tiny controller fits without
-changing R. Pretrained diagnostic results remain unrun; expanding the independent
-graph evaluation remains separate follow-up work.
+Retain step 2,250. The [controller diagnostic has completed](experiments/controller_seed61_diagnostic.md).
+Count is 99.48% decodable from the prompt feature and 95.57% from initialized
+memory on held-out graphs, falling to chance by loop 12 in the original controller.
+Both continued and fresh controller-only tiny fits achieve 72/72 exact fit stops;
+held-out trained-count accuracy improves to 66.67% and 62.50%, but extrapolation
+remains weak. The user approved a separate controller-training phase on more independent
+training graphs with R frozen and the same trained counts. The
+[training and evaluation launchers](training_pointer.md#separate-controller-training--current-desktop-run)
+are now implemented: `bash train_controller.sh && bash eval_controller.sh`.
+The new pretrained run has not been launched locally. Selection uses trained-count
+development exact stopping, then BCE; the exported best checkpoint preserves all
+non-controller tensors and loads through the existing evaluators.
+The audit checked all exported stopping decisions, probe confusion counts and
+source hashes; the raw vectors and weights remain on the desktop.
 The reserved test split and seed 29 remain untouched. No pretrained inference was
 rerun on the Mac; this review audited saved artifacts and reproduced dataset bytes.
 The full run took 127.9 minutes and peaked at 4.43 GiB allocated CUDA memory.
@@ -40,6 +48,12 @@ missing-stop semantics, replay equivalence, hook cleanup, graph-disjoint probe
 selection, tiny-fit gradients, extraction/cache-reuse CLI and launcher failures.
 Local file/heading links and shell syntax passed. No pretrained controller
 features or fits have run on this Mac.
+
+Controller-training validation: 30 focused training/diagnostic/executor tests passed.
+After final launcher and telemetry changes, all nine controller-training tests
+passed, including frozen-tensor preservation, cache reuse, portable checkpoint
+reload, native learned-stop evaluation, selection isolation and launcher failures.
+These use tiny local models; the new pretrained CUDA run remains unrun.
 
 The following sections retain historical evidence.
 

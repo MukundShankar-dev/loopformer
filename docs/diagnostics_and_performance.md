@@ -4,7 +4,9 @@
 
 The [seed-61 audit](experiments/stage1_executor_seed61.md) shows strong forced
 execution and unsuccessful stopping. The user authorized a bounded diagnosis
-with the executor frozen, before another production training run.
+with the executor frozen, before another production training run. That diagnostic
+has now [completed and been audited](experiments/controller_seed61_diagnostic.md).
+The command below reproduces it; another identical run is not the next recommendation.
 
 On the CUDA desktop, with the existing data and full checkpoint:
 
@@ -94,8 +96,8 @@ The output directory contains:
 
 Push the JSON/JSONL/CSV files and sibling log. `.pt` caches and weights are already
 Git-ignored; no large binary upload is needed for the initial review. No additional
-requirements are needed. CUDA runtime and pretrained outcomes remain unmeasured
-until the desktop run; local validation uses a tiny random Qwen model.
+requirements are needed. The desktop diagnostic completed in 88.87 seconds before upload; see the linked
+report for pretrained outcomes. Local implementation tests use a tiny random Qwen model.
 
 The extraction can be reused without loading Qwen or its checkpoint:
 

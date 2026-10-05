@@ -162,3 +162,17 @@ instruments, not model inputs; this does not authorize a parsed-count controller
 a new production model, a broader training sweep or confirmation evaluation.
 The [diagnostic guide](diagnostics_and_performance.md#controller-diagnostic--current-desktop-command)
 owns the configuration, artifact contract and limitations.
+
+
+## 2026-10-04 — Separate controller training after the diagnostic
+
+The user approved controller-only training after count-access and tiny-fit results.
+Keep the successful step-2,250 executor frozen; use cached features from 2,048
+training graphs paired across the same nine trained counts. Continue the original
+controller with its own optimizer, and select by trained-count development exact
+stopping, then stop BCE. Do not expand the training depth range in this first run.
+Export one complete best checkpoint by preserving every non-controller tensor,
+so the existing evaluators can test actual stopping. Reuse the diagnostic for
+memory probes after training; diagnostic head copies are never promoted implicitly.
+The [runbook](training_pointer.md#separate-controller-training--current-desktop-run)
+owns the exact bounded recipe and validation evidence.

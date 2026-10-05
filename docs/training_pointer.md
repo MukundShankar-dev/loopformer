@@ -2,6 +2,116 @@
 
 Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md), [loop-balanced ablation](experiments/stage1_loopbalanced.md), and [learned-completion ablation](experiments/stage1_learned_completion.md) have completed. The latter two did not improve the depth frontier. Dated commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
 
+## Separate controller training — current desktop run
+
+The [controller diagnostic](experiments/controller_seed61_diagnostic.md) found
+accessible initial count information and successful tiny-set learning, but weak
+held-out stopping. The user authorized broader controller-only training with the
+successful executor fixed. This is implemented; pretrained outcomes of this new
+run remain unmeasured.
+
+From the repository root on the CUDA desktop:
+
+```bash
+git pull --ff-only
+bash train_controller.sh
+bash eval_controller.sh
+```
+
+To run evaluation only if training succeeds, use
+`bash train_controller.sh && bash eval_controller.sh`.
+Existing seed-61 data and the complete `executor_r-seed61/step-002250` checkpoint
+are required. **No dataset regeneration or R training is needed.** The launcher
+activates `.venv` and uses [configs/controller_seed61.json](../configs/controller_seed61.json).
+Optional `bash train_controller.sh --dry-run` writes nothing and does not load the
+model; `--smoke-test` makes a separate ten-update run on two training and two
+validation graphs without replacing the full run.
+
+### Data and optimization
+
+- Sample 2,048 distinct source **training** graphs with seed 83, pair every graph
+  and start with requested counts **1–6, 8, 10, 12**: 18,432 training questions.
+- Use 128 source validation graphs at every count 1–16: 2,048 development questions.
+  This is still development selection, not fresh confirmation. Never open the
+  reserved test split. Validate no source train/validation table overlaps.
+- Continue the **original** step-2,250 controller, not either diagnostic tiny-fit
+  controller. Freeze R, prelude, bridge, coda, and symbolic heads.
+- Extract normal FP32/SDPA forwards in batches of 16; cache controller prompt
+  vectors, R observations, original logits and symbolic predictions. Check replay
+  against the live controller. Extraction executes the model separately for each
+  requested count; it does not assume that differently shaped prompts are bitwise
+  equivalent. Cache training through loop 12, validation through loop 16.
+- Train only the controller using cached prompt vectors and R observations.
+  Batch 256, 3,000 updates, shuffled passes through the paired dataset, seed 83.
+  AdamW, no weight decay, gradient norm clip 1, peak LR 0.0003, 100-update warmup,
+  cosine decay to 0.00003. This is a bounded recipe, not a claimed optimal LR.
+- Keep existing class-balanced per-example completion BCE: continue before N,
+  stop at N, no labels after N. Controller recurrence retains its full gradient
+  history. Neither numeric N/t/countdown nor oracle states become model inputs.
+
+The expensive frozen-model computation happens once. Cached context/observation
+arrays are moved to the selected training device for minibatch indexing; optimizer
+updates do not execute Qwen. The default cache is roughly a GB of local tensors;
+exact bytes and extraction time are recorded. No training-time or throughput
+promise is made before the desktop measurement.
+
+### Selection, artifacts and evaluation
+
+Evaluate the original controller at update zero, then every 100 updates and at
+completion. Select **highest exact-stop accuracy on trained-count validation
+queries**, breaking ties by lower stop BCE. Counts 7/9/11 and 13–16 are logged
+separately and cannot select the checkpoint. Probability threshold stays 0.5.
+Correct letters at the wrong loop, and missing stops at the safety cap, fail
+exact stopping and joint success. Training accuracy/loss describe the current
+minibatch; the terminal labels the last validation update explicitly.
+
+The run writes `models/stage1_pointer/controller-seed61/`:
+
+- `config.json`, `run.json`, `metrics.jsonl`, `summary.json`: configuration,
+  source/data/task hashes, replay checks, training/validation metrics and timing.
+- `train_panel.csv`, `validation_tasks.jsonl`: reproducible selection and exact
+  development queries; `validation_history.csv` reports metrics by count/cohort.
+- `baseline_decisions.csv`, `best_decisions.csv`, `best_selection.json`: original
+  and selected first-stop decisions, expected/predicted letters, exact timing,
+  correct-answer-at-exact-stop and selection step.
+- `features.pt`, `best_controller.pt`, `last_controller_state.pt`: ignored local
+  cache/head/optimizer files, not complete standalone models.
+- `best/` and `best_checkpoint.json`: one complete selected recurrent checkpoint.
+  Export replaces only `completion_head.*` in the original executor payload;
+  all other saved tensors are unchanged. The source checkpoint is never edited.
+  The existing naive, loop, and learned-stop evaluators load this format directly.
+
+The training launcher saves a sibling `controller-seed61-launch-*.log`, enables
+live W&B training/validation logging in project `loopformer`, and propagates
+failures. Set `WANDB_MODE=disabled` to opt out. Rich progress uses bounded redraws.
+A completed/partial output is never silently overwritten. Cached extraction can
+be reused for a **new optimizer run**, with the same source/data/panel identity:
+
+```bash
+python -m scripts.training.train_controller \
+  --config configs/controller_seed61.json \
+  --features-cache models/stage1_pointer/controller-seed61/features.pt \
+  --output models/stage1_pointer/controller-seed61-retry
+```
+
+This is not optimizer resume; the joint pointer trainer's `--resume` is not
+compatible with a controller-only export. Preserve any partial run for review.
+
+`bash eval_controller.sh` selects the new portable `best/` checkpoint. It runs
+actual native learned stopping on validation and depth-test data with cap 64,
+then the existing controller diagnostic (including its separate tiny-fit controls)
+to measure count/memory accessibility in the newly selected controller. Its
+`original` condition now refers to this newly trained controller. Those diagnostic
+fits cannot modify or replace the selected production checkpoint. The deep split
+still has only 32 independent graphs; do not relabel its 1,664 queries as independent
+graph trials. Evaluation outputs and its log live under
+`eval/pointer_diagnostics/controller-eval-*`, with retrospective W&B uploads.
+
+Push the tracked JSON/JSONL/CSV files and logs from both directories. Existing
+Git rules ignore tensor caches, optimizer state and model/tokenizer binaries.
+No new dependency or requirements change is needed.
+
+
 ## Depth 12 with held-out counts: current desktop run
 
 The [depth-12 config](../configs/stage1_pointer_depth12_gaps.json) implements the coverage experiment motivated by the [fixed-prompt investigation](experiments/stage1_fixed_prompt_review.md). Input remains the original Rules/Start/Steps prompt. R and H receive no external clock or decoded state. Fresh adapters train on 30,000 seed-47 examples with requested depths **1–6, 8, 10, 12**, balanced within one example across the nine counts. All intermediate targets remain supervised. Validation/test have 125 examples at each depth 1–12; depth_test has 125 at each depth 13–20. Requested counts **7, 9, 11 are absent from training prompts and checkpoint selection**. Their intermediate loop positions are trained inside longer tasks, so this is count interpolation, not recurrent-depth extrapolation. Seed 29 remains untouched.
@@ -403,7 +513,7 @@ Use the depth-by-loop heatmap and intermediate trajectories to assess the gate. 
 
 Run from the repository root with the [configured environment](setup.md):
 
-All current dataset code lives in `scripts/dataset/`. Preview before choosing to write a full dataset. The [root README](../README.md#pointer-dataset-preview-and-reproduce) provides the complete explicit seed-17 configuration and runtime requirements for reproducing the existing JSONL files byte for byte.
+All current dataset code lives in `scripts/dataset/`. Preview before choosing to write a full dataset. The [root README](../README.md#original-pointer-dataset-preview-and-reproduce) provides the complete explicit seed-17 configuration and runtime requirements for reproducing the existing JSONL files byte for byte.
 
 ```bash
 # Preview five examples, with Rich tables of per-loop targets; no dataset writes.
@@ -530,7 +640,7 @@ To verify your local desktop copy without generating data:
 python -m scripts.dataset --verify data/pointer/seed-17
 ```
 
-If the dataset is absent on a new machine, use the [README's complete seed-17 reproduction command](../README.md#pointer-dataset-preview-and-reproduce). Existing output directories are never overwritten. Seed 29 remains reserved; do not regenerate with a different seed merely to enable depth-16 evaluation.
+If the dataset is absent on a new machine, use the [README's complete seed-17 reproduction command](../README.md#original-pointer-dataset-preview-and-reproduce). Existing output directories are never overwritten. Seed 29 remains reserved; do not regenerate with a different seed merely to enable depth-16 evaluation.
 
 ### Preview, then train on the desktop
 
