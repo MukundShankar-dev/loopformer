@@ -9,9 +9,11 @@ It reuses the immutable training cache and existing trainer/export interfaces.
 `initial_loss_weight` defaults to zero for historical recipes; the new exploratory
 config sets it to 12. No new data generation is needed for either repair pilot.
 The initialization-only pilot has completed without fixing generalization. The
-current `bash repair_controller_prefix.sh` prepares broader frozen P features,
+completed `bash repair_controller_prefix.sh` prepares broader frozen P features,
 trains through 12 loops, and evaluates selected/final heads; see the protocol
 for held-out counts and selection restrictions.
+The current architecture pilot is `bash repair_controller_affine.sh`, using learned
+suffix initialization and scalar recurrence; it is not the historical GRU recipe.
 
 ## Audit the completed controller runs
 

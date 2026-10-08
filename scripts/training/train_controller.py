@@ -17,7 +17,7 @@ from scripts.eval.loop_metrics import write_csv
 from scripts.eval.pointer_task import sha256_file, synchronize
 from scripts.eval.tracking import add_tracking_arguments
 from scripts.recurrent_qwen.checkpoint import load_recurrent_checkpoint
-from scripts.recurrent_qwen.interfaces import RecurrentController
+from scripts.recurrent_qwen.interfaces import RecurrentController, controller_head
 from scripts.training.controller import ControllerConfig, evaluate_controller, export_checkpoint, learning_rate, selection_key, select_graphs
 from scripts.training.data import read_tasks
 from scripts.training.objective import completion_loss
@@ -94,7 +94,9 @@ def main() -> None:
         cache = torch.load(args.features_cache, map_location='cpu', weights_only=True)
         if cache.get('format') != 'controller-training-features-v1' or cache['identity'] != identity:
             raise ValueError('Cache source/data/selected tasks differ from this run')
-        head = RecurrentController(cache['width'], cache['controller_width'])
+        if cache.get('controller_kind', 'gru') != config.controller_kind:
+            raise ValueError('Cache controller architecture differs from config')
+        head = controller_head(cache['width'], cache['controller_width'], config.controller_kind)
         head.load_state_dict(cache['head'])
     else:
         model, tokenizer, loaded_spec = load_recurrent_checkpoint(source, device=config.device)
@@ -124,7 +126,7 @@ def main() -> None:
     for name, tasks, loops in [('train', train_tasks, training_loops),
                                ('validation', validation_tasks, config.evaluation_max_depth)]:
         f = features[name]
-        if (f['context'].shape != (len(tasks), cache['width']) or
+        if (f['context'].shape != (len(tasks), cache.get('context_width', cache['width'])) or
                 f['working'].shape != (len(tasks), loops, cache['width']) or
                 f['predictions'].shape != (len(tasks), loops)):
             raise ValueError(f'Invalid {name} feature shapes')
@@ -144,16 +146,27 @@ def main() -> None:
         'selection': 'maximize seen-count development exact stopping within training loop budget; tie-break BCE',
         'optimization_scope': 'controller_only', 'trained_depths': trained_depths,
         'training_loops': training_loops,
+        'controller_kind': config.controller_kind,
+        'initializer': cache.get('extraction', {}).get('initializer'),
         'trainable_parameters': sum(p.numel() for p in head.parameters()),
         'remaining_readout_parameters': head.intermediate + 1 if config.remaining_readout else 0,
-        'remaining_gradient_scope': ('controller_and_readout' if config.remaining_loss_weight or config.initial_loss_weight else 'detached_readout_only')
+        'remaining_gradient_scope': ('scalar_memory_only_fixed_measurement' if config.controller_kind == 'affine_suffix'
+                                    else 'controller_and_readout' if config.remaining_loss_weight or config.initial_loss_weight else 'detached_readout_only')
                                    if config.remaining_readout else None,
         'cached_tensor_bytes': sum(t.numel() * t.element_size() for group in features.values() for t in group.values())}
     (output / 'run.json').write_text(json.dumps(metadata, indent=2) + '\n')
     head = head.to(config.device).requires_grad_(True)
+    if head.kind == 'affine_suffix':
+        head.context.requires_grad_(False)  # Supervised closed-form initializer is already fitted.
+        metadata['sgd_trainable_parameters'] = sum(p.numel() for p in head.parameters() if p.requires_grad)
     optimizer_seed = config.seed if config.optimizer_seed is None else config.optimizer_seed
     torch.manual_seed(optimizer_seed)
     remaining_readout = torch.nn.Linear(head.intermediate, 1).to(config.device) if config.remaining_readout else None
+    if head.kind == 'affine_suffix':
+        with torch.no_grad():
+            remaining_readout.weight.fill_(1 / config.remaining_scale)
+            remaining_readout.bias.zero_()
+        remaining_readout.requires_grad_(False)  # Direct scalar-memory supervision; no learned measurement alias.
     if remaining_readout is not None:
         console.print(f'Remaining-work readout · weight {config.remaining_loss_weight:g} · fixed scale {config.remaining_scale:g}'
                       + (' · detached measurement control' if config.remaining_loss_weight == 0 else ' · trains controller memory'))
@@ -161,9 +174,12 @@ def main() -> None:
             console.print(f'Independent initialization loss · weight {config.initial_loss_weight:g} · no trajectory averaging')
     console.print(f'Frozen features ready · {sum(p.numel() for p in head.parameters()):,} controller parameters · starting optimizer')
     torch.manual_seed(optimizer_seed)
-    optimizer = torch.optim.AdamW(head.parameters(), lr=config.learning_rate, weight_decay=0.0)
+    groups = ([{'params': [head.cell.weight], 'lr_ratio': config.affine_gain_lr_ratio},
+               {'params': [head.cell.bias, *head.readout.parameters()], 'lr_ratio': 1.}]
+              if head.kind == 'affine_suffix' else head.parameters())
+    optimizer = torch.optim.AdamW(groups, lr=config.learning_rate, weight_decay=0.0)
     readout_optimizer = (torch.optim.AdamW(remaining_readout.parameters(), lr=config.learning_rate, weight_decay=0.0)
-                         if remaining_readout is not None else None)
+                         if remaining_readout is not None and head.kind != 'affine_suffix' else None)
     context = features['train']['context'].to(config.device)
     working = features['train']['working'].to(config.device)
     depths = torch.tensor([t.task_depth for t in train_tasks], device=config.device)
@@ -220,7 +236,7 @@ def main() -> None:
                 head.train()
                 lr = learning_rate(config, step)
                 for group in optimizer.param_groups:
-                    group['lr'] = lr
+                    group['lr'] = lr * group.get('lr_ratio', 1.)
                 optimizer.zero_grad(set_to_none=True)
                 logits, initial, memories = replay(head, context[idx], working[idx])
                 stop_loss = (completion_loss(logits, masks[idx])[0] if config.training_loops is None
@@ -229,9 +245,10 @@ def main() -> None:
                 initial_loss = None
                 loss = stop_loss
                 if remaining_readout is not None:
-                    readout_optimizer.zero_grad(set_to_none=True)
-                    for group in readout_optimizer.param_groups:
-                        group['lr'] = lr
+                    if readout_optimizer is not None:
+                        readout_optimizer.zero_grad(set_to_none=True)
+                        for group in readout_optimizer.param_groups:
+                            group['lr'] = lr
                     predicted = remaining_predictions(remaining_readout, initial, memories, config.remaining_scale,
                                                        detach=config.remaining_loss_weight == 0 and config.initial_loss_weight == 0)
                     if config.training_loops is not None:
@@ -258,6 +275,9 @@ def main() -> None:
                             **({'initial_loss': initial_loss.item()} if initial_loss is not None else {}),
                             'exact_stop': exact.float().mean().item()},
                         'learning_rate': lr, 'gradient_norm_before_clip': float(norm),
+                        **({'affine_gain': head.cell.weight.item(), 'affine_offset': head.cell.bias.item(),
+                            'stop_slope': head.readout.weight.item(), 'stop_intercept': head.readout.bias.item()}
+                           if head.kind == 'affine_suffix' else {}),
                         'training_elapsed_seconds': perf_counter() - training_began,
                         'cuda_peak_bytes': torch.cuda.max_memory_allocated() if config.device == 'cuda' else None})
                 if step % config.eval_every == 0 or step == config.steps:

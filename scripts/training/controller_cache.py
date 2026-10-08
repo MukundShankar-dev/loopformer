@@ -9,9 +9,33 @@ from scripts.training.data import collate, encode_tasks
 from scripts.training.objective import forward_symbols
 
 
+def fit_suffix_initializer(head, context: Tensor, counts: list[int]) -> dict:
+    """Fit a linear prompt reader using training labels only; no recurrent labels.
+
+    Exact suffix embeddings are independent of graph/start for this prompt
+    template. Fit their first graph's count variants and verify all repeats.
+    The learned weights, not targets or a parser, initialize native memory.
+    """
+    if head.kind != 'affine_suffix' or len(context) % len(counts) or context.shape[1] != head.context.in_features:
+        raise ValueError('Need an affine suffix head and aligned count variants')
+    rows = context.reshape(-1, len(counts), context.shape[1])
+    torch.testing.assert_close(rows, rows[:1].expand_as(rows), atol=0, rtol=0)
+    x = rows[0].double()
+    a = torch.cat((x, torch.ones(len(x), 1, dtype=x.dtype)), 1)
+    labels = torch.tensor(counts, dtype=x.dtype)
+    fit = torch.linalg.lstsq(a, labels, rcond=1e-8, driver='gelsd')
+    with torch.no_grad():
+        head.context.weight.copy_(fit.solution[:-1][None].to(head.context.weight))
+        head.context.bias.copy_(fit.solution[-1:].to(head.context.bias))
+    predicted = head.context(rows[0].to(head.context.weight)).detach().cpu().flatten()
+    return {'method': 'training-only linear least squares, rcond=1e-8', 'training_counts': counts,
+            'feature_rank': int(fit.rank), 'training_max_absolute_error': (predicted - labels.float()).abs().max().item(),
+            'graph_invariant_suffix_verified': True, 'updates': 'initializer frozen after supervised fit'}
+
+
 def prompt_features(model, tokenizer, token_ids: list[int], tasks: list, batch_size: int,
                     progress: Callable[[int], None] | None = None) -> Tensor:
-    """Cache [B,H] actual initialization inputs; no R/C execution or count parser."""
+    """Cache [B,H_context] native initialization inputs; no R/C or count parser."""
     if not tasks or batch_size < 1 or model.router is None:
         raise ValueError('Need tasks, positive batch size and an isolated executor')
     model.eval().requires_grad_(False)

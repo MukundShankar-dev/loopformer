@@ -1,8 +1,11 @@
 """Evaluate one controller repair against immutable cached development observations."""
 import argparse
+import csv
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import subprocess
+import sys
 
 import torch
 from rich.console import Console
@@ -11,7 +14,7 @@ from rich.table import Table
 from scripts.eval.loop_metrics import write_csv
 from scripts.eval.pointer_task import load_examples, sha256_file
 from scripts.eval.tracking import add_tracking_arguments, report_saved_run
-from scripts.recurrent_qwen.interfaces import RecurrentController
+from scripts.recurrent_qwen.interfaces import controller_head
 from scripts.training.controller import ControllerConfig, evaluate_controller
 from scripts.training.data import read_tasks
 
@@ -21,6 +24,7 @@ def main() -> None:
     parser.add_argument('--run', type=Path, required=True)
     parser.add_argument('--deep-features-cache', type=Path, required=True)
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--native-check', action='store_true', help='Verify best export on fixed short/held-out/long panels')
     add_tracking_arguments(parser)
     args = parser.parse_args()
     config = ControllerConfig(**json.loads((args.run / 'config.json').read_text()))
@@ -37,6 +41,8 @@ def main() -> None:
     cache = torch.load(cache_path, map_location='cpu', weights_only=True)
     deep = torch.load(args.deep_features_cache, map_location='cpu', weights_only=True)
     if (cache['format'] != 'controller-training-features-v1' or
+            cache.get('controller_kind', 'gru') != config.controller_kind or
+            deep['identity'].get('controller_kind', 'gru') != config.controller_kind or
             deep['identity']['source_sha256'] != cache['identity']['source_sha256'] or
             deep['identity']['source_config_sha256'] != cache['identity']['source_config_sha256'] or
             metadata['source_checkpoint_sha256'] != cache['identity']['source_sha256']):
@@ -61,8 +67,9 @@ def main() -> None:
     for name in ('Checkpoint', 'Split', 'Counts', 'Exact stop', 'Initial MAE'):
         table.add_column(name)
     results, rows = {}, []
+    best_decisions = {}
     for label in ('best', 'last'):
-        head = RecurrentController(cache['width'], cache['controller_width']).to(config.device)
+        head = controller_head(cache['width'], cache['controller_width'], config.controller_kind).to(config.device)
         readout = torch.nn.Linear(cache['controller_width'], 1).to(config.device)
         if label == 'best':
             head.load_state_dict(torch.load(args.run / 'best_controller.pt', weights_only=True, map_location=config.device))
@@ -80,6 +87,8 @@ def main() -> None:
                 remaining_readout=readout, remaining_scale=config.remaining_scale,
                 training_loops=config.training_loops)
             results[label][split] = metrics
+            if label == 'best':
+                best_decisions[split] = {r['example_id']: r for r in decisions}
             write_csv(output / f'{label}_{split}_decisions.csv', decisions)
             rows.extend({'checkpoint': label, 'split': split, 'cohort': cohort, **values}
                         for cohort, values in metrics.items())
@@ -88,7 +97,34 @@ def main() -> None:
                     m = metrics[cohort]
                     table.add_row(label, split, cohort, f'{m["exact_stop"]:.2%}', f'{m["remaining_initial_mae"]:.3f}')
     write_csv(output / 'metrics.csv', rows)
+    native_checks = []
+    if args.native_check:
+        for split, (tasks, features) in panels.items():
+            graph_ids = set(list(dict.fromkeys(t.mapping_sha256 for t in tasks))[:4])
+            counts = ({1, 6, 9, 12, 16} if split == 'validation' else {13, 17, 29, 41, 53, 64})
+            selected = [t for t in tasks if t.mapping_sha256 in graph_ids and t.task_depth in counts]
+            if not selected:
+                raise ValueError('Native check panel is empty')
+            task_path = output / f'{split}_native_tasks.jsonl'
+            task_path.write_text(''.join(json.dumps(t.to_dict()) + '\n' for t in selected))
+            native_output = output / f'{split}_native'
+            subprocess.run([sys.executable, '-u', '-m', 'scripts.eval.loop_test', '--model', str(args.run / 'best'),
+                '--data', str(task_path), '--loops', str(features['working'].shape[1]), '--device', config.device,
+                '--attention', 'sdpa', '--stop-policy', 'completion', '--stop-threshold', '.5',
+                '--output', str(native_output), '--wandb-mode', 'disabled'], check=True)
+            actual = list(csv.DictReader((native_output / 'decisions.csv').open()))
+            if {r['example_id'] for r in actual} != {t.example_id for t in selected}:
+                raise ValueError('Native check coverage differs')
+            for r in actual:
+                expected = best_decisions[split][r['example_id']]
+                for field in ('prediction', 'executed_loops', 'exact_stop', 'joint_success'):
+                    if r[field] != str(expected[field]):
+                        raise ValueError(f'Native/cache mismatch at {r["example_id"]}: {field}')
+                if r['cap_fallback'] != str(expected['missing_stop']):
+                    raise ValueError('Native/cache missing-stop mismatch')
+            native_checks.append({'split': split, 'questions': len(selected), 'passed': True})
     result = {'status': 'complete', 'run': str(args.run), 'metrics': results, 'threshold': .5,
+              'native_checks': native_checks,
               'scope': 'cached development replay; no measured native latency or confirmation',
               'input_sha256': {str(p): sha256_file(p) for p in [cache_path, args.deep_features_cache,
                   args.run / 'best_controller.pt', args.run / 'best_remaining_readout.pt',

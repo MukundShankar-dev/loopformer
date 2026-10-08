@@ -7,7 +7,9 @@ Last updated: 2026-10-08.
 The user authorized [controller repair](controller_repair.md) on 2026-10-08.
 The [initialization-only intervention](experiments/controller_initialization_seed61.md)
 completed: 95.92% familiar exact stopping, still 0% at count nine and 1.80% deep.
-Next test broader count exposure with 12-loop training prefixes, keeping R frozen.
+The broader-count 12-loop GRU pilot also failed (60.65% short seen timing).
+A learned suffix initializer plus affine memory is now the selected pilot, with
+implementation tested but pretrained effectiveness still unverified. R stays frozen.
 Newly seen numeric values and unseen recurrent rollout lengths remain separate.
 Implementation and desktop effectiveness are pending validation; no repair is
 claimed. Exact timing through 64 and native/replay agreement are required before

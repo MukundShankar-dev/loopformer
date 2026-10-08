@@ -8,7 +8,7 @@ import torch
 from torch import Tensor
 
 from scripts.dataset.pointer import PointerExample, SYMBOLS, execute, render_prompt
-from scripts.recurrent_qwen.interfaces import RecurrentController
+from scripts.recurrent_qwen.interfaces import RecurrentController, controller_head
 from scripts.training.data import collate, encode_tasks
 from scripts.training.objective import forward_symbols
 
@@ -88,7 +88,7 @@ def extract_features(model, tokenizer, token_ids: list[int], tasks: list[Pointer
         head.cell.register_forward_hook(lambda module, inputs, output: save('memory', output)),
     ]
     # This copy has no capture hooks. Copies of nn.Module also copy hook registries.
-    replay_head = RecurrentController(model.config.hidden_size, head.intermediate).to(device)
+    replay_head = controller_head(model.config.hidden_size, head.intermediate, head.kind).to(device)
     replay_head.load_state_dict(head.state_dict())
     replay_head.eval().requires_grad_(False)
     chunks: dict[str, list[Tensor]] = {}

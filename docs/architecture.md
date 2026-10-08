@@ -358,3 +358,18 @@ is continue; no terminal is invented at T. Numeric supervision covers t=0..min(N
 Requests seen only through a short prefix are distinct from supervised terminal
 loop lengths. Selection excludes larger and held-out requests. The architecture
 and portable export remain unchanged; empirical success is unverified.
+
+## Learned affine suffix controller — 2026-10-08
+
+The [repair protocol](controller_repair.md#suffix-initializer-and-learned-affine-memory)
+specifies the new optional controller. Frozen final-eight embeddings `[B,8H]`
+feed a supervised learned linear initializer `[B,1]`; a shared affine cell evolves
+this unbounded memory once per R transition. Identity initialization contains no
+programmed decrement. Numeric N−t labels train free-running memory through the
+12-loop prefix; stop BCE trains a separate affine readout on detached memory.
+Initializer fitting uses only training counts, then freezes those weights. No
+numeric label, parsed count, loop index or decoded state is a forward input.
+R/C/P pointer computation and re-entry remain unchanged. This is a task-specific
+counting bias, not a generic adaptive controller. Checkpoints explicitly set
+`executor.controller_kind=affine_suffix` and memory width one; exports replace
+only controller tensors, and the common loader/scorer remain the inference path.

@@ -68,6 +68,7 @@ class ReentryBridge(nn.Module):
 
 class RecurrentController(nn.Module):
     """Own learned memory; detached prompt/executor features, no numeric clock."""
+    kind = 'gru'
     def __init__(self, width: int, intermediate: int = 128) -> None:
         super().__init__()
         self.intermediate = intermediate
@@ -82,3 +83,44 @@ class RecurrentController(nn.Module):
     def advance(self, state: Tensor, memory: Tensor) -> tuple[Tensor, Tensor]:
         memory = self.cell(self.observation(state.detach()), memory)
         return self.readout(memory).squeeze(-1), memory
+
+
+class AffineSuffixController(RecurrentController):
+    """Learned prompt reading and unbounded scalar recurrence; no parsed clock.
+
+    Initialization consumes flattened final-eight frozen token embeddings.
+    The trainable cell implements a*m+b, initialized to identity (b=0), never
+    a programmed decrement. Numerical labels train the cell through free-running
+    recurrence; stop BCE trains its readout without distorting counting dynamics.
+    Executor observations are intentionally ignored for this requested-count
+    controller: timing is independent of the pointer's identity or correctness.
+    """
+    kind = 'affine_suffix'
+    suffix_tokens = 8
+
+    def __init__(self, width: int) -> None:
+        nn.Module.__init__(self)
+        self.width = width
+        self.intermediate = 1
+        self.context = nn.Linear(width * self.suffix_tokens, 1)
+        self.observation = nn.Identity()
+        self.cell = nn.Linear(1, 1)
+        self.readout = nn.Linear(1, 1)
+        nn.init.ones_(self.cell.weight)
+        nn.init.zeros_(self.cell.bias)
+        nn.init.zeros_(self.readout.weight)
+        nn.init.zeros_(self.readout.bias)
+
+    def advance(self, state: Tensor, memory: Tensor) -> tuple[Tensor, Tensor]:
+        self.observation(state.detach())  # Preserve observation hooks for cache/native checks.
+        memory = self.cell(memory)
+        return self.readout(memory.detach()).squeeze(-1), memory
+
+
+def controller_head(width: int, intermediate: int, kind: str = 'gru') -> RecurrentController:
+    """Explicit architecture factory; historical checkpoints default to GRU."""
+    if kind == 'gru':
+        return RecurrentController(width, intermediate)
+    if kind == 'affine_suffix' and intermediate == 1:
+        return AffineSuffixController(width)
+    raise ValueError('Unknown controller kind or incompatible memory width')

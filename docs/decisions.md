@@ -236,3 +236,16 @@ This is a declared repair pilot changing graph sample size, coverage and budget;
 it cannot isolate a single cause of improvement. Preserve short-request-only
 selection and report seen values versus unseen rollout lengths and held-out
 values. The [protocol](controller_repair.md) owns the exact settings and limits.
+
+## 2026-10-08 — Learned affine controller after the summary bottleneck probe
+
+Broad counts with short prefixes still leave large initial errors. Standardized
+summary-feature numerical probes do not resolve them, while a training-only linear
+suffix-embedding probe recovers held-out numeric values to precision. Select a
+narrow counting inductive bias: learned suffix reading, unbounded scalar affine
+recurrence, and independent learned stop readout. No decrement is hard-coded;
+free-running intermediate labels train the transition. Stop gradients cannot
+modify that numerical transition. This changes input access and controller class,
+so a gain would not isolate a unique cause of the GRU failure. Keep the executor
+frozen, held-out counts out of selection and confirmation closed. The
+[protocol](controller_repair.md) owns scope and required validation.

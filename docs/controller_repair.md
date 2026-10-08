@@ -109,3 +109,62 @@ heads on the immutable development caches. Output paths refuse overwrite. Frozen
 prompt extraction executes P only, instead of all 64 executor loops per request.
 Model export remains the existing format, with every non-controller tensor intact.
 Implementation tests and actual desktop effectiveness must be recorded separately.
+
+## Suffix initializer and learned affine memory
+
+The broader GRU pilot completed in 144.38 seconds but still failed: selected
+step 5,800 had 60.65% short seen-count stopping; deep stopping was 8.18% for seen
+values and 5.63% for unseen values. Short initialization MAE was 1.743. A frozen
+summary-feature ridge probe still made about 1.5-step validation errors. Merely
+standardizing that summary did not resolve the initialization bottleneck.
+
+A no-update probe instead fitted numeric values from the last eight frozen token
+embeddings. It recovered all 1–64 values, including held-out 9/17/29/41/53/64,
+to double precision. For this raw prompt template those suffix tokens contain
+Steps and Answer, independent of graph/start. This identifies an available
+compositional input route; it does not establish any controller result.
+
+The next explicit architectural pilot (`controller_kind: affine_suffix`) has:
+
+- A linear initializer on flattened final-eight token embeddings. Supervised
+  least squares fits its weights on the same training requests only; the learned
+  weights are frozen afterwards. No number parser, integer lookup or gold count
+  executes at inference.
+- An unbounded one-dimensional learned memory. Each executor transition invokes
+  the shared trainable affine cell `m_next = a*m + b`. It starts at identity
+  (a=1, b=0), without a decrement. Free-running N−t supervision trains a and b;
+  targets are never fed into the cell. Numeric measurement is memory itself,
+  implemented through a fixed identity readout for existing metric interfaces.
+- A learned affine stop readout with ordinary sigmoid/0.5 first crossing. BCE
+  trains this readout on detached memory, so it cannot distort numerical dynamics.
+  It intentionally ignores R's symbol/state for timing: this controller counts
+  requested transitions and does not judge whether execution needs repair.
+
+This is a strong counting inductive bias, distinct from a generic GRU controller
+or adaptive confidence-based stopping. It changes both initialization access and
+memory dynamics; success cannot establish which change alone was necessary. The
+raw public prompt, R, P/C execution, bridge and intermediate pointer targets stay
+unchanged. Only the controller branch uses the suffix embeddings rather than P's
+single answer-position summary. No new prompt appears between loops.
+
+Training reuses the 12-loop prefixes and broader counts above. After initializer
+fitting, AdamW trains four scalar recurrence/stop parameters for 3,000 updates.
+Base LR is .01 with the same warmup/decay; the gain parameter's LR is .0001
+(1/100 of the base) because gain errors grow with memory magnitude. Initialization
+is analytically supervised, not described as SGD or ordinary full-model SFT.
+Every learned parameter and its fit method is recorded. Stop threshold and
+short-seen-count selection remain fixed; no held-out value selects a checkpoint.
+
+```bash
+bash repair_controller_affine.sh --dry-run
+bash repair_controller_affine.sh
+```
+
+New caches and the complete portable model are under
+`models/stage1_pointer/controller-affine*`; selected/final development evaluation
+uses the existing replay and exact-stop metrics. Loader/export preserve every
+non-controller tensor and explicitly save the controller kind. Historical GRU
+checkpoints remain compatible. Native inference and three-seed results remain
+required before claiming repair. The suffix length and training coverage restrict
+claims to the declared numeric/template scope; arbitrary integers or alternate
+prompt wording are not established.

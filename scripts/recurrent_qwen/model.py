@@ -13,7 +13,7 @@ from .completion import CompletionHead
 from .memory import PromptMemory
 from .prefix import fixed_prefix_layer
 from torch.utils.checkpoint import checkpoint
-from .interfaces import PromptRouter, ReentryBridge, RecurrentController
+from .interfaces import PromptRouter, ReentryBridge, RecurrentController, AffineSuffixController, controller_head
 
 
 def _answer_readout(hidden: Tensor, positions: list[int]) -> Tensor:
@@ -121,7 +121,8 @@ class RecurrentQwen(nn.Module):
     def configure_executor(self, tokenizer: Any, *, train_scope: str = "recurrent",
                            bridge: bool = True, direct_readout: bool = True,
                            controller_size: int = 128, isolated: bool = True,
-                           prefix_reuse: bool = False, gradient_checkpointing: bool = False) -> None:
+                           prefix_reuse: bool = False, gradient_checkpointing: bool = False,
+                           controller_kind: str = 'gru') -> None:
         """Opt-in architecture; legacy forwards/checkpoints keep their semantics."""
         if train_scope not in ("lora", "recurrent", "full"):
             raise ValueError("train_scope must be lora, recurrent, or full")
@@ -140,7 +141,7 @@ class RecurrentQwen(nn.Module):
         if isolated:
             self.router = PromptRouter(tokenizer)
             if controller_size:
-                self.completion_head = RecurrentController(self.config.hidden_size, controller_size).to(device=device, dtype=dtype)
+                self.completion_head = controller_head(self.config.hidden_size, controller_size, controller_kind).to(device=device, dtype=dtype)
         if bridge:
             self.bridge = ReentryBridge(self.config.hidden_size).to(device=device, dtype=dtype)
         if direct_readout:
@@ -153,16 +154,25 @@ class RecurrentQwen(nn.Module):
 
     def controller_prompt_state(self, input_ids: Tensor, attention_mask: Tensor,
                                 answer_positions: Tensor | None = None) -> Tensor:
-        """Frozen full-prompt P features [B,H], identical to controller initialization.
+        """Frozen native initializer features [B,H_context], without R/C execution.
 
         This interface runs neither R nor C and consumes only token IDs/mask.
-        It never parses numeric values. Used to cache broader controller prompts.
+        GRU uses full-prompt P's answer position; affine_suffix uses the final
+        eight frozen token embeddings. Neither branch parses numeric values.
         """
         if input_ids.ndim != 2 or attention_mask.shape != input_ids.shape or not attention_mask.any(-1).all():
             raise ValueError('Need aligned nonempty [B,S] prompt IDs and mask')
         if answer_positions is None:
             answer_positions = (attention_mask.long() * torch.arange(1, input_ids.shape[1] + 1,
                                 device=input_ids.device)).argmax(-1)
+        if isinstance(self.completion_head, AffineSuffixController):
+            k = self.completion_head.suffix_tokens
+            if (answer_positions < k - 1).any():
+                raise ValueError('Affine suffix initialization requires eight final prompt tokens')
+            with torch.no_grad():
+                embeddings = self.embed_tokens(input_ids)
+                return torch.stack([embeddings[i, end - k + 1:end + 1].flatten()
+                                    for i, end in enumerate(answer_positions.tolist())])
         with torch.no_grad():
             context = self.embed_tokens(input_ids)
             positions = torch.arange(input_ids.shape[1], device=input_ids.device).unsqueeze(0)

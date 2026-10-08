@@ -14,6 +14,7 @@ from scripts.eval.controller_learning import aggregate_stops, stop_rows
 from scripts.eval.executor_diagnostic import matched_tasks
 from scripts.training.objective import completion_loss
 from scripts.training.controller_remaining import remaining_predictions, remaining_metrics, remaining_trace_rows
+from scripts.recurrent_qwen.interfaces import controller_head
 
 
 @dataclass(frozen=True)
@@ -40,6 +41,8 @@ class ControllerConfig:
     initial_loss_weight: float = 0.0
     requested_counts: list[int] | None = None
     training_loops: int | None = None
+    controller_kind: str = 'gru'
+    affine_gain_lr_ratio: float = .01
 
     def validate(self) -> None:
         for key in ('train_graphs', 'validation_graphs', 'extraction_batch_size', 'batch_size',
@@ -72,6 +75,12 @@ class ControllerConfig:
             raise ValueError('Training loops must be an integer in 1..64')
         if self.training_loops is not None and not self.remaining_readout:
             raise ValueError('Prefix supervision requires a numerical remaining-work readout')
+        if self.controller_kind not in ('gru', 'affine_suffix'):
+            raise ValueError('Unknown controller kind')
+        if self.controller_kind == 'affine_suffix' and (not self.training_loops or not self.remaining_loss_weight):
+            raise ValueError('Affine controller requires numerical prefix supervision')
+        if not math.isfinite(self.affine_gain_lr_ratio) or not 0 < self.affine_gain_lr_ratio <= 1:
+            raise ValueError('Affine gain learning-rate ratio must be in (0,1]')
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -149,11 +158,20 @@ def export_checkpoint(source: Path, destination: Path, head, provenance: dict) -
     weights = torch.load(source / 'adapter_model.pt', map_location='cpu', weights_only=True)
     new = {f'completion_head.{name}': value.detach().cpu().clone() for name, value in head.state_dict().items()}
     expected = {name for name in weights if name.startswith('completion_head.')}
+    if head.kind == 'affine_suffix':
+        template = controller_head(head.width, 1, head.kind).state_dict()
+        expected = {f'completion_head.{k}' for k in template}
+        spec = {**spec, 'executor': {**spec['executor'], 'controller_kind': head.kind, 'controller_size': 1},
+                'completion_head': {'intermediate': 1}}
+        shapes = {f'completion_head.{k}': v.shape for k, v in template.items()}
+    else:
+        shapes = {k: weights[k].shape for k in expected}
     if set(new) != expected:
         raise ValueError('Controller tensor names differ from source checkpoint')
     for name, value in new.items():
-        if value.shape != weights[name].shape or not torch.isfinite(value).all():
+        if value.shape != shapes[name] or not torch.isfinite(value).all():
             raise ValueError(f'Invalid controller tensor {name}')
+    weights = {name: value for name, value in weights.items() if not name.startswith('completion_head.')}
     weights.update(new)
     destination.mkdir(parents=True, exist_ok=False)
     for path in source.iterdir():

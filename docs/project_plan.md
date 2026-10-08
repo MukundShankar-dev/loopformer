@@ -21,6 +21,10 @@ and preserve prompt-only learned stopping. Start with separately weighted
 initialization supervision; broader requested-count exposure may follow a failed
 controlled result, with seen counts and unseen rollout lengths reported distinctly.
 The [repair protocol](controller_repair.md) declares development acceptance criteria.
+After two failed GRU pilots and a numerical input probe, an explicit learned
+suffix/affine controller is selected: no parsed clock or programmed decrement.
+This is a task-specific counting bias and is reported separately from generic
+GRU or adaptive-confidence control.
 Numeric targets remain labels only: no external clock, gold state re-entry or
 programmed decrement. Reserved confirmation splits and later research stages
 remain closed. This supersedes the earlier bounded-comparison-only scope.

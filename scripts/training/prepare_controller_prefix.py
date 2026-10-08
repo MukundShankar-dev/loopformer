@@ -10,7 +10,8 @@ from scripts.eval.controller_diagnostic import progress_bar
 from scripts.eval.pointer_task import sha256_file
 from scripts.recurrent_qwen.checkpoint import load_recurrent_checkpoint
 from scripts.training.controller import ControllerConfig, select_graphs
-from scripts.training.controller_cache import prompt_features, pair_prefixes, check_native_prefix
+from scripts.training.controller_cache import prompt_features, pair_prefixes, check_native_prefix, fit_suffix_initializer
+from scripts.recurrent_qwen.interfaces import controller_head
 from scripts.training.data import read_tasks
 
 
@@ -20,6 +21,8 @@ def main() -> None:
     parser.add_argument('--features-cache', type=Path, default=Path('models/stage1_pointer/controller-seed61/features.pt'))
     parser.add_argument('--output', type=Path, default=Path('models/stage1_pointer/controller-prefix-features.pt'))
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--deep-features-cache', type=Path,
+                        help='For affine suffix controllers, reuse R and replace only deep prompt features')
     args = parser.parse_args()
     config = ControllerConfig(**json.loads(args.config.read_text())); config.validate()
     if not config.requested_counts or not config.training_loops:
@@ -55,11 +58,24 @@ def main() -> None:
     del cache['features']['train'], raw_train
     model, tokenizer, loaded_spec = load_recurrent_checkpoint(source, device=config.device)
     model.config._attn_implementation = 'sdpa'; model.eval().requires_grad_(False)
+    if config.controller_kind == 'affine_suffix':
+        model.completion_head = controller_head(cache['width'], 1, config.controller_kind).to(config.device)
     with progress_bar() as progress:
         bar = progress.add_task('Cache frozen full-prompt P features', total=len(tasks))
         context = prompt_features(model, tokenizer, loaded_spec['token_ids'], tasks, config.extraction_batch_size,
                                   progress=lambda done: progress.update(bar, completed=done))
     train_features['context'] = context
+    initialization = None
+    if config.controller_kind == 'affine_suffix':
+        # Fitting is on training prompts only. No held-out count or graph enters it.
+        initialization = fit_suffix_initializer(model.completion_head, context, config.requested_counts)
+        validation_context = prompt_features(model, tokenizer, loaded_spec['token_ids'], validation, config.extraction_batch_size)
+        cache['features']['validation']['context'] = validation_context
+        with torch.no_grad():
+            # Zero-initialized stop readout; preserve actual fresh-head baseline.
+            cache['features']['validation']['logits'] = torch.zeros(len(validation), config.evaluation_max_depth)
+        cache.update(controller_kind=config.controller_kind, controller_width=1,
+                     context_width=context.shape[1], head={k: v.detach().cpu() for k, v in model.completion_head.state_dict().items()})
     # Independent of outcomes: first graph, extrema and a central requested count.
     chosen = [g * len(config.requested_counts) + i for g in range(min(4, config.train_graphs))
               for i in sorted({0, len(config.requested_counts) // 2, len(config.requested_counts) - 1})]
@@ -73,12 +89,28 @@ def main() -> None:
               'extraction': {**cache['extraction'], 'prefix_cache_source': str(args.features_cache),
                   'prefix_cache_sha256': original_hash, 'requested_counts': config.requested_counts,
                   'training_loops': config.training_loops, 'native_prefix_max_error': error,
-                  'native_validation_max_error': val_error}}
+                  'native_validation_max_error': val_error, 'controller_kind': config.controller_kind,
+                  'initializer': initialization}}
     if sha256_file(source / 'adapter_model.pt') != identity['source_sha256'] or sha256_file(args.features_cache) != original_hash:
         raise RuntimeError('Frozen source/cache changed')
     args.output.parent.mkdir(parents=True, exist_ok=True)
     torch.save(result, args.output)
     args.output.with_suffix('.json').write_text(json.dumps({k: v for k, v in result.items() if k not in ('head', 'features')}, indent=2) + '\n')
+    if config.controller_kind == 'affine_suffix' and args.deep_features_cache:
+        deep = torch.load(args.deep_features_cache, map_location='cpu', weights_only=True)
+        deep_tasks = read_tasks(data / 'depth_test.jsonl', 'depth_test')
+        if (deep['identity']['source_sha256'] != identity['source_sha256'] or
+                deep['identity']['source_config_sha256'] != identity['source_config_sha256'] or
+                deep['identity']['data_sha256'] != sha256_file(data / 'depth_test.jsonl') or
+                deep['identity']['ids'] != [t.example_id for t in deep_tasks]):
+            raise ValueError('Deep source/data cache differs')
+        deep['features']['context'] = prompt_features(model, tokenizer, loaded_spec['token_ids'], deep_tasks,
+                                                     config.extraction_batch_size)
+        deep['identity'].update(controller_kind=config.controller_kind, context_format='suffix8_embeddings')
+        deep_output = args.output.with_name(args.output.stem + '-deep.pt')
+        if deep_output.exists():
+            raise ValueError('Deep output exists')
+        torch.save(deep, deep_output)
     console.print(f'[green]Cache validated[/green] · native R error {error:g} · {args.output}')
 
 
