@@ -383,3 +383,11 @@ and stop slope/intercept. No loop counter is supplied to the cell, but remaining
 labels provide explicit counting supervision. This route ignores R observations;
 its only runtime inputs after initialization are its own memory and the invocation
 once per executor loop. It is a timer rather than a learned correctness evaluator.
+
+
+The [frozen benchmark](pointer_benchmark.md) now evaluates this architecture without
+training. Count-free executor trajectories may be reused across requested counts
+only for the isolated executor with an affine controller that ignores R input.
+The benchmark verifies suffix input invariance across seed/mode representatives
+and checks a declared native stopped panel before accepting reused quality scores.
+This optimization is not an adaptive latency measurement.

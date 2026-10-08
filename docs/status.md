@@ -4,6 +4,13 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
+The user has now authorized the [frozen pointer benchmark](pointer_benchmark.md):
+open the seed-61 reserved test using the fixed seed-83 repaired checkpoint and
+threshold 0.5, then evaluate 1,350 independent graphs at every count 1–256.
+The protocol was committed before opening the test. Implementation and five
+focused tests pass; actual test/benchmark outcomes are pending. No training or
+outcome-based tuning is selected. Seed 29 and other research stages stay closed.
+
 The [controller repair](controller_repair.md) has passed its declared development
 criteria. After two failed GRU pilots, a learned suffix initializer and scalar
 affine memory reached **100% exact stopping at every count 1–64** across optimizer
@@ -23,10 +30,9 @@ The suffix format and finite range are the established scope. These repetitions
 share data and initializer, so they are optimization robustness checks, not
 independent confirmation or arbitrary-depth proof.
 
-The current bounded repair is complete; no identical rerun is needed. Before
-opening another phase, review whether this explicit counting bias meets the
-intended scientific question and predeclare any broader numeric/template or
-independent confirmation protocol. Reserved test data and seed 29 remain closed.
+The bounded repair is complete; no identical rerun is needed. The authorized
+frozen benchmark above supersedes its reserved-test restriction; seed 29 remains
+closed. The explicit counting bias and broader numeric scope are reported separately.
 No latency savings, terminal repair/damage, or cross-family result is claimed.
 
 Validation: 50 focused architecture, prefix, training, remaining-work and audit

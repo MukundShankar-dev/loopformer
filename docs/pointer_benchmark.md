@@ -52,7 +52,9 @@ trajectory-and-timing, and correct-letter/wrong-time coincidences. Missing stops
 remain failures even if safety-cap execution lands on the correct letter.
 Use graph-cluster bootstrap confidence intervals (2,000 repeats, seed 239) within
 balanced seed/mode strata; repeated horizons do not multiply the independent
-sample size. Report all counts and seeds without selecting a favorable range.
+sample size. Per-count rates also carry marginal graph-level Wilson intervals,
+which remain nondegenerate at zero/all successes; these are not simultaneous
+confidence bounds over all depths. Report all counts and seeds without selecting a favorable range.
 
 `configs/pointer_benchmark.json` declares descriptive acceptance thresholds:
 95% overall joint success/complete trajectory, 99% exact stopping, with at least
@@ -62,9 +64,33 @@ universal claim. Existing test and each numeric range are reported independently
 Broader research stage gates, terminal repair/damage and confidence-based adaptive
 allocation remain separate.
 
-## Implementation status
+## Commands and implementation
 
-Protocol is declared; implementation and execution are in progress. The final
-report will record commands, checkpoint/data/source hashes, test results, native
-fidelity, compute scope and negative results. Generated data belongs under `data/`;
-metrics belong under `eval/pointer_benchmark/`. No model weights are pushed.
+```bash
+bash benchmark_pointer.sh --dry-run
+bash benchmark_pointer.sh
+```
+
+The launcher records/verifies the freeze, runs the existing test unless its
+completed output already exists, then runs the independent benchmark. It refuses
+to proceed past an incomplete test or overwrite independent benchmark outputs.
+Use the complete checkpoint and old dataset on the CUDA desktop. All parameters
+have gradients disabled for benchmark extraction, with inference mode and disk
+hashes checked before/after. The existing native evaluator uses inference mode.
+W&B is disabled for this reserved benchmark; results remain local/repository
+artifacts. The benchmark is evaluative only and never fits an initializer/head.
+
+Model mechanics stay in `scripts/recurrent_qwen/`; graph generation/count variants
+are in `scripts/dataset/benchmark.py`, scoring/bootstrap in
+`scripts/eval/benchmark_metrics.py`, and composing CLI in
+`scripts/eval/frozen_pointer_benchmark.py`. Native evaluation still uses `loop_test`.
+All 345,600 decision rows are compressed into `decisions.csv.gz`; per-graph
+predictions, per-count/stratum/loop rates, controller counts and native traces are
+saved as CSV. The graph JSONL remains under `data/pointer/benchmark-seeds211-223-227/`;
+its hashes, seeds, exclusions and orbit metadata are in the tracked output manifest.
+
+Six focused tests cover, including seeded generation and overlap rejection,
+cyclic wrong-time letters, missing-cap failures, recovery without a perfect
+trajectory, clustered horizons, unchanged exported weights, and a tiny end-to-end
+native/reuse check with deliberately failed stopping. The actual pretrained run
+is in progress; success and performance remain unmeasured until its report.

@@ -1,0 +1,115 @@
+"""Frozen confirmation contracts: disjoint sampling, exact timing and native fidelity."""
+from dataclasses import replace
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+import numpy as np
+import pytest
+import torch
+
+from test_executor_upgrade import setup
+from test_controller_training import source_checkpoint
+from scripts.dataset.benchmark import count_variant, independent_graphs
+from scripts.dataset.dataset import DatasetConfig, generate_dataset, write_dataset
+from scripts.dataset.pointer import execute, generate_unconditioned_example
+from scripts.eval.benchmark_metrics import clustered_summary, criteria_result, quality_arrays, wilson_interval
+from scripts.eval.frozen_pointer_benchmark import checkpoint_hashes
+from scripts.recurrent_qwen.interfaces import AffineSuffixController
+from scripts.training.controller import export_checkpoint
+
+
+def criteria():
+    return {'overall_joint_success': .95, 'overall_complete_trajectory': .95, 'overall_exact_stop': .99,
+            'minimum_depth_joint_success': .90, 'minimum_depth_complete_trajectory': .90, 'minimum_depth_exact_stop': .95}
+
+
+def test_sampling_replays_and_rejects_overlap_without_depth_conditioning():
+    config = {'seeds': [211,223], 'graph_modes': ['random_function','permutation','full_cycle'],
+              'graphs_per_seed_mode': 2, 'max_depth': 256}
+    first, meta = independent_graphs(config, set())
+    second, _ = independent_graphs(config, set())
+    assert first == second and len({t.mapping_sha256 for t in first}) == 12
+    shorter, _ = independent_graphs({**config, 'max_depth': 12}, set())
+    assert [(t.mapping,t.initial_state) for t in first] == [(t.mapping,t.initial_state) for t in shorter]
+    excluded = {first[0].mapping_sha256}
+    fresh, _ = independent_graphs(config, excluded)
+    assert not excluded & {t.mapping_sha256 for t in fresh}
+    assert count_variant(first[0], 99).mapping == first[0].mapping
+    assert all(meta[i]['cycle_period']==26 for i,t in enumerate(first) if meta[i]['graph_mode']=='full_cycle')
+
+
+def test_exact_stop_rejects_cyclic_coincidence_and_missing_cap():
+    task = generate_unconditioned_example(30, 3, 'benchmark', 0)
+    # Make a fixed-point reference; every letter is right, but timing still matters.
+    task = replace(task, initial_state='A', mapping=[[chr(65+i),'A'] for i in range(26)])
+    predicted = torch.zeros(1,4,dtype=torch.long)
+    arrays, rows = quality_arrays([task],predicted,[1,1,None],3)
+    assert arrays['nominal_final_correct'].all() and arrays['complete_trajectory'].all()
+    assert arrays['exact_stop'].tolist()==[[True,False,False]]
+    assert arrays['joint_success'].tolist()==[[True,False,False]]
+    assert arrays['correct_letter_wrong_time'].tolist()==[[False,True,True]]
+    assert arrays['missing_stop'][0,2] and not criteria_result(arrays,criteria())['passed']
+
+
+def test_prefix_error_is_not_hidden_by_recovery_and_conditional_denominators():
+    task = generate_unconditioned_example(31, 3, 'benchmark', 0)
+    targets = torch.tensor([[ord(s)-65 for s in execute(dict(task.mapping),task.initial_state,4)]])
+    targets[0,1]=(targets[0,1]+1)%26
+    arrays, rows = quality_arrays([task],targets,[1,2,3],3)
+    assert arrays['complete_trajectory'].tolist()==[[True,False,False]]
+    assert arrays['nominal_final_correct'][0,2] and not arrays['strict_success'][0,2]
+    assert rows[2]['correct_prefix_graphs']==0 and rows[2]['conditional_transition_accuracy'] is None
+
+
+def test_cluster_bootstrap_keeps_paired_horizons_together():
+    arrays={k:np.array([[True,True],[False,False]]) for k in ('nominal_final_correct','complete_trajectory',
+        'exact_stop','early_stop','late_stop','missing_stop','stopped_answer_correct','joint_success',
+        'strict_success','correct_letter_wrong_time')}
+    meta=[{'dataset_seed':211,'graph_mode':'random_function'}]*2
+    result=clustered_summary(arrays,meta,np.array([True,True]),repeats=100,seed=239)
+    assert result['graphs']==2 and result['queries']==4
+    assert result['metrics']['joint_success']['rate']==.5
+    # Resampling two graphs yields 0, .5, 1 rather than falsely four independent observations.
+    assert result['metrics']['joint_success']['graph_bootstrap_95']==[0.,1.]
+
+
+def test_frozen_benchmark_cli_native_agrees_on_failures_and_files_unchanged(setup):
+    model, tokenizer, tokens, path = source_checkpoint(setup)
+    head=AffineSuffixController(model.config.hidden_size)
+    with torch.no_grad():
+        head.context.weight.zero_();head.context.bias.zero_()
+        head.readout.weight.zero_();head.readout.bias.fill_(1)  # Always stops at one; deliberate failures.
+    export_checkpoint(path/'source',path/'affine',head,{'step':0})
+    dataset_config=DatasetConfig(seed=61,train_count=2,validation_count=2,test_count=2,
+        depth_test_count=2,max_train_depth=2,max_eval_depth=3)
+    old=generate_dataset(dataset_config,tokenizer,tokens)
+    write_dataset(path/'old',old,dataset_config,tokens,{})
+    config={'model':str(path/'affine'),'existing_data':str(path/'old'),'seeds':[211],
+        'graphs_per_seed_mode':1,'graph_modes':['random_function','full_cycle'],'max_depth':4,
+        'safety_cap':6,'threshold':.5,'batch_size':2,'native_counts':[1,4],
+        'native_graphs_per_seed_mode':1,'bootstrap_repeats':10,'bootstrap_seed':239,'criteria':criteria()}
+    config_path=path/'config.json';config_path.write_text(json.dumps(config))
+    before=checkpoint_hashes(path/'affine')
+    freeze=path/'freeze.json';freeze.write_text(json.dumps({'checkpoint':str(path/'affine'),
+        'inference_sha256':before,'threshold':.5,'safety_cap':6}))
+    args=[sys.executable,'-m','scripts.eval.frozen_pointer_benchmark','--config',str(config_path),
+        '--freeze',str(freeze),'--output',str(path/'result'),'--dataset-output',str(path/'benchmark'),
+        '--device','cpu','--wandb-mode','disabled']
+    result=subprocess.run(args,capture_output=True,text=True,env={**os.environ,'WANDB_MODE':'disabled'})
+    assert result.returncode==0,result.stdout+result.stderr
+    summary=json.loads((path/'result/summary.json').read_text())
+    assert summary['native_fidelity']=={'passed':True,'questions':4,'mismatches':[]}
+    assert not summary['acceptance']['passed'] and summary['inference_files_unchanged']
+    assert checkpoint_hashes(path/'affine')==before
+    repeat=subprocess.run(args,capture_output=True,text=True)
+    assert repeat.returncode!=0 and 'refuse overwrite' in repeat.stderr
+
+
+def test_per_count_boundary_interval_does_not_claim_certainty():
+    low, high = wilson_interval(128,128)
+    assert .97 < low < 1 and high == 1
+    low, high = wilson_interval(0,128)
+    assert low == 0 and 0 < high < .03

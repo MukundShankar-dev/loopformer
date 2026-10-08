@@ -519,3 +519,15 @@ For native learned stopping use `loop_test --stop-policy completion
 validate stop timing. Cached replay supports quality/fidelity checks, not measured
 adaptive inference speedups. Historical GRU-specific fitting/audit tools remain
 historical interfaces; use the candidate/native path for affine checkpoints.
+
+
+## Frozen reserved-test and larger benchmark
+
+The user authorized opening the existing reserved test and new independent pointer
+seeds after freezing the model. `bash benchmark_pointer.sh` composes the existing
+native evaluator and a count-invariant trajectory benchmark; `--dry-run` writes
+nothing. The [predeclared protocol](pointer_benchmark.md) owns sample sizes, seeds,
+checkpoint/threshold, numeric cohorts, native fidelity and graph-cluster confidence
+intervals. No tuning on these results is allowed within this run. The seed-29
+split and unrelated confirmation stages remain unopened. A larger range must
+pass every declared count rather than hiding failure behind a pooled mean.
