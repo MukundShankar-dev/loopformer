@@ -68,5 +68,7 @@ records the verified SSH and repository Git-authentication setup.
 
 The [initialization-only repair pilot](experiments/controller_initialization_seed61.md)
 improves familiar stopping slightly but leaves count nine and deep timing broken.
-The current [repair protocol](controller_repair.md) defines broader count exposure
-with short recurrent prefixes and separates its generalization claims.
+The [completed affine-controller repair](experiments/controller_affine_seed61.md)
+passes timing through 64 across three optimizer seeds, with bounded native checks.
+The [repair protocol](controller_repair.md) owns reproduction, scientific scope
+and the distinction between seen numeric values and unseen rollout lengths.

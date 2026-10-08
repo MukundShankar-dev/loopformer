@@ -249,3 +249,18 @@ modify that numerical transition. This changes input access and controller class
 so a gain would not isolate a unique cause of the GRU failure. Keep the executor
 frozen, held-out counts out of selection and confirmation closed. The
 [protocol](controller_repair.md) owns scope and required validation.
+
+
+## 2026-10-08 — Finite controller repair accepted, broader claims deferred
+
+The affine recipe passes the predeclared development thresholds in every optimizer
+seed 83/89/97: 100% timing at all counts 1–64 and 132/132 native/replay matches.
+All non-controller tensors remain unchanged. This settles the bounded timer
+repair, not the cause of every earlier GRU failure: input access, memory class,
+numeric exposure and optimization changed across pilots. The 7,169-parameter
+initializer is analytically fitted on training labels; only four scalars receive
+AdamW updates. This deliberately encodes a strong counting architecture and
+ignores executor correctness. Most deep requested values were seen, while
+recurrent supervision ended at 12. Review this scientific scope before a new
+phase; no additional run, reserved confirmation, broader prompt/numeric claim or
+terminal-dynamics claim is selected. See [the report](experiments/controller_affine_seed61.md).

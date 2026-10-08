@@ -9,10 +9,14 @@ when several changes are enabled together.
 
 The public input remains one raw `Rules / Start / Steps / Answer` prompt. An
 explicit, deterministic text router removes the Steps line from the executor's
-view. The controller sees the full prompt through the prelude, initializes its
+view. The original GRU controller sees the full prompt through the prelude, initializes its
 own learned recurrent memory, and updates once per executor transition. It never
 receives a numeric loop index, parsed requested count, reference state, or
-remaining-step feature. Its output cannot modify R, and its BCE gradients cannot
+remaining-step feature. The completed [controller repair](controller_repair.md)
+adds an explicit alternative: final-eight frozen token embeddings initialize a
+learned scalar affine memory. It ignores executor observations and receives no
+external clock; its counting bias and finite validation scope are reported there.
+Its output cannot modify R, and its BCE gradients cannot
 modify R or the prelude. This structural separation deliberately changes the
 architecture; merely moving a classifier outside R did not provide it before.
 

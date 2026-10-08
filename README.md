@@ -23,39 +23,17 @@ One recurrent block is reused across all loops. The current experiment trains al
 ## Current result and diagnostics
 
 The [seed-61 executor audit](docs/experiments/stage1_executor_seed61.md) finds strong
-execution beyond trained depth on a limited set of 26-state graphs. The
-[controller diagnostic](docs/experiments/controller_seed61_diagnostic.md) isolates
-poor stopping despite accessible initial count information and successful tiny fits.
-The [completed controller-only run](docs/experiments/controller_seed61_training.md)
-reaches 95.3% exact stopping on trained counts, but 45.8% on held-out counts
-7/9/11 and zero beyond count 13. R remains frozen; controller generalization is
-still unresolved.
+pointer execution beyond trained depth on a limited set of cyclic 26-state graphs.
+The [completed controller repair](docs/experiments/controller_affine_seed61.md)
+reaches 100% exact stopping through count 64 across three optimizer seeds, with
+98.73% joint answer-and-timing success on validation and 100% on the smaller deep
+panel. The controller learns a scalar countdown from prompt suffix embeddings;
+it does not judge executor correctness. Training includes numeric values through
+63 but only 12 recurrent loops. These are finite development results.
 
-The [matched remaining-work comparison](docs/experiments/controller_remaining_seed61.md)
-improves the controller's numerical readout but leaves stopping generalization
-essentially unchanged. Unfamiliar counts are already misestimated before looping;
-the [completed training audit](docs/experiments/controller_training_audit_seed61.md)
-finds modest graph train/validation gaps and mixed objective-gradient alignment.
-The cause of count generalization failure remains unresolved.
-
-The current [controller repair](docs/controller_repair.md) tests stronger,
-independent initialization supervision while keeping R frozen. The desktop
-launcher `bash repair_controller.sh` trains and evaluates this controlled change;
-`--dry-run` previews without writes. The first intervention did not repair count generalization; the guide records the
-next broader-count, short-prefix pilot.
-
-To reproduce the read-only training audit on the desktop, use the existing cached features
-and saved controller weights:
-
-```bash
-git pull --ff-only
-bash audit_controller.sh
-```
-
-This evaluates all six runs, compares training and validation errors, and measures
-loss gradients without updating weights or loading Qwen. Results and logs go to
-`eval/pointer_diagnostics/` and W&B. See the [audit guide](docs/diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
-for required artifacts, metrics and options.
+See [controller usage and reproduction](docs/controller_repair.md) for the completed
+recipe, data coverage, checkpoints and learned-stop evaluation commands. Weights
+and feature caches remain on the desktop; Git carries metrics and metadata.
 
 Start with the [research plan](docs/project_plan.md), [current status](docs/status.md),
 and [documentation index](docs/README.md). Historical experiments remain in the
@@ -160,7 +138,7 @@ for configuration, exact data reproduction and output locations.
 
 A compact Rich dashboard shows progress, ETA, losses and memory. W&B uses project
 `loopformer`. Checkpoints and logs go to `models/stage1_pointer/`; model binaries
-are excluded from Git. CUDA fit, speed and quality need the new desktop smoke/run.
+are excluded from Git. The completed desktop results and measured resource use are recorded in the linked reports.
 
 ## Inspect recurrent checkpoints
 

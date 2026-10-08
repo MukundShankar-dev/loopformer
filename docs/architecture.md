@@ -356,8 +356,8 @@ The [prefix pilot](controller_repair.md#broader-count-exposure-with-short-prefix
 retains free-running GRU memory and full BPTT. For N>T, every observed stop target
 is continue; no terminal is invented at T. Numeric supervision covers t=0..min(N,T).
 Requests seen only through a short prefix are distinct from supervised terminal
-loop lengths. Selection excludes larger and held-out requests. The architecture
-and portable export remain unchanged; empirical success is unverified.
+loop lengths. Selection excludes larger and held-out requests. The GRU architecture
+and portable export remain unchanged; the completed pilot failed to repair timing.
 
 ## Learned affine suffix controller — 2026-10-08
 
@@ -373,3 +373,13 @@ R/C/P pointer computation and re-entry remain unchanged. This is a task-specific
 counting bias, not a generic adaptive controller. Checkpoints explicitly set
 `executor.controller_kind=affine_suffix` and memory width one; exports replace
 only controller tensors, and the common loader/scorer remain the inference path.
+
+
+The completed affine-controller experiment passes finite development timing gates
+across three optimizer seeds; see [the report](experiments/controller_affine_seed61.md).
+For Qwen's H=896, the initializer learns 7,169 weights/biases by training-only
+least squares, then freezes them. AdamW learns four scalars: recurrence gain/offset
+and stop slope/intercept. No loop counter is supplied to the cell, but remaining-work
+labels provide explicit counting supervision. This route ignores R observations;
+its only runtime inputs after initialization are its own memory and the invocation
+once per executor loop. It is a timer rather than a learned correctness evaluator.

@@ -1,0 +1,149 @@
+{
+  "scope": "offline saved-decision arithmetic and native reference audit; no model execution",
+  "seeds": {
+    "83": {
+      "best_validation": {
+        "questions": 2048,
+        "exact_stop": 2048,
+        "joint_success": 2022,
+        "complete_nominal_trajectory": 2022,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "best_depth_test": {
+        "questions": 1664,
+        "exact_stop": 1664,
+        "joint_success": 1664,
+        "complete_nominal_trajectory": 1664,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "last_validation": {
+        "questions": 2048,
+        "exact_stop": 2048,
+        "joint_success": 2022,
+        "complete_nominal_trajectory": 2022,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "last_depth_test": {
+        "questions": 1664,
+        "exact_stop": 1664,
+        "joint_success": 1664,
+        "complete_nominal_trajectory": 1664,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "native_questions": 44
+    },
+    "89": {
+      "best_validation": {
+        "questions": 2048,
+        "exact_stop": 2048,
+        "joint_success": 2022,
+        "complete_nominal_trajectory": 2022,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "best_depth_test": {
+        "questions": 1664,
+        "exact_stop": 1664,
+        "joint_success": 1664,
+        "complete_nominal_trajectory": 1664,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "last_validation": {
+        "questions": 2048,
+        "exact_stop": 2048,
+        "joint_success": 2022,
+        "complete_nominal_trajectory": 2022,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "last_depth_test": {
+        "questions": 1664,
+        "exact_stop": 1664,
+        "joint_success": 1664,
+        "complete_nominal_trajectory": 1664,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "native_questions": 44
+    },
+    "97": {
+      "best_validation": {
+        "questions": 2048,
+        "exact_stop": 2048,
+        "joint_success": 2022,
+        "complete_nominal_trajectory": 2022,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "best_depth_test": {
+        "questions": 1664,
+        "exact_stop": 1664,
+        "joint_success": 1664,
+        "complete_nominal_trajectory": 1664,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "last_validation": {
+        "questions": 2048,
+        "exact_stop": 2048,
+        "joint_success": 2022,
+        "complete_nominal_trajectory": 2022,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "last_depth_test": {
+        "questions": 1664,
+        "exact_stop": 1664,
+        "joint_success": 1664,
+        "complete_nominal_trajectory": 1664,
+        "early": 0,
+        "late": 0,
+        "missing": 0,
+        "correct_letter_wrong_time": 0
+      },
+      "native_questions": 44
+    }
+  },
+  "native_reference_rows": 3132,
+  "input_sha256": {
+    "eval/pointer_diagnostics/controller-affine-seed83-20261008T225656.737071Z/best_validation_decisions.csv": "c44467b47571af10b9eab9296231229e420280d295e84bc8b0ff33bfe495e862",
+    "eval/pointer_diagnostics/controller-affine-seed83-20261008T225656.737071Z/best_depth_test_decisions.csv": "9461831ea22dc90f951d555888b8ba079255c5dab5a01ac5d40d310ed237ffdd",
+    "eval/pointer_diagnostics/controller-affine-seed83-20261008T225656.737071Z/last_validation_decisions.csv": "c44467b47571af10b9eab9296231229e420280d295e84bc8b0ff33bfe495e862",
+    "eval/pointer_diagnostics/controller-affine-seed83-20261008T225656.737071Z/last_depth_test_decisions.csv": "9461831ea22dc90f951d555888b8ba079255c5dab5a01ac5d40d310ed237ffdd",
+    "eval/pointer_diagnostics/controller-affine-repeats/seed-89-evaluation/best_validation_decisions.csv": "adc2a6af4673ee84e4b13dd7b4acae955dee5d14d3be2426f801283dc390b017",
+    "eval/pointer_diagnostics/controller-affine-repeats/seed-89-evaluation/best_depth_test_decisions.csv": "710ef01739e77c716e97605e2495bebd4e207d3c8ed065999ed86fe8698f1608",
+    "eval/pointer_diagnostics/controller-affine-repeats/seed-89-evaluation/last_validation_decisions.csv": "adc2a6af4673ee84e4b13dd7b4acae955dee5d14d3be2426f801283dc390b017",
+    "eval/pointer_diagnostics/controller-affine-repeats/seed-89-evaluation/last_depth_test_decisions.csv": "710ef01739e77c716e97605e2495bebd4e207d3c8ed065999ed86fe8698f1608",
+    "eval/pointer_diagnostics/controller-affine-repeats/seed-97-evaluation/best_validation_decisions.csv": "982db5ef9592f23e08274e04c07f2b905774cbef7fd99ebd457ad527106e46fd",
+    "eval/pointer_diagnostics/controller-affine-repeats/seed-97-evaluation/best_depth_test_decisions.csv": "875b2759ab12478699b70ad68f9e1e864bb31899f9c8021e94edd8eac8506361",
+    "eval/pointer_diagnostics/controller-affine-repeats/seed-97-evaluation/last_validation_decisions.csv": "982db5ef9592f23e08274e04c07f2b905774cbef7fd99ebd457ad527106e46fd",
+    "eval/pointer_diagnostics/controller-affine-repeats/seed-97-evaluation/last_depth_test_decisions.csv": "875b2759ab12478699b70ad68f9e1e864bb31899f9c8021e94edd8eac8506361"
+  }
+}

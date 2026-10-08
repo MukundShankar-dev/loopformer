@@ -493,3 +493,29 @@ panel; complete decisions and aggregates cover all queries. Both arms of the
 lowest predeclared seed additionally execute bounded native learned-stop checks
 through `scripts.eval.loop_test`. These guard checkpoint/replay fidelity, not
 statistical confirmation. Cached replay cannot support adaptive latency claims.
+
+
+## Completed affine-controller repair
+
+The [repair protocol](controller_repair.md) uses the existing exact first-crossing
+scorer and `controller_candidate --native-check`; it does not create another
+stopping definition. The source executor remains frozen. Both selected and final
+heads are scored at threshold 0.5, with independent rows for early/late/missing
+stops, joint answer/timing and complete nominal execution. A cap fallback never
+counts as an exact stop, even when a cycle repeats the correct letter.
+
+The [three-seed report](experiments/controller_affine_seed61.md) records 100% timing
+through 64 and all 132 native/replay matches. Validation counts 1–16 share 128
+graphs; deep counts 13–64 share 32 different graphs. These repeated horizons and
+optimizer seeds are not independent graph samples. Numeric requests through 63
+were mostly seen during initialization/prefix training; recurrent supervision
+unrolled only 12 loops. Report both distinctions, plus held-out values
+9/17/29/41/53 and the one-value extrapolation to 64.
+
+For native learned stopping use `loop_test --stop-policy completion
+--stop-threshold 0.5 --loops 64` with the exported `best/` checkpoint; see the
+[full command](controller_repair.md#completed-repair-and-current-use). Ordinary
+`naive_test` forces requested-depth inference for recurrent checkpoints and cannot
+validate stop timing. Cached replay supports quality/fidelity checks, not measured
+adaptive inference speedups. Historical GRU-specific fitting/audit tools remain
+historical interfaces; use the candidate/native path for affine checkpoints.

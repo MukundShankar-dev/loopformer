@@ -164,15 +164,13 @@ New caches and the complete portable model are under
 `models/stage1_pointer/controller-affine*`; selected/final development evaluation
 uses the existing replay and exact-stop metrics. Loader/export preserve every
 non-controller tensor and explicitly save the controller kind. Historical GRU
-checkpoints remain compatible. Native inference and three-seed results remain
-required before claiming repair. The suffix length and training coverage restrict
+checkpoints remain compatible. Native inference and three-seed results are now complete, as recorded below. The suffix length and training coverage restrict
 claims to the declared numeric/template scope; arbitrary integers or alternate
 prompt wording are not established.
 
 The first pretrained affine pilot has completed. It reached 100% exact stopping
 at every evaluated count through 64, for both selected and final heads. All 44
-native checks matched replay. This passes the first-seed gate; two optimizer-order
-repetitions are still required. The recipe is frozen before those repetitions:
+native checks matched replay. The recipe was frozen before the two optimizer-order repetitions:
 
 ```bash
 python -m scripts.training.repeat_affine_controller \
@@ -183,3 +181,36 @@ This reuses the completed seed 83 and its frozen caches, trains seeds 89/97,
 performs native checks for each, reports all seeds and fails unless each seed
 meets the declared exact-timing thresholds. It does not select a winning seed or
 open the reserved confirmation split.
+
+## Completed repair and current use
+
+All three seeds 83/89/97 now pass: exact stopping is 100% at every evaluated count
+1–64, with zero early, late or missing stops. Selected and final checkpoints agree
+on these outcomes. All 132 predeclared native checks match replay. Validation
+joint success and complete nominal trajectories are 2,022/2,048 (98.73%); deep
+joint success and trajectories are 1,664/1,664. See the
+[report](experiments/controller_affine_seed61.md) for provenance, limits and audits.
+This completes the declared development repair, without opening confirmation.
+
+The three complete checkpoints are `models/stage1_pointer/controller-affine-seed83/best`
+(and seeds 89/97) on the desktop. Weights and caches are excluded from Git; metrics
+and metadata are tracked. Existing outputs refuse overwrite, so the launchers
+above reproduce the protocol only in a fresh output location/workspace with its
+required source weights and caches.
+
+To inspect actual learned stopping on the existing validation dataset:
+
+```bash
+python -m scripts.eval.loop_test \
+  --model models/stage1_pointer/controller-affine-seed83/best \
+  --data data/pointer/seed-61-independent/validation.jsonl \
+  --device cuda --loops 64 --stop-policy completion --stop-threshold 0.5 --test
+```
+
+Remove `--test` for all original validation queries. `naive_test` on recurrent
+checkpoints forces the requested depth and does not test this controller.
+`controller_candidate --native-check` supplies the expanded count panel; historical
+GRU-specific fitting/audit commands are not advertised for the affine architecture.
+The controller is a learned timer, not an execution-quality evaluator: it receives
+neither R's current symbol nor confidence. A future adaptive-quality controller
+would be a separate research design.

@@ -4,18 +4,37 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
-The user authorized [controller repair](controller_repair.md) on 2026-10-08.
-The [initialization-only intervention](experiments/controller_initialization_seed61.md)
-completed: 95.92% familiar exact stopping, still 0% at count nine and 1.80% deep.
-The broader-count 12-loop GRU pilot also failed (60.65% short seen timing).
-A learned suffix initializer plus affine memory is now the selected pilot, with
-the first pretrained seed now reaches 100% exact timing through 64 and passes
-44 native/replay checks. The frozen recipe is being repeated with seeds 89/97.
-R stays frozen; no multi-seed repair or confirmation claim yet.
-Newly seen numeric values and unseen recurrent rollout lengths remain separate.
-Implementation and desktop effectiveness are pending validation; no repair is
-claimed. Exact timing through 64 and native/replay agreement are required before
-success. Confirmation stays closed.
+The [controller repair](controller_repair.md) has passed its declared development
+criteria. After two failed GRU pilots, a learned suffix initializer and scalar
+affine memory reached **100% exact stopping at every count 1–64** across optimizer
+seeds 83/89/97. All 132 native exported-model checks matched cached replay. Joint
+answer-and-timing success is 98.73% on 2,048 validation queries and 100% on 1,664
+deep queries per seed; the remaining validation errors belong to the frozen
+executor. All 148 non-controller checkpoint tensors are bitwise unchanged.
+See [the completed report](experiments/controller_affine_seed61.md).
+
+This is a task-specific learned countdown: the controller reads the final eight
+frozen prompt-token embeddings, evolves one scalar once per R transition, and
+learns a stop readout. It ignores executor state and cannot detect execution errors
+or repair needs. Training requests span 1–63 except 9/17/29/41/53, while training
+recurrence stops at 12 loops. Thus most longer numeric values are seen, although
+longer rollouts are not supervised; count 64 is only one beyond the numeric range.
+The suffix format and finite range are the established scope. These repetitions
+share data and initializer, so they are optimization robustness checks, not
+independent confirmation or arbitrary-depth proof.
+
+The current bounded repair is complete; no identical rerun is needed. Before
+opening another phase, review whether this explicit counting bias meets the
+intended scientific question and predeclare any broader numeric/template or
+independent confirmation protocol. Reserved test data and seed 29 remain closed.
+No latency savings, terminal repair/damage, or cross-family result is claimed.
+
+Validation: 50 focused architecture, prefix, training, remaining-work and audit
+tests passed in 120.55 seconds. Offline decision arithmetic passed for all 22,272
+selected/final decisions; 3,132 native transition rows were checked against raw
+rule execution. Shell syntax, local documentation links and whitespace checks
+pass. The training/audit history below records earlier failures; current evidence
+supersedes its next-run instructions.
 
 The [controller training audit has completed](experiments/controller_training_audit_seed61.md)
 on the CUDA desktop in 31.19 seconds, with no weight updates and a successful
@@ -26,7 +45,7 @@ fixed training panel), with mixed rather than consistently negative alignment.
 Seed 89 deteriorates on both training and validation by the final checkpoint.
 Count-nine initial estimates fail on every validation graph in all auxiliary
 seeds. These findings constrain explanations without establishing a unique cause.
-The first controlled intervention is now selected above; confirmation stays closed.
+The subsequent repair is reported above; confirmation stays closed.
 
 Desktop SSH is operational via `ssh desktop`; the repo is `/home/mukund/loopformer`.
 Repository-scoped Git SSH authentication has been verified by an actual push.
