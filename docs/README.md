@@ -57,3 +57,10 @@ The [completed remaining-work comparison](experiments/controller_remaining_seed6
 finds better numerical readout but essentially unchanged stopping across three
 paired seeds. Initial unfamiliar-count estimates are already wrong before
 recurrence. The [training audit](diagnostics_and_performance.md#controller-training-audit--current-desktop-command) checks fitting and objective gradients before another architecture or recipe change.
+
+
+The [completed controller training audit](experiments/controller_training_audit_seed61.md)
+finds modest training/validation graph gaps, residual fitting error, mixed
+objective-gradient alignment, and persistent count-nine initialization errors.
+The [desktop remote-operations guide](windows_cuda_setup.md#remote-operations-from-the-mac)
+records the verified SSH and repository Git-authentication setup.

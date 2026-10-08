@@ -34,9 +34,11 @@ still unresolved.
 The [matched remaining-work comparison](docs/experiments/controller_remaining_seed61.md)
 improves the controller's numerical readout but leaves stopping generalization
 essentially unchanged. Unfamiliar counts are already misestimated before looping;
-the next step is to audit training fit and supervision before changing the model.
+the [completed training audit](docs/experiments/controller_training_audit_seed61.md)
+finds modest graph train/validation gaps and mixed objective-gradient alignment.
+The cause of count generalization failure remains unresolved.
 
-Run the read-only training audit on the desktop with the existing cached features
+To reproduce the read-only training audit on the desktop, use the existing cached features
 and saved controller weights:
 
 ```bash

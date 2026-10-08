@@ -4,6 +4,8 @@
 
 After the [remaining-work comparison](experiments/controller_remaining_seed61.md),
 inspect fitting and supervision before changing the model or training recipe.
+The [desktop audit has completed](experiments/controller_training_audit_seed61.md);
+the command below reproduces its protocol, and no identical rerun is selected.
 This audit performs **zero optimizer updates** and does not load Qwen, regenerate
 features, change inference, or touch confirmation splits.
 

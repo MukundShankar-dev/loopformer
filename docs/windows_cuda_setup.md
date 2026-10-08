@@ -407,3 +407,58 @@ Then run the desired evaluation/training command, or `codex resume` to return to
 | Gate failure / non-finite logits or gradients | Preserve the error and config and investigate before training; do not silently relax tolerances or disable determinism |
 
 The desktop is caught up when the pushed code is present, pinned packages/model are installed, dataset verification and all 87 tests pass, historical artifacts are restored if wanted, and CUDA matrix forward/backward works. The first pretrained CUDA training run is still a new experiment, with its own startup gate and measurements.
+
+
+## Remote operations from the Mac
+
+Verified 2026-10-08: the Mac's `desktop` SSH alias reaches Ubuntu user `mukund`,
+with the repository at `/home/mukund/loopformer`. Tailscale provides connectivity;
+its address and the Mac authentication key live in the user's SSH configuration,
+not in this repository. Keep Windows awake and WSL running. Automatic recovery
+following Windows restart has not been configured or verified.
+
+From the Mac:
+
+```bash
+ssh desktop
+```
+
+Inside Ubuntu:
+
+```bash
+cd /home/mukund/loopformer
+source .venv/bin/activate
+git status --short
+/usr/lib/wsl/lib/nvidia-smi
+```
+
+Noninteractive SSH sessions do not currently find `nvidia-smi` on PATH; the
+absolute WSL path above works. PyTorch detects CUDA normally. Existing launchers
+activate `.venv`, so use them or `.venv/bin/python` for remote commands.
+
+The completed audit ran in tmux session `controller-audit`. To inspect its
+terminal from the Mac:
+
+```bash
+ssh -t desktop 'tmux attach -t controller-audit'
+```
+
+Detach with **Ctrl+B**, then **D**. The audit has already finished; the session
+currently contains its terminal output and an idle shell. Results are under
+`eval/pointer_diagnostics/controller-training-audit-20261008T221058.031281Z/`.
+
+Git for this checkout uses `git@github.com:MukundShankar-dev/loopformer.git` and a
+repository-local `core.sshCommand`. It selects the desktop-only key
+`~/.ssh/id_ed25519_loopformer_git`, with file permissions restricted to the owner,
+and verifies GitHub against its published Ed25519 host key stored in
+`~/.ssh/known_hosts_loopformer_git`. GitHub lists this write-enabled repository
+deploy key as **desktop loopformer Git**. Both a noninteractive dry-run push and
+an actual artifact push succeeded. No account token/password was copied to the
+desktop or stored in Git. This authentication setup applies to this repository;
+it does not authorize other repositories automatically.
+
+Normal `git pull --ff-only` and `git push` now work without credential entry.
+Private keys, environments and model binaries stay outside Git. The audit's
+85 MiB raw predictions are retained on the desktop and W&B; only its summaries,
+gradient tables and launcher log were committed. SSH access does not itself
+schedule unattended follow-ups or automatically select further experiments.

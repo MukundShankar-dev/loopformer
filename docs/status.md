@@ -1,22 +1,27 @@
 # Project status
 
-Last updated: 2026-10-05.
+Last updated: 2026-10-08.
 
 ## Current priority
 
-The no-update [controller training audit](diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
-is implemented. Next desktop command: **`bash audit_controller.sh`**. It checks all
-six remaining-work comparison runs at their selected and final checkpoints using
-full cached train/validation panels, fixed graph panels for per-objective/module
-gradients, and paired numerical-readout/stopping cross-tabs. No Qwen extraction,
-optimizer updates, new checkpoint selection or confirmation data. Desktop results
-and CUDA runtime remain unmeasured. Validation: 28 audit/remaining-work/controller
-training tests passed in 68.54 seconds; after the final conditional summaries and
-manifest checks, all 10 audit tests passed again in 8.63 seconds. Synthetic CLI
-coverage verifies both arms and best/final checkpoints, objective-gradient
-reconstruction, readout alignment, no mutation, no-overwrite behavior and launcher
-failure propagation. Dry-run, shell syntax, 242 local file links and whitespace
-checks passed. No pretrained audit ran locally.
+The [controller training audit has completed](experiments/controller_training_audit_seed61.md)
+on the CUDA desktop in 31.19 seconds, with no weight updates and a successful
+W&B upload. Full training versus familiar-count validation gaps are about 1–2.2
+percentage points; count generalization remains poor. The selected auxiliary
+remaining-work gradients are present (9–24% of stopping-gradient norm on the
+fixed training panel), with mixed rather than consistently negative alignment.
+Seed 89 deteriorates on both training and validation by the final checkpoint.
+Count-nine initial estimates fail on every validation graph in all auxiliary
+seeds. These findings constrain explanations without establishing a unique cause.
+No new training recipe or confirmation experiment is selected.
+
+Desktop SSH is operational via `ssh desktop`; the repo is `/home/mukund/loopformer`.
+Repository-scoped Git SSH authentication has been verified by an actual push.
+See [remote operations](windows_cuda_setup.md#remote-operations-from-the-mac).
+The [audit launcher](diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
+now reproduces a completed protocol; no identical rerun is currently needed.
+Implementation validation: 28 audit/remaining-work/controller tests passed, with
+all 10 audit tests rerun after final changes.
 
 
 The [remaining-work comparison has completed](experiments/controller_remaining_seed61.md)
