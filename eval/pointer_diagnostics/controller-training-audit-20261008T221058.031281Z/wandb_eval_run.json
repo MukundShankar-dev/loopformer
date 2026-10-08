@@ -1,0 +1,18 @@
+{
+  "id": "lsjjgxfd",
+  "url": "https://wandb.ai/mukunds/loopformer/runs/lsjjgxfd",
+  "project": "loopformer",
+  "entity": "mukunds",
+  "mode": "online",
+  "sdk_version": "0.30.0",
+  "artifact_sha256": {
+    "summary.json": "20beb7b4b48a26aa9515833312a5ca8a4930e4db55d13bf43b6c95337971131e",
+    "countdown_stop_crosstab.csv": "00dc243ccfc3f7f3dd580396b8330c45f8fbaf2721e1779b583128844130e404",
+    "fit_metrics.csv": "326601ee6c648963046a80d3e4abf15555360c7276243b01aa7fb61313e71384",
+    "gradient_cosines.csv": "f4f763bec88def270e0d9d295d5530029f5e444f5439502f68f0c8eccb9840c3",
+    "gradient_norms.csv": "2a7dce12fe56151a3c89b506f1450d1518ae7b2e3f18ce09f26948b67ff5989e",
+    "gradient_panel.csv": "7277bda486fa0f66a6b2495fe6abdf04368066a9d7c986b6a6074979a0cbe9a5",
+    "loss_components.csv": "84ae3007ac465aa662eaafa5278b124bad957d3f53bb4e52850f8a774de27bfb",
+    "predictions.csv": "d925f7de25ad973979f63d6e8fbaa163f372f6bc62274d8cb5d159cd9ebbf794"
+  }
+}
