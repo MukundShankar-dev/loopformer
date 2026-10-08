@@ -1,5 +1,9 @@
 # Train recurrent pointer execution
 
+The repaired model is now frozen for the [reserved-test and larger benchmark](pointer_benchmark.md).
+No further training is selected from its outcomes; the commands below retain
+training/reproduction context.
+
 Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md), [loop-balanced ablation](experiments/stage1_loopbalanced.md), and [learned-completion ablation](experiments/stage1_learned_completion.md) have completed. The latter two did not improve the depth frontier. Dated commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
 
 ## Controller repair

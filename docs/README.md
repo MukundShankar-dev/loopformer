@@ -73,3 +73,10 @@ The [completed affine-controller repair](experiments/controller_affine_seed61.md
 passes timing through 64 across three optimizer seeds, with bounded native checks.
 The [repair protocol](controller_repair.md) owns reproduction, scientific scope
 and the distinction between seen numeric values and unseen rollout lengths.
+
+
+The [frozen larger benchmark](experiments/pointer_frozen_benchmark.md) confirms a
+perfect current reserved test and strong executor trajectories through 256 on
+1,350 new graphs, but exposes controller number-reading failures starting at 70.
+All native/reuse checks and independent reference audits pass. This report
+supersedes broader interpretations of the smaller controller repair panel.

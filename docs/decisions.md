@@ -264,3 +264,34 @@ ignores executor correctness. Most deep requested values were seen, while
 recurrent supervision ended at 12. Review this scientific scope before a new
 phase; no additional run, reserved confirmation, broader prompt/numeric claim or
 terminal-dynamics claim is selected. See [the report](experiments/controller_affine_seed61.md).
+
+
+## 2026-10-08 — Freeze the repaired model before larger testing
+
+The user authorized opening the current reserved test and expanding pointer
+benchmark coverage. Freeze seed 83 (the first declared repaired seed), all
+inference tensors/tokenizer/config and threshold 0.5 before reading outcomes.
+Use the old reserved test plus three independent data seeds and balanced graph
+modes, with every requested count through 256. Reject graph overlap with old data.
+Keep negative numeric-format/extrapolation results; do not refit a head or choose
+a different model on these panels. The count-free executor and timing-only affine
+controller permit exact trajectory reuse, guarded by a fixed native panel.
+Quality statistics cluster repeated horizons by graph and distinguish controller
+from executor. This authorization supersedes the seed-61 test restriction only;
+seed 29 and other research stages remain closed. The
+[protocol](pointer_benchmark.md) was committed before test execution. Automatic
+approval review disallowed the attempted reserved-test W&B upload; all benchmark
+commands therefore use local-only results with W&B disabled.
+
+
+## 2026-10-08 — Keep the larger benchmark failure and the model frozen
+
+The current reserved test passes perfectly. The independently seeded panel has
+96.96% full trajectories through 256, but every request 70–256 stops early.
+Initialization is already incorrect at 70; untrained digit roles and three-digit
+suffix layouts are explicit limitations of the positional linear reader. Keep
+the finite repair-through-64 claim, reject full-model generalization through 256,
+and preserve all results. No controller or executor retraining is selected by
+this evaluation. These panels are now opened; a later repair needs new held-out
+confirmation rather than reusing them as unseen tests. The
+[report](experiments/pointer_frozen_benchmark.md) owns statistics, fidelity and limits.

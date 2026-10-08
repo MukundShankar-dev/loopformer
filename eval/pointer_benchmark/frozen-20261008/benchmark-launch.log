@@ -1,0 +1,24 @@
+Existing freeze verified; no changes.
+Frozen benchmark · 1,350 new graphs × 256 counts · safety cap 272
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:39,  7.38it/s]Loading weights:  98%|█████████▊| 284/290 [00:00<00:00, 1453.10it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1221.59it/s]
+Frozen executor ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1350/1350 graphs 0:13:14 0:00:00
+Pointer task · adaptive stopping
+126 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_benchmark/frozen-20261008/independent/nativ
+e
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:31,  9.24it/s]Loading weights:  80%|███████▉  | 231/290 [00:00<00:00, 1289.78it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1181.42it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 126/126 0:01:42 0:00:00
+Stopped accuracy: 61.90%; mean loops: 29.93; p95 latency: 1.8638s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_benchmark/frozen-20261008/independent/nativ
+e
+Completed · quality criteria passed: False · native matches 126/126
+all: joint 26.46% · exact stop 26.95% · trajectory 97.11%
+1_12: joint 99.29% · exact stop 100.00% · trajectory 99.14%
+13_63: joint 97.94% · exact stop 100.00% · trajectory 97.17%
+64_99: joint 16.31% · exact stop 16.67% · trajectory 96.96%
+100_256: joint 0.00% · exact stop 0.00% · trajectory 96.96%
+held_out_values: joint 98.09% · exact stop 100.00% · trajectory 97.48%

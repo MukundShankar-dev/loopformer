@@ -214,3 +214,11 @@ GRU-specific fitting/audit commands are not advertised for the affine architectu
 The controller is a learned timer, not an execution-quality evaluator: it receives
 neither R's current symbol nor confidence. A future adaptive-quality controller
 would be a separate research design.
+
+
+The subsequent [frozen larger benchmark](experiments/pointer_frozen_benchmark.md)
+passed the current reserved test, but showed that the number reader fails starting
+at count 70 and on three-digit layouts. This does not invalidate the declared
+finite development gate through 64; it prevents extending that claim to broader
+numeric ranges. R is strong through 256 on the new graph panel. The complete model
+remains frozen, with no new training selected from these results.

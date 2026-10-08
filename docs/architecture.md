@@ -391,3 +391,11 @@ only for the isolated executor with an affine controller that ignores R input.
 The benchmark verifies suffix input invariance across seed/mode representatives
 and checks a declared native stopped panel before accepting reused quality scores.
 This optimization is not an adaptive latency measurement.
+
+
+The completed [larger benchmark](experiments/pointer_frozen_benchmark.md) exposes
+an initializer limitation: separate token-position weights do not enforce shared
+digit values/place-value composition. At 70 an unseen tens-role digit gives an
+initial estimate near 49.26; three-digit layouts introduce further unseen slot
+tokens. The observed early stops occur despite strong forced executor trajectories.
+This architecture remains frozen; no new reader is implemented from the result.

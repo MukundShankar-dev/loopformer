@@ -1,0 +1,2 @@
+# Optional benchmark figures; install after the main requirements.txt.
+matplotlib==3.11.2

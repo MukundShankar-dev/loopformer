@@ -1,0 +1,18 @@
+{
+  "graphs": 1350,
+  "distinct_rule_tables": 1350,
+  "old_graph_overlap": 0,
+  "old_excluded_graphs": 36288,
+  "seed_replay_byte_records_match": true,
+  "all_reference_targets_valid": true,
+  "graph_modes": [
+    "random_function",
+    "permutation",
+    "full_cycle"
+  ],
+  "seeds": [
+    211,
+    223,
+    227
+  ]
+}

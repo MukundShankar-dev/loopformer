@@ -22,18 +22,19 @@ One recurrent block is reused across all loops. The current experiment trains al
 
 ## Current result and diagnostics
 
-The [seed-61 executor audit](docs/experiments/stage1_executor_seed61.md) finds strong
-pointer execution beyond trained depth on a limited set of cyclic 26-state graphs.
-The [completed controller repair](docs/experiments/controller_affine_seed61.md)
-reaches 100% exact stopping through count 64 across three optimizer seeds, with
-98.73% joint answer-and-timing success on validation and 100% on the smaller deep
-panel. The controller learns a scalar countdown from prompt suffix embeddings;
-it does not judge executor correctness. Training includes numeric values through
-63 but only 12 recurrent loops. These are finite development results.
+The [frozen benchmark](docs/experiments/pointer_frozen_benchmark.md) scores 100%
+answer accuracy, exact stopping and complete trajectories on the current reserved
+test. A larger panel has 1,350 independent graphs at every depth 1–256: the
+executor keeps every transition correct on 96.96% of graphs through 256, but the
+controller stops correctly only through count 69. The complete model does not
+pass the broader benchmark; its initial number reader needs work. All graphs
+have 26 states and long executions can cycle.
 
-See [controller usage and reproduction](docs/controller_repair.md) for the completed
-recipe, data coverage, checkpoints and learned-stop evaluation commands. Weights
-and feature caches remain on the desktop; Git carries metrics and metadata.
+See [benchmark commands and data](docs/pointer_benchmark.md),
+[controller architecture](docs/controller_repair.md), and the saved
+[figure](eval/pointer_benchmark/frozen-20261008/independent/plots/quality_and_initialization.png).
+Weights remain on the desktop; Git carries metrics, audits and metadata.
+`bash benchmark_pointer.sh --dry-run` previews the suite without writes.
 
 Start with the [research plan](docs/project_plan.md), [current status](docs/status.md),
 and [documentation index](docs/README.md). Historical experiments remain in the
@@ -148,7 +149,7 @@ Pass a complete saved step directory, including its adapter weights and tokenize
 
 ```bash
 python -m scripts.eval.loop_test \
-  --model models/stage1_pointer/executor_r-seed61/step-000750 \
+  --model models/stage1_pointer/controller-affine-seed83/best \
   --data data/pointer/seed-61-independent/validation.jsonl \
   --device cuda --loops 12 --test
 ```

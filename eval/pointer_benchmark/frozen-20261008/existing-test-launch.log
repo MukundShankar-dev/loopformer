@@ -1,0 +1,11 @@
+Pointer task · adaptive stopping
+1,536 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_benchmark/frozen-20261008/existing_test
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:49,  5.87it/s]Loading weights:  51%|█████▏    | 149/290 [00:00<00:00, 654.99it/s]Loading weights:  79%|███████▉  | 230/290 [00:00<00:00, 662.22it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 603.94it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1536/1536 0:05:11 0:00:00
+Stopped accuracy: 100.00%; mean loops: 6.50; p95 latency: 0.4388s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_benchmark/frozen-20261008/existing_test

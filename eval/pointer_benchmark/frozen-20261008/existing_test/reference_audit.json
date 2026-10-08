@@ -1,0 +1,10 @@
+{
+  "questions": 1536,
+  "independent_graphs": 128,
+  "reference_checked_transition_rows": 9984,
+  "exact_stop_correct": 1536,
+  "full_trajectory_correct": 1536,
+  "joint_success": 1536,
+  "inference_files_unchanged": true,
+  "test_hash_matches_freeze": true
+}

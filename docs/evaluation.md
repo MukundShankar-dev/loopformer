@@ -531,3 +531,11 @@ checkpoint/threshold, numeric cohorts, native fidelity and graph-cluster confide
 intervals. No tuning on these results is allowed within this run. The seed-29
 split and unrelated confirmation stages remain unopened. A larger range must
 pass every declared count rather than hiding failure behind a pooled mean.
+
+
+The [completed report](experiments/pointer_frozen_benchmark.md) records a perfect
+reserved test, 96.96% full executor trajectories through 256, and zero exact timing
+at counts 70–256. All 126 native calls match reuse. All 345,600 decision rows and
+aggregates pass independent reference checks. The wider end-to-end quality gate
+fails; correct cyclic letters at wrong times remain failures. These evaluated
+panels are now opened and cannot become new confirmation data after tuning.

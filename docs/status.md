@@ -4,12 +4,29 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
-The user has now authorized the [frozen pointer benchmark](pointer_benchmark.md):
-open the seed-61 reserved test using the fixed seed-83 repaired checkpoint and
-threshold 0.5, then evaluate 1,350 independent graphs at every count 1–256.
-The protocol was committed before opening the test. Implementation and five
-focused tests pass; actual test/benchmark outcomes are pending. No training or
-outcome-based tuning is selected. Seed 29 and other research stages stay closed.
+The [frozen pointer benchmark](experiments/pointer_frozen_benchmark.md) completed.
+The fixed seed-83 checkpoint scores **100% exact timing, complete trajectories and
+joint success** on the reserved seed-61 test (1,536 questions, 128 graphs, depths
+1–12). On 1,350 fresh graphs at every count 1–256, R has **96.96% complete
+trajectories through 256** (1,309/1,350); all first errors occur by loop 31.
+But stopping is exact only at counts 1–69: every request 70–256 stops early.
+Count 70 initializes memory near 49.26 and stops at loop 49. The numeric reader
+fails on untrained positional digit roles and the three-digit suffix layout.
+The complete model therefore **fails** the predeclared broader benchmark; the
+executor and number reader must not share a generalization claim.
+
+All 126 native calls match reuse, all 345,600 decision rows pass independent
+reference/aggregate checks, and all inference files remain unchanged. Existing
+test targets/predictions passed 9,984 reference checks. Graph seeds replay exactly
+and no new graph overlaps any old split. Eleven focused benchmark/affine tests
+pass; optional figures render. The [runbook](pointer_benchmark.md) owns reproduction.
+W&B upload was disallowed by automatic review; outputs are local/repository only.
+
+The model remains frozen. Review the initial number reader before selecting
+another training experiment. These panels are now opened: later tuning would
+require fresh held-out confirmation. Seed 29 and other stages remain closed.
+The finite controller repair below remains a valid result through 64, but cannot
+be extended to arbitrary counts based on its smaller development panel.
 
 The [controller repair](controller_repair.md) has passed its declared development
 criteria. After two failed GRU pilots, a learned suffix initializer and scalar

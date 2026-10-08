@@ -54,7 +54,9 @@ Use graph-cluster bootstrap confidence intervals (2,000 repeats, seed 239) withi
 balanced seed/mode strata; repeated horizons do not multiply the independent
 sample size. Per-count rates also carry marginal graph-level Wilson intervals,
 which remain nondegenerate at zero/all successes; these are not simultaneous
-confidence bounds over all depths. Report all counts and seeds without selecting a favorable range.
+confidence bounds over all depths. Controller outcomes at each count are
+identical across graphs because its input ignores graph content; graph uncertainty
+intervals do not measure uncertainty over unseen integers. Report all counts and seeds without selecting a favorable range.
 
 `configs/pointer_benchmark.json` declares descriptive acceptance thresholds:
 95% overall joint success/complete trajectory, 99% exact stopping, with at least
@@ -89,8 +91,41 @@ predictions, per-count/stratum/loop rates, controller counts and native traces a
 saved as CSV. The graph JSONL remains under `data/pointer/benchmark-seeds211-223-227/`;
 its hashes, seeds, exclusions and orbit metadata are in the tracked output manifest.
 
-Six focused tests cover, including seeded generation and overlap rejection,
+Eleven focused benchmark/affine tests passed in 22.01 seconds, including seeded generation and overlap rejection,
 cyclic wrong-time letters, missing-cap failures, recovery without a perfect
 trajectory, clustered horizons, unchanged exported weights, and a tiny end-to-end
-native/reuse check with deliberately failed stopping. The actual pretrained run
-is in progress; success and performance remain unmeasured until its report.
+native/reuse check with deliberately failed stopping. The pretrained benchmark completed; see [the report](experiments/pointer_frozen_benchmark.md).
+The current reserved test is perfect, while the broader model fails because
+counts 70–256 stop early. R remains strong through 256 (96.96% full trajectories).
+All 126 native checks match, and every compressed decision passes reference audit.
+No model/policy was changed. The benchmark panels are now opened; any later tuning
+needs a new held-out confirmation design.
+
+
+Optional figures use a separate plotting dependency and do not load the model:
+
+```bash
+python -m pip install -r requirements-plots.txt
+python -m scripts.eval.plot_pointer_benchmark \
+  --results eval/pointer_benchmark/frozen-20261008/independent
+```
+
+This saves standalone PNG/SVG/PDF plots and plotting-library/input provenance.
+The evaluator itself needs only the existing main requirements.
+
+
+The tracked output directories now exist. For a deterministic replay of the same
+frozen benchmark into fresh paths (not a new confirmation):
+
+```bash
+python -m scripts.eval.freeze_pointer_benchmark \
+  --verify-result eval/pointer_benchmark/frozen-20261008/existing_test/summary.json
+python -m scripts.eval.frozen_pointer_benchmark \
+  --output eval/pointer_benchmark/frozen-replay \
+  --dataset-output data/pointer/benchmark-frozen-replay \
+  --wandb-mode disabled
+```
+
+This requires the same complete checkpoint and old dataset. Fresh paths refuse
+overwrite. The original launch commands reproduce the first run in a new workspace;
+existing tracked metrics are for inspection and should not be deleted to rerun.

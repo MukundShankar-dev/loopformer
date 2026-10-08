@@ -113,3 +113,15 @@ def test_per_count_boundary_interval_does_not_claim_certainty():
     assert .97 < low < 1 and high == 1
     low, high = wilson_interval(0,128)
     assert low == 0 and 0 < high < .03
+
+
+def test_reserved_reuse_requires_full_frozen_model_and_policy():
+    from scripts.eval.freeze_pointer_benchmark import verify_reserved_result
+    frozen={'inference_sha256':{'adapter_model.pt':'abc'},'test_data_sha256':'def','threshold':.5,'safety_cap':272}
+    summary={'status':'complete','local_checkpoint_sha256':frozen['inference_sha256'],'data_sha256':'def',
+        'stop_policy':'completion','stop_threshold':.5,'loops':272,'selected_examples':1536,'limit':None,'test_mode':False}
+    verify_reserved_result(summary,frozen,1536)
+    for bad in ({'selected_examples':3},{'stop_threshold':.6},{'data_sha256':'other'},
+                {'local_checkpoint_sha256':{'adapter_model.pt':'other'}},{'status':'running'}):
+        with pytest.raises(ValueError):
+            verify_reserved_result({**summary,**bad},frozen,1536)

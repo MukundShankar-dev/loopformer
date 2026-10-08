@@ -1,0 +1,14 @@
+{
+  "checkpoint": "models/stage1_pointer/controller-affine-seed83/best",
+  "inference_sha256": {
+    "adapter_model.pt": "8dfdaee726c0f6413ed2f15478abad68574eb63d8401bb3463bbdc09ab27ff7a",
+    "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "recurrent_config.json": "4bd9579fde6002b85536f3f2309d7c5c3684096264afb49ffba14441b183a6df",
+    "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+    "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+  },
+  "threshold": 0.5,
+  "safety_cap": 272,
+  "selection": "First predeclared repair seed 83; frozen before reserved test",
+  "test_data_sha256": "9b383af72722fff74660627fd35042f34238652492a0de6f7ee431a9c0b06bfa"
+}

@@ -20,6 +20,6 @@ mkdir -p "$root"
       --device cuda --attention sdpa --loops 272 --stop-policy completion --stop-threshold .5 \
       --output "$root/existing_test" --wandb-mode disabled
   fi
-  python -c 'import json; from pathlib import Path; d=json.loads(Path("eval/pointer_benchmark/frozen-20261008/existing_test/summary.json").read_text()); assert d["status"] == "complete", "Reserved test incomplete; do not run concurrently"'
+  python -m scripts.eval.freeze_pointer_benchmark --verify-result "$root/existing_test/summary.json"
   python -u -m scripts.eval.frozen_pointer_benchmark --wandb-mode disabled
 } 2>&1 | tee "$root/benchmark-launch.log"

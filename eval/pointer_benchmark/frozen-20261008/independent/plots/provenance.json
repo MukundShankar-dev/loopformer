@@ -1,0 +1,15 @@
+{
+  "matplotlib": "3.11.2",
+  "script_sha256": "b3157cb868b5b48df42f9f0b44ffd118cb2c5bc0a8afabb6785da57e108de2da",
+  "inputs_sha256": {
+    "summary.json": "1048f985d4185d0eb9a31e56e10bbf90c33835385b5a9c8c9acc5e8c97e9fe1b",
+    "per_count_and_stratum.csv": "0b79cca7d2e1428d99683b82bd3b76a3ee3adfc47bb962d8194ce488494c26a4",
+    "controller_counts.csv": "18c3e6502589eacd27187416b5fca03a30e91e7d9c05e43c77509ea409844992"
+  },
+  "vertical_lines": {
+    "12": "maximum supervised recurrent prefix",
+    "63": "maximum trained requested value; five values excluded",
+    "100": "three-digit boundary"
+  },
+  "uncertainty": "Per-count graph-level Wilson intervals are in the CSV; controller graph variability is degenerate at fixed count."
+}
