@@ -21,7 +21,7 @@ from scripts.recurrent_qwen.interfaces import RecurrentController
 from scripts.training.controller import ControllerConfig, evaluate_controller, export_checkpoint, learning_rate, selection_key, select_graphs
 from scripts.training.data import read_tasks
 from scripts.training.objective import completion_loss
-from scripts.training.controller_remaining import remaining_predictions, remaining_loss, initialization_loss
+from scripts.training.controller_remaining import remaining_predictions, remaining_loss, initialization_loss, prefix_losses
 from scripts.training.tracking import tracking_run
 
 
@@ -47,13 +47,17 @@ def main() -> None:
         raise ValueError('Controller training requires an isolated executor checkpoint')
     if not (source / 'adapter_model.pt').is_file():
         raise ValueError('Complete source checkpoint weights are required on this device')
-    trained_depths = spec.get('train_depths') or list(range(1, spec['train_max_depth'] + 1))
-    if max(trained_depths) >= config.evaluation_max_depth:
-        raise ValueError('Evaluation budget must extend beyond trained requested counts')
+    trained_depths = config.requested_counts or spec.get('train_depths') or list(range(1, spec['train_max_depth'] + 1))
+    training_loops = config.training_loops or max(trained_depths)
+    if training_loops >= config.evaluation_max_depth:
+        raise ValueError('Evaluation budget must extend beyond the training loop budget')
+    if training_loops < max(trained_depths) and not args.features_cache and not args.dry_run:
+        raise ValueError('Short-prefix training requires an explicitly prepared frozen feature cache')
     console = Console()
     console.print('[bold]Controller-only training[/bold] · executor frozen · existing controller initialization')
     console.print(f'{config.train_graphs:,} training graphs × {len(trained_depths)} counts · {config.steps:,} updates · batch {config.batch_size}')
-    console.print(f'Trained counts: {trained_depths} · select on validation exact stop, then BCE · threshold 0.5')
+    console.print(f'Trained counts: {trained_depths} · training loops {training_loops} · threshold 0.5')
+    console.print('Select on seen-count validation timing within the training loop budget, then BCE')
     console.print(f'Output: {args.output}')
     if args.dry_run:
         console.print(json.dumps(config.to_dict(), indent=2))
@@ -99,7 +103,7 @@ def main() -> None:
                  'extraction': {'device': config.device, 'precision': 'float32', 'attention': 'sdpa',
                                 'batch_size': config.extraction_batch_size},
                  'features': {}, 'replay_error': {}}
-        for name, tasks, loops in [('train', train_tasks, max(trained_depths)),
+        for name, tasks, loops in [('train', train_tasks, training_loops),
                                    ('validation', validation_tasks, config.evaluation_max_depth)]:
             with progress_bar() as progress:
                 bar = progress.add_task(f'Cache frozen {name} features', total=len(tasks))
@@ -117,7 +121,7 @@ def main() -> None:
     synchronize(torch.device(config.device))
     extraction_seconds = perf_counter() - began
     features = cache['features']
-    for name, tasks, loops in [('train', train_tasks, max(trained_depths)),
+    for name, tasks, loops in [('train', train_tasks, training_loops),
                                ('validation', validation_tasks, config.evaluation_max_depth)]:
         f = features[name]
         if (f['context'].shape != (len(tasks), cache['width']) or
@@ -137,8 +141,9 @@ def main() -> None:
         'extraction': cache['extraction'], 'live_replay_error': cache['replay_error'],
         'extraction_seconds': extraction_seconds, 'python': platform.python_version(), 'torch': torch.__version__,
         'command': [sys.executable, '-m', 'scripts.training.train_controller', *sys.argv[1:]],
-        'selection': 'maximize trained-count development exact stopping; tie-break by its class-balanced BCE',
+        'selection': 'maximize seen-count development exact stopping within training loop budget; tie-break BCE',
         'optimization_scope': 'controller_only', 'trained_depths': trained_depths,
+        'training_loops': training_loops,
         'trainable_parameters': sum(p.numel() for p in head.parameters()),
         'remaining_readout_parameters': head.intermediate + 1 if config.remaining_readout else 0,
         'remaining_gradient_scope': ('controller_and_readout' if config.remaining_loss_weight or config.initial_loss_weight else 'detached_readout_only')
@@ -178,13 +183,14 @@ def main() -> None:
         def validate(step: int) -> dict:
             nonlocal best_key, best_step, best_metrics
             metrics, rows = evaluate_controller(head, features['validation'], validation_tasks, trained_depths, config.device,
-                remaining_readout=remaining_readout, remaining_scale=config.remaining_scale)
+                remaining_readout=remaining_readout, remaining_scale=config.remaining_scale,
+                training_loops=training_loops if config.training_loops is not None else None)
             record({'event': 'validation', 'step': step, 'validation': metrics})
             validation_history.extend({'step': step, 'cohort': name, **values} for name, values in metrics.items())
             write_csv(output / 'validation_history.csv', validation_history)
             if step == 0:
                 write_csv(output / 'baseline_decisions.csv', rows)
-            key = selection_key(metrics)
+            key = selection_key({'trained': metrics['selection']} if 'selection' in metrics else metrics)
             if key < best_key:
                 best_key, best_step, best_metrics = key, step, metrics
                 torch.save({k: v.detach().cpu().clone() for k, v in head.state_dict().items()}, output / 'best_controller.pt')
@@ -217,7 +223,8 @@ def main() -> None:
                     group['lr'] = lr
                 optimizer.zero_grad(set_to_none=True)
                 logits, initial, memories = replay(head, context[idx], working[idx])
-                stop_loss, _ = completion_loss(logits, masks[idx])
+                stop_loss = (completion_loss(logits, masks[idx])[0] if config.training_loops is None
+                             else logits.new_zeros(()))
                 auxiliary = None
                 initial_loss = None
                 loss = stop_loss
@@ -227,7 +234,10 @@ def main() -> None:
                         group['lr'] = lr
                     predicted = remaining_predictions(remaining_readout, initial, memories, config.remaining_scale,
                                                        detach=config.remaining_loss_weight == 0 and config.initial_loss_weight == 0)
-                    auxiliary = remaining_loss(predicted, depths[idx], config.remaining_scale)
+                    if config.training_loops is not None:
+                        stop_loss, auxiliary = prefix_losses(logits, predicted, depths[idx], config.remaining_scale)
+                    else:
+                        auxiliary = remaining_loss(predicted, depths[idx], config.remaining_scale)
                     initial_loss = initialization_loss(predicted, depths[idx], config.remaining_scale)
                     loss = (stop_loss + config.remaining_loss_weight * auxiliary
                             + config.initial_loss_weight * initial_loss)
@@ -259,7 +269,7 @@ def main() -> None:
                                output / 'last_controller_state.pt')
                 if step % config.log_every == 0 or step == config.steps:
                     progress.update(bar, completed=step,
-                        description=f'Controller · val@{last_validation_step} {latest["trained"]["exact_stop"]:.1%}')
+                        description=f'Controller · val@{last_validation_step} {latest.get("selection", latest["trained"])["exact_stop"]:.1%}')
         # Publish only the selected controller with the original frozen executor.
         head.load_state_dict(torch.load(output / 'best_controller.pt', map_location=config.device, weights_only=True))
         if remaining_readout is not None:
@@ -267,10 +277,12 @@ def main() -> None:
             remaining_readout.load_state_dict(saved_readout['state_dict'])
             traces = []
             evaluate_controller(head, features['validation'], validation_tasks, trained_depths, config.device,
-                remaining_readout=remaining_readout, remaining_scale=config.remaining_scale, traces=traces)
+                remaining_readout=remaining_readout, remaining_scale=config.remaining_scale, traces=traces,
+                training_loops=training_loops if config.training_loops is not None else None)
             write_csv(output / 'remaining_trajectories.csv', traces)
         provenance = {'source_checkpoint_sha256': identity['source_sha256'], 'step': best_step,
                       'optimization_scope': 'controller_only', 'trained_depths': trained_depths,
+                      'training_loops': training_loops,
                       'config': config.to_dict(), 'selection': metadata['selection']}
         if sha256_file(source / 'adapter_model.pt') != identity['source_sha256']:
             raise RuntimeError('Source checkpoint changed before export')

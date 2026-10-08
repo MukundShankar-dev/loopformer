@@ -65,3 +65,8 @@ finds modest training/validation graph gaps, residual fitting error, mixed
 objective-gradient alignment, and persistent count-nine initialization errors.
 The [desktop remote-operations guide](windows_cuda_setup.md#remote-operations-from-the-mac)
 records the verified SSH and repository Git-authentication setup.
+
+The [initialization-only repair pilot](experiments/controller_initialization_seed61.md)
+improves familiar stopping slightly but leaves count nine and deep timing broken.
+The current [repair protocol](controller_repair.md) defines broader count exposure
+with short recurrent prefixes and separates its generalization claims.

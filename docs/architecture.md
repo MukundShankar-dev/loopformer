@@ -342,3 +342,19 @@ it does not directly supervise recurrent updates or stop logits. Existing
 trajectory and stop losses still train those paths through full BPTT. No forward
 input, recurrence, export tensor name or inference policy changes. A zero default
 weight preserves historical objectives. Generalization remains unverified.
+
+## Broader-count short-prefix supervision — 2026-10-08
+
+`controller_prompt_state` exposes the same frozen full-prompt P representation
+used by native initialization. Cache preparation runs this path without R/C and
+pairs it with existing count-free R prefixes by rule table and Start. It verifies
+old count invariance, graph-disjoint validation, source/data identities and bounded
+native agreement before saving a new cache. Forward input remains token IDs and
+mask only; the helper does not parse requested count.
+
+The [prefix pilot](controller_repair.md#broader-count-exposure-with-short-prefixes)
+retains free-running GRU memory and full BPTT. For N>T, every observed stop target
+is continue; no terminal is invented at T. Numeric supervision covers t=0..min(N,T).
+Requests seen only through a short prefix are distinct from supervised terminal
+loop lengths. Selection excludes larger and held-out requests. The architecture
+and portable export remain unchanged; empirical success is unverified.

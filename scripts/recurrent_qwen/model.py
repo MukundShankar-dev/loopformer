@@ -151,6 +151,26 @@ class RecurrentQwen(nn.Module):
             block.prefix_reuse = prefix_reuse
             block.gradient_checkpointing = gradient_checkpointing
 
+    def controller_prompt_state(self, input_ids: Tensor, attention_mask: Tensor,
+                                answer_positions: Tensor | None = None) -> Tensor:
+        """Frozen full-prompt P features [B,H], identical to controller initialization.
+
+        This interface runs neither R nor C and consumes only token IDs/mask.
+        It never parses numeric values. Used to cache broader controller prompts.
+        """
+        if input_ids.ndim != 2 or attention_mask.shape != input_ids.shape or not attention_mask.any(-1).all():
+            raise ValueError('Need aligned nonempty [B,S] prompt IDs and mask')
+        if answer_positions is None:
+            answer_positions = (attention_mask.long() * torch.arange(1, input_ids.shape[1] + 1,
+                                device=input_ids.device)).argmax(-1)
+        with torch.no_grad():
+            context = self.embed_tokens(input_ids)
+            positions = torch.arange(input_ids.shape[1], device=input_ids.device).unsqueeze(0)
+            mask = create_causal_mask(config=self.config, inputs_embeds=context,
+                attention_mask=attention_mask, past_key_values=None, position_ids=positions)
+            context = self.prelude(context, mask, positions, self.rotary_emb(context, positions))
+        return _answer_readout(context, answer_positions.tolist())
+
     def forward(
         self,
         input_ids: Tensor,
@@ -248,14 +268,7 @@ class RecurrentQwen(nn.Module):
             if logits_mode != "answer":
                 raise ValueError("Isolated execution supports answer-position logits only")
             # Controller prompt encoding is isolated even for full-model training.
-            with torch.no_grad():
-                context = self.embed_tokens(input_ids)
-                context_positions = torch.arange(sequence, device=device).unsqueeze(0)
-                context_mask = create_causal_mask(config=self.config, inputs_embeds=context,
-                    attention_mask=attention_mask, past_key_values=None, position_ids=context_positions)
-                context = self.prelude(context, context_mask, context_positions,
-                                       self.rotary_emb(context, context_positions))
-            controller_initial = _answer_readout(context, readout_positions)
+            controller_initial = self.controller_prompt_state(input_ids, attention_mask, answer_positions)
             input_ids, attention_mask, position_ids = self.router(input_ids, attention_mask)
         hidden = self.embed_tokens(input_ids)
         causal_mask = create_causal_mask(

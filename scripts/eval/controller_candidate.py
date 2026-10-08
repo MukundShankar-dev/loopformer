@@ -77,12 +77,13 @@ def main() -> None:
         results[label] = {}
         for split, (tasks, features) in panels.items():
             metrics, decisions = evaluate_controller(head, features, tasks, metadata['trained_depths'], config.device,
-                remaining_readout=readout, remaining_scale=config.remaining_scale)
+                remaining_readout=readout, remaining_scale=config.remaining_scale,
+                training_loops=config.training_loops)
             results[label][split] = metrics
             write_csv(output / f'{label}_{split}_decisions.csv', decisions)
             rows.extend({'checkpoint': label, 'split': split, 'cohort': cohort, **values}
                         for cohort, values in metrics.items())
-            for cohort in ('trained', 'interpolation', 'extrapolation'):
+            for cohort in ('trained', 'interpolation', 'extrapolation', 'selection', 'seen_count_long_rollout', 'unseen_requested_count'):
                 if cohort in metrics:
                     m = metrics[cohort]
                     table.add_row(label, split, cohort, f'{m["exact_stop"]:.2%}', f'{m["remaining_initial_mae"]:.3f}')

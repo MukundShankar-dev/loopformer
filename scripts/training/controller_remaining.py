@@ -52,6 +52,33 @@ def initialization_loss(predicted: Tensor, depths: Tensor, scale: float) -> Tens
     return ((predicted[:, 0] - depths) / scale).square().mean()
 
 
+def prefix_losses(logits: Tensor, predicted: Tensor, depths: Tensor, scale: float) -> tuple[Tensor, Tensor]:
+    """Stop/countdown supervision through min(N,T), with no fabricated stop at T.
+
+    logits [B,T], predicted [B,T+1], depths [B]. A request longer than the
+    training prefix has continue labels only. Recurrence remains free-running;
+    N and t construct loss targets only. Mean each observed class per example.
+    """
+    if (not math.isfinite(scale) or scale <= 0 or logits.ndim != 2 or logits.shape[1] < 1 or
+            predicted.shape != (logits.shape[0], logits.shape[1] + 1) or
+            depths.shape != logits.shape[:1] or depths.dtype not in (torch.int32, torch.int64) or
+            (depths < 1).any()):
+        raise ValueError('Need aligned [B,T]/[B,T+1] outputs and positive integer requests')
+    if not torch.isfinite(logits).all() or not torch.isfinite(predicted).all():
+        raise FloatingPointError('Nonfinite controller prefix predictions')
+    t = torch.arange(1, logits.shape[1] + 1, device=logits.device)[None, :]
+    cont, stop = t < depths[:, None], t == depths[:, None]
+    error = torch.nn.functional.binary_cross_entropy_with_logits(logits, stop.to(logits.dtype), reduction='none')
+    continue_mean = (error * cont).sum(-1) / cont.sum(-1).clamp_min(1)
+    stop_mean = (error * stop).sum(-1) / stop.sum(-1).clamp_min(1)
+    classes = cont.any(-1).long() + stop.any(-1).long()
+    stop_loss = ((continue_mean + stop_mean) / classes).mean()
+    times = torch.arange(predicted.shape[1], device=predicted.device)[None, :]
+    nominal = times <= depths[:, None]
+    numeric = (((predicted - (depths[:, None] - times)) / scale).square() * nominal).sum(-1)
+    return stop_loss, (numeric / nominal.sum(-1)).mean()
+
+
 def remaining_metrics(predicted: Tensor, logits: Tensor, depths: Tensor) -> dict[str, float | int | None]:
     """Metrics in actual steps, per-example averaged; only t<=N has gold targets.
 

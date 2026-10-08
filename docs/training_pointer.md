@@ -7,7 +7,11 @@ Status: pointer training and full-loop checkpoint evaluation are implemented. Th
 The current controlled intervention is [independent initialization supervision](controller_repair.md).
 It reuses the immutable training cache and existing trainer/export interfaces.
 `initial_loss_weight` defaults to zero for historical recipes; the new exploratory
-config sets it to 12. No new data generation is needed for this first intervention.
+config sets it to 12. No new data generation is needed for either repair pilot.
+The initialization-only pilot has completed without fixing generalization. The
+current `bash repair_controller_prefix.sh` prepares broader frozen P features,
+trains through 12 loops, and evaluates selected/final heads; see the protocol
+for held-out counts and selection restrictions.
 
 ## Audit the completed controller runs
 

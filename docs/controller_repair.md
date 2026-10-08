@@ -65,12 +65,47 @@ These are finite development acceptance criteria, not proof of arbitrary-depth
 counting or independent confirmation. Reserved test data and seed 29 remain
 untouched; no natural-language or cross-family claim is opened.
 
-## Contingent next investigation
+## Broader count exposure with short prefixes
 
-If independent initialization supervision is insufficient, broaden count exposure
-in frozen prompt features and supervise short recurrent prefixes on those larger
-requests. This deliberately changes count coverage while retaining short training
-rollouts; it must be documented as such before implementation. Do not substitute
-a parsed-count clock, gold memory re-entry, numerical feedback or hand-coded
-countdown. An architecture change requires a separate recorded rationale and
-contract tests. No such change has been implemented or validated yet.
+The first intervention completed in 88.55 seconds. Selected step 2,800 reached
+95.92% familiar-count stopping, 38.02% held-out 7/9/11 and 1.80% deep stopping.
+Count nine remains 0%; familiar initial MAE improved to 0.212 but count-nine MAE
+was 1.164. This rejects independent initialization weighting as a sufficient fix.
+See [the report](experiments/controller_initialization_seed61.md).
+
+The next declared exploratory config, `configs/controller_prefix.json`, uses 256
+of the same training graphs and requests 1–63 excluding 9/17/29/41/53. Counts
+7/11 are now seen. Counts 9/17/29/41/53 remain held out; 64 exceeds the largest
+seen request. Train the same GRU and auxiliary readout from the same original
+controller for 6,000 updates, batch 256, seed 83. Full prompt features are frozen
+P outputs; existing count-free R features provide the first 12 observations.
+A no-update native check validates reuse on four graphs at short/middle/long
+requests and cached validation prompts before training.
+
+Stop labels are continue at every observed t<N and stop only if t=N is actually
+observed. A request longer than 12 has **no positive stop label** in its prefix;
+the training cap is never mislabeled as completion. Numerical targets are N−t
+through min(N,12), including initialization, with existing scale 12 and independent
+initial weight 12. No decoded number is fed back, no memory is reset, and the GRU
+must generate each next memory itself. This tests broader state/count coverage
+while keeping actual recurrent training unrolls short. It changes graph count,
+request coverage and update budget together, so it is a repair pilot, not a causal
+ablation attributing any gain to a single factor.
+
+Select on exact stopping for **seen requests at most 12**, then their BCE. Larger
+requests and held-out numeric values cannot select checkpoints. Evaluations
+separately report `selection`, `seen_count_long_rollout`, and
+`unseen_requested_count`; count-level rows retain exact denominators. The original
+32-graph deep cache remains development evidence, not confirmation.
+
+```bash
+bash repair_controller_prefix.sh --dry-run
+bash repair_controller_prefix.sh
+```
+
+The launcher prepares `models/stage1_pointer/controller-prefix-features.pt`, trains
+`models/stage1_pointer/controller-prefix-seed83/`, then evaluates selected/final
+heads on the immutable development caches. Output paths refuse overwrite. Frozen
+prompt extraction executes P only, instead of all 64 executor loops per request.
+Model export remains the existing format, with every non-controller tensor intact.
+Implementation tests and actual desktop effectiveness must be recorded separately.

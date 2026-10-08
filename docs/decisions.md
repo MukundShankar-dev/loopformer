@@ -225,3 +225,14 @@ supervised numeric values cannot be called unseen-count generalization. The
 [repair protocol](controller_repair.md) records development criteria and contingent
 changes. No programmed countdown, external progress input or confirmation run is
 authorized by this repair.
+
+## 2026-10-08 — Broaden count exposure after initialization-only failure
+
+The first controlled pilot leaves count nine at zero and deep exact stopping at
+1.80%. Next use broader full-prompt P features with short, count-free executor
+prefixes. Requests 1–63 except 9/17/29/41/53 are supervised; 64 is outside that
+range. No extra external progress feature or programmed countdown is introduced.
+This is a declared repair pilot changing graph sample size, coverage and budget;
+it cannot isolate a single cause of improvement. Preserve short-request-only
+selection and report seen values versus unseen rollout lengths and held-out
+values. The [protocol](controller_repair.md) owns the exact settings and limits.

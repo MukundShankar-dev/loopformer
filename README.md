@@ -41,7 +41,8 @@ The cause of count generalization failure remains unresolved.
 The current [controller repair](docs/controller_repair.md) tests stronger,
 independent initialization supervision while keeping R frozen. The desktop
 launcher `bash repair_controller.sh` trains and evaluates this controlled change;
-`--dry-run` previews without writes. Effectiveness is not yet established.
+`--dry-run` previews without writes. The first intervention did not repair count generalization; the guide records the
+next broader-count, short-prefix pilot.
 
 To reproduce the read-only training audit on the desktop, use the existing cached features
 and saved controller weights:

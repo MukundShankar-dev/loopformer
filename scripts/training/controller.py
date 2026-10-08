@@ -38,6 +38,8 @@ class ControllerConfig:
     remaining_loss_weight: float = 0.0
     remaining_scale: float = 12.0
     initial_loss_weight: float = 0.0
+    requested_counts: list[int] | None = None
+    training_loops: int | None = None
 
     def validate(self) -> None:
         for key in ('train_graphs', 'validation_graphs', 'extraction_batch_size', 'batch_size',
@@ -62,6 +64,14 @@ class ControllerConfig:
         if (not math.isfinite(self.initial_loss_weight) or self.initial_loss_weight < 0
                 or (self.initial_loss_weight and not self.remaining_readout)):
             raise ValueError('Initial loss needs a numerical readout and a nonnegative finite weight')
+        if self.requested_counts is not None:
+            if (not self.requested_counts or any(type(n) is not int or not 1 <= n <= 256 for n in self.requested_counts)
+                    or self.requested_counts != sorted(set(self.requested_counts))):
+                raise ValueError('Requested counts must be sorted unique integers in 1..256')
+        if self.training_loops is not None and (type(self.training_loops) is not int or not 1 <= self.training_loops <= 64):
+            raise ValueError('Training loops must be an integer in 1..64')
+        if self.training_loops is not None and not self.remaining_readout:
+            raise ValueError('Prefix supervision requires a numerical remaining-work readout')
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -88,7 +98,8 @@ def selection_key(metrics: dict) -> tuple[float, float]:
 
 def evaluate_controller(head, features: dict[str, Tensor], tasks: list, trained_depths: list[int],
                         device: str, batch_size: int = 256, *, remaining_readout=None,
-                        remaining_scale: float = 12.0, traces: list[dict] | None = None) -> tuple[dict, list[dict]]:
+                        remaining_scale: float = 12.0, traces: list[dict] | None = None,
+                        training_loops: int | None = None) -> tuple[dict, list[dict]]:
     """Cached first-crossing evaluation; gold labels cannot enter replay."""
     head.eval()
     logits, remaining = [], []
@@ -111,6 +122,11 @@ def evaluate_controller(head, features: dict[str, Tensor], tasks: list, trained_
                'interpolation': depths.new_tensor([d <= max(trained_depths) and d not in trained_depths for d in depths.tolist()], dtype=torch.bool),
                'extrapolation': depths > max(trained_depths)}
     cohorts.update({f'depth_{d}': depths == d for d in sorted(set(depths.tolist()))})
+    if training_loops is not None:
+        seen = cohorts['trained']
+        cohorts.update(selection=seen & (depths <= training_loops),
+                       seen_count_long_rollout=seen & (depths > training_loops),
+                       unseen_requested_count=~seen)
     metrics = {}
     for name, chosen in cohorts.items():
         if chosen.any():

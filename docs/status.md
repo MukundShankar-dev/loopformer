@@ -5,12 +5,13 @@ Last updated: 2026-10-08.
 ## Current priority
 
 The user authorized [controller repair](controller_repair.md) on 2026-10-08.
-First test independent loop-zero supervision against the retained seed-83
-remaining-work control, keeping R, data, controller and stopping policy fixed.
+The [initialization-only intervention](experiments/controller_initialization_seed61.md)
+completed: 95.92% familiar exact stopping, still 0% at count nine and 1.80% deep.
+Next test broader count exposure with 12-loop training prefixes, keeping R frozen.
+Newly seen numeric values and unseen recurrent rollout lengths remain separate.
 Implementation and desktop effectiveness are pending validation; no repair is
-claimed. Exact timing through 64, count-specific results and native/replay
-agreement are required before a success claim. Confirmation stays closed.
-
+claimed. Exact timing through 64 and native/replay agreement are required before
+success. Confirmation stays closed.
 
 The [controller training audit has completed](experiments/controller_training_audit_seed61.md)
 on the CUDA desktop in 31.19 seconds, with no weight updates and a successful
