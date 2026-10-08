@@ -213,3 +213,15 @@ is selected and no wider training coverage is authorized by this audit. The
 [diagnostic guide](diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
 owns commands, artifacts and limits; scalar gradient measurements are diagnostic,
 not proof of a causal mechanism or proposed optimizer changes.
+
+## 2026-10-08 — Controller repair after the completed audit
+
+The user authorized working until the controller is repaired. Start by increasing
+initialization supervision independently of trajectory length, while keeping
+architecture, frozen executor, graph/count panel and optimizer budget fixed.
+The declared coefficient is exploratory; retained seed-83 remaining-work training
+is the control. Broader count coverage is permitted if required, but newly
+supervised numeric values cannot be called unseen-count generalization. The
+[repair protocol](controller_repair.md) records development criteria and contingent
+changes. No programmed countdown, external progress input or confirmation run is
+authorized by this repair.

@@ -2,9 +2,16 @@
 
 Status: pointer training and full-loop checkpoint evaluation are implemented. The [fresh 30k baseline](experiments/stage1_fresh30k.md), [loop-balanced ablation](experiments/stage1_loopbalanced.md), and [learned-completion ablation](experiments/stage1_learned_completion.md) have completed. The latter two did not improve the depth frontier. Dated commands below document completed protocols, not current instructions. See [status](status.md) for the latest evidence and [implementation validation](experiments/stage1_training_implementation.md) for earlier toy-model checks.
 
+## Controller repair
+
+The current controlled intervention is [independent initialization supervision](controller_repair.md).
+It reuses the immutable training cache and existing trainer/export interfaces.
+`initial_loss_weight` defaults to zero for historical recipes; the new exploratory
+config sets it to 12. No new data generation is needed for this first intervention.
+
 ## Audit the completed controller runs
 
-The next command is `bash audit_controller.sh`, using the saved comparison heads
+The completed audit can be reproduced with `bash audit_controller.sh`, using the saved comparison heads
 and original cached features. This performs no training updates. See the
 [audit guide](diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
 for required local files, all measured quantities and interpretation limits.

@@ -37,6 +37,21 @@ def remaining_loss(predicted: Tensor, depths: Tensor, scale: float) -> Tensor:
     return (error.sum(-1) / (depths + 1)).mean()
 
 
+def initialization_loss(predicted: Tensor, depths: Tensor, scale: float) -> Tensor:
+    """Independent loop-zero MSE; no trajectory-length dilution or forward feedback.
+
+    Predictions are [B,T+1]. Only column zero receives direct gradients. The
+    fixed scale matches remaining_loss and is independent of requested count.
+    """
+    if (not math.isfinite(scale) or scale <= 0 or predicted.ndim != 2 or
+            predicted.shape[1] < 1 or depths.shape != predicted.shape[:1] or
+            depths.dtype not in (torch.int32, torch.int64) or (depths < 1).any()):
+        raise ValueError('Need finite positive scale, [B,T+1] predictions and positive integer depths')
+    if not torch.isfinite(predicted).all():
+        raise FloatingPointError('Nonfinite initialization predictions')
+    return ((predicted[:, 0] - depths) / scale).square().mean()
+
+
 def remaining_metrics(predicted: Tensor, logits: Tensor, depths: Tensor) -> dict[str, float | int | None]:
     """Metrics in actual steps, per-example averaged; only t<=N has gold targets.
 

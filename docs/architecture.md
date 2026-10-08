@@ -332,3 +332,13 @@ the recorded actual controller objective. No numerical readout replaces stopping
 Best/final selection is an inspection label, not checkpoint promotion. Full-panel
 fit and gradient diagnostics remain development evidence. Parameter tensors and
 input hashes are checked unchanged after the audit, and no new weights are saved.
+
+## Independent initialization supervision — 2026-10-08
+
+The [repair intervention](controller_repair.md) adds an independently weighted
+loop-zero regression objective to the same controller and numerical readout.
+Its direct gradient reaches context initialization and the training-only readout;
+it does not directly supervise recurrent updates or stop logits. Existing
+trajectory and stop losses still train those paths through full BPTT. No forward
+input, recurrence, export tensor name or inference policy changes. A zero default
+weight preserves historical objectives. Generalization remains unverified.

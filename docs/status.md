@@ -4,6 +4,14 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
+The user authorized [controller repair](controller_repair.md) on 2026-10-08.
+First test independent loop-zero supervision against the retained seed-83
+remaining-work control, keeping R, data, controller and stopping policy fixed.
+Implementation and desktop effectiveness are pending validation; no repair is
+claimed. Exact timing through 64, count-specific results and native/replay
+agreement are required before a success claim. Confirmation stays closed.
+
+
 The [controller training audit has completed](experiments/controller_training_audit_seed61.md)
 on the CUDA desktop in 31.19 seconds, with no weight updates and a successful
 W&B upload. Full training versus familiar-count validation gaps are about 1–2.2
@@ -13,7 +21,7 @@ fixed training panel), with mixed rather than consistently negative alignment.
 Seed 89 deteriorates on both training and validation by the final checkpoint.
 Count-nine initial estimates fail on every validation graph in all auxiliary
 seeds. These findings constrain explanations without establishing a unique cause.
-No new training recipe or confirmation experiment is selected.
+The first controlled intervention is now selected above; confirmation stays closed.
 
 Desktop SSH is operational via `ssh desktop`; the repo is `/home/mukund/loopformer`.
 Repository-scoped Git SSH authentication has been verified by an actual push.

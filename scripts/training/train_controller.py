@@ -21,7 +21,7 @@ from scripts.recurrent_qwen.interfaces import RecurrentController
 from scripts.training.controller import ControllerConfig, evaluate_controller, export_checkpoint, learning_rate, selection_key, select_graphs
 from scripts.training.data import read_tasks
 from scripts.training.objective import completion_loss
-from scripts.training.controller_remaining import remaining_predictions, remaining_loss
+from scripts.training.controller_remaining import remaining_predictions, remaining_loss, initialization_loss
 from scripts.training.tracking import tracking_run
 
 
@@ -141,7 +141,7 @@ def main() -> None:
         'optimization_scope': 'controller_only', 'trained_depths': trained_depths,
         'trainable_parameters': sum(p.numel() for p in head.parameters()),
         'remaining_readout_parameters': head.intermediate + 1 if config.remaining_readout else 0,
-        'remaining_gradient_scope': ('controller_and_readout' if config.remaining_loss_weight else 'detached_readout_only')
+        'remaining_gradient_scope': ('controller_and_readout' if config.remaining_loss_weight or config.initial_loss_weight else 'detached_readout_only')
                                    if config.remaining_readout else None,
         'cached_tensor_bytes': sum(t.numel() * t.element_size() for group in features.values() for t in group.values())}
     (output / 'run.json').write_text(json.dumps(metadata, indent=2) + '\n')
@@ -152,6 +152,8 @@ def main() -> None:
     if remaining_readout is not None:
         console.print(f'Remaining-work readout · weight {config.remaining_loss_weight:g} · fixed scale {config.remaining_scale:g}'
                       + (' · detached measurement control' if config.remaining_loss_weight == 0 else ' · trains controller memory'))
+        if config.initial_loss_weight:
+            console.print(f'Independent initialization loss · weight {config.initial_loss_weight:g} · no trajectory averaging')
     console.print(f'Frozen features ready · {sum(p.numel() for p in head.parameters()):,} controller parameters · starting optimizer')
     torch.manual_seed(optimizer_seed)
     optimizer = torch.optim.AdamW(head.parameters(), lr=config.learning_rate, weight_decay=0.0)
@@ -217,17 +219,21 @@ def main() -> None:
                 logits, initial, memories = replay(head, context[idx], working[idx])
                 stop_loss, _ = completion_loss(logits, masks[idx])
                 auxiliary = None
+                initial_loss = None
                 loss = stop_loss
                 if remaining_readout is not None:
                     readout_optimizer.zero_grad(set_to_none=True)
                     for group in readout_optimizer.param_groups:
                         group['lr'] = lr
                     predicted = remaining_predictions(remaining_readout, initial, memories, config.remaining_scale,
-                                                       detach=config.remaining_loss_weight == 0)
+                                                       detach=config.remaining_loss_weight == 0 and config.initial_loss_weight == 0)
                     auxiliary = remaining_loss(predicted, depths[idx], config.remaining_scale)
-                    loss = stop_loss + config.remaining_loss_weight * auxiliary
+                    initial_loss = initialization_loss(predicted, depths[idx], config.remaining_scale)
+                    loss = (stop_loss + config.remaining_loss_weight * auxiliary
+                            + config.initial_loss_weight * initial_loss)
                 # At weight zero the auxiliary trains only a detached measurement probe.
-                backward_loss = loss + auxiliary if auxiliary is not None and config.remaining_loss_weight == 0 else loss
+                backward_loss = (loss + auxiliary if auxiliary is not None and config.remaining_loss_weight == 0
+                                 and config.initial_loss_weight == 0 else loss)
                 backward_loss.backward()
                 norm = torch.nn.utils.clip_grad_norm_(head.parameters(), 1.0, error_if_nonfinite=True)
                 optimizer.step()
@@ -239,6 +245,7 @@ def main() -> None:
                         exact = (logits >= 0).any(-1) & ((logits >= 0).int().argmax(-1) + 1 == depths[idx])
                     record({'event': 'train', 'step': step, 'train': {'loss': loss.item(), 'stop_loss': stop_loss.item(),
                             **({'remaining_loss': auxiliary.item()} if auxiliary is not None else {}),
+                            **({'initial_loss': initial_loss.item()} if initial_loss is not None else {}),
                             'exact_stop': exact.float().mean().item()},
                         'learning_rate': lr, 'gradient_norm_before_clip': float(norm),
                         'training_elapsed_seconds': perf_counter() - training_began,

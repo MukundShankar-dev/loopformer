@@ -16,7 +16,7 @@ from scripts.eval.controller_features import replay
 from scripts.eval.controller_comparison import paired_summary
 from scripts.recurrent_qwen.interfaces import RecurrentController
 from scripts.training.controller import ControllerConfig
-from scripts.training.controller_remaining import remaining_loss, remaining_predictions, remaining_metrics
+from scripts.training.controller_remaining import remaining_loss, remaining_predictions, remaining_metrics, initialization_loss
 from scripts.training.compare_controllers import comparison_runs
 
 
@@ -38,6 +38,20 @@ def test_remaining_targets_masking_and_error_metrics():
     assert missing['remaining_zero_missing'] == 1 and missing['remaining_stop_near_zero_rate'] is None
     with pytest.raises(ValueError):
         remaining_loss(predicted, torch.tensor([0, 4]), 12)
+
+
+def test_initialization_weight_is_independent_of_rollout_length():
+    predicted = torch.tensor([[3., 99., 99., 99.], [4., 99., 99., 99.]], requires_grad=True)
+    depths = torch.tensor([2, 3])
+    loss = initialization_loss(predicted, depths, 12)
+    torch.testing.assert_close(loss, torch.tensor(1 / 144))
+    loss.backward()
+    torch.testing.assert_close(predicted.grad[:, 0], torch.full((2,), 1 / 144))
+    assert torch.count_nonzero(predicted.grad[:, 1:]) == 0
+    for invalid in [replace(ControllerConfig(), initial_loss_weight=1),
+                    replace(ControllerConfig(), initial_loss_weight=-1)]:
+        with pytest.raises(ValueError):
+            invalid.validate()
 
 
 def test_readout_gradient_scope_and_no_feedback():
@@ -141,6 +155,16 @@ def test_matched_suite_cache_export_and_native_eval(setup):
         '--deep-features-cache', path / 'evaluation/deep_features.pt')
     reused = json.loads((path / 'evaluation-reuse/summary.json').read_text())
     assert reused['metrics'] == summary['metrics']
+    # The repair retains export/replay contracts while adding direct loop-zero supervision.
+    repaired_config = path / 'repair.json'
+    repaired_config.write_text(json.dumps(replace(config, remaining_readout=True,
+        remaining_loss_weight=1., initial_loss_weight=12.).to_dict()))
+    run('scripts.training.train_controller', '--config', repaired_config, '--output', path / 'repair',
+        '--features-cache', spec['features_cache'])
+    run('scripts.eval.controller_candidate', '--run', path / 'repair',
+        '--deep-features-cache', path / 'evaluation/deep_features.pt', '--output', path / 'repair-eval')
+    repair_result = json.loads((path / 'repair-eval/summary.json').read_text())
+    assert repair_result['metrics']['best']['validation'] == json.loads((path / 'repair/summary.json').read_text())['validation']
 
 
 @pytest.mark.parametrize('fail_call', [None, 3])

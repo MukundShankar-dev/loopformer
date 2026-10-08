@@ -37,6 +37,7 @@ class ControllerConfig:
     remaining_readout: bool = False
     remaining_loss_weight: float = 0.0
     remaining_scale: float = 12.0
+    initial_loss_weight: float = 0.0
 
     def validate(self) -> None:
         for key in ('train_graphs', 'validation_graphs', 'extraction_batch_size', 'batch_size',
@@ -58,6 +59,9 @@ class ControllerConfig:
                 or self.remaining_loss_weight < 0 or not math.isfinite(self.remaining_scale)
                 or self.remaining_scale <= 0 or (self.remaining_loss_weight and not self.remaining_readout)):
             raise ValueError('Invalid remaining-work readout, weight or scale')
+        if (not math.isfinite(self.initial_loss_weight) or self.initial_loss_weight < 0
+                or (self.initial_loss_weight and not self.remaining_readout)):
+            raise ValueError('Initial loss needs a numerical readout and a nonnegative finite weight')
 
     def to_dict(self) -> dict:
         return asdict(self)

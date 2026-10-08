@@ -11,6 +11,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | Research objectives, stage gates, transfer, and claim hierarchy | [Project plan](docs/project_plan.md) |
 | Implemented work and the next bounded milestone | [Status](docs/status.md) |
 | Current executor/controller upgrade and validation checklist | [Pipeline upgrade](docs/pipeline_upgrade.md) |
+| Current controller repair, controlled interventions and acceptance scope | [Controller repair](docs/controller_repair.md) |
 | Recurrent model, gradients, and Stage 0 validation | [Architecture](docs/architecture.md) |
 | Pointer data, training, checkpoints, and depth comparison | [Pointer execution and training](docs/training_pointer.md) |
 | Metrics, ordinary and recurrent baselines, and terminal overscaling | [Evaluation](docs/evaluation.md) |

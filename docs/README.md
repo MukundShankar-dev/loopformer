@@ -4,6 +4,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 
 | Need | Canonical document |
 | --- | --- |
+| Current controller repair and acceptance criteria | [Controller repair](controller_repair.md) |
 | Current executor/controller implementation checklist | [Pipeline upgrade](pipeline_upgrade.md) |
 | Recurrent model, parameter sharing, gradient behavior, Stage 0 validation protocol | [Architecture](architecture.md) |
 | Pointer data, training, checkpoints, resume, and historical depth-6 comparison commands | [Pointer execution and training](training_pointer.md) |

@@ -15,6 +15,16 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-08 controller-repair amendment:** The user authorized working through
+the controller failure using the desktop. Keep the successful executor frozen
+and preserve prompt-only learned stopping. Start with separately weighted
+initialization supervision; broader requested-count exposure may follow a failed
+controlled result, with seen counts and unseen rollout lengths reported distinctly.
+The [repair protocol](controller_repair.md) declares development acceptance criteria.
+Numeric targets remain labels only: no external clock, gold state re-entry or
+programmed decrement. Reserved confirmation splits and later research stages
+remain closed. This supersedes the earlier bounded-comparison-only scope.
+
 **2026-10-05 controller-supervision amendment:** The user authorized the
 [matched remaining-work comparison](training_pointer.md#remaining-work-comparison--current-desktop-run).
 Keep the successful executor frozen and compare existing stop supervision with
