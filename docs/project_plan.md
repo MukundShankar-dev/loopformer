@@ -15,6 +15,14 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-08 frozen-benchmark amendment:** The user authorized freezing the
+repaired model, opening the existing seed-61 reserved test, and evaluating a larger
+independent pointer benchmark with longer depths. The [predeclared protocol](pointer_benchmark.md)
+fixes seed 83, threshold 0.5, data seeds and quality criteria before results.
+No further tuning is authorized by this evaluation; seed 29 and later research
+stages remain closed. Report finite task/range claims, including numeric-format
+boundaries, rather than generic evaluator/controller generality.
+
 **2026-10-08 controller-repair amendment:** The user authorized working through
 the controller failure using the desktop. Keep the successful executor frozen
 and preserve prompt-only learned stopping. Start with separately weighted

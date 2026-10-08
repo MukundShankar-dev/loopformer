@@ -4,6 +4,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 
 | Need | Canonical document |
 | --- | --- |
+| Frozen reserved-test and larger pointer benchmark | [Benchmark protocol](pointer_benchmark.md) |
 | Current controller repair and acceptance criteria | [Controller repair](controller_repair.md) |
 | Current executor/controller implementation checklist | [Pipeline upgrade](pipeline_upgrade.md) |
 | Recurrent model, parameter sharing, gradient behavior, Stage 0 validation protocol | [Architecture](architecture.md) |
