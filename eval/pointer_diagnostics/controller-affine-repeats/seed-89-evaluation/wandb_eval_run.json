@@ -1,0 +1,16 @@
+{
+  "id": "h3md3amm",
+  "url": "https://wandb.ai/mukunds/loopformer/runs/h3md3amm",
+  "project": "loopformer",
+  "entity": "mukunds",
+  "mode": "online",
+  "sdk_version": "0.30.0",
+  "artifact_sha256": {
+    "summary.json": "8fbd15301fc542b63e7ba288bddbcfbc8d8bd878a17955a2c5dfb58de3b3a5a3",
+    "best_depth_test_decisions.csv": "710ef01739e77c716e97605e2495bebd4e207d3c8ed065999ed86fe8698f1608",
+    "best_validation_decisions.csv": "adc2a6af4673ee84e4b13dd7b4acae955dee5d14d3be2426f801283dc390b017",
+    "last_depth_test_decisions.csv": "710ef01739e77c716e97605e2495bebd4e207d3c8ed065999ed86fe8698f1608",
+    "last_validation_decisions.csv": "adc2a6af4673ee84e4b13dd7b4acae955dee5d14d3be2426f801283dc390b017",
+    "metrics.csv": "414e2ed3b7113b3a97d9de102925c4d707264b9f86b670b12c4b338eaeb2e2e3"
+  }
+}

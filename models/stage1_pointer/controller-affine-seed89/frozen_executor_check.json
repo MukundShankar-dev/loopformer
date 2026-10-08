@@ -1,0 +1,8 @@
+{
+  "all_noncontroller_tensors_bitwise_unchanged": true,
+  "noncontroller_tensors": 148,
+  "affine_gain": 0.9999994039535522,
+  "affine_offset": -0.999981164932251,
+  "stop_slope": -3.8339176177978516,
+  "stop_intercept": 2.6793432235717773
+}

@@ -1,0 +1,12 @@
+{
+  "id": "ksuvm8db",
+  "url": "https://wandb.ai/mukunds/loopformer/runs/ksuvm8db",
+  "project": "loopformer",
+  "entity": "mukunds",
+  "mode": "online",
+  "sdk_version": "0.30.0",
+  "artifact_sha256": {
+    "summary.json": "64c3f2bbe69ae04bb9219fa173504df96eab5d3e6aab85eee5e517d6171d008c",
+    "per_count.csv": "8dee0bfa3a7d54d2544488997e7c93abc211999fb339bbed06ac3d04d07c818f"
+  }
+}

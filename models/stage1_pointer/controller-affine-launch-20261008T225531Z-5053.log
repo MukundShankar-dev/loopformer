@@ -1,0 +1,91 @@
+Frozen prompt cache · 256 graphs × 58 counts · 12 reused R loops
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  30%|███       | 88/290 [00:00<00:00, 845.22it/s]Loading weights:  63%|██████▎   | 183/290 [00:00<00:00, 904.23it/s]Loading weights:  94%|█████████▍| 274/290 [00:00<00:00, 885.10it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 897.85it/s]
+[?25l[2KCache frozen full-prompt P features [38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 0/14848 [33m0:00:00[0m [36m-:--:--[0m[2KCache frozen full-prompt P features [38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 0/14848 [33m0:00:01[0m [36m-:--:--[0m[2KCache frozen full-prompt P features [38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 0/14848 [33m0:00:02[0m [36m-:--:--[0m[2KCache frozen full-prompt P features [38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 0/14848 [33m0:00:03[0m [36m-:--:--[0m[2KCache frozen full-prompt P features [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━[0m 13312/14848 [33m0:00:04[0m [36m0:00:01[0m[2KCache frozen full-prompt P features [38;5;70m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 14848/14848 [33m0:00:04[0m [36m0:00:00[0m
+[?25hCache validated · native R error 0.000125885 · 
+models/stage1_pointer/controller-affine-features.pt
+Controller-only training · executor frozen · existing controller initialization
+256 training graphs × 58 counts · 3,000 updates · batch 256
+Trained counts: [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20,
+21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 42, 
+43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63] 
+· training loops 12 · threshold 0.5
+Select on seen-count validation timing within the training loop budget, then BCE
+Output: models/stage1_pointer/controller-affine-seed83
+Remaining-work readout · weight 1 · fixed scale 12 · trains controller memory
+Independent initialization loss · weight 12 · no trajectory averaging
+Frozen features ready · 7,173 controller parameters · starting optimizer
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: setting up run sjw2bi6c
+wandb: Syncing run controller-affine-seed83
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/sjw2bi6c
+[?25l[2KController training [38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 0/3000 [33m0:00:00[0m [36m-:--:--[0m[2KController · val@0 9.1% [38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 30/3000 [33m0:00:01[0m [36m0:00:28[0m[2KController · val@100 0.0% [38;5;197m━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 110/3000 [33m0:00:02[0m [36m0:00:36[0m[2KController · val@100 0.0% [38;5;197m━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 160/3000 [33m0:00:02[0m [36m0:00:35[0m[2KController · val@200 27.3% [38;5;197m━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 230/3000 [33m0:00:03[0m [36m0:00:35[0m[2KController · val@300 9.1% [38;5;197m━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 310/3000 [33m0:00:04[0m [36m0:00:34[0m[2KController · val@300 9.1% [38;5;197m━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 380/3000 [33m0:00:05[0m [36m0:00:34[0m[2KController · val@400 9.1% [38;5;197m━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 450/3000 [33m0:00:06[0m [36m0:00:34[0m[2KController · val@500 9.1% [38;5;197m━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 510/3000 [33m0:00:07[0m [36m0:00:34[0m[2KController · val@500 9.1% [38;5;197m━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 580/3000 [33m0:00:08[0m [36m0:00:33[0m[2KController · val@600 100.0% [38;5;197m━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 650/3000 [33m0:00:09[0m [36m0:00:33[0m[2KController · val@700 100.0% [38;5;197m━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 710/3000 [33m0:00:10[0m [36m0:00:33[0m[2KController · val@700 100.0% [38;5;197m━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 790/3000 [33m0:00:11[0m [36m0:00:31[0m[2KController · val@800 100.0% [38;5;197m━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 840/3000 [33m0:00:12[0m [36m0:00:31[0m[2KController · val@900 100.0% [38;5;197m━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 910/3000 [33m0:00:13[0m [36m0:00:30[0m[2KController · val@900 100.0% [38;5;197m━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 980/3000 [33m0:00:14[0m [36m0:00:29[0m[2KController · val@1000 100.0% [38;5;197m━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━[0m 1050/3000 [33m0:00:15[0m [36m0:00:28[0m[2KController · val@1100 100.0% [38;5;197m━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━[0m 1130/3000 [33m0:00:16[0m [36m0:00:27[0m[2KController · val@1200 100.0% [38;5;197m━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━[0m 1200/3000 [33m0:00:17[0m [36m0:00:26[0m[2KController · val@1200 100.0% [38;5;197m━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━[0m 1270/3000 [33m0:00:18[0m [36m0:00:25[0m[2KController · val@1300 100.0% [38;5;197m━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━━[0m 1330/3000 [33m0:00:19[0m [36m0:00:24[0m[2KController · val@1400 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━━[0m 1400/3000 [33m0:00:20[0m [36m0:00:23[0m[2KController · val@1400 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━━[0m 1460/3000 [33m0:00:21[0m [36m0:00:22[0m[2KController · val@1500 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━━[0m 1530/3000 [33m0:00:22[0m [36m0:00:22[0m[2KController · val@1600 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━━[0m 1600/3000 [33m0:00:23[0m [36m0:00:21[0m[2KController · val@1600 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━━[0m 1680/3000 [33m0:00:24[0m [36m0:00:19[0m[2KController · val@1700 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━━[0m 1740/3000 [33m0:00:25[0m [36m0:00:19[0m[2KController · val@1800 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━━[0m 1820/3000 [33m0:00:26[0m [36m0:00:17[0m[2KController · val@1800 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━━[0m 1890/3000 [33m0:00:27[0m [36m0:00:16[0m[2KController · val@1900 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━━[0m 1960/3000 [33m0:00:28[0m [36m0:00:15[0m[2KController · val@2000 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━━━[0m 2030/3000 [33m0:00:29[0m [36m0:00:14[0m[2KController · val@2000 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━━━━━[0m 2090/3000 [33m0:00:30[0m [36m0:00:13[0m[2KController · val@2100 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━━[0m 2180/3000 [33m0:00:31[0m [36m0:00:12[0m[2KController · val@2200 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━━━[0m 2250/3000 [33m0:00:32[0m [36m0:00:11[0m[2KController · val@2300 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━━[0m 2310/3000 [33m0:00:33[0m [36m0:00:10[0m[2KController · val@2300 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━━[0m 2390/3000 [33m0:00:34[0m [36m0:00:09[0m[2KController · val@2400 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;237m╺[0m[38;5;237m━━━━━━━[0m 2400/3000 [33m0:00:34[0m [36m0:00:09[0m[2KController · val@2400 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━━[0m 2470/3000 [33m0:00:35[0m [36m0:00:08[0m[2KController · val@2500 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━━[0m 2540/3000 [33m0:00:36[0m [36m0:00:07[0m[2KController · val@2600 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━━[0m 2610/3000 [33m0:00:37[0m [36m0:00:06[0m[2KController · val@2600 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━━[0m 2690/3000 [33m0:00:38[0m [36m0:00:05[0m[2KController · val@2700 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━━[0m 2750/3000 [33m0:00:39[0m [36m0:00:04[0m[2KController · val@2800 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━━[0m 2820/3000 [33m0:00:40[0m [36m0:00:03[0m[2KController · val@2900 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m[38;5;237m━[0m 2900/3000 [33m0:00:41[0m [36m0:00:02[0m[2KController · val@2900 100.0% [38;5;197m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[38;5;197m╸[0m 2970/3000 [33m0:00:42[0m [36m0:00:01[0m[2KController · val@3000 100.0% [38;5;70m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m 3000/3000 [33m0:00:43[0m [36m0:00:00[0m
+[?25hwandb: uploading history steps 226-331, summary; updating run metadata
+wandb: uploading wandb-summary.json; uploading config.yaml
+wandb: 🚀 View run controller-affine-seed83 at: https://wandb.ai/mukunds/loopformer/runs/sjw2bi6c
+wandb: ⭐️ View project at: https://wandb.ai/mukunds/loopformer
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+Complete · best step 3000 · trained-count validation exact stop 100.00%
+Saved portable checkpoint: models/stage1_pointer/controller-affine-seed83/best
+Pointer task · adaptive stopping
+20 examples · up to 16 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_diagnostics/controller-affine-seed83-202610
+08T225656.737071Z/validation_native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:45,  6.34it/s]Loading weights:  80%|███████▉  | 231/290 [00:00<00:00, 1093.04it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 896.00it/s] 
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 20/20 0:00:05 0:00:00
+Stopped accuracy: 100.00%; mean loops: 8.80; p95 latency: 0.6636s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_diagnostics/controller-affine-seed83-202610
+08T225656.737071Z/validation_native
+Pointer task · adaptive stopping
+24 examples · up to 64 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_diagnostics/controller-affine-seed83-202610
+08T225656.737071Z/depth_test_native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  21%|██▏       | 62/290 [00:00<00:00, 618.97it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1508.28it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 24/24 0:00:22 0:00:00
+Stopped accuracy: 100.00%; mean loops: 36.17; p95 latency: 2.0826s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_diagnostics/controller-affine-seed83-202610
+08T225656.737071Z/depth_test_native
+                    Exact stopping · unchanged threshold 0.5                    
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ Checkpoint ┃ Split      ┃ Counts                  ┃ Exact stop ┃ Initial MAE ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ best       │ validation │ trained                 │ 100.00%    │ 0.000       │
+│ best       │ validation │ interpolation           │ 100.00%    │ 0.000       │
+│ best       │ validation │ selection               │ 100.00%    │ 0.000       │
+│ best       │ validation │ seen_count_long_rollout │ 100.00%    │ 0.000       │
+│ best       │ validation │ unseen_requested_count  │ 100.00%    │ 0.000       │
+│ best       │ depth_test │ trained                 │ 100.00%    │ 0.000       │
+│ best       │ depth_test │ interpolation           │ 100.00%    │ 0.000       │
+│ best       │ depth_test │ extrapolation           │ 100.00%    │ 0.000       │
+│ best       │ depth_test │ seen_count_long_rollout │ 100.00%    │ 0.000       │
+│ best       │ depth_test │ unseen_requested_count  │ 100.00%    │ 0.000       │
+│ last       │ validation │ trained                 │ 100.00%    │ 0.000       │
+│ last       │ validation │ interpolation           │ 100.00%    │ 0.000       │
+│ last       │ validation │ selection               │ 100.00%    │ 0.000       │
+│ last       │ validation │ seen_count_long_rollout │ 100.00%    │ 0.000       │
+│ last       │ validation │ unseen_requested_count  │ 100.00%    │ 0.000       │
+│ last       │ depth_test │ trained                 │ 100.00%    │ 0.000       │
+│ last       │ depth_test │ interpolation           │ 100.00%    │ 0.000       │
+│ last       │ depth_test │ extrapolation           │ 100.00%    │ 0.000       │
+│ last       │ depth_test │ seen_count_long_rollout │ 100.00%    │ 0.000       │
+│ last       │ depth_test │ unseen_requested_count  │ 100.00%    │ 0.000       │
+└────────────┴────────────┴─────────────────────────┴────────────┴─────────────┘
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: Syncing run controller-affine-seed83-20261008T225656.737071Z
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/u0xbrs68
+wandb: updating run metadata; uploading artifact run-u0xbrs68-tablesbest_validation_decisions-p8lyaQ; uploading artifact run-u0xbrs68-tableslast_depth_test_decisions-JM0ztA; uploading artifact run-u0xbrs68-tableslast_validation_decisions-iR8TJw; uploading artifact run-u0xbrs68-tablesmetrics-74_wBQ
+wandb: uploading artifact run-u0xbrs68-tablesbest_validation_decisions-p8lyaQ; uploading artifact run-u0xbrs68-tableslast_depth_test_decisions-JM0ztA; uploading artifact run-u0xbrs68-tableslast_validation_decisions-iR8TJw; uploading artifact run-u0xbrs68-tablesmetrics-74_wBQ
+wandb: uploading artifact run-u0xbrs68-tableslast_depth_test_decisions-JM0ztA; uploading artifact run-u0xbrs68-tableslast_validation_decisions-iR8TJw; uploading artifact run-u0xbrs68-tablesmetrics-74_wBQ
+wandb: uploading history steps 0-4, summary
+wandb: 🚀 View run controller-affine-seed83-20261008T225656.737071Z at: https://wandb.ai/mukunds/loopformer/runs/u0xbrs68
+wandb: ⭐️ View project at: https://wandb.ai/mukunds/loopformer
+wandb: Synced 4 W&B file(s), 5 media file(s), 17 artifact file(s) and 0 other file(s)
+Saved evaluation: 
+eval/pointer_diagnostics/controller-affine-seed83-20261008T225656.737071Z
