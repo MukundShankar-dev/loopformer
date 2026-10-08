@@ -168,3 +168,18 @@ checkpoints remain compatible. Native inference and three-seed results remain
 required before claiming repair. The suffix length and training coverage restrict
 claims to the declared numeric/template scope; arbitrary integers or alternate
 prompt wording are not established.
+
+The first pretrained affine pilot has completed. It reached 100% exact stopping
+at every evaluated count through 64, for both selected and final heads. All 44
+native checks matched replay. This passes the first-seed gate; two optimizer-order
+repetitions are still required. The recipe is frozen before those repetitions:
+
+```bash
+python -m scripts.training.repeat_affine_controller \
+  --pilot-evaluation eval/pointer_diagnostics/controller-affine-seed83-20261008T225656.737071Z
+```
+
+This reuses the completed seed 83 and its frozen caches, trains seeds 89/97,
+performs native checks for each, reports all seeds and fails unless each seed
+meets the declared exact-timing thresholds. It does not select a winning seed or
+open the reserved confirmation split.

@@ -9,7 +9,9 @@ The [initialization-only intervention](experiments/controller_initialization_see
 completed: 95.92% familiar exact stopping, still 0% at count nine and 1.80% deep.
 The broader-count 12-loop GRU pilot also failed (60.65% short seen timing).
 A learned suffix initializer plus affine memory is now the selected pilot, with
-implementation tested but pretrained effectiveness still unverified. R stays frozen.
+the first pretrained seed now reaches 100% exact timing through 64 and passes
+44 native/replay checks. The frozen recipe is being repeated with seeds 89/97.
+R stays frozen; no multi-seed repair or confirmation claim yet.
 Newly seen numeric values and unseen recurrent rollout lengths remain separate.
 Implementation and desktop effectiveness are pending validation; no repair is
 claimed. Exact timing through 64 and native/replay agreement are required before

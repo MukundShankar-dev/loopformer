@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 import torch
+import pytest
 
 from test_executor_upgrade import setup
 from test_controller_training import source_checkpoint
@@ -15,6 +16,22 @@ from scripts.recurrent_qwen.interfaces import AffineSuffixController
 from scripts.training.controller import ControllerConfig
 from scripts.training.controller_cache import fit_suffix_initializer
 from scripts.training.controller_remaining import prefix_losses
+from scripts.training.repeat_affine_controller import acceptance
+
+
+def test_repeat_gate_checks_every_count_and_actual_stop_not_letters():
+    def result():
+        return {'status': 'complete', 'threshold': .5,
+                'native_checks': [{'passed': True, 'questions': 20}, {'passed': True, 'questions': 24}],
+                'metrics': {'best': {'all': {f'depth_{n}': {'questions': 32, 'exact_stop': 1.,
+                    'stopped_answer_correct': 1.} for n in range(1, 65)}}}}
+    results = {seed: result() for seed in (83, 89, 97)}
+    assert acceptance(results)['passed']
+    results[89]['metrics']['best']['all']['depth_64']['exact_stop'] = 0
+    assert not acceptance(results)['passed']  # A correct cyclic final letter is insufficient.
+    del results[97]['metrics']['best']['all']['depth_64']
+    with pytest.raises(ValueError):
+        acceptance(results)
 
 
 def test_affine_update_is_learned_and_stop_gradients_are_isolated():
