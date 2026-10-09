@@ -22,3 +22,5 @@ python -m scripts.eval.frozen_pointer_benchmark \
   --output "$root/independent" --dataset-output data/pointer/benchmark-seeds281-283-293 \
   --wandb-mode disabled
 python -m scripts.eval.number_reader_diagnostic --output "$root/numeric"
+python -m scripts.eval.audit_pointer_benchmark --results "$root/independent" \
+  --graphs data/pointer/benchmark-seeds281-283-293/graphs.jsonl

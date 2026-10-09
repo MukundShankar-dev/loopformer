@@ -1,6 +1,10 @@
 # Train recurrent pointer execution
 
-The repaired model is now frozen for the [reserved-test and larger benchmark](pointer_benchmark.md).
+The original repaired model remains frozen as the
+[reserved-test and larger benchmark](pointer_benchmark.md) reference. The user
+subsequently authorized [replacing only its number reader](number_reader_repair.md)
+with unchanged training count/depth exposure. This does not select another R
+training run; the learned countdown and stop readout are retained unchanged.
 No further training is selected from its outcomes; the commands below retain
 training/reproduction context.
 

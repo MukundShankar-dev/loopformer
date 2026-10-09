@@ -1,5 +1,8 @@
 """Shared reading extrapolates positions/lengths without adding training counts."""
 import json
+from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 import torch
@@ -11,7 +14,7 @@ from scripts.dataset.pointer import generate_unconditioned_example
 from scripts.recurrent_qwen.checkpoint import load_recurrent_checkpoint
 from scripts.recurrent_qwen.interfaces import SharedNumberController
 from scripts.recurrent_qwen.number_reader import MAX_NUMBER_TOKENS, SharedNumberReader, number_token_ids
-from scripts.training.controller import export_checkpoint
+from scripts.training.controller import ControllerConfig, export_checkpoint, select_graphs
 from scripts.training.controller_cache import prompt_features
 from scripts.training.data import collate, encode_tasks
 from scripts.training.number_reader import fit_number_reader
@@ -108,9 +111,55 @@ def test_shared_controller_export_native_padding_and_count_free_executor(setup):
 
 
 def test_repair_keeps_original_training_protocol():
-    from pathlib import Path
     config=json.loads(Path('configs/controller_affine.json').read_text())
     repair=json.loads(Path('configs/controller_number_reader.json').read_text())
     assert repair['training_config']=='configs/controller_affine.json'
     assert config['requested_counts']==TRAIN_COUNTS and config['training_loops']==12
     assert MAX_NUMBER_TOKENS==8
+
+
+def test_reader_repair_cli_preserves_countdown_and_refuses_changed_training_panel(setup):
+    from scripts.dataset.dataset import DatasetConfig, generate_dataset, write_dataset
+    from scripts.eval.frozen_pointer_benchmark import checkpoint_hashes
+    from scripts.eval.loop_metrics import write_csv
+    from scripts.eval.pointer_task import sha256_file
+    from scripts.training.data import read_tasks
+    model,tokenizer,tokens,path=source_checkpoint(setup)
+    dataset=DatasetConfig(seed=61,graph_mode='mixture',paired_horizons=True,
+        train_count=4,validation_count=2,test_count=2,depth_test_count=2,max_train_depth=2,max_eval_depth=3)
+    write_dataset(path/'data',generate_dataset(dataset,tokenizer,tokens),dataset,tokens,{})
+    config=ControllerConfig(source=str(path/'source'),data=str(path/'data'),device='cpu',
+        train_graphs=2,validation_graphs=1,training_loops=12,requested_counts=TRAIN_COUNTS,
+        remaining_readout=True,remaining_loss_weight=1,controller_kind='affine_suffix')
+    training=path/'training.json';training.write_text(json.dumps(config.to_dict()))
+    old=path/'old-run'
+    from scripts.recurrent_qwen.interfaces import AffineSuffixController
+    old_head=AffineSuffixController(model.config.hidden_size)
+    export_checkpoint(path/'source',old/'best',old_head,{'trained_depths':TRAIN_COUNTS,
+        'training_loops':12,'config':config.to_dict()})
+    before=checkpoint_hashes(old/'best')
+    selected=select_graphs(read_tasks(path/'data/train.jsonl','train'),2,TRAIN_COUNTS,config.seed)
+    write_csv(old/'train_panel.csv',[{'example_id':t.example_id} for t in selected])
+    (old/'run.json').write_text(json.dumps({'train_data_sha256':sha256_file(path/'data/train.jsonl')}))
+    settings={'source':str(old/'best'),'training_config':str(training),'output':str(path/'new-run')}
+    file=path/'repair.json';file.write_text(json.dumps(settings))
+    args=[sys.executable,'-m','scripts.training.repair_number_reader','--config',str(file)]
+    preview=subprocess.run(args+['--dry-run'],capture_output=True,text=True)
+    assert preview.returncode==0 and not (path/'new-run').exists()
+    result=subprocess.run(args,capture_output=True,text=True)
+    assert result.returncode==0,result.stdout+result.stderr
+    assert checkpoint_hashes(old/'best')==before
+    original=torch.load(old/'best/adapter_model.pt',weights_only=True)
+    exported=torch.load(path/'new-run/best/adapter_model.pt',weights_only=True)
+    for name in original:
+        if not name.startswith('completion_head.context.'):
+            torch.testing.assert_close(original[name],exported[name],atol=0,rtol=0)
+    summary=json.loads((path/'new-run/summary.json').read_text())
+    assert summary['training_loops']==12 and summary['fit']['training_counts']==TRAIN_COUNTS
+    assert subprocess.run(args,capture_output=True,text=True).returncode!=0
+    config_dict=config.to_dict();config_dict['requested_counts']=TRAIN_COUNTS[:-1]
+    training.write_text(json.dumps(config_dict))
+    settings['output']=str(path/'invalid-run');file.write_text(json.dumps(settings))
+    bad=subprocess.run(args,capture_output=True,text=True)
+    assert bad.returncode!=0 and 'actual training config differs' in bad.stderr
+    assert not (path/'invalid-run').exists()

@@ -106,6 +106,20 @@ def test_frozen_benchmark_cli_native_agrees_on_failures_and_files_unchanged(setu
     assert summary['native_fidelity']=={'passed':True,'questions':4,'mismatches':[]}
     assert not summary['acceptance']['passed'] and summary['inference_files_unchanged']
     assert checkpoint_hashes(path/'affine')==before
+    from scripts.eval.audit_pointer_benchmark import audit_benchmark
+    assert audit_benchmark(path/'result',path/'benchmark/graphs.jsonl')['decisions_checked']==8
+    import csv
+    import gzip
+    decisions=path/'result/decisions.csv.gz'
+    original_bytes=decisions.read_bytes()
+    with gzip.open(decisions,'rt') as handle:
+        rows=list(csv.DictReader(handle))
+    rows[1]['exact_stop']='True'  # Correct letters cannot turn a wrong loop into exact timing.
+    with gzip.open(decisions,'wt',newline='') as handle:
+        writer=csv.DictWriter(handle,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
+    with pytest.raises(ValueError,match='Decision flag exact_stop differs'):
+        audit_benchmark(path/'result',path/'benchmark/graphs.jsonl')
+    decisions.write_bytes(original_bytes)
     repeat=subprocess.run(args,capture_output=True,text=True)
     assert repeat.returncode!=0 and 'refuse overwrite' in repeat.stderr
 

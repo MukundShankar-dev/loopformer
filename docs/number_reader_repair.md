@@ -63,7 +63,9 @@ bash repair_number_reader.sh
 Run on the desktop with the complete old checkpoint, training dataset, old run
 metadata/train panel and opened benchmark graph file. The launcher fits only the
 reader, exports the normal full checkpoint, freezes inference hashes, runs the
-fresh benchmark, then numeric-only diagnostics. It refuses existing outputs.
+fresh benchmark, numeric-only diagnostics, then an independent saved-result audit.
+The audit traverses raw graphs and recomputes every flag/aggregate without the
+inference scorer or its reference interpreter. It refuses existing outputs.
 W&B stays disabled; artifacts are saved under
 `eval/pointer_benchmark/shared-number-20261008/`. Model files stay under
 `models/stage1_pointer/controller-shared-number-seed83/` and are ignored by Git.
@@ -75,4 +77,5 @@ controller factory. Fitting is in `scripts/training/number_reader.py`, composed
 by `repair_number_reader`. The existing frozen benchmark is reused, including
 native checks, graph clustering and cyclic coincidence exclusions. Numeric-only
 diagnostics never run R and must not be confused with longer pointer evaluation.
-All old artifacts remain preserved. Results will be recorded in a dated report.
+All old artifacts remain preserved. Results are recorded in the
+[experiment report](experiments/controller_number_reader.md).

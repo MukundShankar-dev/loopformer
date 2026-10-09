@@ -32,7 +32,7 @@ def main() -> None:
     axes[1].plot(x, x, color='#777777', linestyle='--', linewidth=1.2, label='Correct initialization: memory = N')
     axes[1].plot([int(r['depth']) for r in counts], [float(r['initial_memory']) for r in counts],
                  color='#b14536', linewidth=1.8, label='Frozen learned initializer')
-    axes[1].set(xlabel='Requested steps', ylabel='Initial controller memory', xlim=(1, 256), title='Number reading fails before recurrence')
+    axes[1].set(xlabel='Requested steps', ylabel='Initial controller memory', xlim=(1, 256), title='Number reading before recurrence')
     axes[1].legend(loc='upper left', frameon=False, fontsize=9)
     for ax in axes:
         ax.axvline(12, color='#bbbbbb', linestyle=':', linewidth=1)

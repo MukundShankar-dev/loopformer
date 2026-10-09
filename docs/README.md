@@ -81,3 +81,7 @@ perfect current reserved test and strong executor trajectories through 256 on
 1,350 new graphs, but exposes controller number-reading failures starting at 70.
 All native/reuse checks and independent reference audits pass. This report
 supersedes broader interpretations of the smaller controller repair panel.
+
+The [shared reader report](experiments/controller_number_reader.md) records the
+authorized reader-only intervention with unchanged count/depth exposure and a
+fresh graph confirmation panel; consult its status before treating it as verified.

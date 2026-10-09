@@ -7,6 +7,12 @@ at every count 1–256; the separate numeric stress diagnostic does not execute 
 Checkpoint/config hashes are fixed before confirmation, and native calls must
 match reuse. No numeric stress result establishes pointer execution at that depth.
 
+`python -m scripts.eval.audit_pointer_benchmark --results <result-directory>
+--graphs <graphs.jsonl>` independently traverses raw graph records and checks
+every compressed decision, overall/per-count aggregates, first-error annotations,
+data bytes and exclusions. It does not call the inference scorer or fit any model.
+The number-reader launcher runs this after inference and numeric diagnostics.
+
 Status: nominal per-loop evaluation is implemented through the [full-loop checkpoint CLI](evaluation.md) and training monitoring. Repair/damage and censored survival are implemented for the separate [absorbing-terminal diagnostic](evaluation.md), whose pretrained execution is deferred. The conventions derive from project plan sections 6–8 and 23–27. Allowed-token raw-logit margins are implemented and tested in [outputs](../scripts/recurrent_qwen/outputs.py). [Stage 0](experiments/stage0_validation.md) records architecture measurements only.
 
 The [ordinary-model final-answer baseline](evaluation.md) is implemented separately with unconstrained greedy generation, strict decoded-symbol accuracy, per-depth summaries, and CSV/JSON artifacts. Its toy-model tests verify evaluation mechanics; the [first full pretrained run](experiments/naive_pointer_baseline.md) achieved 60/1,000 correct and has been audited. The restricted-logit and recurrent-transition conventions below apply to the later recurrent evaluation, not automatically to this generation baseline.
