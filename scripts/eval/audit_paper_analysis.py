@@ -83,6 +83,8 @@ def main()->None:
                 aggregate_cells_checked=len(quality),original_final_decisions_crosschecked=source_count,
                 source_sha256=sha256_file(source),audit_code_sha256=sha256_file(Path(__file__)))
     (root/'independent_audit.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
+    from scripts.eval.paper_baseline_analysis import analyze
+    analyze(root)
 
 
 if __name__=='__main__':main()

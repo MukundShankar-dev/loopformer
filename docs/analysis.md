@@ -19,16 +19,70 @@ earlier attempts; this requires no new checkpoint sweep or model fitting.
 The full suite is implemented in [the launcher](../analyze_pointer.sh), using the
 frozen [protocol](../configs/pointer_analysis_protocol.json). It runs all six
 selected checkpoints, all integer requests, nine retained successful-executor
-snapshots, independent scoring/audits, and one organized replacement figure set.
+snapshots, an ordinary-Qwen baseline on identical questions, independent
+scoring/audits, and one organized replacement figure set.
 No training, threshold fitting or new checkpoint selection is performed.
 
 <!-- paper-run-status:start -->
-**Running on the desktop.** The CE checkpoint passed all 54 predeclared native
-checks (largest absolute logit difference 0.0000496; exact decoded agreement).
-Full historical population results and replacement plots are not yet complete.
-The launcher automatically scores/audits, renders PNG/PDF/SVG, retires old render
-exports, and writes the completion report after the remaining inference finishes.
+**Resumed on the desktop at the user's request.** All 1,350 completed CE
+graphs were retained and skipped; its 54 native checks remain passed. Original
+source and all 11 original recurrent modules passed the reuse guard again.
+`joint_full` passed native checks and is extracting population graphs (248/1,350
+at the recorded check; it subsequently reached 300). Launcher PID 42791 and extractor PID 42863 identify this
+resume; `resume_request.json` records authorization and launch time. The remaining
+models, nine snapshots, population scoring/audits and final plots are pending.
+The recurrent protocol, checkpoints, precision and batch sizes are unchanged.
+A separately configured ordinary-Qwen baseline is now queued after recurrent
+extraction; it needs new generation, with results still pending.
 <!-- paper-run-status:end -->
+
+## Pause and resume handoff — 2026-10-09
+
+The user paused the desktop after CE finished, then explicitly authorized
+resumption. The pause was intentional, not a failed experiment. The current
+status above supersedes the historical pause instructions below. The last observed state above is a snapshot; verify the
+runtime records before acting. The desktop is reached with `ssh desktop`; its
+repository is `/home/mukund/loopformer`, at commit `6c670dd` when paused. The Mac
+repository is `/Users/mukunds/Desktop/loopformer`.
+
+The saved run is `eval/pointer_analysis/paper-20261009/` on the desktop. Its
+`pause_request.json` records the request and original process identities;
+`pause_completed.json` and `PAUSED` are written only after CE completes and the
+owned processes exit. The one-time watcher is `/tmp/loopformer-pause-after-ce.py`
+(PID 21031 when armed), with `/tmp/loopformer-pause-after-ce.log`. It checks the
+CE summary every 50 ms without modifying model code. Original launcher/extractor
+PIDs were 12588/12617; verify command lines rather than trusting old PIDs.
+
+After the pause, CE should have 1,350 graphs, `ce_full/summary.json` marked
+complete, and passing `ce_full/native_fidelity.json`. The next extraction is
+`joint_full`, followed by `fixed6`, `fixed12`, `gru` and reused `final` results.
+Then come ordinary-Qwen generation, nine executor snapshots, metrics, structural
+analysis, independent audits and 25 replacement figure families. Retain all chunks, freeze files,
+`indexing_migration.json`, old provenance and logs. No training is needed.
+
+**Resume only on a new user instruction**, after checking `PAUSED`,
+`pause_completed.json` and that no suite process is still running:
+
+```bash
+ssh desktop
+cd /home/mukund/loopformer
+output=eval/pointer_analysis/paper-20261009
+cat "$output/pause_completed.json"
+pgrep -af 'analyze_pointer.sh|scripts.eval.paper_suite|scripts.eval.paper_snapshots'
+rm -f "$output/PAUSED"
+nohup bash analyze_pointer.sh "$output" > /tmp/paper-indexed-launch.log 2>&1 < /dev/null &
+.venv/bin/python -m scripts.eval.paper_status --json
+```
+
+The launcher skips completed CE and resumes identical atomic chunks. Preserve
+the protocol, weights, FP32/SDPA precision and batch sizes (historical 4, isolated
+64); editing inference files can invalidate strict resume. `paper_status` now
+recognizes `PAUSED`; pause records preserve the intentional boundary separately
+from an error. The Mac's finite sync helper waits for full `COMPLETE`/`FAILED`, not `PAUSED`;
+it does not resume inference. After completion, check whether it copied the run;
+if needed, rerun `bash scripts/eval/sync_paper_analysis.sh` on the Mac. Inspect
+actual final figures and audits before committing results or calling the suite
+complete. Old plot exports must remain until the replacement audits pass.
 
 The central questions are:
 
@@ -44,6 +98,44 @@ They do not identify a failure mechanism by themselves. No new internal probes
 are selected just to produce more plots.
 
 ## Runbook, outputs and rendering contract
+
+### Live terminal monitor
+
+The read-only Rich monitor refreshes in place every five seconds. From the Mac
+repository, run:
+
+```bash
+.venv/bin/python -m scripts.eval.paper_watch --remote desktop
+```
+
+On the desktop, run `.venv/bin/python -m scripts.eval.paper_watch` from
+`/home/mukund/loopformer`. No SSH session is needed for the Mac command; it uses
+the configured `desktop` alias. `--once` prints a static dashboard; `--interval 10`
+changes the refresh interval. `Ctrl+C` closes only the monitor, never the suite.
+No new dependencies are needed.
+
+The display has colored per-model graph bars, loading/native-check versus
+extraction labels, snapshot graph coverage, and a checklist through final
+reporting. Green means complete, cyan active, yellow paused and red failed.
+ETAs extrapolate committed chunk time for that model only; later models and
+native/audit/reporting costs are excluded. There is no misleading overall time
+percentage. Graph-count completion requires saved chunks and a complete summary;
+a failed audit file does not count as a passed gate. Only tiny index/timing arrays
+are read from chunks, never prediction tensors or weights. The JSON reader does
+not import Torch. Linux process metadata identifies the live stage without
+modifying the launcher or its frozen inference implementation.
+
+SSH failures show a warning and the last successful update time, then retry.
+The monitor exits when the suite completes or fails. `--once` also works in pipes;
+`paper_status --json` remains the machine-readable interface and now recognizes
+the explicit `PAUSED` marker. Neither command starts/resumes training or inference.
+
+Verified on both hosts: five monitor-contract tests pass, and twelve related
+monitor/metric/export checks pass on the Mac. The SSH static view and live
+Ctrl+C exit were exercised against the running suite; the evaluator stayed
+active. One desktop metadata scan took 0.043 seconds with 1,350 CE and 48 joint
+graphs saved, and Torch was not imported. This is a bounded overhead measurement,
+not a whole-suite speed benchmark. No frozen inference source changed.
 
 Run on the configured CUDA desktop, which holds the checkpoint weights:
 
@@ -68,9 +160,9 @@ is waiting for this desktop run to complete or fail. It copies this output only
 (no model weights), updates the owned handoff status, and retires local old renders
 only after a passing replacement. It does not commit or push future user edits.
 
-The current desktop job is already launched; another launcher must wait for it
-rather than run concurrently against the same output. No additional training run
-is needed. Historical inference is expensive even with exact prefix sharing:
+The desktop job has resumed; another launcher must not run concurrently against
+the same output. The pause/resume handoff records the preserved boundary.
+No additional training run is needed. Historical inference is expensive even with exact prefix sharing:
 the measured CE chunk takes about 43 seconds for four graphs, implying roughly
 four hours for that arm. Other arms have different costs; no aggregate ETA has
 been measured.
@@ -78,6 +170,7 @@ been measured.
 | Stage | Implementation and saved evidence |
 | --- | --- |
 | Frozen historical and isolated extraction | [`paper_suite.py`](../scripts/eval/paper_suite.py); per-arm `freeze.json`, `native_fidelity.json`, atomic `graphs-*.npz`, `summary.json` |
+| Ordinary-Qwen generation and audit | [`paper_baseline.py`](../scripts/eval/paper_baseline.py), [`paper_baseline_analysis.py`](../scripts/eval/paper_baseline_analysis.py); separate `ordinary_qwen/` raw continuations, outcomes, strata, intervals and independent audit |
 | Successful R snapshot population progression | [`paper_snapshots.py`](../scripts/eval/paper_snapshots.py); `executor_snapshots/step-*/` |
 | Raw-reference outcome and failure scoring | [`paper_metrics.py`](../scripts/eval/paper_metrics.py); `decisions.csv.gz`, `quality_by_depth.csv`, `fixed_request_loops.csv`, `first_errors.csv`, `execution_statistics.csv`, `wrong_episodes.csv`, `timing_residuals.csv` |
 | Structure and secondary exposure denominators | [`paper_structure.py`](../scripts/eval/paper_structure.py); `graph_features.csv`, `structure_failure_rates.csv`, `first_error_exposures.csv` |
@@ -87,8 +180,10 @@ been measured.
 | Completion report and safe export retirement | [`paper_report.py`](../scripts/eval/paper_report.py), [`retire_pointer_plots.py`](../scripts/eval/retire_pointer_plots.py); [population report](experiments/pointer_population_analysis.md) |
 | Read-only progress | [`paper_status.py`](../scripts/eval/paper_status.py); chunk-derived coverage and remaining extraction time |
 
-Five analysis groups contain fifteen figure families; a sixth writeup group
-adds the historical baseline and five attempt figures, for twenty-one families. The five primary questions are
+Five analysis groups contain sixteen figure families, including the new
+final-letter comparison; a sixth writeup group adds historical/matched baselines
+and five attempt figures; a seventh compute group adds two Pareto figures, for
+twenty-five families. The five primary questions are
 quality, execution failure, structure, stopping, and successful-model learning;
 the extra panels expose denominators and diagnostic detail rather than checkpoint
 sweeps. Exact duplicate curves are drawn once with every represented label;
@@ -125,13 +220,13 @@ python -m scripts.eval.paper_writeup
 | 1–2. TL;DR and intro | Research question and bounded results in the project plan, architecture guide and current report | Existing final-model results are available; full historical population comparison is still running. |
 | 3. Task definition and data | Dataset/reference guide, benchmark manifest, graph features and structure plots | Ready; specify 26 states, cycles, exact transitions and each distinct training distribution. Long rollout is not a nonrepeating long graph. |
 | 4. Metrics and experiments | Definitions below, native fidelity, independent reference audit, exact stopping and graph-level denominators | Implemented; retrospective opened population, not new confirmation. |
-| 5. Base checkpoint | `06_writeup/baseline`: original three-shot seed-17 test, 60/1000, depth 1–8, Wilson intervals | Baseline predictions recounted now; this is historical context, not the same panel/prompt as recurrent comparisons. |
+| 5. Base checkpoint | `06_writeup/baseline`: original seed-17 60/1000; `06_writeup/matched_baseline`: current graph/count panel, format/budget and graph-type metrics | Historical predictions recounted; full 345,600-question baseline queued. Same questions, different prompt/readout procedure. |
 | 6. Attempt 1 | `attempt_01`: CE-only full-sequence LoRA; selected step 2500; original loss and trained/untrained development cohorts | Learning panels ready, new eval column pending. This is the retained fresh-30k representative; earlier small pilots are archival context. |
 | 7. Attempt 2 | `attempt_02`: joint completion, then fixed-memory subvariant; two explicitly named rows | Original training panels ready; new eval columns pending. Include fixed memory as 2b rather than silently omitting an architecture. |
 | 8. Attempt 3 | `attempt_03`: fixed-memory depth-12 recipe, requested-count gaps 7/9/11 | Learning ready, eval pending. Depth, dataset seed, precision, batching and update count all changed; this is not an isolated data ablation. |
 | 9. Attempt 4 | `attempt_04`, `executor_validation_learning`, `controller_development`, `executor_population_progression` | Saved R/GRU development ready; population/snapshot extraction pending. Later GRU checkpoint uses the trained frozen R, not the unsuccessful controller from the original executor run. |
 | 10. Attempt 5 | `attempt_05`: scalar pilot development, separate shared-reader and cell fits, final-model eval | Fit evidence ready; final model's original full population already exists, integrated comparison pending. Reader least-squares and ten L-BFGS objective evaluations have no saved epoch curves; report summaries honestly. |
-| 11. Comparisons | `01_quality`, first-error survival/hazard, graph strata and `04_stopping` | Await complete paired extraction/audit; separate forced execution from actual first stopping. |
+| 11. Comparisons | `01_quality`, first-error survival/hazard, graph strata, `04_stopping` and `07_compute` Pareto panels | Await complete paired extraction/audit; separate forced execution from actual first stopping. |
 | 12. Takeaways | Claim boundaries in this document and model evolution | One successful R seed, bundled architecture/recipe changes, 26-state cyclic tables, task-specific numeric timer. Do not claim a uniquely proven failure cause or cross-task generality. |
 | 13. Demo | Not implemented/hosted by this analysis request | A demo must invoke the custom recurrent executor/controller, rather than ordinary Hugging Face text generation. Packaging, hosting and latency checks are a separate follow-up. |
 
@@ -142,7 +237,138 @@ training/inference separately. Learning panels use original data/cohort
 population sizes, raw source hashes and example-weighted 50-update CE windows;
 no old training curve is relabeled as the new 1,350-graph benchmark.
 
-### Actual compute measurements
+### Queued output organization and Pareto comparisons
+
+Every terminal pipeline stage is already queued in `analyze_pointer.sh`: recurrent
+extraction, ordinary-Qwen generation, nine executor snapshots, scoring/bootstrap, graph/failure analysis,
+independent audit, rendering, old-export retirement and completion reporting.
+It proceeds automatically after each predecessor succeeds; a failure stops the
+queue and retains chunks. Pareto reporting needs no additional inference; the
+ordinary baseline adds generation but needs no restart of the active extraction.
+
+Article panels are under `plots/06_writeup/`: `baseline`, `matched_baseline`, `attempt_01` through
+`attempt_05`. Each attempt pairs its original training/development history with
+selected-model population evaluation. Attempt 2 has separate joint-completion
+and fixed-memory rows. Attempt 4 uses the later GRU with the successful executor.
+Shared comparisons and failure matrices live in `01_quality/` through
+`05_learning/`. All families have PNG/PDF/SVG, numeric arrays, captions and
+provenance; `plots/index.md` lists baseline/attempt panels first, followed by
+shared comparisons. Architecture/config
+explanations remain in the canonical model-evolution and training guides.
+A hosted demo is a separate unimplemented follow-up, not an automatic stage.
+
+`07_compute/pareto_joint_success` compares answer-plus-exact-stop quality;
+`pareto_strict_success` compares every-transition-plus-exact-stop quality.
+Both compare five frozen learned-stop policies separately at N=1–6, 7–12,
+13–32, 33–64, 65–128 and 129–256. Cost is mean executed R passes: the native
+first threshold crossing, or the full 272 cap for a missing stop. It is not the
+longer forced diagnostic horizon. A cyclic correct letter at the wrong loop
+fails both metrics. Headless CE has no autonomous stopping policy and is
+excluded, while remaining in execution comparisons.
+
+Pareto dominance minimizes cost and maximizes quality with one strict inequality;
+exact duplicates remain tied. Frontiers concern observed point estimates, not
+statistically established dominance, tuned thresholds or interpolated policies.
+Both axes have paired graph-cluster 95% intervals using the existing nine
+strata/2,000 draws/seed 239. Exact coincident points are drawn once with policy
+names; coordinates are never moved. `quality_compute.csv` and plotted numeric
+arrays save every point and interval.
+
+Per-pass costs differ across architectures: these are **logical-budget** frontiers,
+not FLOP or latency frontiers. Current extraction timings mix prefix sharing,
+count/graph batching, diagnostic continuation and source-result reuse. They
+cannot measure comparable autonomous latency; that needs a separately controlled
+native benchmark. No extra GPU experiment is queued by this plot addition.
+
+`scripts/eval/paper_pareto.py` composes audited outcomes and existing quality
+intervals in the normal plot stage. `paper_plot_contract.py` now requires all 25
+named families and every PNG/PDF/SVG format before completion reporting or
+old-export retirement. Ten focused Pareto/export/writeup tests pass. The
+synthetic reporting fixture rendered all 23 families; both new layouts were
+inspected. Synthetic historical points are not model results; actual Pareto
+exports still await the full-population audit.
+
+## Ordinary Qwen on the current benchmark — 2026-10-09
+
+The historical 6% result covers only the old seed-17 test, depths 1–8. It cannot
+supply a base-checkpoint curve for the current population. The user authorized
+adding that missing baseline; it is implemented and queued, not yet measured.
+Its sidecar [configuration](../configs/pointer_analysis_baseline.json) leaves the
+already-frozen recurrent [protocol](../configs/pointer_analysis_protocol.json)
+and all retained extraction chunks unchanged.
+
+Evaluate pinned `Qwen/Qwen2.5-0.5B-Instruct` revision
+`7ae557604adf67be50417f59c2c2f167def9a775` on every saved graph and N=1–256:
+**345,600 questions** with identical rules, displayed rule order and start states.
+Use the existing [three-shot prompt](../prompts/pointer_task.txt), examples at
+depths 1/2/3, tokenizer chat formatting, unconstrained greedy generation, eight
+new tokens, disabled cache, IEEE FP32/SDPA and batch 16. This is a matched-question
+baseline; recurrent inference uses raw prompts and restricted symbol readout,
+so it does not isolate architecture from prompting/decoding. No prompt tuning
+on this opened panel is authorized. Desktop cache/revision/chat availability
+was checked without loading weights onto the GPU. Batch-16 resource use and
+54 predeclared batch-one continuation comparisons remain GPU run gates.
+
+[Extraction](../scripts/eval/paper_baseline.py) reuses the ordinary generation
+and scoring library. It writes `ordinary_qwen/graph-NNNN.jsonl.gz`, one atomic
+256-query file per graph, with raw token IDs/responses, scores and exact rendered
+input hashes. The prompt and tokenizer are saved once for input reconstruction.
+`freeze.json` pins protocol, graph/prompt/model/tokenizer bytes, code, packages,
+precision and batching; changed identity or committed bytes reject resume.
+`progress.json` exposes committed queries, throughput and ETA to the existing
+dashboard. Completed chunks skip model execution. GPU inference remains serial
+with the recurrent job.
+
+The updated launcher explicitly schedules generation after `paper_suite`.
+For the already-running older launcher, the next `paper_snapshots` process also
+requires this resumable baseline before loading snapshot weights. This guarantees
+the active run picks it up without relying on Bash rereading an edited launcher.
+The child stage is visible in the monitor and releases its GPU allocations on exit.
+
+After recurrent scoring, the independent-audit stage invokes
+[baseline analysis](../scripts/eval/paper_baseline_analysis.py): reconstruct every
+prompt, decode each raw continuation with the saved tokenizer, rebuild every target
+using scalar dictionary transitions, and check coverage, EOS/budget semantics,
+strict uppercase-letter parsing, stored scores and hashes. Cyclic final-letter
+matches are allowed in final-answer accuracy; they do not establish correct timing
+or intermediate reasoning. Metrics include per-depth accuracy/invalid/budget
+counts, graph-mode/seed/cycle/transient strata, returned-letter frequencies,
+95% graph-cluster intervals and paired recurrent-minus-ordinary final-letter
+deltas over the existing depth bands, using 2,000 stratified draws/seed 239.
+
+The plot stage adds `06_writeup/matched_baseline` and
+`01_quality/final_letter_comparison`, comparing both forced-N and actual returned
+letters to ordinary generation. Returned-letter accuracy permits wrong-loop cyclic
+matches and is explicitly distinct from joint success. Ordinary generation has
+no recurrent trajectory, first-error loop, exact-stop metric or R-pass cost; it is
+excluded from recurrent stopping plots and Pareto frontiers. Generated tokens/s
+must not be compared as recurrent transitions/s. The completion report requires
+its independent audit, all 25 figure families and the approved numeric hashes.
+
+The whole queue remains `bash analyze_pointer.sh`; do not launch a second copy.
+For isolated recovery after confirming the suite is stopped:
+
+```bash
+python -m scripts.eval.paper_baseline --input eval/pointer_analysis/paper-20261009
+python -m scripts.eval.paper_baseline_analysis --input eval/pointer_analysis/paper-20261009
+```
+
+The analysis command additionally requires completed recurrent outcomes. CPU
+contract tests cover corrupted labels/inputs/scores/budgets, exact chunk coverage,
+model-free completed resume, full per-count independent audit and changed identity.
+These checks do not establish pretrained baseline performance.
+
+Validation: **37 focused tests passed on the Mac (26.61 s) and desktop (10.39 s)**,
+including an actual random tiny-Qwen FP32/SDPA generation comparison against
+batch-one calls and frozen-weight preservation. A synthetic reporting fixture
+passes the complete 25-family manifest; both new layouts were rendered and
+visually checked. Its synthetic values are not pretrained results. All 345 local
+documentation targets checked exist; shell syntax, compilation and whitespace
+checks pass. Desktop source reuse still verifies all 11 original recurrent
+modules unchanged; launcher/extractor PIDs 42791/42863 remain active. The new
+baseline row is pending at 0/345,600, with no fabricated ETA or accuracy.
+
+### Actual compute measurements (earlier CE capture)
 
 Only CE extraction is active, followed by the queued full launcher. Each old
 checkpoint needs 345,600 independent requested-count questions and 44,409,600

@@ -40,7 +40,15 @@ selected architectures/checkpoints and the full population failure-analysis suit
 Run `bash analyze_pointer.sh` on the desktop for all six models, all 1,350 graphs
 and depths 1–256, followed by audited, organized plots. It resumes unchanged
 chunks; `python -m scripts.eval.paper_status` shows coverage and extraction ETA.
+For a live colored terminal monitor, run `python -m scripts.eval.paper_watch` on
+the desktop, or add `--remote desktop` from the Mac. See [monitoring](docs/analysis.md#live-terminal-monitor).
 See [run state and results](docs/experiments/pointer_population_analysis.md).
+The final bundle includes per-attempt training/eval panels, cross-model failure
+comparisons and Pareto plots; [the output map](docs/analysis.md#queued-output-organization-and-pareto-comparisons)
+explains the folders and logical-compute scope.
+The queue also evaluates ordinary Qwen on the same current questions using the
+existing 3-shot prompt, with audited final-answer comparisons; the older 6%
+baseline remains separately labelled. See [the baseline setup](docs/analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09).
 See [how the architectures evolved](docs/pointer_model_evolution.md) for technical
 and plain-language explanations, and the [historical comparison](docs/experiments/pointer_architecture_history.md)
 for original full-sequence/fixed-prompt models and two frozen-R examples.

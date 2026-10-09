@@ -6,6 +6,8 @@ step 1000 has monitor records but no retained weights and is never reconstructed
 import argparse
 import json
 from pathlib import Path
+import subprocess
+import sys
 from time import perf_counter
 
 import numpy as np
@@ -26,6 +28,9 @@ def main()->None:
     parser.add_argument('--config',type=Path,default=Path('configs/pointer_analysis_protocol.json'))
     parser.add_argument('--output',type=Path,default=Path('eval/pointer_analysis/paper-20261009'))
     args=parser.parse_args();config=json.loads(args.config.read_text())
+    # The already-running launcher predates the explicit baseline line. This
+    # resumable prerequisite also guarantees it queues without a GPU-job restart.
+    subprocess.run([sys.executable, '-m', 'scripts.eval.paper_baseline', '--input', str(args.output)], check=True)
     tasks,_=load_graphs(Path(config['graphs']));cap=config['safety_cap'];batch_size=64
     root=args.output/'executor_snapshots';root.mkdir(parents=True,exist_ok=True)
     torch.set_num_threads(4);torch.manual_seed(239);torch.use_deterministic_algorithms(True)

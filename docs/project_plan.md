@@ -25,6 +25,19 @@ the resumable full-population suite is implemented and running; completed
 population evidence and final figures remain pending. This is retrospective analysis,
 not new training, threshold selection, fresh confirmation or another research stage.
 
+The user additionally requested per-attempt writeup panels, cross-architecture
+comparisons and Pareto plots. The [analysis contract](analysis.md#queued-output-organization-and-pareto-comparisons)
+uses frozen policies and logical recurrent-pass budgets; it does not infer a
+hardware frontier from differently optimized extraction jobs. This reports on
+the same opened panel, with no new fitting or research stage.
+
+The user subsequently requested the missing ordinary-Qwen baseline on that full
+panel. Its [sidecar contract](analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09)
+keeps active recurrent extraction unchanged and adds frozen 3-shot generation,
+independent response audits and paired final-letter comparisons. Prompt/readout
+differences remain explicit; no recurrent stopping/trajectory metric is assigned
+to ordinary generation. This adds evaluation, not training or a new research gate.
+
 **2026-10-09 architecture-history amendment:** The user requested the earlier
 executor architectures rather than a comparison dominated by frozen-R controller
 repairs. The [historical reconstruction](experiments/pointer_architecture_history.md)

@@ -14,6 +14,7 @@ exec > >(tee -a "$output/run.log") 2>&1
 printf 'Pointer paper suite: %s\nFrozen weights; 1350 graphs × all depths 1–256; FP32/SDPA.\n' "$output"
 python -m scripts.eval.paper_reuse_audit --input "$output"
 python -m scripts.eval.paper_suite --output "$output"
+python -m scripts.eval.paper_baseline --input "$output"
 python -m scripts.eval.paper_snapshots --output "$output"
 python -m scripts.eval.paper_metrics --input "$output"
 python -m scripts.eval.paper_structure --input "$output"

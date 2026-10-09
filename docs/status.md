@@ -27,6 +27,23 @@ checks passed. See [analysis](analysis.md#measured-accelerator-candidates-and-se
 
 ## Current priority
 
+The queued final exports now include two observed-policy Pareto comparisons:
+answer/trajectory-plus-exact-stop quality versus mean recurrent passes, with
+missing stops charged the cap. This logical budget is not matched hardware cost
+or measured latency. Per-attempt panels, aggregate comparisons and failure
+matrices remain queued automatically. The newly requested ordinary-Qwen baseline
+adds 345,600 generations on the identical graph/count panel after recurrent
+extraction, under a separate frozen 3-shot configuration; it has not run yet.
+Independent response audits, final-letter comparisons, graph-stratum metrics and
+paired intervals are queued too. The required bundle now has seven groups/25
+named families. Ordinary generation is excluded from recurrent timing/trajectory
+and R-pass Pareto metrics. See [the baseline contract](analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09).
+
+Live monitoring is available with `.venv/bin/python -m scripts.eval.paper_watch
+--remote desktop` from the Mac, or without `--remote` on the desktop. It reports
+per-model extraction, current stage, snapshots and remaining audits/plots without
+loading a model or interfering with the running job. See [monitoring](analysis.md#live-terminal-monitor).
+
 The current priority is the [population analysis and agent handoff](analysis.md),
 following the user's rejection of the 27-graph panel as the main architecture
 comparison. A full inventory at `b49030e` captured 1,314 Mac files and 2,383
@@ -51,11 +68,7 @@ now implements extraction, retained R snapshots, scoring, structure/exposure tab
 independent scalar auditing, scientific exports and safe retirement of old renders.
 
 <!-- paper-run-status:start -->
-Full-population inference is running on the desktop. The CE candidate passed 54
-native checks with exact decoded agreement and maximum logit difference 0.0000496.
-All historical results, nine snapshot results, and final replacement exports are
-still pending; no full-suite success is claimed. The pipeline completes reporting
-and plot replacement automatically after its audits pass.
+**Resumed on the desktop; extraction continues.** CE retains all 1,350 graphs and 54 passing native checks. Joint-full has passed native checks and reached 300/1,350 graphs at the latest captured check. Launcher/extractor PIDs are 42791/42863; verify live metadata before acting. The ordinary-Qwen baseline is deployed and queued after recurrent extraction (0/345,600 questions), followed by nine snapshots, full audits and 25 replacement figure families. Its separate frozen configuration preserves the active recurrent protocol and chunks. Thirty-seven focused tests pass on both hosts; pretrained baseline results and final population figures remain pending. See [the analysis handoff](analysis.md).
 <!-- paper-run-status:end -->
 
 Validation: 28 focused tests pass. A separate synthetic reporting fixture checked

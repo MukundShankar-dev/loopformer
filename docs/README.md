@@ -25,13 +25,20 @@ The adaptive-compute guide is the **single source for that extension**. The rese
 ## Evidence, not instructions
 
 The [full population suite](experiments/pointer_population_analysis.md) is implemented
-and running; `bash analyze_pointer.sh` performs frozen extraction, independent
+and resumed at the user's request after the CE completion pause; `bash analyze_pointer.sh` performs frozen extraction, independent
 audits, retained successful-R snapshots and clean plot replacement. The report
 distinguishes current run state from completed evidence.
+Read the [pause/resume handoff](analysis.md#pause-and-resume-handoff--2026-10-09)
+for the saved boundary; the user has now authorized resumption.
 
 The [writeup coverage map](analysis.md#writeup-coverage--user-outline-2026-10-09)
 now follows the baseline and five attempts. Original saved learning histories are
 rendered without model inference; full paired evaluation columns remain pending.
+
+The [matched ordinary baseline](analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09)
+is queued on the same 1,350 graphs and requests 1–256, with frozen 3-shot
+generation, independent response audits and paired final-letter comparisons.
+Its results remain pending; the historical seed-17 baseline is retained separately.
 
 The [complete evidence inventory](experiments/pointer_evidence_inventory.md)
 records both hosts' saved datasets, checkpoint availability, schemas and run

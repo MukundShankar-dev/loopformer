@@ -39,12 +39,12 @@ class Figures:
         self.entries=[]
 
     def save(self,fig,group:str,name:str,title:str,caption:str,arrays:dict,
-             source_paths:list[Path]|None=None)->None:
+             source_paths:list[Path]|None=None,layout_top:float=.93)->None:
         import matplotlib.pyplot as plt
         directory=self.output/group;directory.mkdir(exist_ok=True)
         fig.suptitle(title,fontsize=15,fontweight='bold',x=.04,y=.99,ha='left')
         fig.text(.04,.015,caption,fontsize=8,color='#45505c',va='bottom')
-        fig.tight_layout(rect=(.01,.09,.99,.93))
+        fig.tight_layout(rect=(.01,.09,.99,layout_top))
         save_figure(fig,directory,name);plt.close(fig)
         numeric=self.numeric/f'{name}.npz';np.savez_compressed(numeric,**arrays)
         self.entries.append(dict(group=group,name=name,title=title,caption=caption,
@@ -54,13 +54,16 @@ class Figures:
                              sha256=sha256_file(directory/f'{name}.{ext}')) for ext in ('png','pdf','svg')}))
 
     def finish(self)->None:
+        from scripts.eval.paper_plot_contract import validate_manifest
+        validate_manifest(dict(status='complete',figures=self.entries))
         hashes={p.name:sha256_file(p) for p in (self.root/'reference_audit.json',self.root/'quality_by_depth.csv',self.root/'outcomes.npz',self.root/'fixed_request_loops.csv',self.root/'first_errors.csv',self.root/'structure_failure_rates.csv')}
         (self.output/'manifest.json').write_text(json.dumps(dict(status='complete',figures=self.entries,
             input_sha256=hashes,plot_code_sha256=sha256_file(Path(__file__)),
             overlap_policy='Identical executor curves grouped; separate metric panels; staggered marker locations only, no value jitter',
-            coverage='Population: 1350 graphs, requests 1–256; training and ordinary baseline retain their separately labelled original populations'),indent=2)+'\n')
-        lines=['# Pointer analysis figures','','Population comparisons use the full 1,350-graph opened panel and requested depths 1–256. Training and ordinary baseline figures retain their original separately labelled populations.','','PNG previews, editable SVG and publication PDF have identical numerical sources. `numeric/` and `manifest.json` preserve arrays, captions and hashes.','','`06_writeup/` follows the baseline and five-attempt narrative; the other groups supply comparisons and failure analysis.','']
-        for e in self.entries:
+            coverage='Population: 1350 graphs, requests 1–256, including ordinary Qwen. Training histories and old seed-17 baseline are separately labelled.'),indent=2)+'\n')
+        lines=['# Pointer analysis figures','','Population comparisons, including ordinary Qwen, use the full 1,350-graph opened panel and requested depths 1–256. Training histories and the historical seed-17 baseline retain their original separately labelled populations.','','PNG previews, editable SVG and publication PDF have identical numerical sources. `numeric/` and `manifest.json` preserve arrays, captions and hashes.','','`06_writeup/` follows the historical/current baselines and five-attempt narrative; `07_compute/` has observed-policy Pareto plots in recurrent passes, not measured latency. Ordinary generation has no R-pass budget and is excluded from those frontiers. The other groups supply comparisons and failure analysis.','']
+        ordered = sorted(self.entries, key=lambda e: (0 if e['group']=='06_writeup' else 1, e['group']))
+        for e in ordered:
             lines.extend([f"## {e['title']}",'',e['caption'],'',f"![{e['title']}]({e['group']}/{e['name']}.png)",'',f"[PDF]({e['group']}/{e['name']}.pdf) · [SVG]({e['group']}/{e['name']}.svg)",''])
         (self.output/'index.md').write_text('\n'.join(lines))
 
@@ -336,6 +339,8 @@ def main()->None:
     args=parser.parse_args();root=args.input
     if not json.loads((root/'reference_audit.json').read_text())['passed']:raise ValueError('Reference audit failed')
     if not json.loads((root/'independent_audit.json').read_text())['passed']:raise ValueError('Independent audit failed')
+    from scripts.eval.paper_baseline_plots import require_audit, baseline_figures
+    require_audit(root)
     if (root/'plots').exists():
         if not args.replace:raise ValueError('Plot output exists; use --replace')
         shutil.rmtree(root/'plots')
@@ -359,6 +364,9 @@ def main()->None:
     learning_figures(figures,config,arrays,g,root)
     from scripts.eval.paper_writeup import writeup_figures
     writeup_figures(figures, arrays)
+    baseline_figures(figures, config, arrays)
+    from scripts.eval.paper_pareto import pareto_figures
+    pareto_figures(figures, config, arrays, names, metadata)
     figures.finish()
     print(f'Wrote {len(figures.entries)} audited figure families to {figures.output}')
 

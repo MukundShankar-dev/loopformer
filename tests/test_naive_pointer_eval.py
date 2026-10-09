@@ -141,6 +141,22 @@ def test_partial_state_dict_rejected(tiny_checkpoint, tmp_path):
         load_state_file(model, path)
 
 
+def test_paper_baseline_sdpa_generation_matches_native_calls(tiny_checkpoint):
+    from scripts.eval.paper_baseline import native_gate
+    directory, original, _ = tiny_checkpoint
+    model, tokenizer, _ = load_model(str(directory), base_model=None, tokenizer_source=None,
+        revision=None, device='cpu', dtype='float32', download=False)
+    model.set_attn_implementation('sdpa')
+    tasks = [generate_example(17, 1, 'test', 0), generate_example(18, 1, 'test', 1)]
+    metadata = [dict(dataset_seed=17, graph_mode='random_function'),
+                dict(dataset_seed=18, graph_mode='permutation')]
+    gate = native_gate(model, tokenizer, tasks, metadata, TEMPLATE,
+                       dict(native_counts=[1,2], batch_size=2, max_new_tokens=2, prompt_format='chat'))
+    assert gate['passed'] and gate['questions'] == 4
+    for key, value in original.state_dict().items():
+        assert torch.equal(value, model.state_dict()[key])
+
+
 @pytest.mark.parametrize("test_count", [None, 2, 3])
 def test_cli_outputs_and_optional_prompt_inspection(tiny_checkpoint, tmp_path, test_count):
     directory, _, _ = tiny_checkpoint

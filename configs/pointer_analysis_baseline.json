@@ -1,0 +1,18 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+  "graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+  "prompt": "prompts/pointer_task.txt",
+  "prompt_sha256": "b21beb6d6de45972329143ce2d7dcabe409da97641e691ff9984d6cc474e353f",
+  "prompt_format": "chat",
+  "shots": 3,
+  "batch_size": 16,
+  "max_new_tokens": 8,
+  "dtype": "float32",
+  "attention": "sdpa",
+  "use_cache": false,
+  "do_sample": false,
+  "seed": 239,
+  "native_counts": [1, 6, 12, 32, 128, 256],
+  "scope": "All graphs and requests from the unchanged recurrent protocol; ordinary unconstrained final-letter generation. Same questions, different prompt/readout procedure; not a causal architecture ablation."
+}

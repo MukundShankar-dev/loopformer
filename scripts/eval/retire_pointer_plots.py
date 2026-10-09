@@ -9,6 +9,7 @@ import platform
 from pathlib import Path
 
 from scripts.eval.pointer_task import sha256_file
+from scripts.eval.paper_plot_contract import validate_manifest
 
 OLD_DIRECTORIES=(
     'eval/pointer_benchmark/frozen-20261008/independent/plots',
@@ -24,7 +25,7 @@ def main()->None:
     args=parser.parse_args();root=args.input
     if not json.loads((root/'independent_audit.json').read_text())['passed']:raise ValueError('Replacement decision audit failed')
     manifest=json.loads((root/'plots/manifest.json').read_text())
-    if manifest['status']!='complete' or len(manifest['figures'])!=21:raise ValueError('Replacement figure set incomplete')
+    validate_manifest(manifest)
     for figure in manifest['figures']:
         for export in figure['exports'].values():
             if sha256_file(root/'plots'/export['path'])!=export['sha256']:raise ValueError('Replacement export hash differs')

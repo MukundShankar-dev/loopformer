@@ -6,6 +6,7 @@ import pytest
 
 from scripts.eval import retire_pointer_plots
 from scripts.eval.pointer_task import sha256_file
+from scripts.eval.paper_plot_contract import REQUIRED_FIGURES, validate_manifest
 
 
 def test_retirement_requires_verified_replacement_and_preserves_raw_evidence(tmp_path,monkeypatch):
@@ -20,14 +21,20 @@ def test_retirement_requires_verified_replacement_and_preserves_raw_evidence(tmp
     with pytest.raises(ValueError):retire_pointer_plots.main()
     assert (old/'old.png').exists()
     entries=[]
-    for i in range(21):
-        p=root/'plots'/f'{i}.png';p.write_bytes(str(i).encode())
-        entries.append({'exports':{'png':{'path':p.name,'sha256':sha256_file(p)}}})
+    for i, (group, name) in enumerate(sorted(REQUIRED_FIGURES)):
+        exports = {}
+        for ext in ('png','pdf','svg'):
+            p=root/'plots'/f'{i}.{ext}';p.write_bytes(str(i).encode())
+            exports[ext]={'path':p.name,'sha256':sha256_file(p)}
+        entries.append({'group':group,'name':name,'exports':exports})
     (root/'plots/manifest.json').write_text(json.dumps({'status':'complete','figures':entries}))
     retire_pointer_plots.main();retire_pointer_plots.main()
     assert not (old/'old.png').exists()
     assert (old/'raw.csv').read_text()=='raw evidence' and (old/'weights.pt').read_bytes()==b'model bytes'
     assert len(json.loads((root/'retired_plot_exports.json').read_text()))==1
+    incomplete = {'status':'complete','figures':[e for e in entries if e['group']!='07_compute']}
+    with pytest.raises(ValueError, match='incomplete'):
+        validate_manifest(incomplete)
 
 
 def test_duplicate_curves_are_named_once_without_coordinate_jitter(monkeypatch,tmp_path):

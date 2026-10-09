@@ -412,3 +412,33 @@ about 10% less fixed-memory batch time and 2% less CE time. Preserve all
 completed chunks, archive their original freeze/source identity, and explicitly
 migrate only this AST change after stopping the old extractor. No new training,
 clock feature, smaller benchmark, threshold fit or silent precision change.
+
+## 2026-10-09: Pareto reporting for frozen policies
+
+The user requested Pareto plots alongside per-attempt and aggregate figures.
+Use answer/trajectory-plus-exact-stop success versus mean first-stop/cap recurrent
+passes within matched requested-count bands. Exclude undefined headless stopping;
+retain cap failures and cyclic wrong-time failures. This characterizes frozen
+observed policies without tuning on the opened population. Logical passes do
+not establish matched FLOPs or latency, because per-pass architecture costs and
+extraction optimizations differ. A separately controlled timing benchmark is
+needed for a hardware frontier. The normal reporting stage produces these plots
+from saved audited outcomes; no new training or GPU experiment is introduced.
+See the [analysis contract](analysis.md#queued-output-organization-and-pareto-comparisons).
+
+## 2026-10-09: Add the missing full-panel ordinary-Qwen baseline
+
+The old 6% ordinary baseline is on the seed-17 depth-1–8 test, so it cannot fill
+the current paper comparison. Evaluate the same pinned pretrained checkpoint
+with its existing 3-shot chat/greedy/max-eight-token recipe on all current
+graph/count questions. Keep the active recurrent protocol and chunks unchanged;
+freeze this new baseline separately and run it serially after extraction. A
+resumable prerequisite in the upcoming snapshot process guarantees the older
+active launcher adopts the new queue without restarting its model job.
+
+Use exact final-letter generation accuracy with independent raw-response audits,
+graph-stratum summaries and paired graph-cluster differences. Prompt/readout
+differences are a comparison limitation, not an isolated architecture ablation.
+Do not invent recurrent timing/trajectory metrics or convert generated tokens to
+R-pass costs. Retain the old baseline as clearly labelled historical context.
+See [the implementation and inference contract](analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09).

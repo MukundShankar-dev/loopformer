@@ -1,5 +1,24 @@
 # Evaluation and reproducibility
 
+For the live full-population suite, use `python -m scripts.eval.paper_watch`
+on the desktop or `python -m scripts.eval.paper_watch --remote desktop` from the
+Mac repository. The [monitoring guide](analysis.md#live-terminal-monitor) explains
+the read-only progress bars, current stage, per-model ETA and failure handling.
+
+The same plot stage produces baseline/per-attempt training/eval panels,
+cross-model comparisons and observed-policy Pareto figures. These compare
+exact-stop quality against logical recurrent-pass cost, not extraction time or
+matched hardware latency. See [output organization](analysis.md#queued-output-organization-and-pareto-comparisons).
+
+Ordinary Qwen is now additionally queued on **all 345,600 current graph/count
+questions**, using the existing 3-shot chat prompt and strict final-letter
+generation scoring. It has separate atomic outputs and frozen provenance,
+complete response/target audits, depth/graph-stratum summaries, paired
+graph-cluster intervals and final-answer comparison plots. The original 6%
+seed-17 result remains historical context. Same questions do not mean identical
+prompts/readout; ordinary generation has no recurrent trajectory, exact-loop
+stopping or comparable R-pass cost. See [the matched baseline contract](analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09).
+
 The current [analysis contract](analysis.md) specifies a full 1,350-graph selected
 architecture comparison, execution/structural/stopping diagnostics and successful
 model progression. Its [inventory](experiments/pointer_evidence_inventory.md)
