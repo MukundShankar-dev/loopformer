@@ -1,44 +1,41 @@
-import csv
-import json
-
+"""Comparisons cannot hide execution errors or reuse changed executor weights."""
+from dataclasses import replace
 import pytest
-
-from scripts.eval.compare_checkpoints import compare_runs
-
-
-def make_run(path, predictions):
-    path.mkdir()
-    summary = dict(status='complete', checkpoint=str(path), data_sha256='same', loops=3,
-                   dtype='float32', batch_size=16, scoring='symbols', prompt_format='plain')
-    (path / 'summary.json').write_text(json.dumps(summary))
-    rows = []
-    for loop, (prediction, target) in enumerate(zip(predictions, 'BCD'), 1):
-        rows.append(dict(example_id='a', task_depth=3, loop=loop, split='depth_test', seed=47,
-                         initial_state='A', prediction=prediction, intermediate_target=target,
-                         intermediate_correct=prediction == target, final_correct=prediction == 'D'))
-    with (path / 'trajectories.csv').open('w') as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
-        writer.writeheader()
-        writer.writerows(rows)
-    return path
+import torch
+from scripts.dataset.pointer import generate_unconditioned_example
+from scripts.eval.checkpoint_comparison import assert_executor_tensors, compose_row, executor_spec, nominal_fields
 
 
-def test_risk_sets_and_paired_recovery(tmp_path):
-    a = make_run(tmp_path / 'a', 'BXD')
-    b = make_run(tmp_path / 'b', 'BCD')
-    depths, risks, pairs, _ = compare_runs([a, b])
-    assert depths[0]['trajectory_accuracy'] == 0  # final recovery is not a perfect trajectory
-    assert [r['conditional_transition_accuracy'] for r in risks[:3]] == [1, 0, None]
-    assert pairs[1]['correct_prefix_delta'] == 2
-    assert depths[1]['trajectory_accuracy'] == 1
+def test_controller_change_allowed_but_executor_change_rejected():
+    old = {'recurrent.weight': torch.tensor([2.]), 'completion_head.weight': torch.tensor([1.])}
+    new = {'recurrent.weight': torch.tensor([2.]), 'completion_head.different': torch.tensor([4.])}
+    assert assert_executor_tensors(old, new) == 1
+    new['recurrent.weight'] += .001
+    with pytest.raises(AssertionError):
+        assert_executor_tensors(old, new)
+    spec = {'executor': {'isolated': True, 'controller_size': 128}, 'completion_head': {'intermediate': 128},
+            'controller_training': {'seed': 61}, 'recurrence_mode': 'fixed_prompt'}
+    changed = {**spec, 'executor': {'isolated': True, 'controller_kind': 'shared_number', 'controller_size': 1}}
+    assert executor_spec(spec) == executor_spec(changed)
+    changed['executor']['isolated'] = False
+    assert executor_spec(spec) != executor_spec(changed)
 
 
-def test_reject_mismatched_evaluations(tmp_path):
-    a = make_run(tmp_path / 'a', 'BCD')
-    b = make_run(tmp_path / 'b', 'BCD')
-    path = b / 'summary.json'
-    summary = json.loads(path.read_text())
-    summary['data_sha256'] = 'different'
-    path.write_text(json.dumps(summary))
-    with pytest.raises(ValueError, match='identical'):
-        compare_runs([a, b])
+def test_recovery_is_final_correct_but_never_a_complete_trajectory():
+    task = generate_unconditioned_example(31, 3, 'benchmark', 0)
+    predicted = [ord(c) - 65 for c in task.intermediate_states]
+    predicted[1] = (predicted[1] + 1) % 26
+    row = nominal_fields(task, predicted)
+    assert row['nominal_final_correct'] and not row['complete_trajectory'] and row['first_error_loop'] == 2
+    with pytest.raises(ValueError):
+        nominal_fields(task, predicted[:2])
+
+
+def test_cyclic_letter_at_wrong_loop_and_missing_cap_remain_failures():
+    task = replace(generate_unconditioned_example(30, 3, 'benchmark', 0), intermediate_states=['A'] * 3, final_state='A')
+    for first, missing in ((1, False), (None, True)):
+        stopped = {'first_stop': first, 'exact_stop': False, 'missing_stop': missing,
+                   'stopped_answer_correct': True, 'joint_success': False}
+        row = compose_row(task, {'depth': 3}, stopped, [0, 0, 0])
+        assert row['complete_trajectory'] and row['correct_letter_wrong_time']
+        assert not row['joint_success'] and not row['strict_success']

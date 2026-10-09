@@ -329,3 +329,14 @@ and preserve all results. No controller or executor retraining is selected by
 this evaluation. These panels are now opened; a later repair needs new held-out
 confirmation rather than reusing them as unseen tests. The
 [report](experiments/pointer_frozen_benchmark.md) owns statistics, fidelity and limits.
+
+## 2026-10-08 — paired frozen architecture diagnostics
+
+The user requested earlier checkpoints and richer matrices after opening the
+full benchmark. Use the same outcome-independent 27-graph/30-count subset for
+all five retained models. The legacy comparison is descriptive because its
+data, recipe and capacity differ. Reuse isolated executor trajectories only
+after bitwise tensor/spec/tokenizer/code identity; retain actual observations
+and per-prompt contexts for GRU replay. Never count a correct cyclic letter at
+the wrong loop as joint success. The protocol is recorded in the
+[diagnostic report](experiments/pointer_checkpoint_comparison.md).

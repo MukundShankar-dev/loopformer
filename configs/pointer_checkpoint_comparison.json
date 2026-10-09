@@ -1,0 +1,82 @@
+{
+  "source_results": "eval/pointer_benchmark/final-full-20261008/independent",
+  "graphs": "data/pointer/benchmark-seeds307-311-313/graphs.jsonl",
+  "output": "eval/pointer_benchmark/checkpoint-comparison-20261008",
+  "graphs_per_stratum": 3,
+  "counts": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    16,
+    17,
+    24,
+    29,
+    32,
+    41,
+    53,
+    63,
+    64,
+    69,
+    70,
+    80,
+    99,
+    100,
+    101,
+    128,
+    192,
+    256
+  ],
+  "native_counts": [
+    1,
+    9,
+    12,
+    70,
+    100,
+    256
+  ],
+  "threshold": 0.5,
+  "safety_cap": 272,
+  "batch_size": 16,
+  "device": "cuda",
+  "models": [
+    {
+      "name": "legacy_lora",
+      "label": "Coupled LoRA",
+      "model": "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-005000",
+      "mode": "legacy"
+    },
+    {
+      "name": "gru",
+      "label": "Isolated R + GRU",
+      "model": "models/stage1_pointer/controller-prefix-seed83/best",
+      "mode": "isolated"
+    },
+    {
+      "name": "positional",
+      "label": "Positional reader + affine",
+      "model": "models/stage1_pointer/controller-affine-seed83/best",
+      "mode": "isolated"
+    },
+    {
+      "name": "shared",
+      "label": "Shared reader before precision",
+      "model": "models/stage1_pointer/controller-shared-number-seed83/best",
+      "mode": "isolated"
+    },
+    {
+      "name": "final",
+      "label": "Final shared reader + precision",
+      "model": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+      "mode": "isolated"
+    }
+  ]
+}

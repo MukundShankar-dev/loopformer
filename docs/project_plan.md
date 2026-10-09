@@ -15,6 +15,13 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-08 failure-matrix amendment:** The user requested richer diagnostics and
+earlier frozen architecture comparisons on the opened full benchmark. The
+[paired diagnostic protocol](experiments/pointer_checkpoint_comparison.md) declares
+fixed checkpoints, outcome-independent matched inputs and actual-stop fidelity.
+This is failure diagnosis, not training, checkpoint selection or independent
+confirmation. Later research stages remain closed.
+
 **2026-10-08 final full-benchmark amendment:** The user requested a full benchmark
 of the frozen final reader/precision checkpoint and informative plots. Run the
 existing test as a regression check and fresh graph seeds 307/311/313 through

@@ -1,5 +1,12 @@
 # Evaluation and reproducibility
 
+The [paired checkpoint diagnostic](experiments/pointer_checkpoint_comparison.md)
+compares retained architectures on identical opened benchmark inputs. Run
+`python -m scripts.eval.checkpoint_comparison --dry-run` to inspect the fixed
+protocol. It composes the existing actual-stop evaluator, replay and independent
+audit; GRU observations remain actual R vectors, and legacy count-dependent R is
+executed per count. No fitting or threshold selection occurs.
+
 The [final full benchmark](experiments/pointer_final_benchmark.md) directly
 evaluates the frozen repaired checkpoint on the entire existing test and a new
 independent graph panel. `bash benchmark_pointer.sh --full` reuses the standard

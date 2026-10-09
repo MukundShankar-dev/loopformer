@@ -4,6 +4,11 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
+The user requested richer failure matrices and a frozen comparison with earlier
+architectures. The [declared diagnostic](experiments/pointer_checkpoint_comparison.md)
+uses matched graphs/counts on the opened full benchmark. Implementation is in
+validation; inference/results are pending. No training is selected.
+
 The [final full benchmark](experiments/pointer_final_benchmark.md) completed and
 passed all six predeclared criteria. The frozen final checkpoint scores **100%**
 on all 1,536 existing test queries and **97.81% answer-plus-exact-stop success**

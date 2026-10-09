@@ -29,8 +29,8 @@ def main() -> None:
     torch.set_num_threads(4)
     model, tokenizer, _ = load_recurrent_checkpoint(args.model,device=args.device)
     model.eval().requires_grad_(False)
-    if model.completion_head.kind != 'shared_number':
-        raise ValueError('Need the shared-number frozen controller')
+    if model.completion_head.kind not in ('shared_number', 'affine_suffix'):
+        raise ValueError('Need an executor-independent scalar controller; GRU observations cannot be replaced with zeros')
     task = read_tasks(args.data,'train')[0]
     initial = []
     with torch.inference_mode():

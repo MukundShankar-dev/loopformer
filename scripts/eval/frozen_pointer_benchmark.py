@@ -99,15 +99,25 @@ def native_fidelity(config: dict, output: Path, tasks: list, metadata: list[dict
             chosen.extend((i, count_variant(task, depth)) for depth in config['native_counts'])
         counters[key] = count + 1
     selected = [t for _, t in chosen]
+    expected = stop_rows(torch.stack([controller_logits[t.task_depth - 1] for _, t in chosen]),
+        torch.stack([predictions[i] for i, _ in chosen]), selected,
+        [{'example_id': t.example_id, 'depth': t.task_depth} for t in selected], 'benchmark')
+    return verify_native_decisions(config, output, selected, expected, device)
+
+
+def verify_native_decisions(config: dict, output: Path, selected: list, expected: list[dict],
+                            device: str) -> dict:
+    """Check arbitrary controller replay against the existing actual-stop evaluator.
+
+    Unlike scalar controller_panel, this supports graph-dependent GRU decisions.
+    Both successes and failures, including cap fallbacks, must match exactly.
+    """
     path = output / 'native_tasks.jsonl'
     path.write_text(''.join(json.dumps(t.to_dict()) + '\n' for t in selected))
     subprocess.run([sys.executable, '-u', '-m', 'scripts.eval.loop_test', '--model', config['model'],
         '--data', str(path), '--device', device, '--attention', 'sdpa', '--loops', str(config['safety_cap']),
         '--stop-policy', 'completion', '--stop-threshold', str(config['threshold']),
         '--output', str(output / 'native'), '--wandb-mode', 'disabled'], check=True)
-    expected = stop_rows(torch.stack([controller_logits[t.task_depth - 1] for _, t in chosen]),
-        torch.stack([predictions[i] for i, _ in chosen]), selected,
-        [{'example_id': t.example_id, 'depth': t.task_depth} for t in selected], 'benchmark')
     actual = {r['example_id']: r for r in csv.DictReader((output / 'native/decisions.csv').open())}
     if set(actual) != {t.example_id for t in selected}:
         raise ValueError('Native panel coverage differs')

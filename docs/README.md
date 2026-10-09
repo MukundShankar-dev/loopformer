@@ -22,6 +22,10 @@ The adaptive-compute guide is the **single source for that extension**. The rese
 
 ## Evidence, not instructions
 
+The [paired checkpoint diagnostic](experiments/pointer_checkpoint_comparison.md)
+declares frozen older architecture comparisons and richer failure matrices.
+Execution and stopping are scored separately on the opened benchmark.
+
 The [final full benchmark](experiments/pointer_final_benchmark.md) records passing
 fresh evaluation of the complete repaired checkpoint: 97.81% joint success and
 96.89% full trajectories through 256, with native regression, independent audits,
