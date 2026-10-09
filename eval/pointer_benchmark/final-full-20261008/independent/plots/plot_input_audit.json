@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "graphs": 1350,
+  "decisions_checked": 345600,
+  "stratum_count_rows_checked": 11776,
+  "loop_rows_checked": 256,
+  "first_c_error_counts": {
+    "4": 4,
+    "none": 1308,
+    "5": 5,
+    "6": 3,
+    "16": 2,
+    "9": 3,
+    "3": 3,
+    "7": 3,
+    "10": 4,
+    "20": 1,
+    "13": 1,
+    "2": 1,
+    "28": 2,
+    "15": 1,
+    "17": 1,
+    "14": 1,
+    "8": 1,
+    "25": 2,
+    "30": 1,
+    "29": 1,
+    "21": 1,
+    "24": 1
+  },
+  "depth_checks": [
+    {
+      "requested_steps": 1,
+      "denominator_graphs": 1350,
+      "all_steps_correct_graphs": 1350,
+      "final_answer_and_exact_stop_graphs": 1350,
+      "exact_stop_graphs": 1350
+    },
+    {
+      "requested_steps": 12,
+      "denominator_graphs": 1350,
+      "all_steps_correct_graphs": 1323,
+      "final_answer_and_exact_stop_graphs": 1330,
+      "exact_stop_graphs": 1350
+    },
+    {
+      "requested_steps": 30,
+      "denominator_graphs": 1350,
+      "all_steps_correct_graphs": 1308,
+      "final_answer_and_exact_stop_graphs": 1320,
+      "exact_stop_graphs": 1350
+    },
+    {
+      "requested_steps": 31,
+      "denominator_graphs": 1350,
+      "all_steps_correct_graphs": 1308,
+      "final_answer_and_exact_stop_graphs": 1320,
+      "exact_stop_graphs": 1350
+    },
+    {
+      "requested_steps": 64,
+      "denominator_graphs": 1350,
+      "all_steps_correct_graphs": 1308,
+      "final_answer_and_exact_stop_graphs": 1319,
+      "exact_stop_graphs": 1350
+    },
+    {
+      "requested_steps": 128,
+      "denominator_graphs": 1350,
+      "all_steps_correct_graphs": 1308,
+      "final_answer_and_exact_stop_graphs": 1320,
+      "exact_stop_graphs": 1350
+    },
+    {
+      "requested_steps": 256,
+      "denominator_graphs": 1350,
+      "all_steps_correct_graphs": 1308,
+      "final_answer_and_exact_stop_graphs": 1320,
+      "exact_stop_graphs": 1350
+    }
+  ],
+  "metric_definitions": {
+    "joint_success": "correct C letter at actual stop AND first stop equals N",
+    "complete_trajectory": "every C letter at loops 1..N matches the reference; no recovery",
+    "first_error": "first incorrect intermediate C letter; not a first joint-success failure"
+  },
+  "inputs_sha256": {
+    "graphs.csv": "a9bfba654d74b71518e773c5c33c05f264b3ef73478cc79afd6d84722b9bf60a",
+    "controller_counts.csv": "cae696def023d0101e772dcce418e5bcc3307834ad3c94d8ea03d97977c3f84e",
+    "per_count_and_stratum.csv": "9cc78872dca436a9acd23e52929f82153936144f14d016053c8d0f2903419674",
+    "per_loop.csv": "1696ebc00305ac8db3d2b0e680e5924fb218a85e6aafb7f65be975868d1a51a9",
+    "decisions.csv.gz": "aa2c0fd72792e8b9f1844280a9ba5b486be71354e820efbe3c627afc032a9569",
+    "summary.json": "df47f3117ba0a31814adc44d8b25f67274059cdbd15b2494849b4c1a268d2bd4"
+  },
+  "raw_graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285"
+}

@@ -4,6 +4,16 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
+The [all-figure audit](experiments/pointer_figure_audit.md) is complete. All thirteen
+figures were rescored, regenerated and inspected. The audit checks 345,600 main
+decisions, 11,776 stratum/depth rows, 256 loop rows, 4,050 comparison decisions,
+all failure-matrix cells and 12,288 numerical timing requests. Re-audits pass
+2,751 saved native calls / 45,791 transition rows. All original metric CSVs remain
+unchanged. At every requested N ≥30, the strict-prefix numerator is 1,308 over
+the same 1,350 graphs; final-answer/exact-stop success remains a separate,
+recoverable criterion. Six new audit tests and fifteen relevant existing tests
+pass. No training or new model inference ran.
+
 The [paired architecture diagnostic](experiments/pointer_checkpoint_comparison.md)
 is complete: five frozen models, the same 27 graphs × 30 counts, 4,050 independently
 audited decisions and 1,026 native calls. Exact stopping is 35.93% for legacy LoRA,

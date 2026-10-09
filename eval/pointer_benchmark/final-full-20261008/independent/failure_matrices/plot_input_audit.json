@@ -1,0 +1,207 @@
+{
+  "benchmark": {
+    "passed": true,
+    "graphs": 1350,
+    "decisions_checked": 345600,
+    "stratum_count_rows_checked": 11776,
+    "loop_rows_checked": 256,
+    "first_c_error_counts": {
+      "4": 4,
+      "none": 1308,
+      "5": 5,
+      "6": 3,
+      "16": 2,
+      "9": 3,
+      "3": 3,
+      "7": 3,
+      "10": 4,
+      "20": 1,
+      "13": 1,
+      "2": 1,
+      "28": 2,
+      "15": 1,
+      "17": 1,
+      "14": 1,
+      "8": 1,
+      "25": 2,
+      "30": 1,
+      "29": 1,
+      "21": 1,
+      "24": 1
+    },
+    "depth_checks": [
+      {
+        "requested_steps": 1,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1350,
+        "final_answer_and_exact_stop_graphs": 1350,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 12,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1323,
+        "final_answer_and_exact_stop_graphs": 1330,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 30,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1320,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 31,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1320,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 64,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1319,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 128,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1320,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 256,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1320,
+        "exact_stop_graphs": 1350
+      }
+    ],
+    "metric_definitions": {
+      "joint_success": "correct C letter at actual stop AND first stop equals N",
+      "complete_trajectory": "every C letter at loops 1..N matches the reference; no recovery",
+      "first_error": "first incorrect intermediate C letter; not a first joint-success failure"
+    },
+    "inputs_sha256": {
+      "graphs.csv": "a9bfba654d74b71518e773c5c33c05f264b3ef73478cc79afd6d84722b9bf60a",
+      "controller_counts.csv": "cae696def023d0101e772dcce418e5bcc3307834ad3c94d8ea03d97977c3f84e",
+      "per_count_and_stratum.csv": "9cc78872dca436a9acd23e52929f82153936144f14d016053c8d0f2903419674",
+      "per_loop.csv": "1696ebc00305ac8db3d2b0e680e5924fb218a85e6aafb7f65be975868d1a51a9",
+      "decisions.csv.gz": "aa2c0fd72792e8b9f1844280a9ba5b486be71354e820efbe3c627afc032a9569",
+      "summary.json": "df47f3117ba0a31814adc44d8b25f67274059cdbd15b2494849b4c1a268d2bd4"
+    },
+    "raw_graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285"
+  },
+  "comparison": {
+    "passed": true,
+    "decisions_checked": 4050,
+    "graphs": 27,
+    "models": 5,
+    "success_counts": {
+      "legacy_lora": {
+        "nominal_final_correct": 357,
+        "complete_trajectory": 313,
+        "exact_stop": 291,
+        "early_stop": 519,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 366,
+        "joint_success": 286,
+        "strict_success": 282,
+        "correct_letter_wrong_time": 80
+      },
+      "gru": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 190,
+        "early_stop": 414,
+        "late_stop": 206,
+        "missing_stop": 0,
+        "stopped_answer_correct": 295,
+        "joint_success": 186,
+        "strict_success": 186,
+        "correct_letter_wrong_time": 109
+      },
+      "positional": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 594,
+        "early_stop": 216,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 599,
+        "joint_success": 567,
+        "strict_success": 565,
+        "correct_letter_wrong_time": 32
+      },
+      "shared": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 810,
+        "early_stop": 0,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 768,
+        "joint_success": 768,
+        "strict_success": 765,
+        "correct_letter_wrong_time": 0
+      },
+      "final": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 810,
+        "early_stop": 0,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 768,
+        "joint_success": 768,
+        "strict_success": 765,
+        "correct_letter_wrong_time": 0
+      }
+    },
+    "inputs_sha256": {
+      "summary.json": "05832e071c811f7fd377688161737715d03c857963787accd2894be468755c30",
+      "decisions.csv": "ecfde98b4f574be4bac81d6410710912f15a4a76587ae49c0f2e71dfdfacdc19",
+      "freeze.json": "39261f18094a000152e299b58f25d56c8f1ed3d0179222631f6d65fccbd43d3a"
+    },
+    "graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+    "audit_source_sha256": "6cc1d18a6b3fd3eb210332d46d115f975b063d476503db8813743398c5d14c15"
+  },
+  "numeric": {
+    "eval/pointer_benchmark/shared-number-20261008/numeric": {
+      "passed": true,
+      "requests_checked": 4096,
+      "exact_stop_questions": 1037,
+      "first_failed_stop_count": 1038,
+      "inputs_sha256": {
+        "summary.json": "fc1f5efb33aa3813748e0c12c67fdf5d30a0dac84ffd794f6228d27bc67dbb64",
+        "countdown.csv": "114eb9a5f86dd0eb9f91b0d120c8ffa62f8f3e2ccf4a13e27195beb398a29f23",
+        "reader.csv": "cba346678aae7bbb0c3eecc0f64cd27b4da530e2eb251cfc08968ddb8cad909b"
+      }
+    },
+    "eval/pointer_benchmark/shared-number-precision-20261008/numeric": {
+      "passed": true,
+      "requests_checked": 8192,
+      "exact_stop_questions": 8192,
+      "first_failed_stop_count": null,
+      "inputs_sha256": {
+        "summary.json": "f1aaa0fbaacfbb2c34e4e3d92df58f708fe1aea6fc5e1f372f5c8a78928f3fb5",
+        "countdown.csv": "c6857cd176a63b553f770f783e3311551f03d01cf81727610c72d9e18a89e108",
+        "reader.csv": "cba346678aae7bbb0c3eecc0f64cd27b4da530e2eb251cfc08968ddb8cad909b"
+      }
+    }
+  },
+  "failure_exports": {
+    "passed": true,
+    "failing_graphs_checked": 42,
+    "confusion_cells_checked": 676,
+    "final_letter_rates_checked": 26,
+    "cycle_matrix_cells_checked": 6656,
+    "error_episode_entries_checked": 264,
+    "category_cells_checked": 12,
+    "dynamics_cells_checked": 9
+  }
+}

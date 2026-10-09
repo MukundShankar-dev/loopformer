@@ -12,7 +12,7 @@ from scripts.eval.pointer_task import sha256_file
 
 COLORS = {'joint_success': '#2563a6', 'complete_trajectory': '#16826b', 'exact_stop': '#3e4349'}
 LABELS = {'joint_success': 'Correct answer + exact stopping loop',
-          'complete_trajectory': 'Every intermediate step correct', 'exact_stop': 'Exact stopping loop'}
+          'complete_trajectory': 'All steps 1…N correct (strict prefix)', 'exact_stop': 'Exact stopping loop'}
 MODES = {'random_function': 'Random functions', 'permutation': 'Permutations',
          'full_cycle': 'Full 26-state cycles'}
 READING_COLOR = '#a35339'
@@ -56,14 +56,20 @@ def zoom_floor(rows: list[dict]) -> float:
 
 def decorate(fig, title: str, subtitle: str, footer: str) -> None:
     fig.suptitle(title, x=.06, y=.98, ha='left', fontsize=17, fontweight='bold', color='#1d2935')
-    fig.text(.06, .925, subtitle, ha='left', fontsize=10, color='#55616e')
+    fig.text(.06, .905, subtitle, ha='left', fontsize=10, color='#55616e')
     fig.text(.06, .025, footer, ha='left', fontsize=8.5, color='#55616e')
-    fig.subplots_adjust(left=.07, right=.97, top=.75, bottom=.17, wspace=.28)
+    # Leave room for multi-line panel titles, the shared legend and definitions.
+    fig.subplots_adjust(left=.07, right=.97, top=.70, bottom=.24, wspace=.28)
 
 
 def save_figure(fig, output: Path, name: str) -> None:
     for suffix in ('png', 'svg', 'pdf'):
-        fig.savefig(output / f'{name}.{suffix}', dpi=200, facecolor='white')
+        path = output / f'{name}.{suffix}'
+        metadata = {'Date': None} if suffix == 'svg' else {'CreationDate': None, 'ModDate': None} if suffix == 'pdf' else None
+        fig.savefig(path, dpi=200, facecolor='white', metadata=metadata)
+        if suffix == 'svg':
+            # Matplotlib path lines contain trailing spaces; keep Git diffs clean.
+            path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines()) + '\n')
 
 
 def make_figures(summary: dict, grouped: list[dict], counts: list[dict],
@@ -78,19 +84,21 @@ def make_figures(summary: dict, grouped: list[dict], counts: list[dict],
         raise ValueError('Figure coverage differs from the declared benchmark')
     exposure = 'Dotted lines: R training unroll 12 · largest trained count 63 · three-digit boundary 100.'
     uncertainty = 'Shading: pointwise 95% graph-level Wilson intervals; repeated horizons are paired, not independent.'
-    subtitle = f'{graph_count:,} independent graphs · {summary["queries"]:,} paired queries · every count 1–{maximum}'
+    subtitle = f'Same {graph_count:,} graphs at each N · {summary["queries"]:,} paired queries · counts 1–{maximum}'
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.3))
     for ax in axes:
         quality_lines(ax, all_rows)
         depth_axis(ax, maximum)
-        ax.set_ylabel('Success (%)')
+        ax.set_ylabel('Graphs passing each criterion (%)')
     axes[0].set(title='Full scale', ylim=(0, 102))
     axes[1].set(title='Zoom of the same measurements', ylim=(zoom_floor(all_rows), 100.4))
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(.53, .89), ncol=3,
+    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(.53, .86), ncol=3,
                frameon=False, fontsize=8.5)
-    decorate(fig, 'Does the complete model generalize in depth?', subtitle, exposure + '\n' + uncertainty)
+    decorate(fig, 'Does the complete model generalize in depth?', subtitle,
+             'Blue: final letter AND stop at N; earlier errors may recover. Green: zero errors at ANY step 1…N.\n'
+             + exposure + '\n' + uncertainty)
     save_figure(fig, output, 'quality_over_depth'); plt.close(fig)
 
     mode_rows = [[r for r in grouped if r['stratum'] == f'graph_mode={mode}'] for mode in MODES]
@@ -101,10 +109,12 @@ def make_figures(summary: dict, grouped: list[dict], counts: list[dict],
     for ax, (_, label), rows in zip(axes, MODES.items(), mode_rows, strict=True):
         quality_lines(ax, rows); depth_axis(ax, maximum)
         ax.set(title=f'{label}\n{int(rows[0]["graphs"]):,} graphs', ylim=(minimum, 100.4))
-    axes[0].set_ylabel('Success (%) · zoomed scale')
-    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(.53, .89), ncol=3,
+    axes[0].set_ylabel('Graphs passing each criterion (%) · zoomed')
+    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(.53, .86), ncol=3,
                frameon=False, fontsize=8.5)
-    decorate(fig, 'Graph structure and depth generalization', subtitle, exposure + '\n' + uncertainty)
+    decorate(fig, 'Graph structure and depth generalization', subtitle,
+             'Each N uses the same 450 graphs per type. Green is strict prefix success; blue checks only the final answer and stop.\n'
+             + exposure + '\n' + uncertainty)
     save_figure(fig, output, 'quality_by_graph_type'); plt.close(fig)
 
     first_errors = Counter(int(r['first_error_loop']) for r in graphs if r['first_error_loop'])
@@ -116,28 +126,29 @@ def make_figures(summary: dict, grouped: list[dict], counts: list[dict],
         100 * values(all_rows, 'complete_trajectory_wilson_95_low'),
         100 * values(all_rows, 'complete_trajectory_wilson_95_high'), color=COLORS['complete_trajectory'], alpha=.13)
     depth_axis(axes[0], maximum)
-    axes[0].set(title='Graphs with an entirely correct prefix', ylabel='Graphs surviving (%)',
+    axes[0].set(title='No incorrect C letter at any loop 1…N', ylabel=f'Graphs with zero errors / {graph_count:,} (%)',
                 ylim=(zoom_floor(all_rows), 100.4))
     last = max(first_errors, default=1)
     x = np.arange(1, last + 1)
     axes[1].bar(x, [first_errors.get(int(i), 0) for i in x], color=READING_COLOR, width=.8)
-    axes[1].set(title=f'First error in each failing graph\n{graph_count - survivors:,} fail; {survivors:,} / {graph_count:,} survive through {maximum}', xlabel='First incorrect loop',
+    axes[1].set(title=f'First incorrect intermediate C letter\n{graph_count - survivors:,} fail; {survivors:,} / {graph_count:,} remain error-free', xlabel='First incorrect loop',
                 ylabel='Independent graphs', xlim=(.5, last + .5))
     axes[1].grid(axis='y', alpha=.25); axes[1].set_axisbelow(True)
     if 12 <= last:
         axes[1].axvline(12, color=COLORS['complete_trajectory'], linestyle=':', linewidth=1)
     decorate(fig, 'Where does execution first go wrong?', subtitle,
-             'Each failing graph contributes once to the histogram; survivors are censored at the maximum tested depth.\n' + uncertainty)
+             f'First error means an intermediate letter mismatch, NOT a final-answer/timing failure. Denominator stays {graph_count:,} at every N.\n'
+             'Each failing graph contributes once; error-free graphs are observed only through the maximum tested depth.\n' + uncertainty)
     save_figure(fig, output, 'trajectory_failures'); plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.3))
     x = values(counts, 'depth')
     axes[0].plot(x, values(counts, 'initial_memory') - x, color=READING_COLOR, linewidth=1.6)
-    axes[0].set(title='Number-reader residual', ylabel='Initial memory − requested count')
+    axes[0].set(title='Number-reader residual', ylabel='Initial memory − requested count\n(steps)')
     valid = [r for r in counts if r['first_stop']]
     axes[1].plot(values(valid, 'depth'), values(valid, 'first_stop') - values(valid, 'depth'),
                  color=COLORS['exact_stop'], linewidth=1.8)
-    axes[1].set(title='Actual first stopping-loop residual', ylabel='First stopping loop − requested count')
+    axes[1].set(title='Actual first stopping-loop residual', ylabel='First stop − requested count\n(loops)')
     axes[1].text(.98, .95, f'Missing stops: {len(counts) - len(valid)} / {maximum}',
                  transform=axes[1].transAxes, va='top', ha='right', fontsize=9)
     for ax in axes:
@@ -147,6 +158,7 @@ def make_figures(summary: dict, grouped: list[dict], counts: list[dict],
         axes[1].set_ylim(-1, 1)
     decorate(fig, 'Reading the request and deciding when to stop', subtitle,
              exposure + '\nOne result per integer: the controller is graph-independent; graph repetitions add no numeric evidence.')
+    fig.subplots_adjust(left=.11)  # Scientific tick labels plus the two-line unit label.
     save_figure(fig, output, 'controller_diagnostics'); plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.3))
@@ -159,7 +171,10 @@ def make_figures(summary: dict, grouped: list[dict], counts: list[dict],
     conditional = np.asarray([float(r['conditional_transition_accuracy']) if r['conditional_transition_accuracy'] else np.nan for r in loops])
     axes[1].plot(x, 100 * conditional, color=COLORS['complete_trajectory'], linewidth=1.8)
     axes[1].set(title='Next-step accuracy given a correct prefix', ylabel='Conditional transition accuracy (%)')
-    axes[0].set(title='Decoded states at each recurrent loop', ylabel='Accuracy / agreement (%)')
+    eligible = [int(r['correct_prefix_graphs']) for r in loops]
+    axes[1].text(.98, .08, f'Eligible graphs: {min(eligible):,}–{max(eligible):,}\nAlready-failed graphs excluded',
+                 transform=axes[1].transAxes, ha='right', fontsize=9)
+    axes[0].set(title='Decoded states at each recurrent loop', ylabel='Accuracy / agreement (%) · zoomed')
     axes[0].legend(loc='lower right', frameon=False, fontsize=8.5)
     observed = [100 * values(loops, key) for key in ('accuracy', 'r_accuracy', 'r_c_agreement') if key in loops[0]]
     finite = np.concatenate([*observed, 100 * conditional[np.isfinite(conditional)]])
@@ -174,6 +189,7 @@ def make_figures(summary: dict, grouped: list[dict], counts: list[dict],
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--results', type=Path, required=True)
+    parser.add_argument('--graphs', type=Path, required=True, help='Original benchmark graphs.jsonl for independent plot-input rescoring')
     parser.add_argument('--output', type=Path, help='Fresh figure directory; default RESULTS/plots')
     args = parser.parse_args()
     summary = json.loads((args.results / 'summary.json').read_text())
@@ -183,21 +199,28 @@ def main() -> None:
     audit = json.loads(audit_path.read_text())
     if not audit['passed'] or audit['summary_sha256'] != sha256_file(args.results / 'summary.json'):
         raise ValueError('Need a current independent reference audit before plotting')
+    from scripts.eval.audit_pointer_figures import audit_plot_tables
+    plot_audit = audit_plot_tables(args.results, args.graphs)
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     plt.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 10, 'axes.spines.top': False,
         'axes.spines.right': False, 'axes.edgecolor': '#b2bac3', 'axes.labelcolor': '#34404c',
-        'xtick.color': '#55616e', 'ytick.color': '#55616e', 'svg.fonttype': 'none'})
+        'xtick.color': '#55616e', 'ytick.color': '#55616e', 'svg.fonttype': 'none',
+        'svg.hashsalt': 'loopformer-pointer-figures'})
     names = ('summary.json', 'per_count_and_stratum.csv', 'controller_counts.csv', 'graphs.csv', 'per_loop.csv',
              'result_reference_audit.json')
     output = args.output or args.results / 'plots'
     output.mkdir(parents=True, exist_ok=False)
     make_figures(summary, read_csv(args.results / names[1]), read_csv(args.results / names[2]),
                  read_csv(args.results / names[3]), read_csv(args.results / names[4]), output)
+    (output / 'plot_input_audit.json').write_text(json.dumps(plot_audit, indent=2) + '\n')
     (output / 'provenance.json').write_text(json.dumps({'matplotlib': matplotlib.__version__,
         'script_sha256': sha256_file(Path(__file__)),
         'inputs_sha256': {name: sha256_file(args.results / name) for name in names},
+        'raw_graphs_sha256': sha256_file(args.graphs),
+        'plot_input_audit_sha256': sha256_file(output / 'plot_input_audit.json'),
+        'audit_source_sha256': sha256_file(Path(__file__).with_name('audit_pointer_figures.py')),
         'vertical_lines': {'12': 'maximum supervised recurrent prefix',
                            '63': 'maximum trained requested count; five excluded', '100': 'three-digit boundary'},
         'uncertainty': 'Per-count marginal graph-level Wilson intervals; no independent count-query sample assumption.',

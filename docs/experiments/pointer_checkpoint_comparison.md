@@ -204,3 +204,11 @@ checkpoint changes. The existing comparison tests remain preserved.
 Independent reference audits, figure layout inspection, export/provenance hashes,
 local links, compilation and whitespace checks pass. No training or new stage is
 selected by these descriptive diagnostics. Seed 29 stays closed.
+
+The [all-figure reproduction audit](pointer_figure_audit.md) subsequently checked
+every benchmark stratum/loop input, regenerated these eight figures and the five
+overview figures, and independently checked every exported failure-matrix cell.
+All existing failure CSVs and benchmark scores are unchanged. Labels now state
+fixed graph denominators, distinguish strict prefixes from recovered final answers,
+and identify first errors as intermediate C-letter mismatches. Sparse premature-stop
+measurements are shown as points rather than interpolated unmeasured counts.

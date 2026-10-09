@@ -10,6 +10,7 @@ from scripts.eval.loop_metrics import write_csv
 from scripts.eval.pointer_failure_metrics import CATEGORIES, MODES, failure_metrics
 from scripts.eval.plot_pointer_benchmark import read_csv, save_figure
 from scripts.eval.pointer_task import sha256_file
+from scripts.eval.audit_pointer_figures import audit_plot_tables, audit_numeric, audit_failure_exports
 
 
 def label_figure(fig, title: str, footer: str) -> None:
@@ -31,7 +32,7 @@ def final_figures(metrics: dict, graph_rows: list[dict], output: Path) -> None:
     ax.set(xlabel='Recurrent loop', ylabel='All failing graphs, sorted by first error')
     ax.axvline(12, color='#253747', linestyle=':', linewidth=1)
     label_figure(fig, 'Every failing trajectory: errors can persist, alternate, or recover',
-        f'Red = wrong C decode; pale green = correct. All {len(first)} failing graphs shown; 1,308 fully correct graphs omitted.\n'
+        f'Red = wrong C decode; pale green = correct. All {len(first)} failing graphs shown; {len(correct) - len(first):,} fully correct graphs omitted.\n'
         'A recovered letter never repairs the cumulative complete-trajectory score. Dotted line: training unroll 12.')
     fig.subplots_adjust(left=.20, top=.90, bottom=.12)
     save_figure(fig, output, 'failed_trajectory_matrix'); plt.close(fig)
@@ -59,7 +60,8 @@ def final_figures(metrics: dict, graph_rows: list[dict], output: Path) -> None:
     axes[1].set(title=f'Error rate by true letter at loop {maximum}', xlabel='True final letter', ylabel='Graphs wrong (%)')
     axes[1].tick_params(axis='x', labelsize=7); axes[1].grid(axis='y', alpha=.2)
     label_figure(fig, 'Which symbols are confused?',
-        'Left: each of the 42 failing graphs contributes once, avoiding repeated cycle inflation.\nRight: per-letter error denominators use all 1,350 graphs at the same horizon.')
+        f'Left: each of the {len(first)} failing graphs contributes once: its first incorrect intermediate C letter.\n'
+        f'Right: per-letter error denominators use all {len(correct):,} graphs at the same horizon.')
     save_figure(fig, output, 'symbol_confusion'); plt.close(fig)
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 6))
@@ -155,7 +157,7 @@ def comparison_figures(path: Path, output: Path) -> None:
     fig, axes = plt.subplots(1, len(arms), figsize=(17, 7), sharey=True)
     cmap = plt.colormaps['Blues'].copy(); cmap.set_bad('#fafbfc')
     for ax, arm in zip(axes, arms, strict=True):
-        matrix = np.zeros((273, len(counts)))
+        matrix = np.zeros((summary['config']['safety_cap'] + 1, len(counts)))
         for r in rows:
             if r['model'] == arm['name']:
                 stop = int(r['first_stop']) if r['first_stop'] else 0
@@ -166,7 +168,7 @@ def comparison_figures(path: Path, output: Path) -> None:
         ax.set_title(arm['label'].replace(' + ', '\n+ '), fontsize=10)
         ticks = [0, 7, 11, 17, 20, 23, 27, 29]
         ax.set_xticks(ticks, [counts[i] for i in ticks], fontsize=8, rotation=45)
-        ax.set_xlabel('Requested count')
+        ax.set_xlabel('Requested count\n(discrete columns)')
     axes[0].set_yticks([0, 12, 64, 128, 192, 256], ['No stop', '12', '64', '128', '192', '256'])
     axes[0].set_ylabel('Actual first stopping loop')
     label_figure(fig, 'When do earlier models actually stop?', footer + '\nBlue = graph fraction on a log color scale; blank = zero; red = desired stop. No-stop row is separate from cap successes.')
@@ -184,14 +186,15 @@ def comparison_figures(path: Path, output: Path) -> None:
             sum(lo <= int(r['depth']) <= hi for r in selected) for lo, hi in cohorts]
         axes[0].plot(range(3), wrongtime, marker='o', label=arm['label'])
         late = [100 * sum(r['early_stop'] == 'True' for r in selected if int(r['depth']) == n) / summary['graphs'] for n in counts]
-        axes[1].plot(counts, late, marker='.', linewidth=1.3, label=arm['label'])
+        # Sparse requests are measured points, not observations of intervening counts.
+        axes[1].scatter(counts, late, s=14, label=arm['label'])
     axes[0].set_xticks(range(3), ['Counts 1–12', '13–69', '70–256'])
     axes[0].set(title='Correct letter at the wrong time', ylabel='Paired queries (%)', ylim=(0, 102))
     axes[1].set(title='Premature stopping by requested count', xlabel='Requested count', ylabel='Graphs stopping early (%)', ylim=(0, 102))
     axes[1].legend(fontsize=8, frameon=False)
     for ax in axes:
         ax.grid(axis='y', alpha=.2)
-    label_figure(fig, 'Final-letter scoring alone conceals control failures', footer)
+    label_figure(fig, 'Final-letter scoring alone conceals control failures', footer + '\nCohorts contain only sampled counts; right panel shows measured points without interpolation.')
     save_figure(fig, output, 'cyclic_coincidence_and_early_stops'); plt.close(fig)
 
 
@@ -202,6 +205,7 @@ def numeric_figure(paths: list[Path], output: Path, comparison: Path | None) -> 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.5))
     hashes = {}
     for path in paths:
+        audit_numeric(path)
         summary = json.loads((path / 'summary.json').read_text())
         if (summary['status'] != 'complete' or not summary['inference_files_unchanged']
                 or summary['executor_executed']):
@@ -222,7 +226,8 @@ def numeric_figure(paths: list[Path], output: Path, comparison: Path | None) -> 
         axes[1].plot(counts, residual, color=color, label=label)
         for name in ('summary.json', 'countdown.csv'):
             hashes[str(path / name)] = sha256_file(path / name)
-    axes[0].set(title='Cumulative exact timing over integer requests', xlabel='Requested count', ylabel='Exactly timed requests so far (%)', ylim=(0, 102))
+    axes[0].set(title='Aggregate over ALL integer requests 1…N', xlabel='Largest included requested count N',
+                ylabel='Exact stops among requests 1…N (%)', ylim=(0, 102), yticks=[0, 20, 40, 60, 80, 100])
     axes[1].set(title='Timing drift at each integer request', xlabel='Requested count', ylabel='First stopping loop − requested count')
     for ax in axes:
         ax.legend(fontsize=8, frameon=False); ax.grid(alpha=.2)
@@ -250,6 +255,11 @@ def main() -> None:
             or sha256_file(args.graphs) != manifest['graphs_sha256']):
         raise ValueError('Need current audited frozen benchmark and exact raw graph file')
     tasks = [PointerExample(**json.loads(line)) for line in args.graphs.read_text().splitlines()]
+    plot_audit = {'benchmark': audit_plot_tables(args.results, args.graphs)}
+    if args.comparison:
+        from scripts.eval.audit_checkpoint_comparison import audit_comparison
+        plot_audit['comparison'] = audit_comparison(args.comparison, args.graphs)
+    plot_audit['numeric'] = {str(path): audit_numeric(path) for path in args.numeric_results}
     rows = read_csv(args.results / 'graphs.csv')
     metrics = failure_metrics(tasks, rows, summary['config']['max_depth'])
     if (int(metrics['correct'].sum()) != audit['success_counts']['nominal_final_correct']
@@ -265,8 +275,10 @@ def main() -> None:
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     plt.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 10, 'axes.spines.top': False,
-                        'axes.spines.right': False, 'svg.fonttype': 'none'})
+                        'axes.spines.right': False, 'svg.fonttype': 'none',
+                        'svg.hashsalt': 'loopformer-pointer-figures'})
     final_figures(metrics, rows, args.output)
+    plot_audit['failure_exports'] = audit_failure_exports(args.results, args.graphs, args.output)
     if args.comparison:
         comparison_figures(args.comparison, args.output)
     inputs = {'graphs': sha256_file(args.graphs), 'source_summary': sha256_file(args.results / 'summary.json'),
@@ -276,9 +288,10 @@ def main() -> None:
         inputs['comparison_summary'] = sha256_file(args.comparison / 'summary.json')
     if args.numeric_results:
         inputs.update(numeric_figure(args.numeric_results, args.output, args.comparison))
+    (args.output / 'plot_input_audit.json').write_text(json.dumps(plot_audit, indent=2) + '\n')
     provenance = {'matplotlib': matplotlib.__version__, 'inputs_sha256': inputs,
         'sources_sha256': {name: sha256_file(Path(__file__).with_name(name)) for name in
-                           ('plot_pointer_failures.py', 'pointer_failure_metrics.py', 'plot_pointer_benchmark.py', 'loop_metrics.py', 'pointer_task.py')},
+                           ('plot_pointer_failures.py', 'pointer_failure_metrics.py', 'plot_pointer_benchmark.py', 'audit_pointer_figures.py', 'loop_metrics.py', 'pointer_task.py')},
         'exports_sha256': {p.name: sha256_file(p) for p in args.output.iterdir() if p.suffix in ('.png', '.pdf', '.svg')},
         'data_sha256': {p.name: sha256_file(p) for p in args.output.iterdir() if p.suffix in ('.csv', '.json')}}
     (args.output / 'provenance.json').write_text(json.dumps(provenance, indent=2) + '\n')

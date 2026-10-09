@@ -157,7 +157,8 @@ Plots use the optional pinned Matplotlib 3.11.2 dependency, with no model loadin
 ```bash
 python -m pip install -r requirements-plots.txt
 python -m scripts.eval.plot_pointer_benchmark \
-  --results eval/pointer_benchmark/final-full-20261008/independent
+  --results eval/pointer_benchmark/final-full-20261008/independent \
+  --graphs data/pointer/benchmark-seeds307-311-313/graphs.jsonl
 ```
 
 Five figures are saved in PNG/PDF/SVG, including unsmoothed rates, clearly labeled
@@ -219,3 +220,10 @@ Its smaller 27-graph panel is kept separate from this 1,350-graph benchmark.
 The green complete-trajectory curve is cumulative: every first error occurs by
 loop 30, but already-failed graphs can recover and fail again without changing
 that curve. The new trajectory matrix exposes those later dynamics.
+
+The subsequent [all-figure reproduction audit](pointer_figure_audit.md) independently
+rescored every plotted rate/denominator and regenerated all thirteen figures.
+Results are unchanged. Green means zero intermediate errors at **any** loop
+1 through N, with 1,350 graphs as the denominator at every N. Blue requires only
+the final answer and exact first stop at N and may recover after earlier errors.
+The first-error histogram refers exclusively to intermediate C readouts.

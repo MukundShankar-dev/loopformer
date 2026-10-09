@@ -22,6 +22,11 @@ The adaptive-compute guide is the **single source for that extension**. The rese
 
 ## Evidence, not instructions
 
+The [all-figure audit](experiments/pointer_figure_audit.md) independently rescored
+and regenerated all thirteen current figures, with unchanged results, explicit
+metric definitions and graph denominators, native-record rechecks and per-figure
+validation coverage.
+
 The [paired checkpoint diagnostic](experiments/pointer_checkpoint_comparison.md)
 records five completed frozen architecture comparisons, eight new failure
 figures and independently audited decisions. Execution and stopping are scored

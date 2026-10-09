@@ -1,0 +1,70 @@
+{
+  "full_benchmark": {
+    "passed": true,
+    "graphs": 1350,
+    "decisions_checked": 345600,
+    "excluded_graphs": 38988,
+    "graph_overlap": 0,
+    "success_counts": {
+      "nominal_final_correct": 338026,
+      "complete_trajectory": 335293,
+      "exact_stop": 345600,
+      "early_stop": 0,
+      "late_stop": 0,
+      "missing_stop": 0,
+      "stopped_answer_correct": 338026,
+      "joint_success": 338026,
+      "strict_success": 335293,
+      "correct_letter_wrong_time": 0
+    },
+    "first_error_counts": {
+      "10": 4,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 2,
+      "17": 1,
+      "2": 1,
+      "20": 1,
+      "21": 1,
+      "24": 1,
+      "25": 2,
+      "28": 2,
+      "29": 1,
+      "3": 3,
+      "30": 1,
+      "4": 4,
+      "5": 5,
+      "6": 3,
+      "7": 3,
+      "8": 1,
+      "9": 3,
+      "none": 1308
+    },
+    "graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+    "summary_sha256": "df47f3117ba0a31814adc44d8b25f67274059cdbd15b2494849b4c1a268d2bd4",
+    "decisions_sha256": "aa2c0fd72792e8b9f1844280a9ba5b486be71354e820efbe3c627afc032a9569",
+    "audit_source_sha256": "a41edc03961dd6521aabafbeeb3d7ddd433a3667c176b6cae9b3cefe567b00fa"
+  },
+  "existing_test": {
+    "passed": true,
+    "native_questions": 1536,
+    "transition_rows_checked": 9984,
+    "success_counts": {
+      "correct": 1536,
+      "complete_trajectory": 1536,
+      "exact_stop": 1536,
+      "early_stop": 0,
+      "late_stop": 0,
+      "cap_fallback": 0,
+      "joint_success": 1536
+    },
+    "data_sha256": "9b383af72722fff74660627fd35042f34238652492a0de6f7ee431a9c0b06bfa",
+    "inputs_sha256": {
+      "summary.json": "d589d481bfb78150768b23649547717b3c680fd6ec07be0d32a7e62046923db4",
+      "decisions.csv": "1978c6d1310c84ff4bdbcbc9e90570e43419d08af0bf43b1b7a2dabfb31001aa",
+      "trajectories.csv": "979644576f22972a24798cd8e94852c1d732b172c9cfe6c814ceee1d5e2bcb27"
+    },
+    "audit_source_sha256": "a41edc03961dd6521aabafbeeb3d7ddd433a3667c176b6cae9b3cefe567b00fa"
+  }
+}

@@ -117,7 +117,8 @@ Optional figures use a separate plotting dependency and do not load the model:
 ```bash
 python -m pip install -r requirements-plots.txt
 python -m scripts.eval.plot_pointer_benchmark \
-  --results eval/pointer_benchmark/frozen-20261008/independent
+  --results eval/pointer_benchmark/frozen-20261008/independent \
+  --graphs data/pointer/benchmark-seeds211-223-227/graphs.jsonl
 ```
 
 This saves standalone PNG/SVG/PDF plots and plotting-library/input provenance.

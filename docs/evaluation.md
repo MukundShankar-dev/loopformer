@@ -1,5 +1,14 @@
 # Evaluation and reproducibility
 
+The [complete figure audit](experiments/pointer_figure_audit.md) rescored and
+regenerated all thirteen current benchmark/comparison figures. At requested
+count N, **joint success** requires the correct final C letter and an actual
+first stop at N; an earlier intermediate error does not automatically fail it.
+**Complete trajectory** requires every C letter at loops 1 through N to be
+correct. Its denominator is the same graph panel at every N, not the number of
+loops. The first-error histogram concerns intermediate C-letter mismatches;
+it is not a histogram of final-answer/timing failures.
+
 The [paired checkpoint diagnostic](experiments/pointer_checkpoint_comparison.md)
 compares retained architectures on identical opened benchmark inputs. Run
 `python -m scripts.eval.checkpoint_comparison --dry-run` to inspect the fixed
@@ -42,12 +51,31 @@ compressed graph/count decisions.
 
 `plot_pointer_benchmark` uses optional `requirements-plots.txt` and requires a
 completed result with passed native fidelity and a current independent audit.
+It now also requires `--graphs <original-graphs.jsonl>` and independently
+recomputes all compressed decision flags, stratum/depth rates, pointwise Wilson
+bands and per-loop denominators before rendering. Failure plotting additionally
+checks its exported taxonomy, confusion, recovery and cycle-matrix cells against
+raw traversal. Both plotters save `plot_input_audit.json` with their provenance.
 It saves five figures as PNG/SVG/PDF, plus input/script/render hashes: full-scale
 and zoomed quality, graph-type strata, first-error survival/histogram, numeric
 initialization/stop residuals, and intermediate R/C readouts. Use `--output` for
 a fresh alternative figure directory. Rates are unsmoothed; graph-level Wilson
 bands are pointwise, not simultaneous depth guarantees. Exact controller timing
 has one outcome per integer because its input ignores graph content.
+
+For a standalone audit of all source tables, use:
+
+```bash
+python -m scripts.eval.audit_pointer_figures \
+  --results eval/pointer_benchmark/final-full-20261008/independent \
+  --graphs data/pointer/benchmark-seeds307-311-313/graphs.jsonl \
+  --comparison eval/pointer_benchmark/checkpoint-comparison-20261008 \
+  --numeric-results eval/pointer_benchmark/shared-number-20261008/numeric \
+                    eval/pointer_benchmark/shared-number-precision-20261008/numeric \
+  --output /tmp/pointer-figure-audit.json
+```
+
+Use a fresh output path. This rescoring never loads or executes model weights.
 
 Status: nominal per-loop evaluation is implemented through the [full-loop checkpoint CLI](evaluation.md) and training monitoring. Repair/damage and censored survival are implemented for the separate [absorbing-terminal diagnostic](evaluation.md), whose pretrained execution is deferred. The conventions derive from project plan sections 6–8 and 23–27. Allowed-token raw-logit margins are implemented and tested in [outputs](../scripts/recurrent_qwen/outputs.py). [Stage 0](experiments/stage0_validation.md) records architecture measurements only.
 
