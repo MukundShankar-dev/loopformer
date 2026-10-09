@@ -4,6 +4,16 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
+The shared-reader graph benchmark now passes: 98.02% joint success, 97.33%
+complete trajectories through 256 and 100% exact timing at every count 1–256.
+All 189 actual native checks match; the independent audit checks all 345,600
+flags/aggregates and excluded graph identities. Numeric reading stays accurate
+through 10,000, but the unchanged timer first drifts at 1,038. The
+[precision follow-up](number_reader_repair.md#precision-follow-up-declared-after-the-reader-only-result)
+therefore fits only its two cell parameters more accurately on the same training
+labels/prefix. R stays frozen; numerical rollouts through 8,192 and bounded
+native component checks are declared before fitting and remain pending.
+
 The user authorized [repairing the number reader](number_reader_repair.md)
 without increasing training count exposure or rollout length. The implementation
 shares a learned token projection and accumulation gain across positions/lengths,

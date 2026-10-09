@@ -53,3 +53,54 @@ def fit_number_reader(reader: SharedNumberReader, context: Tensor, counts: list[
             'training_counts': counts, 'gain_fit_counts': gain_counts, 'learned_gain': float(gain),
             'feature_rank': int(fit.rank), 'training_max_absolute_error': error,
             'digit_value_labels': False, 'reader_frozen_after_fit': True}
+
+
+def refine_countdown(head, context: Tensor, counts: list[int], loops: int) -> dict:
+    """Improve only two cell parameters using the original free-running labels.
+
+    Initial memory comes from the frozen reader; N-t constructs loss targets
+    only. Double-precision L-BFGS reduces optimization residuals which otherwise
+    accumulate quadratically far beyond the supervised prefix. No decrement or
+    identity gain is assigned. Deployment still uses the fitted float32 cell.
+    """
+    if head.kind != 'shared_number' or len(context)!=len(counts) or loops<1:
+        raise ValueError('Need shared-number head and original aligned training prefix')
+    head.requires_grad_(False)
+    with torch.no_grad():
+        initial = head.initialize(context).double()
+    head.cell.double().requires_grad_(True)
+    labels = torch.tensor(counts,dtype=torch.float64)
+    times = torch.arange(1,loops+1,dtype=torch.float64)
+    mask = times[None]<=labels[:,None]
+    targets = labels[:,None]-times[None]  # Supervision, never a recurrence input.
+    def objective() -> Tensor:
+        memory, predicted = initial, []
+        for _ in range(loops):
+            memory = head.cell(memory); predicted.append(memory.squeeze(-1))
+        error = (torch.stack(predicted,1)-targets).square()*mask
+        # Same per-example weighting as prefix_losses, omitting constant loop-zero error.
+        return (error.sum(1)/(mask.sum(1)+1)).mean()
+    before = float(objective().detach())
+    optimizer = torch.optim.LBFGS(head.cell.parameters(),lr=1,max_iter=100,
+        tolerance_grad=1e-12,tolerance_change=1e-25,line_search_fn='strong_wolfe')
+    evaluations = 0
+    def closure() -> Tensor:
+        nonlocal evaluations
+        optimizer.zero_grad(); loss=objective(); loss.backward(); evaluations+=1
+        return loss
+    optimizer.step(closure)
+    fitted = float(objective().detach())
+    head.cell.float().requires_grad_(False)
+    with torch.no_grad():
+        memory, predicted = head.initialize(context), []
+        for _ in range(loops):
+            memory=head.cell(memory);predicted.append(memory.squeeze(-1))
+        deployed=(torch.stack(predicted,1).double()-targets).square()*mask
+        after=float((deployed.sum(1)/(mask.sum(1)+1)).mean())
+    if not torch.isfinite(head.cell.weight).all() or not torch.isfinite(head.cell.bias).all() or after>1e-9:
+        raise ValueError('Countdown training-prefix fit failed after float32 export')
+    return {'method':'float64 L-BFGS on original free-running numerical prefix labels; float32 deployment',
+        'training_counts':counts,'training_loops':loops,'objective_evaluations':evaluations,
+        'before_mse':before,'fitted_mse':fitted,'deployed_mse':after,
+        'learned_gain':float(head.cell.weight.item()),'learned_offset':float(head.cell.bias.item()),
+        'numeric_targets_are_inputs':False}

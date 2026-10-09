@@ -79,3 +79,42 @@ native checks, graph clustering and cyclic coincidence exclusions. Numeric-only
 diagnostics never run R and must not be confused with longer pointer evaluation.
 All old artifacts remain preserved. Results are recorded in the
 [experiment report](experiments/controller_number_reader.md).
+
+## Precision follow-up declared after the reader-only result
+
+The first model passes the 1–256 quality gate and all 189 native checks. Its
+reader stays accurate through 10,000, but the copied countdown first stops early
+at 1,038: learned gain 0.99999940395 accumulates error over long recurrence.
+This is a second, distinct training-fit failure, not a digit-reading failure.
+The first model/result stays frozen. Within the user's request to fix
+generalization, refine only its two cell parameters using the **same** 58 labels,
+same original graph panel, and same nominal supervision through min(N,12).
+
+Use float64 L-BFGS on the original free-running numerical prefix objective,
+then export float32 parameters. Initial memory still comes from the frozen
+reader; N−t is a loss target only. No gain or decrement is programmed, no gold
+memory is injected, and the stop threshold/readout remain fixed. This changes
+optimizer precision and convergence, not training-count or rollout exposure.
+
+Before fitting, declare every numeric rollout through **8,192**, including new
+values 4,097–8,192; reader diagnostics remain through 10,000. Verify all 256
+count timings against the first frozen model and actual native calls at
+12/70/100/256 on each of its nine graph strata (36 queries). Prove every non-cell
+tensor is unchanged and re-audit the first panel. This permits **component
+composition** of its previously confirmed R quality with the refined timer;
+it is not a second independent graph confirmation. No R execution at depths
+above 256 or adaptive speedup is claimed. Reject changed graph timing, tensor
+identity, native mismatch or any failed numeric stop; do not tune on outcomes.
+
+```bash
+bash refine_countdown.sh --dry-run
+bash refine_countdown.sh
+```
+
+The final checkpoint is prepared at
+`models/stage1_pointer/controller-shared-number-precision-seed83/best`.
+Fit/evaluation configs are `configs/controller_number_precision*.json`;
+the shared cell-fitting function lives in `scripts/training/number_reader.py`.
+The composing evaluator reuses the existing controller panel and native checker.
+Results go under `eval/pointer_benchmark/shared-number-precision-20261008/`.
+This follow-up is implemented; pretrained verification is pending.

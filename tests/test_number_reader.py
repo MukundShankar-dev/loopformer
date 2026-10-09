@@ -53,6 +53,32 @@ def test_shared_reader_learns_radix_and_unseen_digit_positions_and_lengths():
     torch.testing.assert_close(other(packed(['106'],embeddings)),torch.tensor([[55.]]),atol=1e-4,rtol=0)
 
 
+def test_countdown_precision_uses_same_free_running_prefix_and_preserves_reader():
+    from scripts.training.number_reader import refine_countdown
+    torch.manual_seed(17)
+    embeddings=torch.randn(10,16)
+    head=SharedNumberController(16)
+    context=packed([str(n) for n in TRAIN_COUNTS],embeddings)
+    fit_number_reader(head.context,context,TRAIN_COUNTS)
+    with torch.no_grad():
+        head.cell.weight.fill_(.9999994);head.cell.bias.fill_(-.9999808)
+        head.readout.weight.fill_(-4);head.readout.bias.fill_(2.6)
+    unchanged={k:v.clone() for k,v in head.state_dict().items() if not k.startswith('cell.')}
+    fit=refine_countdown(head,context,TRAIN_COUNTS,12)
+    assert fit['training_loops']==12 and fit['training_counts']==TRAIN_COUNTS
+    assert fit['deployed_mse']<1e-9 and fit['deployed_mse']<fit['before_mse']
+    for k,v in unchanged.items():torch.testing.assert_close(v,head.state_dict()[k],atol=0,rtol=0)
+    counts=[70,256,1038,4096,8192]
+    memory=head.initialize(packed([str(n) for n in counts],embeddings))
+    stops=[None]*len(counts)
+    with torch.no_grad():
+        for loop in range(1,8194):
+            logits,memory=head.advance(torch.zeros(len(counts),16),memory)
+            for i,score in enumerate(logits):
+                if stops[i] is None and score>=0:stops[i]=loop
+    assert stops==counts
+
+
 def test_number_routing_rejects_format_and_tokenizer_contract_violations(setup):
     _, tokenizer, _, _, _ = setup
     prompt = 'Rules: ( A, B)\nStart: A\nSteps: 100\nAnswer:'

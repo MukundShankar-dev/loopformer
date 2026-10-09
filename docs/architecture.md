@@ -372,6 +372,12 @@ through the common factory. This is a task-specific compositional number reader,
 with an eight-character input bound and finite numerical precision, not a generic
 confidence-based stopping mechanism. The old suffix controller remains supported.
 
+The precision follow-up preserves this reader and the stop readout but tightens
+only the two cell parameters with float64 L-BFGS on the same free-running,
+nominal 12-loop numerical loss. N−t is a target, never a cell input. Exported
+inference stays float32. This addresses accumulated optimization residuals; it
+does not install an identity gain/decrement or expose longer training rollouts.
+
 The [repair protocol](controller_repair.md#suffix-initializer-and-learned-affine-memory)
 specifies the new optional controller. Frozen final-eight embeddings `[B,8H]`
 feed a supervised learned linear initializer `[B,1]`; a shared affine cell evolves

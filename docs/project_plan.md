@@ -23,6 +23,13 @@ the executor, learned countdown and stop readout unchanged. The
 [repair protocol](number_reader_repair.md) declares the same training labels and
 a fresh finite confirmation panel before fitting. No later research stage opens.
 
+The reader-only result subsequently passed through 256, while longer numerical
+diagnostics located accumulated countdown-fit error beginning at 1,038.
+The same user-authorized repair now includes tighter optimization of only the
+two cell parameters on the unchanged 12-loop numerical training labels. The
+protocol distinguishes component composition from independent graph confirmation
+and declares new numerical rollout values through 8,192 before this fit.
+
 **2026-10-08 frozen-benchmark amendment:** The user authorized freezing the
 repaired model, opening the existing seed-61 reserved test, and evaluating a larger
 independent pointer benchmark with longer depths. The [predeclared protocol](pointer_benchmark.md)

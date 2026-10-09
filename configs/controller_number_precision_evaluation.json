@@ -1,0 +1,9 @@
+{
+  "model": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+  "source_results": "eval/pointer_benchmark/shared-number-20261008/independent",
+  "graphs": "data/pointer/benchmark-seeds281-283-293/graphs.jsonl",
+  "native_counts": [12, 70, 100, 256],
+  "numeric_rollout_max": 8192,
+  "numeric_reader_max": 10000,
+  "output": "eval/pointer_benchmark/shared-number-precision-20261008"
+}
