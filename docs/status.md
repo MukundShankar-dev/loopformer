@@ -4,26 +4,38 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
-The shared-reader graph benchmark now passes: 98.02% joint success, 97.33%
-complete trajectories through 256 and 100% exact timing at every count 1–256.
-All 189 actual native checks match; the independent audit checks all 345,600
-flags/aggregates and excluded graph identities. Numeric reading stays accurate
-through 10,000, but the unchanged timer first drifts at 1,038. The
-[precision follow-up](number_reader_repair.md#precision-follow-up-declared-after-the-reader-only-result)
-therefore fits only its two cell parameters more accurately on the same training
-labels/prefix. R stays frozen; numerical rollouts through 8,192 and bounded
-native component checks are declared before fitting and remain pending.
+The [number-reader and countdown repair](experiments/controller_number_reader.md)
+is complete. The final checkpoint is
+`models/stage1_pointer/controller-shared-number-precision-seed83/best`.
+It retains **98.02% joint success**, **97.33% complete trajectories through 256**
+and **100% exact timing at every count 1–256**. The controller alone now stops
+exactly for **8,192/8,192 numeric requests**; reader error through 10,000 is at
+most 0.001953125. Pointer quality at larger requested depths remains untested.
 
-The user authorized [repairing the number reader](number_reader_repair.md)
-without increasing training count exposure or rollout length. The implementation
-shares a learned token projection and accumulation gain across positions/lengths,
-fitted only on the same 58 training count labels. R, bridge, learned countdown
-and stopping readout are kept bitwise unchanged. A fresh 1–256 benchmark on seeds
-281/283/293 is declared before fitting. Sixteen focused reader/affine/benchmark
-tests passed, including unseen positions and longer strings, a learned alternate
-radix, padding, export/loading, executor count invariance, and native/reuse checks
-on deliberately failed policies. Pretrained results are pending; no claim of
-successful repair is made yet.
+Training exposure is unchanged: the same 58 count labels through 63, excluding
+9/17/29/41/53, and the same 12-loop controller ceiling. First replace only the
+reader with shared token projection/accumulation; all 152 other tensors remain
+unchanged. Fresh seeds 281/283/293 supply 1,350 disjoint graphs and 345,600 queries;
+all quality criteria and 189 native checks pass. The independent audit recomputes
+all decision flags/aggregates and verifies the excluded tables. Longer diagnostics
+then reveal timer drift at 1,038, motivating the separately declared fit of only
+two cell parameters with float64 L-BFGS on the original free-running labels.
+All 153 non-cell tensors stay bitwise unchanged; all 256 count timings match and
+all 36 additional native calls verify composition. The final graph-quality result
+is inherited from the unchanged, confirmed executor; this second check is not a
+new independent graph confirmation.
+
+The original failure results remain preserved. No external clock, numeric parser,
+gold-state re-entry, or programmed decrement is added. The final checkpoint is
+frozen; no additional training is selected. Review the completed finite result
+before opening another stage. All newly evaluated panels are now opened; future
+model tuning needs fresh confirmation. Seed 29 and later stages remain closed.
+Six reader/precision tests and the composing tiny-model checks pass, including
+negative-result preservation, changed-R rejection, native/replay fidelity and
+unchanged training exposure. Earlier related architecture/training checks also
+pass; optional figures render, shell syntax/whitespace and local links pass.
+
+## Previous frozen benchmark and repair history
 
 The [frozen pointer benchmark](experiments/pointer_frozen_benchmark.md) completed.
 The fixed seed-83 checkpoint scores **100% exact timing, complete trajectories and

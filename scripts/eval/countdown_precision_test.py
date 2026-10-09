@@ -1,6 +1,7 @@
 """Verify final composition using the already-confirmed, unchanged executor."""
 import argparse
 import csv
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -15,6 +16,35 @@ from scripts.eval.audit_pointer_benchmark import audit_benchmark
 from scripts.eval.loop_metrics import write_csv
 from scripts.eval.pointer_task import sha256_file
 from scripts.recurrent_qwen.checkpoint import load_recurrent_checkpoint
+
+
+def verify_executor_reuse(source: Path, candidate: Path, source_result: dict) -> dict:
+    """Prove tensor, tokenizer, architecture and inference-code identity for reuse."""
+    if checkpoint_hashes(source)!=source_result['checkpoint_sha256']:
+        raise ValueError('Confirmed source model files changed')
+    old_spec=json.loads((source/'recurrent_config.json').read_text())
+    new_spec=json.loads((candidate/'recurrent_config.json').read_text())
+    strip=lambda spec:{k:v for k,v in spec.items() if k!='controller_training'}
+    if strip(old_spec)!=strip(new_spec):
+        raise ValueError('Inference architecture/base/options changed; executor reuse is invalid')
+    old_files,new_files=checkpoint_hashes(source),checkpoint_hashes(candidate)
+    for name,value in old_files.items():
+        if name not in ('adapter_model.pt','recurrent_config.json') and new_files.get(name)!=value:
+            raise ValueError('Tokenizer or another inference file changed; executor reuse is invalid')
+    code={}
+    for path in sorted(Path('scripts/recurrent_qwen').glob('*.py')):
+        old_bytes=subprocess.check_output(['git','show',f'{source_result["git_head"]}:{path.as_posix()}'])
+        expected=hashlib.sha256(old_bytes).hexdigest()
+        if sha256_file(path)!=expected:
+            raise ValueError(f'Inference code changed since source confirmation: {path}')
+        code[str(path)]=expected
+    old=torch.load(source/'adapter_model.pt',weights_only=True,map_location='cpu')
+    new=torch.load(candidate/'adapter_model.pt',weights_only=True,map_location='cpu')
+    if set(old)!=set(new):raise ValueError('Model tensor names differ')
+    preserved=[k for k in old if not k.startswith('completion_head.cell.')]
+    for k in preserved:torch.testing.assert_close(old[k],new[k],atol=0,rtol=0)
+    return {'passed':True,'unchanged_non_cell_tensors':len(preserved),
+        'inference_spec_unchanged':True,'tokenizer_bytes_unchanged':True,'inference_code_sha256':code}
 
 
 def main() -> None:
@@ -32,16 +62,9 @@ def main() -> None:
         raise ValueError('Need completed source graph/native confirmation')
     maximum,cap=source_summary['config']['max_depth'],source_summary['config']['safety_cap']
     source_model=Path(source_summary['checkpoint'])
-    if checkpoint_hashes(source_model)!=source_summary['checkpoint_sha256']:
-        raise ValueError('Confirmed source model files changed')
+    identity=verify_executor_reuse(source_model,Path(settings['model']),source_summary)
     audit_benchmark(source_results,Path(settings['graphs']))
     before=checkpoint_hashes(Path(settings['model']))
-    old=torch.load(source_model/'adapter_model.pt',weights_only=True,map_location='cpu')
-    new=torch.load(Path(settings['model'])/'adapter_model.pt',weights_only=True,map_location='cpu')
-    if set(old)!=set(new):raise ValueError('Model tensor names differ')
-    preserved=[k for k in old if not k.startswith('completion_head.cell.')]
-    for k in preserved:torch.testing.assert_close(old[k],new[k],atol=0,rtol=0)
-    del old,new
     manifest=json.loads((source_results/'dataset_manifest.json').read_text())
     if sha256_file(Path(settings['graphs']))!=manifest['graphs_sha256']:
         raise ValueError('Confirmed graph bytes differ')
@@ -49,6 +72,7 @@ def main() -> None:
     graph_rows=list(csv.DictReader((source_results/'graphs.csv').open()))
     predictions=torch.tensor([[SYMBOLS.index(c) for c in row['predictions']] for row in graph_rows])
     output.mkdir(parents=True)
+    (output/'composition_identity_audit.json').write_text(json.dumps(identity,indent=2)+'\n')
     freeze={'checkpoint':settings['model'],'inference_sha256':before,
         'threshold':source_summary['config']['threshold'],'safety_cap':cap,
         'protocol_sha256':sha256_file(args.config),'source_quality_summary_sha256':sha256_file(source_results/'summary.json')}
@@ -76,7 +100,7 @@ def main() -> None:
             and numeric['exact_stop_questions']==settings['numeric_rollout_max'])
     result={'status':'complete','passed':passed,'checkpoint':settings['model'],'inference_sha256':before,
         'config':settings,'config_sha256':sha256_file(args.config),'source_results':str(source_results),
-        'unchanged_non_cell_tensors':len(preserved),'matching_count_timings':maximum,'native_fidelity':native,
+        'unchanged_non_cell_tensors':identity['unchanged_non_cell_tensors'],'matching_count_timings':maximum,'native_fidelity':native,
         'numeric':numeric,'inherited_graph_quality':source_summary['cohorts'],
         'inherited_acceptance':source_summary['acceptance'],
         'scope':'Component composition on an opened but verified graph panel; unchanged R and reader; new numerical rollouts through 8192. Not new independent graph confirmation.',

@@ -18,27 +18,29 @@ frozen coda
 readout
 ```
 
-One recurrent block is reused across all loops. The current experiment trains all weights in that block while keeping the prelude and coda frozen; older experiments used LoRA. The executor’s prompt context stays fixed across loops; the frozen coda reads each loop's state for supervision and evaluation. The next loop consumes the recurrent hidden state, rather than the coda output or a decoded answer. See [architecture](docs/architecture.md).
+One recurrent block is reused across all loops. The executor experiment trained all weights in that block while keeping the prelude and coda frozen; older experiments used LoRA. The executor’s prompt context stays fixed across loops; the frozen coda reads each loop's state for supervision and evaluation. The next loop consumes the recurrent hidden state, rather than the coda output or a decoded answer. See [architecture](docs/architecture.md).
 
 ## Current result and diagnostics
 
-The [frozen benchmark](docs/experiments/pointer_frozen_benchmark.md) scores 100%
-answer accuracy, exact stopping and complete trajectories on the current reserved
-test. A larger panel has 1,350 independent graphs at every depth 1–256: the
-executor keeps every transition correct on 96.96% of graphs through 256, but the
-controller stops correctly only through count 69. The complete model does not
-pass the broader benchmark; its initial number reader needs work. All graphs
-have 26 states and long executions can cycle.
+The [repaired model](docs/experiments/controller_number_reader.md) passes the
+larger pointer benchmark with unchanged training count/depth exposure: 98.02%
+answer-plus-exact-stop success across 1,350 graphs at depths 1–256, and 97.33%
+complete trajectories through 256. Its controller alone stops exactly for every
+count through 8,192; pointer execution at those larger depths is untested. All
+graphs have 26 states and long executions can cycle. The earlier
+[frozen benchmark](docs/experiments/pointer_frozen_benchmark.md) records the
+number-reading failure that motivated this repair.
 
-See [benchmark commands and data](docs/pointer_benchmark.md),
-[controller architecture](docs/controller_repair.md), and the saved
-[figure](eval/pointer_benchmark/frozen-20261008/independent/plots/quality_and_initialization.png).
+See [repair commands and data](docs/number_reader_repair.md),
+[controller architecture](docs/architecture.md), and the saved
+[figure](eval/pointer_benchmark/shared-number-20261008/independent/plots/quality_and_initialization.png).
 Weights remain on the desktop; Git carries metrics, audits and metadata.
-`bash benchmark_pointer.sh --dry-run` previews the suite without writes.
 
-The [number-reader repair](docs/number_reader_repair.md) changes only the initial
-reader, with training counts and rollout lengths unchanged.
-`bash repair_number_reader.sh --dry-run` previews its fit and fresh benchmark.
+The [repair runbook](docs/number_reader_repair.md) fits a shared number reader,
+then tightens its two countdown parameters on the same training labels.
+`bash repair_number_reader.sh --dry-run` and `bash refine_countdown.sh --dry-run`
+preview the two stages. The completed final checkpoint is
+`models/stage1_pointer/controller-shared-number-precision-seed83/best`.
 
 Start with the [research plan](docs/project_plan.md), [current status](docs/status.md),
 and [documentation index](docs/README.md). Historical experiments remain in the
@@ -153,9 +155,9 @@ Pass a complete saved step directory, including its adapter weights and tokenize
 
 ```bash
 python -m scripts.eval.loop_test \
-  --model models/stage1_pointer/controller-affine-seed83/best \
+  --model models/stage1_pointer/controller-shared-number-precision-seed83/best \
   --data data/pointer/seed-61-independent/validation.jsonl \
-  --device cuda --loops 12 --test
+  --device cuda --loops 272 --stop-policy completion --stop-threshold 0.5 --test
 ```
 
 This requires the complete checkpoint on the training desktop; local metadata alone is insufficient. Remove `--test` for all 1,536 validation queries. Outputs go to `eval/pointer_loops/`. This reads the model after every recurrent loop; the ordinary three-shot prompt is not used. See [full-loop evaluation](docs/evaluation.md) for commands and metrics.

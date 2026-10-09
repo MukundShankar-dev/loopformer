@@ -102,8 +102,8 @@ count timings against the first frozen model and actual native calls at
 12/70/100/256 on each of its nine graph strata (36 queries). Prove every non-cell
 tensor is unchanged and re-audit the first panel. This permits **component
 composition** of its previously confirmed R quality with the refined timer;
-it is not a second independent graph confirmation. No R execution at depths
-above 256 or adaptive speedup is claimed. Reject changed graph timing, tensor
+it is not a second independent graph confirmation. No nominal pointer quality at
+requested depths above 256 or adaptive speedup is claimed. Reject changed graph timing, tensor
 identity, native mismatch or any failed numeric stop; do not tune on outcomes.
 
 ```bash
@@ -117,4 +117,8 @@ Fit/evaluation configs are `configs/controller_number_precision*.json`;
 the shared cell-fitting function lives in `scripts/training/number_reader.py`.
 The composing evaluator reuses the existing controller panel and native checker.
 Results go under `eval/pointer_benchmark/shared-number-precision-20261008/`.
-This follow-up is implemented; pretrained verification is pending.
+This follow-up is verified: all 153 non-cell tensors are unchanged, all 256 count
+timings match, all 36 native calls match, and every numerical request through
+8,192 stops exactly. Reader error through 10,000 remains at most 0.001953125.
+See the [completed report](experiments/controller_number_reader.md). No R or
+end-to-end pointer accuracy beyond 256 is established by the numeric diagnostic.

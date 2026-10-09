@@ -83,5 +83,6 @@ All native/reuse checks and independent reference audits pass. This report
 supersedes broader interpretations of the smaller controller repair panel.
 
 The [shared reader report](experiments/controller_number_reader.md) records the
-authorized reader-only intervention with unchanged count/depth exposure and a
-fresh graph confirmation panel; consult its status before treating it as verified.
+completed reader/cell repair with unchanged training exposure: passing fresh
+graph quality through 256 and exact controller-only stopping through 8,192.
+It distinguishes the independent graph result from final component composition.

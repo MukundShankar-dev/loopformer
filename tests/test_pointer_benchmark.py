@@ -120,6 +120,27 @@ def test_frozen_benchmark_cli_native_agrees_on_failures_and_files_unchanged(setu
     with pytest.raises(ValueError,match='Decision flag exact_stop differs'):
         audit_benchmark(path/'result',path/'benchmark/graphs.jsonl')
     decisions.write_bytes(original_bytes)
+    if kind=='shared_number':
+        # Component reuse must preserve negative outcomes and reject a changed R.
+        with torch.no_grad():head.cell.bias.add_(-.25)
+        export_checkpoint(path/'affine',path/'refined',head,{'step':0})
+        settings={'model':str(path/'refined'),'source_results':str(path/'result'),
+            'graphs':str(path/'benchmark/graphs.jsonl'),'native_counts':[1,4],
+            'numeric_rollout_max':4,'numeric_reader_max':4,'output':str(path/'composition'),'device':'cpu'}
+        component_config=path/'component.json';component_config.write_text(json.dumps(settings))
+        component_args=[sys.executable,'-m','scripts.eval.countdown_precision_test','--config',str(component_config)]
+        failed=subprocess.run(component_args,capture_output=True,text=True)
+        assert failed.returncode!=0,failed.stdout+failed.stderr
+        composition=json.loads((path/'composition/summary.json').read_text())
+        assert composition['status']=='complete' and not composition['passed']
+        assert composition['matching_count_timings']==4 and composition['native_fidelity']['passed']
+        payload=torch.load(path/'refined/adapter_model.pt',weights_only=True)
+        first=next(k for k in payload if k.startswith('recurrent.'))
+        payload[first]=payload[first]+.001
+        torch.save(payload,path/'refined/adapter_model.pt')
+        settings['output']=str(path/'invalid-composition');component_config.write_text(json.dumps(settings))
+        assert subprocess.run(component_args,capture_output=True,text=True).returncode!=0
+        assert not (path/'invalid-composition').exists()
     repeat=subprocess.run(args,capture_output=True,text=True)
     assert repeat.returncode!=0 and 'refuse overwrite' in repeat.stderr
 

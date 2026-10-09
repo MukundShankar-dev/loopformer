@@ -4,6 +4,18 @@ This document records choices that affect implementation or interpretation. The 
 
 ## Established constraints
 
+2026-10-08 completed repair: the shared reader passes the larger graph benchmark
+on unchanged training labels, while the unchanged timer's longer stress panel
+reveals accumulated optimization error beginning at 1,038. Fit only the two cell
+parameters more accurately with float64 L-BFGS on the original nominal 12-loop
+loss; labels never enter the recurrence. Export stays float32. All 153 non-cell
+tensors remain unchanged, all 256 timings match, 36 native calls verify composition
+and every numerical request through 8,192 stops correctly. Inherit R quality from
+its confirmed unchanged tensors, input routing, tokenizer and inference code;
+do not describe this as another fresh graph confirmation or pointer quality at
+8,192. The [report](experiments/controller_number_reader.md) preserves both phases
+and their negative results. No broader training exposure or later stage opens.
+
 2026-10-08: At the user's request, repair positional number-reading generalization
 without broader count/depth exposure. Fit one shared embedding projection and
 shared accumulation gain on the same 58 count labels, preserving all non-reader
