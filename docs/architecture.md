@@ -458,3 +458,22 @@ observed logit difference was 0.0000496 over 54 checks. Full-panel inference is
 pending. The scheduler may discard a query after its requested readout and first
 stop have both been recorded; that horizon is never an input to R or its head.
 Training and ordinary model mechanics are unchanged.
+
+## Population inference indexing optimization — 2026-10-09
+
+The inference-only partitioned evaluator discovers surviving query rows once
+per loop with `need.nonzero()`, then uses those ordered indices with
+`index_select` for all working states, masks and K/V memories. This replaces
+repeated CUDA boolean indexing/shape discovery. It changes no FP32 model
+arithmetic, readout, counter input, stopping rule, or training path. Rows still
+remain active until both the requested observation horizon and first stop have
+been observed; a missing stop retains the row to the safety cap.
+
+Full-horizon four-graph tests at every request 1–256 preserved logits and stop
+scores bit for bit for CE and fixed-memory checkpoints. Observed chunk time
+changed 44.60→43.81 seconds for CE and 29.51→26.66 for fixed memory. These are
+single-batch measurements, not guaranteed full-run speedups. The explicit
+[resume migration](../scripts/eval/migrate_paper_indexing.py) accepts only this
+AST substitution, preserves the old freeze/source/chunk hashes and refuses
+other source, checkpoint, data, precision or batch changes. Native fidelity,
+reference scoring and strict ordinary resume checks remain in place.

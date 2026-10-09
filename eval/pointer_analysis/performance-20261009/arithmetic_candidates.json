@@ -1,0 +1,26 @@
+[
+  {
+    "candidate": "tf32",
+    "seconds": 35.72345670899995,
+    "reference_chunk_seconds": 43.666638003000116,
+    "changed_observed_readouts": 100,
+    "changed_queries": 87,
+    "changed_final_readouts": 0,
+    "exact_decoded_agreement": false,
+    "fp32_matmul_precision": "high",
+    "weights_on_disk_modified": false,
+    "scope": "First four full-horizon CE graphs, every requested N; bounded candidate rejection test, not full population approval"
+  },
+  {
+    "candidate": "merged_lora",
+    "seconds": 42.6713866049995,
+    "reference_chunk_seconds": 43.666638003000116,
+    "changed_observed_readouts": 1,
+    "changed_queries": 1,
+    "changed_final_readouts": 0,
+    "exact_decoded_agreement": false,
+    "fp32_matmul_precision": "highest",
+    "weights_on_disk_modified": false,
+    "scope": "First four full-horizon CE graphs, every requested N; bounded candidate rejection test, not full population approval"
+  }
+]

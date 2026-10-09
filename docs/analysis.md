@@ -177,6 +177,30 @@ strata and overhead. The profiling job briefly paused CE and automatically resum
 it. Raw timing evidence: [`remaining_arms.json`](../eval/pointer_analysis/performance-20261009/remaining_arms.json).
 
 
+### Measured accelerator candidates and selected exact optimization
+
+Full-depth CE tests on the same first four graphs found that TF32 shortened a
+43.67-second chunk to 35.72 seconds but changed 100 intermediate readouts across
+87 questions. LoRA merging took 42.67 seconds and changed one intermediate
+readout. Neither changed final letters on this tiny panel, but both fail exact
+intermediate-fidelity requirements and are **not deployed**. This does not prove
+that every use of these techniques is unsuitable; it rejects these candidates
+for preserving the ongoing diagnostic run.
+
+An FP32 ordered-index optimization preserved every logit and stop score bit for
+bit on both CE and fixed-memory full-horizon tests. Discovering active rows once
+and reusing indices reduced fixed-memory chunk time 29.51→26.66 seconds (~10%)
+and CE 44.60→43.81 seconds (~2%). It changes no model arithmetic, precision,
+question coverage, batch size, parameters or training. The implementation is
+validated locally; the desktop extraction is being resumed with this optimization.
+Existing completed chunks retain their original-source provenance through
+`freeze-pre-single-index.json` and `indexing_migration.json`. The migration
+checks that this is the only permitted source change; normal resume remains
+strict. See [`indexing.json`](../eval/pointer_analysis/performance-20261009/indexing.json)
+and [`arithmetic_candidates.json`](../eval/pointer_analysis/performance-20261009/arithmetic_candidates.json).
+The expected saving is modest (roughly half an hour across the two fixed-memory
+arms if this batch speedup persists), not a several-fold full-suite acceleration.
+
 ## Checkpoint registry: freeze these choices before population inference
 
 All paths below are relative to `models/stage1_pointer/`. Desktop weights were

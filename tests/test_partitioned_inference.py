@@ -57,3 +57,10 @@ def test_readout_horizon_pruning_preserves_all_observed_predictions(base, mode):
     assert torch.equal(short.stops.argmax(-1),full.stops.argmax(-1))
     for i,n in enumerate(horizons):
         torch.testing.assert_close(short.scores[i,:n],full.scores[i,:n],atol=1e-5,rtol=1e-5)
+    # A head that never crosses must retain every row to the safety cap, even
+    # after its requested horizon; otherwise missing-stop answers are invented.
+    model.completion_head.network[-1].bias.data.fill_(-10)
+    full=partitioned_forward(model,prefix,suffix,mask,indices,tokens,8)
+    short=partitioned_forward(model,prefix,suffix,mask,indices,tokens,8,horizons)
+    assert torch.equal(short.scores,full.scores)
+    assert torch.equal(short.stops,full.stops)

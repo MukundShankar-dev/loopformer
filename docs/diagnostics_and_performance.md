@@ -1,5 +1,17 @@
 # Diagnose recurrent failures and measure execution cost
 
+## Current population-evaluation performance
+
+The running full suite uses causal prefix sharing and count-free trajectory
+reuse. Full-horizon probes rejected TF32 and LoRA merging because they changed
+intermediate predictions. A single ordered-index gather per pruning step instead
+of repeated boolean indexing preserves tested FP32 logits/stop scores bitwise
+and saved about 10% of fixed-memory batch time, about 2% of CE batch time.
+Original code, raw measurements and explicit resume migration are recorded in
+[analysis.md](analysis.md#measured-accelerator-candidates-and-selected-exact-optimization).
+These are bounded measurements; the earlier 13–16-hour planning range is not
+replaced by an unmeasured claim of several-fold speedup.
+
 ## Controller training audit — current desktop command
 
 After the [remaining-work comparison](experiments/controller_remaining_seed61.md),

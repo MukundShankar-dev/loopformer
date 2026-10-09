@@ -1,0 +1,18 @@
+[
+  {
+    "model": "ce_full",
+    "original_seconds": 44.60211246900144,
+    "single_index_seconds": 43.81072515699998,
+    "speed_ratio": 1.018063780253932,
+    "bitwise_scores_equal": true,
+    "bitwise_stops_equal": true
+  },
+  {
+    "model": "fixed6",
+    "original_seconds": 29.51360053099961,
+    "single_index_seconds": 26.656683170998804,
+    "speed_ratio": 1.1071745251153,
+    "bitwise_scores_equal": true,
+    "bitwise_stops_equal": true
+  }
+]

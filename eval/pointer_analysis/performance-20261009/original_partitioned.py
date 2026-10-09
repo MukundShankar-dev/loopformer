@@ -143,24 +143,20 @@ def partitioned_forward(model: nn.Module, prefix_ids: Tensor, suffix_ids: Tensor
             need = horizons[active_rows] > loop + 1
             if model.completion_head is not None:
                 need |= ~crossed[active_rows]
-            # A CUDA boolean index discovers its output shape on the host.
-            # Discover the same ordered rows once, then reuse them for every
-            # state/cache tensor instead of repeating that synchronization.
-            kept = need.nonzero().flatten()
-            if not kept.numel():
+            if not need.any():
                 for _ in range(loop + 1, loops):
                     scores.append(full_score.new_zeros(full_score.shape))
                     if stops: stops.append(full_stop.new_full(full_stop.shape, float('-inf')))
                 break
-            active_rows = active_rows.index_select(0, kept)
-            graph_indices = graph_indices.index_select(0, kept)
-            suffix = suffix.index_select(0, kept)
-            working = working.index_select(0, kept)
-            ends = ends.index_select(0, kept)
+            active_rows = active_rows[need]
+            graph_indices = graph_indices[need]
+            suffix = suffix[need]
+            working = working[need]
+            ends = ends[need]
             rows = torch.arange(len(active_rows), device=device)
-            sm = sm.index_select(0, kept); am = am.index_select(0, kept)
-            ae = tuple(e.index_select(0, kept) for e in ae)
+            sm = sm[need]; am = am[need]
+            ae = tuple(e[need] for e in ae)
             if fixed:
-                r_memory = [(key.index_select(0, kept), value.index_select(0, kept)) for key, value in r_memory]
-                c_memory = [(key.index_select(0, kept), value.index_select(0, kept)) for key, value in c_memory]
+                r_memory = [(key[need], value[need]) for key, value in r_memory]
+                c_memory = [(key[need], value[need]) for key, value in c_memory]
     return PartitionedResult(torch.stack(scores, 1), torch.stack(stops, 1) if stops else None, working[:, 0])

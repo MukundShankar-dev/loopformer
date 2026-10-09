@@ -401,3 +401,14 @@ resumed CE extraction. Batch 16 provided roughly 9% more throughput than 4 over
 fidelity and changed resume provenance would be required before migrating the
 already-running frozen extraction. Preserve that run rather than treating low
 VRAM occupancy as proof that batching will multiply speed.
+
+## 2026-10-09 — Optimize row pruning without changing diagnostic predictions
+
+Full-depth TF32 and merged-LoRA candidates changed intermediate letters despite
+unchanged final letters in the bounded CE panel. Preserve IEEE FP32 and unmerged
+weights for the ongoing failure analysis. Select ordered-index pruning instead:
+full-horizon CUDA logits/stops match bitwise for both recurrence modes, with
+about 10% less fixed-memory batch time and 2% less CE time. Preserve all
+completed chunks, archive their original freeze/source identity, and explicitly
+migrate only this AST change after stopping the old extractor. No new training,
+clock feature, smaller benchmark, threshold fit or silent precision change.
