@@ -1,0 +1,22 @@
+{
+  "status": "complete",
+  "checkpoint": "models/stage1_pointer/controller-shared-number-seed83/best",
+  "inference_sha256": {
+    "adapter_model.pt": "42059fd6fd4cc1ffe05a705a99a7aba76d4e7e0d87933bad18c7adc4cdee1110",
+    "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "recurrent_config.json": "5eb2347e119967f6581fa2c5b7614f1fcfaf95c5d0902d952fedae39538fb91d",
+    "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+    "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+  },
+  "reader_max": 10000,
+  "reader_max_absolute_error": 0.001953125,
+  "reader_mean_absolute_error": 6.478603482246399e-05,
+  "rollout_max": 4096,
+  "exact_stop_questions": 1037,
+  "first_failed_stop_count": 1038,
+  "countdown_gain": 0.9999994039535522,
+  "countdown_offset": -0.9999808669090271,
+  "inference_files_unchanged": true,
+  "executor_executed": false,
+  "interpretation": "Numeric diagnostic only; no fit, retuning, or pointer-quality claim"
+}

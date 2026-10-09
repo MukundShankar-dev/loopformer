@@ -1,0 +1,1065 @@
+{
+  "status": "complete",
+  "passed": true,
+  "checkpoint": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+  "inference_sha256": {
+    "adapter_model.pt": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+    "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "recurrent_config.json": "6ea5b38e2b8c0a7fe1261ccccb8670d3e7a4ff692f11aadc28d4e0db0ff4e8b2",
+    "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+    "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+  },
+  "config": {
+    "model": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+    "source_results": "eval/pointer_benchmark/shared-number-20261008/independent",
+    "graphs": "data/pointer/benchmark-seeds281-283-293/graphs.jsonl",
+    "native_counts": [
+      12,
+      70,
+      100,
+      256
+    ],
+    "numeric_rollout_max": 8192,
+    "numeric_reader_max": 10000,
+    "output": "eval/pointer_benchmark/shared-number-precision-20261008"
+  },
+  "config_sha256": "599caf98aa7e83a9228051d69d5be044c025ceb1fc3d6b0228a212f6857a777b",
+  "source_results": "eval/pointer_benchmark/shared-number-20261008/independent",
+  "unchanged_non_cell_tensors": 153,
+  "matching_count_timings": 256,
+  "native_fidelity": {
+    "passed": true,
+    "questions": 36,
+    "mismatches": []
+  },
+  "numeric": {
+    "status": "complete",
+    "checkpoint": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+    "inference_sha256": {
+      "adapter_model.pt": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "6ea5b38e2b8c0a7fe1261ccccb8670d3e7a4ff692f11aadc28d4e0db0ff4e8b2",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "reader_max": 10000,
+    "reader_max_absolute_error": 0.001953125,
+    "reader_mean_absolute_error": 6.478603482246399e-05,
+    "rollout_max": 8192,
+    "exact_stop_questions": 8192,
+    "first_failed_stop_count": null,
+    "countdown_gain": 1.0,
+    "countdown_offset": -0.9999999403953552,
+    "inference_files_unchanged": true,
+    "executor_executed": false,
+    "interpretation": "Numeric diagnostic only; no fit, retuning, or pointer-quality claim"
+  },
+  "inherited_graph_quality": {
+    "all": {
+      "graphs": 1350,
+      "queries": 345600,
+      "counts": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9802199074074074,
+          "graph_bootstrap_95": [
+            0.9729738859953704,
+            0.9869304108796296
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9747800925925926,
+          "graph_bootstrap_95": [
+            0.9666138599537037,
+            0.9825098379629629
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9802199074074074,
+          "graph_bootstrap_95": [
+            0.9729738859953704,
+            0.9869304108796296
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9802199074074074,
+          "graph_bootstrap_95": [
+            0.9729738859953704,
+            0.9869304108796296
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9747800925925926,
+          "graph_bootstrap_95": [
+            0.9666138599537037,
+            0.9825098379629629
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "1_12": {
+      "graphs": 1350,
+      "queries": 16200,
+      "counts": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9954938271604938,
+          "graph_bootstrap_95": [
+            0.9927145061728394,
+            0.9977777777777778
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9946296296296296,
+          "graph_bootstrap_95": [
+            0.9916033950617282,
+            0.9972839506172839
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9954938271604938,
+          "graph_bootstrap_95": [
+            0.9927145061728394,
+            0.9977777777777778
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9954938271604938,
+          "graph_bootstrap_95": [
+            0.9927145061728394,
+            0.9977777777777778
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9946296296296296,
+          "graph_bootstrap_95": [
+            0.9916033950617282,
+            0.9972839506172839
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "13_63": {
+      "graphs": 1350,
+      "queries": 68850,
+      "counts": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9808278867102396,
+          "graph_bootstrap_95": [
+            0.973884531590414,
+            0.9874509803921568
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9755846042120552,
+          "graph_bootstrap_95": [
+            0.9676684822076977,
+            0.9831372549019606
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9808278867102396,
+          "graph_bootstrap_95": [
+            0.973884531590414,
+            0.9874509803921568
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9808278867102396,
+          "graph_bootstrap_95": [
+            0.973884531590414,
+            0.9874509803921568
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9755846042120552,
+          "graph_bootstrap_95": [
+            0.9676684822076977,
+            0.9831372549019606
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "64_99": {
+      "graphs": 1350,
+      "queries": 48600,
+      "counts": [
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9788888888888889,
+          "graph_bootstrap_95": [
+            0.9712330246913579,
+            0.9859881687242797
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9733333333333334,
+          "graph_bootstrap_95": [
+            0.9644444444444444,
+            0.9814814814814815
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9788888888888889,
+          "graph_bootstrap_95": [
+            0.9712330246913579,
+            0.9859881687242797
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9788888888888889,
+          "graph_bootstrap_95": [
+            0.9712330246913579,
+            0.9859881687242797
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9733333333333334,
+          "graph_bootstrap_95": [
+            0.9644444444444444,
+            0.9814814814814815
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "100_256": {
+      "graphs": 1350,
+      "queries": 211950,
+      "counts": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9791601792875678,
+          "graph_bootstrap_95": [
+            0.9714682708185893,
+            0.9862569002123143
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9733333333333334,
+          "graph_bootstrap_95": [
+            0.9644444444444444,
+            0.9814814814814815
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9791601792875678,
+          "graph_bootstrap_95": [
+            0.9714682708185893,
+            0.9862569002123143
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9791601792875678,
+          "graph_bootstrap_95": [
+            0.9714682708185893,
+            0.9862569002123143
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9733333333333334,
+          "graph_bootstrap_95": [
+            0.9644444444444444,
+            0.9814814814814815
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "held_out_values": {
+      "graphs": 1350,
+      "queries": 6750,
+      "counts": [
+        9,
+        17,
+        29,
+        41,
+        53
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9837037037037037,
+          "graph_bootstrap_95": [
+            0.9777777777777777,
+            0.9891851851851853
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9788148148148149,
+          "graph_bootstrap_95": [
+            0.9718481481481481,
+            0.9856296296296297
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9837037037037037,
+          "graph_bootstrap_95": [
+            0.9777777777777777,
+            0.9891851851851853
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9837037037037037,
+          "graph_bootstrap_95": [
+            0.9777777777777777,
+            0.9891851851851853
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9788148148148149,
+          "graph_bootstrap_95": [
+            0.9718481481481481,
+            0.9856296296296297
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    }
+  },
+  "inherited_acceptance": {
+    "passed": true,
+    "checks": {
+      "overall_joint_success": true,
+      "minimum_depth_joint_success": true,
+      "overall_complete_trajectory": true,
+      "minimum_depth_complete_trajectory": true,
+      "overall_exact_stop": true,
+      "minimum_depth_exact_stop": true
+    },
+    "thresholds": {
+      "overall_joint_success": 0.95,
+      "overall_complete_trajectory": 0.95,
+      "overall_exact_stop": 0.99,
+      "minimum_depth_joint_success": 0.9,
+      "minimum_depth_complete_trajectory": 0.9,
+      "minimum_depth_exact_stop": 0.95
+    }
+  },
+  "scope": "Component composition on an opened but verified graph panel; unchanged R and reader; new numerical rollouts through 8192. Not new independent graph confirmation.",
+  "inference_files_unchanged": true
+}

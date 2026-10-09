@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "unchanged_non_cell_tensors": 153,
+  "inference_spec_unchanged": true,
+  "tokenizer_bytes_unchanged": true,
+  "inference_code_sha256": {
+    "scripts/recurrent_qwen/__init__.py": "33bb24196ba9676312779e3e3afba580f37f0d354c2fff31fa598ab7903301b2",
+    "scripts/recurrent_qwen/checkpoint.py": "26b639d45645a82e2eed9cdf50377b599bd10fcb29a71664f9c1d8f85964015b",
+    "scripts/recurrent_qwen/completion.py": "0e7155e9decaa56dafe44c6a31eb672a2c34e4229b0bac120d5f38281a91d476",
+    "scripts/recurrent_qwen/interfaces.py": "0a1aeded9eee9bba1a07cab90fa5228a8fb21978247022442196556191b55168",
+    "scripts/recurrent_qwen/lora_utils.py": "4f2baf46c9a57f9aa79bf41e50c5fc1cc5bd8020c8e066e5829cfb8284a9b803",
+    "scripts/recurrent_qwen/memory.py": "81cb65bdd3fba5ef9954c4c09a91c115dd2e668bd3d7755af1246f9bf22f3fcd",
+    "scripts/recurrent_qwen/model.py": "38a9c5723803259293469b00023fb614f6ed87cdca22dc33101239b708862261",
+    "scripts/recurrent_qwen/number_reader.py": "0e36ef99d768c8a75cb84efc8b765df94a39318e839026a0a0b09d6a13baca1a",
+    "scripts/recurrent_qwen/outputs.py": "f384bea5eaf663c7e7ce0cfbc7cb5a0165a89186be078b7c12092b424bed9789",
+    "scripts/recurrent_qwen/prefix.py": "bdefddcb3752ff7bb6bb389ede745837ce08c86d3d827c27164c7a91a1c32576",
+    "scripts/recurrent_qwen/validation.py": "7aeb45730858b2bb5999ea18e36de70497de03564db99fd1bfa4599e0c36d511"
+  }
+}

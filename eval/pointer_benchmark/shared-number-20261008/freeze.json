@@ -1,0 +1,15 @@
+{
+  "checkpoint": "models/stage1_pointer/controller-shared-number-seed83/best",
+  "inference_sha256": {
+    "adapter_model.pt": "42059fd6fd4cc1ffe05a705a99a7aba76d4e7e0d87933bad18c7adc4cdee1110",
+    "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "recurrent_config.json": "5eb2347e119967f6581fa2c5b7614f1fcfaf95c5d0902d952fedae39538fb91d",
+    "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+    "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+  },
+  "threshold": 0.5,
+  "safety_cap": 272,
+  "selection": "First predeclared repair seed 83; frozen before reserved test",
+  "test_data_sha256": "9b383af72722fff74660627fd35042f34238652492a0de6f7ee431a9c0b06bfa",
+  "protocol_sha256": "8b4e9cc7121a0a324d3c79a27bd3b649b4d6cccab5163375a19c2b1fdbbbcb0a"
+}

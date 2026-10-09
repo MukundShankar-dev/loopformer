@@ -1,0 +1,6 @@
+{
+  "passed": true,
+  "native_questions": 189,
+  "transition_rows_checked": 17325,
+  "exact_stopped_loop_coverage": true
+}

@@ -1,0 +1,21 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  30%|███       | 87/290 [00:00<00:00, 850.62it/s]Loading weights:  91%|█████████ | 264/290 [00:00<00:00, 1377.70it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1339.50it/s]
+Fitted only cell · gain 1 · offset -0.99999994 · training MSE 6.31e-12
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  71%|███████▏  | 207/290 [00:00<00:00, 2047.11it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 2087.48it/s]
+Pointer task · adaptive stopping
+36 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_benchmark/shared-number-precision-20261008/
+native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:45,  6.37it/s]Loading weights:  76%|███████▌  | 220/290 [00:00<00:00, 1042.64it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 940.79it/s] 
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 36/36 0:01:40 0:00:00
+Stopped accuracy: 100.00%; mean loops: 109.50; p95 latency: 7.2031s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_benchmark/shared-number-precision-20261008/
+native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  59%|█████▉    | 172/290 [00:00<00:00, 1674.80it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 2060.34it/s]
+Read raw number fields ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:03
+Frozen countdown only ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+Reader max error: 0.00195312 · exact countdown: 8192/8192 · first failure: None
+Final composition · passed True · native 36/36 · countdown 8192/8192
