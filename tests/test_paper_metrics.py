@@ -40,3 +40,19 @@ def test_fixed_prompt_risk_set_censoring_and_recovery():
     assert first[0]['loop']==2 and first[0]['recoveries']==1
     assert [(r['start_loop'],r['duration'],r['right_censored']) for r in episodes]==[(2,1,False),(4,1,True)]
     assert first[0]['r_prediction'] is None
+
+
+def test_wrong_state_edge_following_and_reference_recovery_are_exclusive():
+    from scripts.dataset.pointer import generate_unconditioned_example
+    from scripts.eval.paper_metrics import diagnostic_rows
+    from scripts.eval.pointer_failure_metrics import reference_trace
+    task=generate_unconditioned_example(41,3,'benchmark',0,'permutation')
+    target=reference_trace(dict(task.mapping),task.initial_state,3)
+    wrong=chr((ord(target[0])-65+1)%26+65)
+    p=np.array([[ord(wrong)-65,ord(dict(task.mapping)[wrong])-65,ord(target[2])-65]])
+    metadata=[dict(graph_index=0,example_id=task.example_id,mapping_sha256=task.mapping_sha256,
+                   graph_mode='permutation',dataset_seed=307,cycle_period=26,transient_length=0)]
+    first,_,_=diagnostic_rows([task],metadata,p,np.empty(0),np.array([3]),np.array([[3]]),'test',[3])
+    assert first[0]['prior_wrong_transitions']==2
+    assert first[0]['recoveries']==1 and first[0]['wrong_edge_continuations']==1
+    assert first[0]['other_wrong_transitions']==0

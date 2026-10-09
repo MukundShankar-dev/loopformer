@@ -35,7 +35,7 @@ still pending; no full-suite success is claimed. The pipeline completes reportin
 and plot replacement automatically after its audits pass.
 <!-- paper-run-status:end -->
 
-Validation: 23 focused tests pass. A separate synthetic reporting fixture checked
+Validation: 24 focused tests pass. A separate synthetic reporting fixture checked
 2,073,600 decisions/15,360 aggregate cells and rendered fifteen figure families;
 this tests the reporting pipeline, not the pending historical population results.
 No training or threshold selection occurred; closed tests remain closed. See

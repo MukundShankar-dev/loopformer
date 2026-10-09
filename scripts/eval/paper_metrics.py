@@ -72,16 +72,18 @@ def diagnostic_rows(tasks: list, metadata: list[dict], predictions: np.ndarray,
             prior_wrong=int(wrong[:-1].sum())
             recovered=int((wrong[:-1]&hit[i,1:]).sum())
             consistent=sum(int(traces[i,l]==ord(dict(task.mapping)[SYMBOLS[traces[i,l-1]]])-65) for l in range(1,n))
+            follow_wrong=sum(int(wrong[l-1] and wrong[l] and traces[i,l]==ord(dict(task.mapping)[SYMBOLS[traces[i,l-1]]])-65) for l in range(1,n))
             base=dict(model=model,requested_depth=n,**meta)
             if error<=n:
                 t=error-1; target=''.join(SYMBOLS[c] for c in targets[i]); predicted=SYMBOLS[traces[i,t]]
                 r=SYMBOLS[direct[i,t]] if direct.size else None
                 category=first_error_category(dict(task.mapping),task.initial_state,target,predicted,t)
                 first_rows.append(dict(**base,loop=error,target=target[t],prediction=predicted,
-                    category=category,r_prediction=r,readout_category=(None if r is None else
+                    category=category,one_reference_step_ahead=predicted==dict(task.mapping)[target[t]],r_prediction=r,readout_category=(None if r is None else
                        'R correct / C wrong' if r==target[t] else 'R and C wrong, same letter' if r==predicted else 'R and C wrong, different letters'),
                     wrong_loops=int(wrong.sum()),correct_prefix=error-1,correct_final=bool(hit[i,-1]),
-                    prior_wrong_transitions=prior_wrong,recoveries=recovered,
+                    prior_wrong_transitions=prior_wrong,recoveries=recovered,wrong_edge_continuations=follow_wrong,
+                    other_wrong_transitions=prior_wrong-recovered-follow_wrong,
                     decoded_edge_consistent=consistent,edge_exposure=n-1))
             cursor=0
             while cursor<n:
@@ -136,11 +138,13 @@ def main() -> None:
             wrong=sum(row['wrong_loops'] for row in selected)
             prior=sum(row['prior_wrong_transitions'] for row in selected)
             recovery=sum(row['recoveries'] for row in selected)
+            continuation=sum(row['wrong_edge_continuations'] for row in selected)
             prefix=sum(row['correct_prefix'] for row in selected)+(g-len(selected))*n
             execution_stats.append(dict(model=name,requested_depth=n,graphs=g,failed_graphs=len(selected),
                 restricted_mean_correct_prefix=prefix/g,wrong_loop_fraction=wrong/(g*n),
                 prior_wrong_transitions=prior,reference_recoveries=recovery,
                 conditional_reference_recovery=recovery/prior if prior else None,
+                wrong_edge_continuations=continuation,other_wrong_transitions=prior-recovery-continuation,
                 wrong_episodes=sum(row['requested_depth']==n for row in e),
                 right_censored_episodes=sum(row['requested_depth']==n and row['right_censored'] for row in e)))
         if values['exact_stop'] is not None:

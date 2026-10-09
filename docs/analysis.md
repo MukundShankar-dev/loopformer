@@ -371,7 +371,7 @@ ablations, multiple successful executor seeds, larger state spaces/nonrepeating
 
 ## Handoff checklist
 
-Local validation: 23 focused inference/scoring/export/comparison/failure tests pass.
+Local validation: 24 focused inference/scoring/export/comparison/failure tests pass.
 A separate synthetic reporting fixture checked all 2,073,600 decisions and 15,360
 aggregate cells, rendered all fifteen figure families, and was visually inspected.
 It is a reporting contract check, **not** measured historical-model population evidence.

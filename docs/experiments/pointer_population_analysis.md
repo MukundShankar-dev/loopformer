@@ -24,7 +24,7 @@ metrics, uncertainties and interpretive limits. The panel remains retrospective:
 all 1,350 graphs are opened, and finite 26-state cyclic execution does not prove
 unlimited-depth, larger-state or cross-family generalization.
 
-Validation: 23 focused tests pass. A separate synthetic reporting fixture
+Validation: 24 focused tests pass. A separate synthetic reporting fixture
 independently checked 2,073,600 decisions and 15,360 aggregate cells and rendered
 fifteen figure families. This is reporting validation, not historical-model
 population evidence. Layout inspection found and fixed redundant cohort curves,
