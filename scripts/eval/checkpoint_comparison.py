@@ -19,13 +19,13 @@ from rich.console import Console
 from rich.progress import track
 
 from scripts.dataset.benchmark import count_variant
-from scripts.dataset.pointer import SYMBOLS
+from scripts.dataset.pointer import PointerExample, SYMBOLS, validate_example
 from scripts.eval.audit_pointer_benchmark import audit_native_results
 from scripts.eval.controller_features import extract_features, replay
 from scripts.eval.controller_learning import stop_rows
 from scripts.eval.frozen_pointer_benchmark import checkpoint_hashes, controller_panel, verify_native_decisions
 from scripts.eval.loop_metrics import write_csv
-from scripts.eval.pointer_task import load_examples, sha256_file
+from scripts.eval.pointer_task import sha256_file
 from scripts.recurrent_qwen.checkpoint import load_recurrent_checkpoint
 from scripts.training.controller_cache import prompt_features
 from scripts.training.data import collate, encode_tasks
@@ -222,7 +222,9 @@ def main() -> None:
         raise ValueError('Need audited completed source benchmark')
     if sha256_file(Path(config['graphs'])) != manifest['graphs_sha256']:
         raise ValueError('Benchmark graph bytes changed')
-    all_graphs = load_examples(Path(config['graphs']))
+    all_graphs = [PointerExample(**json.loads(line)) for line in Path(config['graphs']).read_text().splitlines()]
+    for graph in all_graphs:
+        validate_example(graph)
     source_rows = read_csv(source / 'graphs.csv')
     selected, strata = [], Counter()
     for i, meta in enumerate(manifest['graph_metadata']):
