@@ -1,0 +1,29 @@
+[
+  {
+    "model": "joint_full",
+    "graphs": 4,
+    "requests_per_graph": 256,
+    "cap": 272,
+    "seconds": 44.38853019899943,
+    "estimated_population_hours": 4.161424706156197,
+    "scope": "One full-horizon first-graph chunk. Timing estimate only; excludes native fidelity, tokenization, loading, export and other graph strata."
+  },
+  {
+    "model": "fixed6",
+    "graphs": 4,
+    "requests_per_graph": 256,
+    "cap": 272,
+    "seconds": 28.85240101800082,
+    "estimated_population_hours": 2.704912595437577,
+    "scope": "One full-horizon first-graph chunk. Timing estimate only; excludes native fidelity, tokenization, loading, export and other graph strata."
+  },
+  {
+    "model": "fixed12",
+    "graphs": 4,
+    "requests_per_graph": 256,
+    "cap": 272,
+    "seconds": 29.309336581000025,
+    "estimated_population_hours": 2.747750304468753,
+    "scope": "One full-horizon first-graph chunk. Timing estimate only; excludes native fidelity, tokenization, loading, export and other graph strata."
+  }
+]

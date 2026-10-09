@@ -164,6 +164,19 @@ See [`batches.json`](../eval/pointer_analysis/performance-20261009/batches.json)
 [`utilization.json`](../eval/pointer_analysis/performance-20261009/utilization.json).
 Native-gate time and later-arm costs are outside the CE extraction ETA.
 
+A subsequent full-horizon timing check measured one four-graph chunk per remaining
+historical architecture: joint full sequence 44.39 s (~4.16 h for 1,350 graphs),
+fixed-memory depth 6 28.85 s (~2.70 h), and depth 12 29.31 s (~2.75 h). The prior
+successful executor's full-panel extraction took 326.61 s; nine same-cost
+snapshots would take about 49 minutes. These are planning extrapolations, not
+completed-run durations: only the first four random-function graphs were timed
+for each old arm, and native gates, tokenization/loading, replay and CPU reporting
+are additional. With ~2 h 20 min of CE left at capture, plan roughly 13–16 hours
+remaining for the full sequential suite, with uncertainty from unmeasured graph
+strata and overhead. The profiling job briefly paused CE and automatically resumed
+it. Raw timing evidence: [`remaining_arms.json`](../eval/pointer_analysis/performance-20261009/remaining_arms.json).
+
+
 ## Checkpoint registry: freeze these choices before population inference
 
 All paths below are relative to `models/stage1_pointer/`. Desktop weights were
