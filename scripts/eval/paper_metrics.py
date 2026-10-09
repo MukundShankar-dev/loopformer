@@ -100,7 +100,7 @@ def main() -> None:
     config=json.loads((root/'protocol.json').read_text()); tasks,metadata=load_graphs(Path(config['graphs']))
     counts=np.array(config['requests']); g=len(tasks); k=len(counts); cap=config['safety_cap']
     targets=np.array([[ord(c)-65 for c in reference_trace(dict(t.mapping),t.initial_state,cap)] for t in tasks],dtype='uint8')
-    table=[]; first_all=[]; loop_all=[]; episode_all=[]; execution_stats=[]; timing_stats=[]; arm_arrays={}; hashes={}
+    table=[]; first_all=[]; loop_all=[]; episode_all=[]; execution_stats=[]; timing_stats=[]; arm_arrays={}; hashes={}; observed_lengths={}
     for arm in config['models']:
         name=arm['name']; directory=root/name
         summary=json.loads((directory/'summary.json').read_text())
@@ -117,6 +117,8 @@ def main() -> None:
             hashes[str(path.relative_to(root))]=sha256_file(path)
         if coverage!=list(range(g)): raise ValueError('Missing/repeated/reordered graph chunk')
         p=np.concatenate(parts);stop=np.concatenate(stops);r=np.concatenate(direct) if direct else np.empty(0,dtype='uint8')
+        observed_lengths[name]=(np.broadcast_to(counts[None,:],stop.shape).copy() if (stop==-2).all() else
+            np.maximum(counts[None,:],np.where(stop>0,stop,cap)) if p.ndim==3 else np.full(stop.shape,cap))
         values=score_arrays(p,stop,targets,counts)
         arm_arrays[name]={m:v for m,v in values.items() if v is not None}
         arm_arrays[name]['stops']=stop
@@ -190,6 +192,11 @@ def main() -> None:
                 deltas.append(dict(baseline=name,comparison='final',metric=metric,depth_range=label,
                                    delta=float(d.mean()),low=float(lo),high=float(hi)))
     write_csv(root/'paired_deltas.csv',deltas)
+    np.savez_compressed(root/'observed_trace_lengths.npz',**observed_lengths,counts=counts)
+    (root/'raw_trace_contract.json').write_text(json.dumps(dict(
+        predictions='Symbol class IDs 0–25. Historical optimized arrays are padded with zero after the last observed loop; those positions are NOT model predictions.',
+        valid_lengths='observed_trace_lengths.npz: [graph,count] observed loops per arm. CE=N; historical controller=max(N,first_stop), or cap for missing stops; isolated R always cap.',
+        scoring='Only actual observed transitions are scored. Fixed-request diagnostics stop at N.'),indent=2)+'\n')
     flat={f'{name}__{key}':value for name,arrays in arm_arrays.items() for key,value in arrays.items()}
     np.savez_compressed(root/'outcomes.npz',**flat,counts=counts,targets=targets)
     audit=dict(passed=True,graphs=g,queries_per_model=g*k,models=list(arm_arrays),

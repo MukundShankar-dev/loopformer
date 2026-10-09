@@ -5,6 +5,7 @@ Git history retains prior render exports. Never remove arbitrary user directorie
 """
 import argparse
 import json
+import platform
 from pathlib import Path
 
 from scripts.eval.pointer_task import sha256_file
@@ -31,7 +32,7 @@ def main()->None:
     for directory in OLD_DIRECTORIES:
         for path in sorted(Path(directory).iterdir()) if Path(directory).exists() else []:
             if path.is_file() and path.suffix in ('.png','.pdf','.svg'):
-                removed.append(dict(path=str(path),sha256=sha256_file(path)));path.unlink()
+                removed.append(dict(path=str(path),sha256=sha256_file(path),host=platform.node()));path.unlink()
     report=root/'retired_plot_exports.json'
     previous=json.loads(report.read_text()) if report.exists() else []
     report.write_text(json.dumps(previous+removed,indent=2)+'\n')

@@ -55,9 +55,16 @@ launcher resumes atomic graph chunks; changed weights, protocol, inference code
 or batch shapes cause an error. Historical models use four graphs × 256 independent
 count suffixes per chunk. Isolated R and its snapshots use graph batches of 64;
 GRU replay processes at most 1,024 questions together. FP32/SDPA is explicit.
-The progress reader reports measured extraction ETA only, excluding later arms,
+Raw arrays distinguish observed transitions from storage padding using
+`observed_trace_lengths.npz` and `raw_trace_contract.json`; padded zero IDs are
+not model predictions. The progress reader reports measured extraction ETA only, excluding later arms,
 native gates and reporting. `run.log`, `RUNNING`, `FAILED`, and `COMPLETE` show the
 pipeline state; a failure preserves recoverable chunks and prevents completion.
+
+A finite follow-up, [`sync_paper_analysis.sh`](../scripts/eval/sync_paper_analysis.sh),
+is waiting for this desktop run to complete or fail. It copies this output only
+(no model weights), updates the owned handoff status, and retires local old renders
+only after a passing replacement. It does not commit or push future user edits.
 
 The current desktop job is already launched; another launcher must wait for it
 rather than run concurrently against the same output. No additional training run
