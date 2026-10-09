@@ -1,0 +1,164 @@
+{
+  "status": "historical evidence only",
+  "figures": [
+    {
+      "group": "06_writeup",
+      "name": "baseline",
+      "title": "Ordinary base checkpoint \u00b7 6% final-answer accuracy",
+      "caption": "Original seed-17 test: 1,000 questions, 125 per depth, greedy 3-shot generation; 95% Wilson intervals.\nHistorical context: this is a different dataset/prompt/inference procedure from the recurrent population comparison.",
+      "numeric": "numeric/baseline.npz",
+      "numeric_sha256": "62455541aef1a735a226e603c439c12419f5496953b11511c89715c330fcef29",
+      "source_sha256": {
+        "eval/pointer_task/20260910-wsl-cuda-instruct-retry/predictions.csv": "4d82eecd681273b2129da9e3dd0b2697fd5546acadeb15c694a4100cde3e9eb1",
+        "eval/pointer_task/20260910-wsl-cuda-instruct-retry/summary.json": "4d030b2620af0ce6444cb3b3235130bc251148064f3aa1e79067b6d7b6c8b6ff"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/baseline.png",
+          "sha256": "5208684ba6e169f60d4ab7f5ea0266b0f6e8cc8e5e9248afe0063fe9438ba390"
+        },
+        "pdf": {
+          "path": "06_writeup/baseline.pdf",
+          "sha256": "b65858e73fc70a708929114fe056c47116396dd7910bb21143393988c7e9e0df"
+        },
+        "svg": {
+          "path": "06_writeup/baseline.svg",
+          "sha256": "d79693832e4d6bcc72c4d1c1cb7ea878172f68666c5a5a2da85ab39a88567e1b"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_01",
+      "title": "Attempt 1 \u00b7 full-sequence intermediate supervision",
+      "caption": "Historical training: CE windows weight minibatch examples; validation cohorts weight questions.\nEach run retains its original development data. Requested-count holdouts can still be supervised intermediate loops.",
+      "numeric": "numeric/attempt_01.npz",
+      "numeric_sha256": "c5c4da6d1df3bb74eee1226ce187a6285b96b09dd4e6bd348cc4933d028a93a1",
+      "source_sha256": {
+        "models/stage1_pointer/depth6-fresh30k-seed37-batch4/metrics.jsonl": "b7009412b6a83b1f54fe6e4fa7d1f288c2bab70cbf0797fc802ac9b45a26f662",
+        "models/stage1_pointer/depth6-fresh30k-seed37-batch4/config.json": "6e551b93fc1f660476c4a7eabaad18c7049f4aa67e7d73b96a3085b70791f7ab"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_01.png",
+          "sha256": "3a6ad6c0608f23fdd69d54586107cbec2240f7b2722a13467f64cba6ce3cb459"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_01.pdf",
+          "sha256": "ab54694fd93e3804e83b24084db706893e51b66f436cb1e4e35d5206277bf00e"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_01.svg",
+          "sha256": "6b900def3285da2c47eed9da769315e41d0141feea838d81dfd687bfbd6da746"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_02",
+      "title": "Attempt 2 \u00b7 completion head and fixed prompt memory",
+      "caption": "Historical training: CE windows weight minibatch examples; validation cohorts weight questions.\nEach run retains its original development data. Requested-count holdouts can still be supervised intermediate loops.",
+      "numeric": "numeric/attempt_02.npz",
+      "numeric_sha256": "f4f2419d3d7915a697131f14d03d7792e7a464d3c9b76f737a7f59b5dfd3fc76",
+      "source_sha256": {
+        "models/stage1_pointer/depth6-completion-seed37/metrics.jsonl": "8cc047d20392780224b80924f5cbff071c0e87a50d741cf3f406b9533a2a757a",
+        "models/stage1_pointer/depth6-completion-seed37/config.json": "2627ecec771a5d8f5aae4bf2cc75f40bf3b1e342f8782d4b8ff2cc1403204c55",
+        "models/stage1_pointer/depth6-fixed-prompt-seed37/metrics.jsonl": "c54c364accd82a5daad852878b4bf8f036ef1721a0a7b316d851f563fc1fb71e",
+        "models/stage1_pointer/depth6-fixed-prompt-seed37/config.json": "469dfd2cf284f18cd472459e99c95e7d0f4e6a8367883edbf2058dd1737e525b"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_02.png",
+          "sha256": "9e046d084a029ab1d1598900e90ee12cc25f8e7b8a49bdfbb5558d081f749408"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_02.pdf",
+          "sha256": "efe6c3a25d37eb157f43843ae76c5a99a6368bf2bada9a89df8981d7dabd4499"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_02.svg",
+          "sha256": "b803185f9f5422bbb801dae2c7d89e5d468b37fdfb70f0704569fbc5d53913d2"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_03",
+      "title": "Attempt 3 \u00b7 deeper training with the same architecture",
+      "caption": "Historical training: CE windows weight minibatch examples; validation cohorts weight questions.\nEach run retains its original development data. Requested-count holdouts can still be supervised intermediate loops.",
+      "numeric": "numeric/attempt_03.npz",
+      "numeric_sha256": "4545d1e024f179f1c79e230f46d40ef0eef1c03fc5aef45529a4dcb99fee41ee",
+      "source_sha256": {
+        "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/metrics.jsonl": "13713bcd0074af5d8f09fa1296acde3c50a8ec01f4f04133742b093e1f13b2b3",
+        "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/config.json": "610fb2888fe13b116470933e2bd210657eaafe2260de384d4944f91e81fb2a9d"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_03.png",
+          "sha256": "91008a20d8209586c9beef5067fe79e4d90a87f2f9f11d7d3493faa5193c9dca"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_03.pdf",
+          "sha256": "d2cdf487fe4ffa8391cdd24ef92c39c45375d0d83691cf6f2c9c046030d034a1"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_03.svg",
+          "sha256": "6b1eb2e1ffc9cb77a70cdb4668aa5aa07e743ebb48f62c9a0fbcf7972ad0b244"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_04",
+      "title": "Attempt 4 \u00b7 count-free executor and private controller",
+      "caption": "Successful R training shown here; later frozen-R GRU fitting is in controller_development.\nPopulation evaluation uses the later GRU controller; the executor training controller was replaced.",
+      "numeric": "numeric/attempt_04.npz",
+      "numeric_sha256": "04894b8aad717e0f0eaad64276b3326b98716ac4f07a0f543fc61c921af97b50",
+      "source_sha256": {
+        "models/stage1_pointer/executor_r-seed61/metrics.jsonl": "0ddcfe05e7b8a5bbf7d1583912a9ccc670dfae9f54f4ed17fb87369b54b69e98",
+        "models/stage1_pointer/executor_r-seed61/config.json": "5f17d07c321c62f09e13a997d1bcf06eb4fb89b5ccee0c0c1e8a06934531ba89"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_04.png",
+          "sha256": "c855aede8815751d6a717b4ef8ac779dad61a7813d8ef0301e990c821fe50bf5"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_04.pdf",
+          "sha256": "ede18c6938e05a9289248553aa052a4700da278fb46dcd2c81f39ac486ed9d4d"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_04.svg",
+          "sha256": "de82d41efe520c92ccc33b2741fa34f14981b53e5b1d494f6cf8b617ab54ea59"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_05",
+      "title": "Attempt 5 \u00b7 shared number reader and precise learned countdown",
+      "caption": "Left: earlier scalar-controller pilot. Middle: later separate fit on the same 58 requested counts and at most 12 labels per count.\nReader was fitted by least squares (maximum training-count error 3.8e-06); no reader/cell epoch history exists.",
+      "numeric": "numeric/attempt_05.npz",
+      "numeric_sha256": "1a79e2bf1b441885ee8df65f857b14daf862d22f8b0ea27005d2383b43cc81df",
+      "source_sha256": {
+        "models/stage1_pointer/controller-affine-seed83/validation_history.csv": "23392c6999673395fdb8bcb546b5edca745a26848d4729fd8111febcf87ae157",
+        "models/stage1_pointer/controller-shared-number-seed83/summary.json": "899de71c49d8fa26da8fd906ff4ee0650300bb689e2f6eb677908ad3272168b7",
+        "models/stage1_pointer/controller-shared-number-precision-seed83/summary.json": "92e1a18710f5e8ba56191f27749ab971ee1567e553880b709c30f44c08f05380"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_05.png",
+          "sha256": "190305dd7fe5110e2bfb40b399de9e8074db14be30cad71135571d2a8eac8ff2"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_05.pdf",
+          "sha256": "20542052f42f820b109493a1f01c5c2ecedd7aab51025a3e71cf6103c1a3e952"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_05.svg",
+          "sha256": "afc94e8a0f31eb05327bdd2a2888e063b1e32e5972588cd35f769961904e0906"
+        }
+      }
+    }
+  ]
+}

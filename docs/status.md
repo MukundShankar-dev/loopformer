@@ -1,5 +1,17 @@
 # Project status
 
+## Writeup coverage update — 2026-10-09
+
+The user's five-attempt outline is mapped in [analysis.md](analysis.md#writeup-coverage--user-outline-2026-10-09).
+Six saved-history figure families (baseline plus five attempt sections) are
+rendered from actual original logs without model inference. Original training
+cohorts and the three-shot baseline remain distinct from the running paired
+population. The final plot job adds audited population curves to those panels.
+A bounded batch-4/8/16 profile found only about 9% more graph throughput at 16;
+mean active CE GPU utilization was 90.4% over ten samples. The existing frozen
+run was briefly paused for profiling and resumed; no training or precision change.
+Final historical population figures and any hosted demo remain pending.
+
 Last updated: 2026-10-09.
 
 ## Current priority
@@ -35,8 +47,8 @@ still pending; no full-suite success is claimed. The pipeline completes reportin
 and plot replacement automatically after its audits pass.
 <!-- paper-run-status:end -->
 
-Validation: 24 focused tests pass. A separate synthetic reporting fixture checked
-2,073,600 decisions/15,360 aggregate cells and rendered fifteen figure families;
+Validation: 28 focused tests pass. A separate synthetic reporting fixture checked
+2,073,600 decisions/15,360 aggregate cells and rendered twenty-one figure families;
 this tests the reporting pipeline, not the pending historical population results.
 No training or threshold selection occurred; closed tests remain closed. See
 [the live population report](experiments/pointer_population_analysis.md).

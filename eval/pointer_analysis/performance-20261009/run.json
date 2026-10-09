@@ -1,0 +1,10 @@
+{
+  "checkpoint": "models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500",
+  "command": "CUBLAS_WORKSPACE_CONFIG=:4096:8 PYTHONPATH=. .venv/bin/python -u /tmp/paper_batch_profile.py",
+  "precision": "float32",
+  "attention": "sdpa",
+  "deterministic": true,
+  "warmup": "No separate warm-up/repeated trials; bounded directional check, not precision throughput estimate",
+  "scope": "Historical CE checkpoint; 1350-source first 4/8/16 graphs; all 256 suffixes; horizons clipped at 32; main job paused then automatically resumed",
+  "profile_sha256": "03c8c18a9fdf02f948af542e05d5d2bc6f1e47552ee92262e3497d059f1c3347"
+}

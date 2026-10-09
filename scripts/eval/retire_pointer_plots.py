@@ -24,7 +24,7 @@ def main()->None:
     args=parser.parse_args();root=args.input
     if not json.loads((root/'independent_audit.json').read_text())['passed']:raise ValueError('Replacement decision audit failed')
     manifest=json.loads((root/'plots/manifest.json').read_text())
-    if manifest['status']!='complete' or len(manifest['figures'])!=15:raise ValueError('Replacement figure set incomplete')
+    if manifest['status']!='complete' or len(manifest['figures'])!=21:raise ValueError('Replacement figure set incomplete')
     for figure in manifest['figures']:
         for export in figure['exports'].values():
             if sha256_file(root/'plots'/export['path'])!=export['sha256']:raise ValueError('Replacement export hash differs')

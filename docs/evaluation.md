@@ -98,6 +98,13 @@ Status: nominal per-loop evaluation is implemented through the [full-loop checkp
 
 The [ordinary-model final-answer baseline](evaluation.md) is implemented separately with unconstrained greedy generation, strict decoded-symbol accuracy, per-depth summaries, and CSV/JSON artifacts. Its toy-model tests verify evaluation mechanics; the [first full pretrained run](experiments/naive_pointer_baseline.md) achieved 60/1,000 correct and has been audited. The restricted-logit and recurrent-transition conventions below apply to the later recurrent evaluation, not automatically to this generation baseline.
 
+Original baseline and per-attempt learning figures for the article are rendered
+without model work using `python -m scripts.eval.paper_writeup`. The
+[writeup coverage map](analysis.md#writeup-coverage--user-outline-2026-10-09)
+records source populations and planned article placement. The completed paper
+renderer joins those histories to audited population curves in `06_writeup/`;
+reader/cell fits have saved summaries rather than invented epoch histories.
+
 ## Targets and loop indexing
 
 `h_0` is the prelude output; `h_t` follows `t` recurrent passes. Task depth and recurrent depth are separate quantities.

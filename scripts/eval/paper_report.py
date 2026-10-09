@@ -35,7 +35,7 @@ def main()->None:
     lines.extend(['','Mean scores weight all 256 requested integers equally; they do not replace per-depth curves. Headless CE stopping is undefined. Strict trajectory and final-letter correctness have different meanings.','',
                   '## Reproduction and evidence','', '```bash','bash analyze_pointer.sh','python -m scripts.eval.paper_status','```','',
                   f'Output: `{root}`. The same launcher resumes unchanged atomic extraction chunks. A changed protocol, checkpoint, implementation or batch shape is rejected.',
-                  '',f'[Organized figure index](../../{root}/plots/index.md). Five scientific groups, fifteen figure families, PNG/PDF/SVG, exact plotted arrays, captions and hashes.',
+                  '',f'[Organized figure index](../../{root}/plots/index.md). Five scientific groups plus the baseline/five-attempt writeup group; PNG/PDF/SVG, exact plotted arrays, captions and hashes.',
                   '',f'[Independent decision audit](../../{root}/independent_audit.json), [reference/chunk coverage](../../{root}/reference_audit.json), [figure manifest](../../{root}/plots/manifest.json).',
                   '', 'The scalar audit reconstructs raw dictionary transitions separately from vectorized scoring. Native batch-one calls verify 54 predeclared graph/count questions per model, including counts 1/6/12/32/128/256 and all nine graph strata. Historical inference uses mathematically equivalent causal-prefix partitioning; each count keeps its own continuous suffix state. No reference state is injected into R.',
                   '', '## Learning and uncertainty','',
@@ -48,7 +48,7 @@ def main()->None:
     Path('docs/experiments/pointer_population_analysis.md').write_text('\n'.join(lines))
     message=(f'The full suite is **complete and independently audited**: six models, {audit["graphs"]:,} graphs, all requested depths 1–256, '
              f'{audit["scalar_decisions_checked"]:,} checked decisions and nine retained successful-executor snapshots. '
-             'The clean figure set has five groups with fifteen figure families; legends/colorbars, coincident-series labels, denominators and source hashes are included. '
+             'The clean figure set has six groups with twenty-one figure families, including a baseline/five-attempt writeup group; legends/colorbars, coincident-series labels, denominators and source hashes are included. '
              'See [the population report](experiments/pointer_population_analysis.md) for results and the figure index. Obsolete render exports are retired; raw evidence is retained.')
     for path in (Path('docs/analysis.md'),Path('docs/status.md')):replace_status(path,message)
 

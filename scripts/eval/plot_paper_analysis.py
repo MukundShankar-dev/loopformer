@@ -38,7 +38,8 @@ class Figures:
         self.numeric=self.output/'numeric';self.numeric.mkdir(exist_ok=True)
         self.entries=[]
 
-    def save(self,fig,group:str,name:str,title:str,caption:str,arrays:dict)->None:
+    def save(self,fig,group:str,name:str,title:str,caption:str,arrays:dict,
+             source_paths:list[Path]|None=None)->None:
         import matplotlib.pyplot as plt
         directory=self.output/group;directory.mkdir(exist_ok=True)
         fig.suptitle(title,fontsize=15,fontweight='bold',x=.04,y=.99,ha='left')
@@ -48,6 +49,7 @@ class Figures:
         numeric=self.numeric/f'{name}.npz';np.savez_compressed(numeric,**arrays)
         self.entries.append(dict(group=group,name=name,title=title,caption=caption,
             numeric=str(numeric.relative_to(self.output)),numeric_sha256=sha256_file(numeric),
+            source_sha256={str(path):sha256_file(path) for path in (source_paths or [])},
             exports={ext:dict(path=str((directory/f'{name}.{ext}').relative_to(self.output)),
                              sha256=sha256_file(directory/f'{name}.{ext}')) for ext in ('png','pdf','svg')}))
 
@@ -56,8 +58,8 @@ class Figures:
         (self.output/'manifest.json').write_text(json.dumps(dict(status='complete',figures=self.entries,
             input_sha256=hashes,plot_code_sha256=sha256_file(Path(__file__)),
             overlap_policy='Identical executor curves grouped; separate metric panels; staggered marker locations only, no value jitter',
-            coverage='1350 graph panel, all integer requests 1–256 for every architecture'),indent=2)+'\n')
-        lines=['# Pointer analysis figures','','All figures use the full 1,350-graph opened panel. Every architecture sees all requested depths 1–256.','','PNG previews, editable SVG and publication PDF have identical numerical sources. `numeric/` and `manifest.json` preserve arrays, captions and hashes.','']
+            coverage='Population: 1350 graphs, requests 1–256; training and ordinary baseline retain their separately labelled original populations'),indent=2)+'\n')
+        lines=['# Pointer analysis figures','','Population comparisons use the full 1,350-graph opened panel and requested depths 1–256. Training and ordinary baseline figures retain their original separately labelled populations.','','PNG previews, editable SVG and publication PDF have identical numerical sources. `numeric/` and `manifest.json` preserve arrays, captions and hashes.','','`06_writeup/` follows the baseline and five-attempt narrative; the other groups supply comparisons and failure analysis.','']
         for e in self.entries:
             lines.extend([f"## {e['title']}",'',e['caption'],'',f"![{e['title']}]({e['group']}/{e['name']}.png)",'',f"[PDF]({e['group']}/{e['name']}.pdf) · [SVG]({e['group']}/{e['name']}.svg)",''])
         (self.output/'index.md').write_text('\n'.join(lines))
@@ -355,6 +357,8 @@ def main()->None:
     structure_figures(figures,config,arrays,names,g,metadata,structure)
     stopping_figures(figures,arrays,names,g)
     learning_figures(figures,config,arrays,g,root)
+    from scripts.eval.paper_writeup import writeup_figures
+    writeup_figures(figures, arrays)
     figures.finish()
     print(f'Wrote {len(figures.entries)} audited figure families to {figures.output}')
 

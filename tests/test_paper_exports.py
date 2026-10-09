@@ -20,7 +20,7 @@ def test_retirement_requires_verified_replacement_and_preserves_raw_evidence(tmp
     with pytest.raises(ValueError):retire_pointer_plots.main()
     assert (old/'old.png').exists()
     entries=[]
-    for i in range(15):
+    for i in range(21):
         p=root/'plots'/f'{i}.png';p.write_bytes(str(i).encode())
         entries.append({'exports':{'png':{'path':p.name,'sha256':sha256_file(p)}}})
     (root/'plots/manifest.json').write_text(json.dumps({'status':'complete','figures':entries}))

@@ -383,3 +383,21 @@ stops remain failures. Retire old render exports only after the replacement
 audits pass, preserving raw evidence and model weights. The full run is underway,
 so implementation/tests are distinguished from completed population evidence.
 See [analysis](analysis.md) and [the completion report](experiments/pointer_population_analysis.md).
+
+## 2026-10-09 — Match evidence to the five-attempt article
+
+The user now wants original training curves for each attempt in the writeup,
+in addition to the previously scoped successful-model checkpoint progression.
+Render original saved histories and the recounted ordinary baseline; do not
+rerun old checkpoint sweeps. Group joint completion and fixed prompt memory as
+Attempt 2/2b so five narrative sections retain all six representatives. Preserve
+separate original validation cohorts and new population evaluation columns.
+Record reader/cell numerical fits as summaries, since their full optimization
+histories were never logged; do not invent curves. A hosted demo remains planned.
+
+The short CUDA batch profile changed no weights/config/precision and automatically
+resumed CE extraction. Batch 16 provided roughly 9% more throughput than 4 over
+32 loops, with exact decoded agreement for the compared four graphs. Full-horizon
+fidelity and changed resume provenance would be required before migrating the
+already-running frozen extraction. Preserve that run rather than treating low
+VRAM occupancy as proof that batching will multiply speed.

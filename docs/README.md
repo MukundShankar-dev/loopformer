@@ -29,6 +29,10 @@ and running; `bash analyze_pointer.sh` performs frozen extraction, independent
 audits, retained successful-R snapshots and clean plot replacement. The report
 distinguishes current run state from completed evidence.
 
+The [writeup coverage map](analysis.md#writeup-coverage--user-outline-2026-10-09)
+now follows the baseline and five attempts. Original saved learning histories are
+rendered without model inference; full paired evaluation columns remain pending.
+
 The [complete evidence inventory](experiments/pointer_evidence_inventory.md)
 records both hosts' saved datasets, checkpoint availability, schemas and run
 coverage. The [analysis contract](analysis.md) supersedes the small historical

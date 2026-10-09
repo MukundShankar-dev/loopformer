@@ -1,0 +1,29 @@
+[
+  {
+    "graph_batch": 4,
+    "loops": 32,
+    "seconds": 9.950328879000153,
+    "graphs_per_second": 0.40199676298558035,
+    "peak_allocated_mb": 3508.1005859375,
+    "first_four_graphs_decoded_identical": true,
+    "scope": "Bounded 32-loop deterministic FP32 profile, not full-horizon batch-equivalence gate"
+  },
+  {
+    "graph_batch": 8,
+    "loops": 32,
+    "seconds": 18.461419540999486,
+    "graphs_per_second": 0.4333361246806315,
+    "peak_allocated_mb": 5094.267578125,
+    "first_four_graphs_decoded_identical": true,
+    "scope": "Bounded 32-loop deterministic FP32 profile, not full-horizon batch-equivalence gate"
+  },
+  {
+    "graph_batch": 16,
+    "loops": 32,
+    "seconds": 36.548282031999406,
+    "graphs_per_second": 0.4377770748838863,
+    "peak_allocated_mb": 8266.82861328125,
+    "first_four_graphs_decoded_identical": true,
+    "scope": "Bounded 32-loop deterministic FP32 profile, not full-horizon batch-equivalence gate"
+  }
+]

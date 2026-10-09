@@ -11,8 +11,10 @@ The user wants a paper-style account of the working pointer system and its failu
 modes, with the strongest documented checkpoint from each earlier architecture.
 The 27-graph historical comparison is exploratory context, not the main population
 comparison. Use **every one of the 1,350 graphs** in the existing seeds
-307/311/313 panel. Show training/checkpoint progression only for the final executor
-and its controller development, not sweeps across every old architecture.
+307/311/313 panel. Show checkpoint progression on the new population only for the final executor
+and its controller development, not sweeps across every old architecture. The
+subsequent writeup request also includes original saved training histories for
+earlier attempts; this requires no new checkpoint sweep or model fitting.
 
 The full suite is implemented in [the launcher](../analyze_pointer.sh), using the
 frozen [protocol](../configs/pointer_analysis_protocol.json). It runs all six
@@ -85,7 +87,8 @@ been measured.
 | Completion report and safe export retirement | [`paper_report.py`](../scripts/eval/paper_report.py), [`retire_pointer_plots.py`](../scripts/eval/retire_pointer_plots.py); [population report](experiments/pointer_population_analysis.md) |
 | Read-only progress | [`paper_status.py`](../scripts/eval/paper_status.py); chunk-derived coverage and remaining extraction time |
 
-Five groups contain fifteen figure families. The five primary questions are
+Five analysis groups contain fifteen figure families; a sixth writeup group
+adds the historical baseline and five attempt figures, for twenty-one families. The five primary questions are
 quality, execution failure, structure, stopping, and successful-model learning;
 the extra panels expose denominators and diagnostic detail rather than checkpoint
 sweeps. Exact duplicate curves are drawn once with every represented label;
@@ -99,6 +102,67 @@ Old PNG/PDF/SVG exports are removed only after all replacement audits succeed.
 Raw old CSV/JSON/NPZ, logs, checkpoint weights and numeric provenance are retained;
 Git history preserves prior render exports. `retired_plot_exports.json` records
 removed paths and hashes. No 27-graph plot is relabeled as full-population evidence.
+
+## Writeup coverage — user outline, 2026-10-09
+
+The article order is TL;DR, introduction, task/data, metrics/experiments, ordinary
+baseline, five attempts, comparisons, takeaways, and a possible demo. The final
+bundle adds `plots/06_writeup/` with a baseline figure and five attempt figures.
+Each attempt joins original learning evidence with its selected checkpoint's new
+population curves; it does not reevaluate every checkpoint from the failed runs.
+
+The actual saved baseline and learning panels are already rendered locally at
+[`writeup-history-20261009/plots/index.md`](../eval/pointer_analysis/writeup-history-20261009/plots/index.md).
+These six **historical-evidence** figures omit population columns until the full
+suite completes. Generate them without any model/GPU work:
+
+```bash
+python -m scripts.eval.paper_writeup
+```
+
+| Article section | Evidence / figure | Readiness and limitation |
+| --- | --- | --- |
+| 1–2. TL;DR and intro | Research question and bounded results in the project plan, architecture guide and current report | Existing final-model results are available; full historical population comparison is still running. |
+| 3. Task definition and data | Dataset/reference guide, benchmark manifest, graph features and structure plots | Ready; specify 26 states, cycles, exact transitions and each distinct training distribution. Long rollout is not a nonrepeating long graph. |
+| 4. Metrics and experiments | Definitions below, native fidelity, independent reference audit, exact stopping and graph-level denominators | Implemented; retrospective opened population, not new confirmation. |
+| 5. Base checkpoint | `06_writeup/baseline`: original three-shot seed-17 test, 60/1000, depth 1–8, Wilson intervals | Baseline predictions recounted now; this is historical context, not the same panel/prompt as recurrent comparisons. |
+| 6. Attempt 1 | `attempt_01`: CE-only full-sequence LoRA; selected step 2500; original loss and trained/untrained development cohorts | Learning panels ready, new eval column pending. This is the retained fresh-30k representative; earlier small pilots are archival context. |
+| 7. Attempt 2 | `attempt_02`: joint completion, then fixed-memory subvariant; two explicitly named rows | Original training panels ready; new eval columns pending. Include fixed memory as 2b rather than silently omitting an architecture. |
+| 8. Attempt 3 | `attempt_03`: fixed-memory depth-12 recipe, requested-count gaps 7/9/11 | Learning ready, eval pending. Depth, dataset seed, precision, batching and update count all changed; this is not an isolated data ablation. |
+| 9. Attempt 4 | `attempt_04`, `executor_validation_learning`, `controller_development`, `executor_population_progression` | Saved R/GRU development ready; population/snapshot extraction pending. Later GRU checkpoint uses the trained frozen R, not the unsuccessful controller from the original executor run. |
+| 10. Attempt 5 | `attempt_05`: scalar pilot development, separate shared-reader and cell fits, final-model eval | Fit evidence ready; final model's original full population already exists, integrated comparison pending. Reader least-squares and ten L-BFGS objective evaluations have no saved epoch curves; report summaries honestly. |
+| 11. Comparisons | `01_quality`, first-error survival/hazard, graph strata and `04_stopping` | Await complete paired extraction/audit; separate forced execution from actual first stopping. |
+| 12. Takeaways | Claim boundaries in this document and model evolution | One successful R seed, bundled architecture/recipe changes, 26-state cyclic tables, task-specific numeric timer. Do not claim a uniquely proven failure cause or cross-task generality. |
+| 13. Demo | Not implemented/hosted by this analysis request | A demo must invoke the custom recurrent executor/controller, rather than ordinary Hugging Face text generation. Packaging, hosting and latency checks are a separate follow-up. |
+
+The narrative mapping groups joint completion and fixed memory under Attempt 2
+so five sections can retain all six selected checkpoints. The detailed
+[model evolution](pointer_model_evolution.md) describes each architecture and its
+training/inference separately. Learning panels use original data/cohort
+population sizes, raw source hashes and example-weighted 50-update CE windows;
+no old training curve is relabeled as the new 1,350-graph benchmark.
+
+### Actual compute measurements
+
+Only CE extraction is active, followed by the queued full launcher. Each old
+checkpoint needs 345,600 independent requested-count questions and 44,409,600
+requested-horizon transitions, plus any continuation needed to locate its first
+stop. Count-dependent R cannot reuse a `Steps: 256` trajectory for smaller N.
+Causal rule-prefix sharing, query retirement after required observations, count-free
+executor reuse, batched GRU replay and existing final-result reuse are implemented.
+
+A ten-second sample during the resumed CE arm measured mean GPU utilization
+90.4% (range 75–97%); a separate instantaneous sample was 98% and 269 W. Low VRAM
+occupancy is not proof of idle arithmetic. The bounded deterministic FP32 profile
+measured 0.402/0.433/0.438 graphs/s at batches 4/8/16 over 32 loops, with
+3,508/5,094/8,267 MiB peak allocated memory respectively. First-four-graph decoded readouts
+matched through 32 loops. This is about 9% observed throughput gain, not a
+full-horizon batch-equivalence gate or an established optimal configuration.
+The ongoing frozen batch-4 run remains unchanged; this bounded measurement does
+not justify silently changing precision or migrating already-frozen chunks.
+See [`batches.json`](../eval/pointer_analysis/performance-20261009/batches.json) and
+[`utilization.json`](../eval/pointer_analysis/performance-20261009/utilization.json).
+Native-gate time and later-arm costs are outside the CE extraction ETA.
 
 ## Checkpoint registry: freeze these choices before population inference
 
@@ -371,9 +435,9 @@ ablations, multiple successful executor seeds, larger state spaces/nonrepeating
 
 ## Handoff checklist
 
-Local validation: 24 focused inference/scoring/export/comparison/failure tests pass.
+Local validation: 28 focused inference/scoring/export/comparison/failure tests pass.
 A separate synthetic reporting fixture checked all 2,073,600 decisions and 15,360
-aggregate cells, rendered all fifteen figure families, and was visually inspected.
+aggregate cells, rendered all twenty-one figure families, and was visually inspected.
 It is a reporting contract check, **not** measured historical-model population evidence.
 The selected CE checkpoint passed its 54 pretrained native checks.
 Previously, 11 focused inventory/comparison/failure tests passed. Collection
