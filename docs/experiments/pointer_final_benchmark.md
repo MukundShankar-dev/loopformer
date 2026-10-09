@@ -210,3 +210,12 @@ terminal repair/damage or adaptive latency improvements. Prior controller-only
 tests through 8,192 remain a separate numerical result. This panel is now opened;
 any tuning needs a fresh confirmation design. Seed 29 and later research stages
 remain closed. W&B stayed disabled.
+
+## Additional failure matrices and earlier model comparison
+
+The [completed paired diagnostic](pointer_checkpoint_comparison.md) adds eight
+figures and independently audited comparisons with four earlier checkpoints.
+Its smaller 27-graph panel is kept separate from this 1,350-graph benchmark.
+The green complete-trajectory curve is cumulative: every first error occurs by
+loop 30, but already-failed graphs can recover and fail again without changing
+that curve. The new trajectory matrix exposes those later dynamics.

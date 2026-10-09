@@ -1,0 +1,217 @@
+{
+  "status": "complete",
+  "config": {
+    "source_results": "eval/pointer_benchmark/final-full-20261008/independent",
+    "graphs": "data/pointer/benchmark-seeds307-311-313/graphs.jsonl",
+    "output": "eval/pointer_benchmark/checkpoint-comparison-20261008",
+    "graphs_per_stratum": 3,
+    "counts": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      16,
+      17,
+      24,
+      29,
+      32,
+      41,
+      53,
+      63,
+      64,
+      69,
+      70,
+      80,
+      99,
+      100,
+      101,
+      128,
+      192,
+      256
+    ],
+    "native_counts": [
+      1,
+      9,
+      12,
+      70,
+      100,
+      256
+    ],
+    "threshold": 0.5,
+    "safety_cap": 272,
+    "batch_size": 16,
+    "device": "cuda",
+    "models": [
+      {
+        "name": "legacy_lora",
+        "label": "Coupled LoRA",
+        "model": "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-005000",
+        "mode": "legacy"
+      },
+      {
+        "name": "gru",
+        "label": "Isolated R + GRU",
+        "model": "models/stage1_pointer/controller-prefix-seed83/best",
+        "mode": "isolated"
+      },
+      {
+        "name": "positional",
+        "label": "Positional reader + affine",
+        "model": "models/stage1_pointer/controller-affine-seed83/best",
+        "mode": "isolated"
+      },
+      {
+        "name": "shared",
+        "label": "Shared reader before precision",
+        "model": "models/stage1_pointer/controller-shared-number-seed83/best",
+        "mode": "isolated"
+      },
+      {
+        "name": "final",
+        "label": "Final shared reader + precision",
+        "model": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+        "mode": "isolated"
+      }
+    ]
+  },
+  "graphs": 27,
+  "questions_per_model": 810,
+  "models": {
+    "legacy_lora": {
+      "label": "Coupled LoRA",
+      "queries": 810,
+      "nominal_final_correct": 0.44074074074074077,
+      "complete_trajectory": 0.38641975308641974,
+      "exact_stop": 0.3592592592592593,
+      "early_stop": 0.6407407407407407,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.45185185185185184,
+      "joint_success": 0.3530864197530864,
+      "strict_success": 0.34814814814814815,
+      "correct_letter_wrong_time": 0.09876543209876543,
+      "seconds": 357.42479269700016,
+      "native_fidelity": {
+        "passed": true,
+        "questions": 810,
+        "native_nominal_prefix_matches": 7289,
+        "native_reference_audit": {
+          "passed": true,
+          "native_questions": 810,
+          "transition_rows_checked": 7289,
+          "success_counts": {
+            "correct": 366,
+            "complete_trajectory": 282,
+            "exact_stop": 291,
+            "early_stop": 519,
+            "late_stop": 0,
+            "cap_fallback": 0,
+            "joint_success": 286
+          },
+          "data_sha256": "cc662890b67295ebda08fd5a5c8efe147f86ded7402c5cae264717dfd3fe2474",
+          "inputs_sha256": {
+            "summary.json": "5552f9268e195941cd20427e5f2a07f59382002ccc0c6ddcb96b6cce308802ce",
+            "decisions.csv": "514bc2354d4b826ba506b4d959179942e6d49870283bbf8e769ca32342313c54",
+            "trajectories.csv": "da8d9d1435f00ab4e9fb3c9c46ff74d8c6ad76d6e1e50d68622c4d07f98a995f"
+          },
+          "audit_source_sha256": "a41edc03961dd6521aabafbeeb3d7ddd433a3667c176b6cae9b3cefe567b00fa"
+        }
+      },
+      "inference_files_unchanged": true
+    },
+    "gru": {
+      "label": "Isolated R + GRU",
+      "queries": 810,
+      "nominal_final_correct": 0.9481481481481482,
+      "complete_trajectory": 0.9444444444444444,
+      "exact_stop": 0.2345679012345679,
+      "early_stop": 0.5111111111111111,
+      "late_stop": 0.254320987654321,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.36419753086419754,
+      "joint_success": 0.22962962962962963,
+      "strict_success": 0.22962962962962963,
+      "correct_letter_wrong_time": 0.1345679012345679,
+      "seconds": 93.63267041799918,
+      "native_fidelity": {
+        "passed": true,
+        "questions": 54,
+        "mismatches": []
+      },
+      "inference_files_unchanged": true
+    },
+    "positional": {
+      "label": "Positional reader + affine",
+      "queries": 810,
+      "nominal_final_correct": 0.9481481481481482,
+      "complete_trajectory": 0.9444444444444444,
+      "exact_stop": 0.7333333333333333,
+      "early_stop": 0.26666666666666666,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.7395061728395061,
+      "joint_success": 0.7,
+      "strict_success": 0.6975308641975309,
+      "correct_letter_wrong_time": 0.03950617283950617,
+      "seconds": 46.211005950999606,
+      "native_fidelity": {
+        "passed": true,
+        "questions": 54,
+        "mismatches": []
+      },
+      "inference_files_unchanged": true
+    },
+    "shared": {
+      "label": "Shared reader before precision",
+      "queries": 810,
+      "nominal_final_correct": 0.9481481481481482,
+      "complete_trajectory": 0.9444444444444444,
+      "exact_stop": 1.0,
+      "early_stop": 0.0,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.9481481481481482,
+      "joint_success": 0.9481481481481482,
+      "strict_success": 0.9444444444444444,
+      "correct_letter_wrong_time": 0.0,
+      "seconds": 122.45228039300127,
+      "native_fidelity": {
+        "passed": true,
+        "questions": 54,
+        "mismatches": []
+      },
+      "inference_files_unchanged": true
+    },
+    "final": {
+      "label": "Final shared reader + precision",
+      "queries": 810,
+      "nominal_final_correct": 0.9481481481481482,
+      "complete_trajectory": 0.9444444444444444,
+      "exact_stop": 1.0,
+      "early_stop": 0.0,
+      "late_stop": 0.0,
+      "missing_stop": 0.0,
+      "stopped_answer_correct": 0.9481481481481482,
+      "joint_success": 0.9481481481481482,
+      "strict_success": 0.9444444444444444,
+      "correct_letter_wrong_time": 0.0,
+      "seconds": 117.20903641599944,
+      "native_fidelity": {
+        "passed": true,
+        "questions": 54,
+        "mismatches": []
+      },
+      "inference_files_unchanged": true
+    }
+  },
+  "inference_files_unchanged": true,
+  "scope": "Paired descriptive diagnostic on opened benchmark; legacy training/capacity/data differ; isolated arms have identical non-controller tensors."
+}

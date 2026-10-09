@@ -1,0 +1,15 @@
+{
+  "graphs": 1350,
+  "maximum_loop": 256,
+  "first_failed_graphs": 42,
+  "last_first_error_loop": 30,
+  "error_episode_entries_after_first": 222,
+  "failed_graphs_correct_final": 12,
+  "first_errors_one_reference_step_ahead": 13,
+  "first_error_readouts": {
+    "R and C wrong, same letter": 37,
+    "R correct / C wrong": 5
+  },
+  "after_wrong_readout_transitions": 7544,
+  "limitations": "Decoded-edge consistency is observational, not a causal hidden-state test; repeated graph loops are dependent."
+}

@@ -1,0 +1,10 @@
+graph_mode,category,transitions,prior_wrong_transitions
+random_function,recover to reference,109,2045
+random_function,follow edge from prior decode,1857,2045
+random_function,other wrong transition,79,2045
+permutation,recover to reference,88,1924
+permutation,follow edge from prior decode,1719,1924
+permutation,other wrong transition,117,1924
+full_cycle,recover to reference,37,3575
+full_cycle,follow edge from prior decode,3336,3575
+full_cycle,other wrong transition,202,3575

@@ -4,10 +4,18 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
-The user requested richer failure matrices and a frozen comparison with earlier
-architectures. The [declared diagnostic](experiments/pointer_checkpoint_comparison.md)
-uses matched graphs/counts on the opened full benchmark. Implementation is in
-validation; inference/results are pending. No training is selected.
+The [paired architecture diagnostic](experiments/pointer_checkpoint_comparison.md)
+is complete: five frozen models, the same 27 graphs × 30 counts, 4,050 independently
+audited decisions and 1,026 native calls. Exact stopping is 35.93% for legacy LoRA,
+23.46% for GRU, 73.33% for positional affine, and 100% for both shared-reader arms.
+The four isolated models have 148 identical non-controller tensors; their executor
+quality is identical. Legacy comparisons are descriptive, with data/recipe/capacity
+confounds. Eight additional figures show failure trajectories, symbol confusion,
+cycle effects, propagation, architecture quality and stopping matrices. Full-panel
+first failures remain 42 by loop 30, with 234 later recoveries and 222 renewed error
+episodes. The green cumulative curve cannot regain success after an earlier error.
+Numeric precision benefits from 1,038 are shown separately from pointer quality
+through 256. All inference hashes stay unchanged; no training or new stage is selected.
 
 The [final full benchmark](experiments/pointer_final_benchmark.md) completed and
 passed all six predeclared criteria. The frozen final checkpoint scores **100%**

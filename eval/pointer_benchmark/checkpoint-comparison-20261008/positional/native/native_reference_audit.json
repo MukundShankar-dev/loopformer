@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "native_questions": 54,
+  "transition_rows_checked": 1188,
+  "success_counts": {
+    "correct": 29,
+    "complete_trajectory": 25,
+    "exact_stop": 27,
+    "early_stop": 27,
+    "late_stop": 0,
+    "cap_fallback": 0,
+    "joint_success": 25
+  },
+  "data_sha256": "7347944ffc7ee2e4fc6766e0de0028f0641bf088c70ec515400342a3f8f7aa92",
+  "inputs_sha256": {
+    "summary.json": "bcdee26f480c91572992085c8f6e4cb8ca80468b70d1b5b6a07daa188b5cc99d",
+    "decisions.csv": "615006002abf2f2c04b6e77d1f15f19baa6da58a50a200f8b86f0ea41e0e27d3",
+    "trajectories.csv": "ff9e11f22d4063f3a81aaafee195b5b7c22616449a9c2518a9c2053e108fea4a"
+  },
+  "audit_source_sha256": "a41edc03961dd6521aabafbeeb3d7ddd433a3667c176b6cae9b3cefe567b00fa"
+}

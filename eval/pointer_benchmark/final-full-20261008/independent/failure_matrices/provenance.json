@@ -1,0 +1,58 @@
+{
+  "matplotlib": "3.11.2",
+  "inputs_sha256": {
+    "graphs": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+    "source_summary": "df47f3117ba0a31814adc44d8b25f67274059cdbd15b2494849b4c1a268d2bd4",
+    "source_trajectories": "a9bfba654d74b71518e773c5c33c05f264b3ef73478cc79afd6d84722b9bf60a",
+    "comparison_decisions": "ecfde98b4f574be4bac81d6410710912f15a4a76587ae49c0f2e71dfdfacdc19",
+    "comparison_summary": "05832e071c811f7fd377688161737715d03c857963787accd2894be468755c30",
+    "eval/pointer_benchmark/shared-number-20261008/numeric/summary.json": "fc1f5efb33aa3813748e0c12c67fdf5d30a0dac84ffd794f6228d27bc67dbb64",
+    "eval/pointer_benchmark/shared-number-20261008/numeric/countdown.csv": "114eb9a5f86dd0eb9f91b0d120c8ffa62f8f3e2ccf4a13e27195beb398a29f23",
+    "eval/pointer_benchmark/shared-number-precision-20261008/numeric/summary.json": "f1aaa0fbaacfbb2c34e4e3d92df58f708fe1aea6fc5e1f372f5c8a78928f3fb5",
+    "eval/pointer_benchmark/shared-number-precision-20261008/numeric/countdown.csv": "c6857cd176a63b553f770f783e3311551f03d01cf81727610c72d9e18a89e108"
+  },
+  "sources_sha256": {
+    "plot_pointer_failures.py": "34b9af6f29bc292bd763707800d3f6d68f8ba70b97452d4e0be4f62624979619",
+    "pointer_failure_metrics.py": "f6356e0b3365e33a9b8e895f266ef8175fdeb9e1d1f94027366e235ca2e830fb",
+    "plot_pointer_benchmark.py": "220705b660163986ecdc09b91d729fa94cc7af7339b24b840698863a91754f2b",
+    "loop_metrics.py": "22b13a47b526a5bfd7b91e7cb983ff58694b462ffa76497ccc4ab72294eccb03",
+    "pointer_task.py": "46ba5361dcfb36295f612d6176d800393d5bc3bfd1e5f2769e970af7e5cf0cdf"
+  },
+  "exports_sha256": {
+    "cyclic_coincidence_and_early_stops.png": "ed7d6e714945e53649e5c94f87cfc47270a2111330a02cf7172538ce785a5ce0",
+    "cyclic_coincidence_and_early_stops.pdf": "cbb149f78c1a0f19f1019b12b12f51292d9a3b1108ededa9399ef0b93884107b",
+    "numeric_precision_comparison.png": "b511b6a54d499888a5cb84c91004c6f0c2027bc612a47d302561847cb5fda5a5",
+    "failure_signatures.svg": "5b0bb435aaedb2b1768447eff7cce8ca177490d910ffe68c86aa41ce6fc83561",
+    "numeric_precision_comparison.pdf": "63b05b2613930dcf15fb386c74f0ef85c913d02f5db24d91b09320662c8cb3dc",
+    "failure_signatures.png": "6f22c17659fdaaa15fd2024688faac67dc888dffde6af4c0a38aa7e98e912977",
+    "failure_signatures.pdf": "2d46ba3855ae968e1539bf6ec4389039df8c1f0102e78c306bced35b7a109ce8",
+    "numeric_precision_comparison.svg": "f32aa0f9770c396b3b64633bd62e2b135acdc85e127a77f4d97496263c25d3c6",
+    "cyclic_coincidence_and_early_stops.svg": "922f20d34d364dfde1bcfc8f8251b3426978d24ed28c5f6506c8cb2f4fcbf678",
+    "symbol_confusion.svg": "28e46ae9e08fb11ab84c22bde563ce57582b4e470e924ac83dcd584ea7e1f618",
+    "architecture_metric_matrices.svg": "3217d07ea70b134622ff504ae76b22d35ac23e5291839d158dffdc4a00a2436b",
+    "cycle_period_matrix.png": "b17fab5301bb860715512813d4a6eb7bccb5aa5e5c5fdb91fbeed21ca63d33a5",
+    "cycle_period_matrix.pdf": "f7b26ff0efa7a692ccf4e785a5761b8dde894674d2a6d6af55577b216eca4a26",
+    "requested_actual_stop_matrices.svg": "d0f5220b5a9b3b93a8fee4f953e67021fe5f0a6a8f55a4d1d9fe7c934c0b298b",
+    "failed_trajectory_matrix.svg": "f9f078b8029c01c9b65ef0ebc0eb4e4e63db3652e1d49b50391141271efc5753",
+    "requested_actual_stop_matrices.pdf": "7b4beba871735a5fcdd8c883c9af7fdcaff02b8e953cb9b52e302a15fd625c8c",
+    "failed_trajectory_matrix.pdf": "7b2e6b0fc3b4b570450735d52b13f0efd82e4ffe8dde89e47eca39e777c70199",
+    "requested_actual_stop_matrices.png": "e04892ce0ec567eeec6ecd15a16bb971545ffa93fe197d8b18194fda57e1c0ca",
+    "failed_trajectory_matrix.png": "2ab4e3a08e9b42c1d08633d23e71470e00b16d5e8582f0abc062e173c27a61ef",
+    "symbol_confusion.pdf": "e1208c888c3afb3210482d8e82c89ae83fbcd5e5569ffb3f6bde41cef9ee079f",
+    "architecture_metric_matrices.pdf": "d6768c79104d0e4a30c5fbd0612e12ed47594f388371c9c5d254c7b05e8681b1",
+    "cycle_period_matrix.svg": "f8a3ed4b838d389aa8e71a4a37edd381330f1c1d65cda8ac5319ffc06dc5c0e4",
+    "symbol_confusion.png": "0b95a17f83bcab4fdb6a10df4380eccea6a4ae3c67ca6aed36dd374c7fdf6fa3",
+    "architecture_metric_matrices.png": "e9b3ba1510ef6330d545bcfdafc9ddc9da35569a315366d5388d621da64b513b"
+  },
+  "data_sha256": {
+    "final_error_by_letter.csv": "94bbd0c9c0ddc83b09afa4c01298306a53430f05c128961e9d8c30e99493e78e",
+    "summary.json": "9f5e9c99c18d03feecf7148c147051ee8e849f7f4f6315781572d27d3a53d5a3",
+    "categories.csv": "94d03a53a765f7362cc28ec728ac65c05ef9aa4cd5f96b64e118abb02463b76c",
+    "first_error_confusion.csv": "66f43e962c4ebb85aeccc8b2212b20aca2f12e2ff4f02c1b0fcd0e4ec8bab6f2",
+    "error_episodes.csv": "3610f8a959b19bdcb82d05a35197a2c1a635e4a7a50b59439420feb87a73f07d",
+    "architecture_by_count.csv": "a906a4f6516b048633ddf10744ae8fcca5f7298d379ea1aefa668c858041bd76",
+    "dynamics.csv": "e75416ad4569c75f682cea0a1543334d305b79b6175a7f79d1f2f844a2524f99",
+    "first_errors.csv": "41e9c99282928c5472e30f0b9244e60befeec496243d5a7f55421df0919fa194",
+    "cycle_period_by_loop.csv": "b02b84c26ef38332633a292d499e32302dc6775c339facc8aeb58ab56afe22ed"
+  }
+}

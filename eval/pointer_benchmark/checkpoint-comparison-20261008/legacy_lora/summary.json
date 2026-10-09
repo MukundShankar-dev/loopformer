@@ -1,0 +1,42 @@
+{
+  "label": "Coupled LoRA",
+  "queries": 810,
+  "nominal_final_correct": 0.44074074074074077,
+  "complete_trajectory": 0.38641975308641974,
+  "exact_stop": 0.3592592592592593,
+  "early_stop": 0.6407407407407407,
+  "late_stop": 0.0,
+  "missing_stop": 0.0,
+  "stopped_answer_correct": 0.45185185185185184,
+  "joint_success": 0.3530864197530864,
+  "strict_success": 0.34814814814814815,
+  "correct_letter_wrong_time": 0.09876543209876543,
+  "seconds": 357.42479269700016,
+  "native_fidelity": {
+    "passed": true,
+    "questions": 810,
+    "native_nominal_prefix_matches": 7289,
+    "native_reference_audit": {
+      "passed": true,
+      "native_questions": 810,
+      "transition_rows_checked": 7289,
+      "success_counts": {
+        "correct": 366,
+        "complete_trajectory": 282,
+        "exact_stop": 291,
+        "early_stop": 519,
+        "late_stop": 0,
+        "cap_fallback": 0,
+        "joint_success": 286
+      },
+      "data_sha256": "cc662890b67295ebda08fd5a5c8efe147f86ded7402c5cae264717dfd3fe2474",
+      "inputs_sha256": {
+        "summary.json": "5552f9268e195941cd20427e5f2a07f59382002ccc0c6ddcb96b6cce308802ce",
+        "decisions.csv": "514bc2354d4b826ba506b4d959179942e6d49870283bbf8e769ca32342313c54",
+        "trajectories.csv": "da8d9d1435f00ab4e9fb3c9c46ff74d8c6ad76d6e1e50d68622c4d07f98a995f"
+      },
+      "audit_source_sha256": "a41edc03961dd6521aabafbeeb3d7ddd433a3667c176b6cae9b3cefe567b00fa"
+    }
+  },
+  "inference_files_unchanged": true
+}

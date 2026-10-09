@@ -73,7 +73,9 @@ def final_figures(metrics: dict, graph_rows: list[dict], output: Path) -> None:
     axes[0].set(title='First-error type · graph counts')
     first_readouts = metrics['first_readouts']
     labels = ['R and C wrong, same letter', 'R correct / C wrong', 'R and C wrong, different letters']
-    axes[1].barh(['Both wrong\nsame decode', 'R correct\nC wrong', 'Both wrong\ndifferent decode'], [first_readouts.get(k, 0) for k in labels], color='#9c6c97')
+    bars = axes[1].barh(['Both wrong\nsame decode', 'R correct\nC wrong', 'Both wrong\ndifferent decode'], [first_readouts.get(k, 0) for k in labels], color='#9c6c97')
+    axes[1].bar_label(bars, padding=3, fontsize=8)
+    axes[1].set_xlim(0, max(first_readouts.values(), default=1) + 4)
     axes[1].tick_params(axis='y', labelsize=8)
     axes[1].set(title='Readouts at the first error', xlabel='Independent failing graphs')
     colors = ['#16826b', '#bd4d3e', '#8a98a5']
@@ -113,6 +115,7 @@ def final_figures(metrics: dict, graph_rows: list[dict], output: Path) -> None:
 
 def comparison_figures(path: Path, output: Path) -> None:
     import matplotlib.pyplot as plt
+    from matplotlib.colors import LogNorm
     summary = json.loads((path / 'summary.json').read_text())
     audit = json.loads((path / 'comparison_reference_audit.json').read_text())
     if summary['status'] != 'complete' or not summary['inference_files_unchanged']:
@@ -150,13 +153,15 @@ def comparison_figures(path: Path, output: Path) -> None:
     save_figure(fig, output, 'architecture_metric_matrices'); plt.close(fig)
 
     fig, axes = plt.subplots(1, len(arms), figsize=(17, 7), sharey=True)
+    cmap = plt.colormaps['Blues'].copy(); cmap.set_bad('#fafbfc')
     for ax, arm in zip(axes, arms, strict=True):
         matrix = np.zeros((273, len(counts)))
         for r in rows:
             if r['model'] == arm['name']:
                 stop = int(r['first_stop']) if r['first_stop'] else 0
                 matrix[stop, counts.index(int(r['depth']))] += 1 / summary['graphs']
-        im = ax.imshow(matrix, aspect='auto', origin='lower', cmap='Blues', vmin=0, vmax=1, interpolation='nearest')
+        im = ax.imshow(np.ma.masked_where(matrix == 0, matrix), aspect='auto', origin='lower',
+                       cmap=cmap, norm=LogNorm(vmin=1 / summary['graphs'], vmax=1), interpolation='nearest')
         ax.plot(range(len(counts)), counts, linestyle='none', marker='.', markersize=3, color='#c44132', label='Desired stop')
         ax.set_title(arm['label'].replace(' + ', '\n+ '), fontsize=10)
         ticks = [0, 7, 11, 17, 20, 23, 27, 29]
@@ -164,9 +169,11 @@ def comparison_figures(path: Path, output: Path) -> None:
         ax.set_xlabel('Requested count')
     axes[0].set_yticks([0, 12, 64, 128, 192, 256], ['No stop', '12', '64', '128', '192', '256'])
     axes[0].set_ylabel('Actual first stopping loop')
-    label_figure(fig, 'When do earlier models actually stop?', footer + '\nBlue = fraction of graphs; red dots = requested stopping loop. Missing stops are a separate row, never cap successes.')
-    fig.subplots_adjust(top=.81, bottom=.21, wspace=.15)
-    fig.colorbar(im, ax=axes.tolist(), fraction=.02, pad=.015, label='Fraction of paired graphs')
+    label_figure(fig, 'When do earlier models actually stop?', footer + '\nBlue = graph fraction on a log color scale; blank = zero; red = desired stop. No-stop row is separate from cap successes.')
+    fig.subplots_adjust(top=.81, bottom=.21, right=.91, wspace=.15)
+    bar = fig.colorbar(im, ax=axes.tolist(), fraction=.02, pad=.015, label='Fraction of paired graphs · log scale',
+                      ticks=[1 / summary['graphs'], .1, .5, 1])
+    bar.ax.set_yticklabels([f'1/{summary["graphs"]}', '10%', '50%', '100%'])
     save_figure(fig, output, 'requested_actual_stop_matrices'); plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.5))
@@ -271,8 +278,9 @@ def main() -> None:
         inputs.update(numeric_figure(args.numeric_results, args.output, args.comparison))
     provenance = {'matplotlib': matplotlib.__version__, 'inputs_sha256': inputs,
         'sources_sha256': {name: sha256_file(Path(__file__).with_name(name)) for name in
-                           ('plot_pointer_failures.py', 'pointer_failure_metrics.py')},
-        'exports_sha256': {p.name: sha256_file(p) for p in args.output.iterdir() if p.suffix in ('.png', '.pdf', '.svg')}}
+                           ('plot_pointer_failures.py', 'pointer_failure_metrics.py', 'plot_pointer_benchmark.py', 'loop_metrics.py', 'pointer_task.py')},
+        'exports_sha256': {p.name: sha256_file(p) for p in args.output.iterdir() if p.suffix in ('.png', '.pdf', '.svg')},
+        'data_sha256': {p.name: sha256_file(p) for p in args.output.iterdir() if p.suffix in ('.csv', '.json')}}
     (args.output / 'provenance.json').write_text(json.dumps(provenance, indent=2) + '\n')
     print(f'Saved failure metrics and matrices to {args.output}')
 

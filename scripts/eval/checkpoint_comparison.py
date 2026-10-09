@@ -300,7 +300,6 @@ def main() -> None:
         'git_head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()}
     (output / 'freeze.json').write_text(json.dumps(freeze, indent=2) + '\n')
     torch.set_num_threads(4); torch.manual_seed(239); torch.use_deterministic_algorithms(True)
-    results, combined = {}, []
     for arm in config['models']:
         console.print(f'[bold cyan]{arm["label"]}[/bold cyan]'); began = perf_counter()
         arm_output = output / arm['name']; arm_output.mkdir()
@@ -319,10 +318,9 @@ def main() -> None:
         write_csv(arm_output / 'per_count.csv', per_count)
         if checkpoint_hashes(Path(arm['model'])) != before[arm['name']]:
             raise ValueError('Frozen inference files changed')
-        results[arm['name']] = {'label': arm['label'], **aggregate(rows), 'seconds': perf_counter() - began,
+        arm_summary = {'label': arm['label'], **aggregate(rows), 'seconds': perf_counter() - began,
             'native_fidelity': fidelity, 'inference_files_unchanged': True}
-        (arm_output / 'summary.json').write_text(json.dumps(results[arm['name']], indent=2) + '\n')
-        combined.extend(rows)
+        (arm_output / 'summary.json').write_text(json.dumps(arm_summary, indent=2) + '\n')
         gc.collect(); torch.cuda.empty_cache()
     assemble_comparison(config, output)
     console.print('[green]All frozen comparison arms complete, reference-audited, and fidelity checked.[/green]')

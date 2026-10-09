@@ -1,0 +1,10 @@
+{
+  "inference_export_exit_code": 1,
+  "reason": "Different optional legacy/replay columns in combined CSV; all model arms already complete and verified",
+  "assembly_command": "python -m scripts.eval.checkpoint_comparison --assemble-only",
+  "assembly_git_head": "6cd1c68",
+  "assembly_exit_code": 0,
+  "inference_rerun": false,
+  "independent_audit_passed": true,
+  "decisions_checked": 4050
+}

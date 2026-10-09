@@ -1,0 +1,93 @@
+Frozen checkpoint comparison: 5 models · 3 graphs per stratum · 30 counts
+Coupled LoRA
+Pointer task · adaptive stopping
+810 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/le
+gacy_lora/native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:51,  5.59it/s]Loading weights:  47%|████▋     | 137/290 [00:00<00:00, 596.94it/s]Loading weights:  74%|███████▍  | 215/290 [00:00<00:00, 630.74it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 626.47it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 810/810 0:02:47 0:00:00
+Stopped accuracy: 45.19%; mean loops: 9.00; p95 latency: 0.3846s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/le
+gacy_lora/native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  55%|█████▍    | 159/290 [00:00<00:00, 1486.60it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1752.49it/s]
+Legacy forced nominal traces ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:03:03
+Isolated R + GRU
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  46%|████▌     | 134/290 [00:00<00:00, 1333.07it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1614.26it/s]
+Replay graph-dependent GRU ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+Pointer task · adaptive stopping
+54 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/gr
+u/native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:42,  6.84it/s]Loading weights:  72%|███████▏  | 209/290 [00:00<00:00, 1030.64it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 902.55it/s] 
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 54/54 0:01:01 0:00:00
+Stopped accuracy: 40.74%; mean loops: 35.94; p95 latency: 2.7965s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/gr
+u/native
+Positional reader + affine
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  25%|██▍       | 72/290 [00:00<00:00, 719.75it/s]Loading weights:  84%|████████▍ | 243/290 [00:00<00:00, 1286.21it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1203.45it/s]
+Pointer task · adaptive stopping
+54 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/po
+sitional/native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:38,  7.44it/s]Loading weights:  74%|███████▍  | 215/290 [00:00<00:00, 1104.51it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 991.86it/s] 
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 54/54 0:00:37 0:00:00
+Stopped accuracy: 53.70%; mean loops: 22.00; p95 latency: 1.7410s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/po
+sitional/native
+Shared reader before precision
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  50%|████▉     | 144/290 [00:00<00:00, 1439.68it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1708.63it/s]
+Pointer task · adaptive stopping
+54 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/sh
+ared/native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:46,  6.27it/s]Loading weights:  80%|████████  | 233/290 [00:00<00:00, 1096.37it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 963.93it/s] 
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 54/54 0:01:52 0:00:00
+Stopped accuracy: 90.74%; mean loops: 74.67; p95 latency: 7.7462s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/sh
+ared/native
+Final shared reader + precision
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:41,  6.90it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1341.75it/s]
+Pointer task · adaptive stopping
+54 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and 
+nominal-prefix scoring
+Results: 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/fi
+nal/native
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  34%|███▍      | 100/290 [00:00<00:00, 997.68it/s]Loading weights:  78%|███████▊  | 227/290 [00:00<00:00, 1145.98it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1184.26it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 54/54 0:01:48 0:00:00
+Stopped accuracy: 90.74%; mean loops: 74.67; p95 latency: 7.0559s
+Saved stopped trajectories.csv, decisions.csv, summary.json to 
+/home/mukund/loopformer/eval/pointer_benchmark/checkpoint-comparison-20261008/fi
+nal/native
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/mukund/loopformer/scripts/eval/checkpoint_comparison.py", line 283, in <module>
+    main()
+  File "/home/mukund/loopformer/scripts/eval/checkpoint_comparison.py", line 274, in main
+    write_csv(output / 'decisions.csv', combined)
+  File "/home/mukund/loopformer/scripts/eval/loop_metrics.py", line 65, in write_csv
+    writer.writerows(rows)
+  File "/home/mukund/.local/share/uv/python/cpython-3.11.8-linux-x86_64-gnu/lib/python3.11/csv.py", line 157, in writerows
+    return self.writer.writerows(map(self._dict_to_list, rowdicts))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mukund/.local/share/uv/python/cpython-3.11.8-linux-x86_64-gnu/lib/python3.11/csv.py", line 149, in _dict_to_list
+    raise ValueError("dict contains fields not in fieldnames: "
+ValueError: dict contains fields not in fieldnames: 'executor_nominal_correct', 'condition', 'stop_probability'

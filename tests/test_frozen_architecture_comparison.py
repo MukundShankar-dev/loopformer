@@ -72,3 +72,41 @@ def test_independent_audit_rejects_wrong_time_success(tmp_path):
     write_csv(output / 'decisions.csv', rows)
     with pytest.raises(ValueError, match='joint_success'):
         audit_comparison(output, graphs)
+
+
+def test_assemble_mixed_schemas_without_inference_and_reject_changed_checkpoint(tmp_path):
+    import csv
+    import json
+    from scripts.eval.checkpoint_comparison import aggregate, assemble_comparison
+    from scripts.eval.frozen_pointer_benchmark import checkpoint_hashes
+    from scripts.eval.loop_metrics import write_csv
+    output = tmp_path / 'result'; output.mkdir()
+    models, hashes = [], {}
+    for name in ('legacy', 'gru'):
+        model = tmp_path / name; model.mkdir()
+        (model / 'metadata.json').write_text('{}')
+        models.append({'name': name, 'model': str(model)})
+        hashes[name] = checkpoint_hashes(model)
+        arm = output / name; arm.mkdir()
+        task = replace(generate_unconditioned_example(30, 1, 'benchmark', 0), intermediate_states=['A'], final_state='A')
+        row = compose_row(task, {'model': name, 'model_label': name, 'graph_index': 0, 'depth': 1,
+            'dataset_seed': 307, 'cycle_period': 1, 'transient_length': 0, 'example_id': 'a', 'mapping_sha256': 'graph'},
+            {'first_stop': 1, 'executed_loops': 1, 'exact_stop': True, 'early_stop': False,
+             'late_stop': False, 'missing_stop': False, 'stopped_answer_correct': True,
+             'joint_success': True, 'prediction': 'A', 'target': 'A'}, [0])
+        if name == 'gru':
+            row.update(condition='matched', executor_nominal_correct=True, stop_probability=.99)
+        write_csv(arm / 'decisions.csv', [row])
+        (arm / 'summary.json').write_text(json.dumps({**aggregate([row]),
+            'native_fidelity': {'passed': True}, 'inference_files_unchanged': True}))
+    config = {'models': models, 'counts': [1]}
+    (output / 'freeze.json').write_text(json.dumps({'config': config, 'inference_sha256': hashes, 'selected_graph_indices': [0]}))
+    result = assemble_comparison(config, output)
+    assert result['questions_per_model'] == 1
+    with (output / 'decisions.csv').open() as handle:
+        rows = list(csv.DictReader(handle))
+    assert len(rows) == 2 and all(r['joint_success'] == 'True' for r in rows)
+    assert all('stop_probability' not in r for r in rows)
+    (tmp_path / 'gru/metadata.json').write_text('{"changed":true}')
+    with pytest.raises(ValueError, match='changed checkpoint'):
+        assemble_comparison(config, output)

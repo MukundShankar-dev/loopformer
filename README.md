@@ -166,7 +166,7 @@ python -m scripts.eval.loop_test \
   --device cuda --loops 272 --stop-policy completion --stop-threshold 0.5 --test
 ```
 
-This requires the complete checkpoint on the training desktop; local metadata alone is insufficient. Remove `--test` for all 1,536 validation queries. Outputs go to `eval/pointer_loops/`. This reads the model after every recurrent loop; the ordinary three-shot prompt is not used. See [full-loop evaluation](docs/evaluation.md) for commands and metrics.
+This requires the complete checkpoint on the training desktop; local metadata alone is insufficient. Remove `--test` for all 1,536 validation queries. This learned-stop command writes to `eval/pointer_adaptive/`. This reads the model after every recurrent loop; the ordinary three-shot prompt is not used. See [full-loop evaluation](docs/evaluation.md) for commands and metrics.
 
 ## Deferred overscaling experiments
 

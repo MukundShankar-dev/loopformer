@@ -1,0 +1,155 @@
+{
+  "config": {
+    "source_results": "eval/pointer_benchmark/final-full-20261008/independent",
+    "graphs": "data/pointer/benchmark-seeds307-311-313/graphs.jsonl",
+    "output": "eval/pointer_benchmark/checkpoint-comparison-20261008",
+    "graphs_per_stratum": 3,
+    "counts": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      16,
+      17,
+      24,
+      29,
+      32,
+      41,
+      53,
+      63,
+      64,
+      69,
+      70,
+      80,
+      99,
+      100,
+      101,
+      128,
+      192,
+      256
+    ],
+    "native_counts": [
+      1,
+      9,
+      12,
+      70,
+      100,
+      256
+    ],
+    "threshold": 0.5,
+    "safety_cap": 272,
+    "batch_size": 16,
+    "device": "cuda",
+    "models": [
+      {
+        "name": "legacy_lora",
+        "label": "Coupled LoRA",
+        "model": "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-005000",
+        "mode": "legacy"
+      },
+      {
+        "name": "gru",
+        "label": "Isolated R + GRU",
+        "model": "models/stage1_pointer/controller-prefix-seed83/best",
+        "mode": "isolated"
+      },
+      {
+        "name": "positional",
+        "label": "Positional reader + affine",
+        "model": "models/stage1_pointer/controller-affine-seed83/best",
+        "mode": "isolated"
+      },
+      {
+        "name": "shared",
+        "label": "Shared reader before precision",
+        "model": "models/stage1_pointer/controller-shared-number-seed83/best",
+        "mode": "isolated"
+      },
+      {
+        "name": "final",
+        "label": "Final shared reader + precision",
+        "model": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+        "mode": "isolated"
+      }
+    ]
+  },
+  "config_sha256": "a42645c49f414416adcd1797aedb3809d7f6d38e8690cedf2a96af22a5b764cc",
+  "inference_sha256": {
+    "legacy_lora": {
+      "adapter_model.pt": "59ee306f8d02fbe88c929da7009987ede66b336f01765af38a2568d1247a2469",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "fc36844b002a300aa2bf601ddf4330cc95bfe2d95b0025311515f5ad2fb5c537",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "gru": {
+      "adapter_model.pt": "7a9f4237957b95087de9df0474413f59254d9b19a3cd3999ebb4608d1f70cb30",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "fe8516731eef30bee20868c1e724c73a15458a69131dc902d273d1757c93e72f",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "positional": {
+      "adapter_model.pt": "8dfdaee726c0f6413ed2f15478abad68574eb63d8401bb3463bbdc09ab27ff7a",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "4bd9579fde6002b85536f3f2309d7c5c3684096264afb49ffba14441b183a6df",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "shared": {
+      "adapter_model.pt": "42059fd6fd4cc1ffe05a705a99a7aba76d4e7e0d87933bad18c7adc4cdee1110",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "5eb2347e119967f6581fa2c5b7614f1fcfaf95c5d0902d952fedae39538fb91d",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "final": {
+      "adapter_model.pt": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "6ea5b38e2b8c0a7fe1261ccccb8670d3e7a4ff692f11aadc28d4e0db0ff4e8b2",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    }
+  },
+  "source_summary_sha256": "df47f3117ba0a31814adc44d8b25f67274059cdbd15b2494849b4c1a268d2bd4",
+  "source_graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+  "selected_graph_indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152,
+    300,
+    301,
+    302,
+    450,
+    451,
+    452,
+    600,
+    601,
+    602,
+    750,
+    751,
+    752,
+    900,
+    901,
+    902,
+    1050,
+    1051,
+    1052,
+    1200,
+    1201,
+    1202
+  ],
+  "panel_selection": "First graphs in each seed/mode, independent of outcomes; opened-panel diagnosis, not fresh confirmation",
+  "git_head": "b674d70dd34ba5ebfd276403cb7edd4ff96113cd"
+}

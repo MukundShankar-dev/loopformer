@@ -54,7 +54,7 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8 python -u -m scripts.eval.checkpoint_comparison
 
 Outputs: `eval/pointer_benchmark/checkpoint-comparison-20261008/`. Existing paths
 are refused. Full-benchmark failure matrices are computed offline from audited
-trajectories and raw tables, without further inference. Results follow execution.
+trajectories and raw tables, without further inference. The run is now complete.
 
 ## Full-panel execution failure signatures
 
@@ -91,3 +91,116 @@ loops are dependent; these percentages are not independent-trial estimates.
 Cycle-period strata and per-letter final-error rates retain their graph
 counts/denominators. Small strata are noisy; pooling graph types confounds cycle
 structure with other properties. No causal conclusion is drawn from the heatmap.
+
+
+## Completed paired comparison
+
+All five arms completed on the RTX 5070 Ti desktop. The measured arm scopes
+sum to 736.93 seconds (about 12.3 minutes), including model loading, identity
+checks, forced execution/replay and native checks; this is not matched inference
+latency across models. Inference ran at Git `b674d70`; final aggregation was
+repaired at `6cd1c68` after a CSV column mismatch between legacy and replay
+schemas. Every arm had completed and passed native checks before that export
+error. `--assemble-only` validated the frozen hashes and rebuilt the combined
+CSV from saved arms, without rerunning any inference.
+
+Each row below averages **810 paired queries on 27 graphs**, with equal weight
+for the 30 declared count columns. These are descriptive panel rates, not the
+full 345,600-query benchmark rates; the smaller panel happens to include two
+failing executor graphs. Repeated count variants are dependent.
+
+| Frozen checkpoint | Forced final | Complete nominal trajectory | Exact stop | Answer + exact stop | Correct letter, wrong time |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Coupled LoRA | 44.07% | 38.64% | 35.93% | 35.31% | 9.88% |
+| Isolated R + GRU | 94.81% | 94.44% | 23.46% | 22.96% | 13.46% |
+| Positional reader + affine | 94.81% | 94.44% | 73.33% | 70.00% | 3.95% |
+| Shared reader before precision | 94.81% | 94.44% | 100.00% | 94.81% | 0.00% |
+| Final shared reader + precision | 94.81% | 94.44% | 100.00% | 94.81% | 0.00% |
+
+The old LoRA model stops early for all tested requests above 12, typically near
+10–11 at large counts. Its forced final accuracy is 4/27 at count 16; complete
+trajectories are zero at every tested count from 17 onward. Both execution and
+control fail. Differences from the new executor are confounded by data,
+capacity, bridge, routing and training recipe; this is not a LoRA-only ablation.
+
+All four isolated arms preserve exactly **148 non-controller tensors**, the
+non-controller specification, tokenizer bytes and recurrent code. Their forced
+R/C predictions are identical. The GRU has poor exact timing even at many short
+counts despite the strong frozen executor. The positional affine controller is
+exact at all sampled counts through 69 and early for every sampled count from
+70 onward. Shared reading eliminates this format-dependent failure through 256.
+Precision repair changes no pointer outcome on this panel: its benefit is at
+larger numerical requests, not an additional executor improvement.
+
+All **1,026 native stopped calls** pass their applicable fidelity checks:
+810 legacy calls plus 54 for each isolated arm. Independent native audits check
+**18,482 transitions**. All 7,289 legacy native decoded steps match the overlapping
+batched forced prefixes. GRU live/replay maximum logit difference is recorded in
+`gru/feature_fidelity.json`; its actual R vectors produce exactly the confirmed
+source C predictions. All model inference hashes remain unchanged. The additional
+independent audit passes **all 4,050 combined decisions**, coverage and aggregates,
+including wrong-time letters, missing-stop semantics and strict-prefix failures.
+
+The final/native fidelity subset scores 49/54 (90.74%): it is only nine graphs,
+one of which is wrong at all five selected horizons above one. This is a fidelity
+panel, not a replacement population estimate or contradiction of the full result.
+The full frozen model's reported 97.81% joint success remains unchanged.
+
+## Eight new figures and machine-readable evidence
+
+All figures are unsmoothed and saved as PNG/PDF/SVG under
+`eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/`.
+The provenance records input, source and export hashes. CSVs retain first-error
+categories, first-error confusion, post-error dynamics, final-letter denominators,
+cycle-period/loop rates, and architecture/count rates.
+
+- [Every failing graph × recurrent loop](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/failed_trajectory_matrix.png)
+- [First-error symbol confusion and final-letter error rates](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/symbol_confusion.png)
+- [First-error categories, R/C agreement and propagation/recovery](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/failure_signatures.png)
+- [Cycle period × loop error rates](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/cycle_period_matrix.png)
+- [Architecture × count matrices for four quality metrics](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/architecture_metric_matrices.png)
+- [Requested count × actual stopping-loop matrices](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/requested_actual_stop_matrices.png)
+- [Wrong-time letters and premature stops](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/cyclic_coincidence_and_early_stops.png)
+- [Saved controller-only numerical precision comparison](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/numeric_precision_comparison.png)
+
+The numeric figure reuses previously measured results, with checkpoint hashes
+matched to the current freeze: the pre-precision controller is exact for
+1,037/4,096 requests and first fails at 1,038; the final is exact for 8,192/8,192.
+No R is executed in those numerical diagnostics. Pointer quality above 256 remains
+untested. The stopping matrix uses a labeled logarithmic color scale for nonzero
+probabilities so dispersed GRU failures remain visible; blank cells mean zero.
+
+Combined decisions, per-arm traces, audit files, freeze and the original launch
+log are in `eval/pointer_benchmark/checkpoint-comparison-20261008/`. Checkpoint
+binaries remain on the desktop. The launch log preserves the export error;
+`export_recovery.json` records the successful assembly/audit without inference.
+
+To audit and plot a fresh reproduction after the GPU comparison completes:
+
+```bash
+python -m scripts.eval.audit_checkpoint_comparison \
+  --graphs data/pointer/benchmark-seeds307-311-313/graphs.jsonl
+
+python -m scripts.eval.plot_pointer_failures \
+  --graphs data/pointer/benchmark-seeds307-311-313/graphs.jsonl \
+  --comparison eval/pointer_benchmark/checkpoint-comparison-20261008 \
+  --numeric-results eval/pointer_benchmark/shared-number-20261008/numeric \
+                    eval/pointer_benchmark/shared-number-precision-20261008/numeric \
+  --output eval/pointer_benchmark/final-full-20261008/independent/failure_matrices
+```
+
+Optional plotting dependencies are in `requirements-plots.txt`. Mac rendering
+used `MPLCONFIGDIR=/tmp/loopformer-mpl-cache` and an identical raw graph file
+copied to `/tmp/loopformer-benchmark-graphs/graphs.jsonl`. Existing output/audit
+paths are refused; choose fresh paths or update a copied protocol for reproduction.
+For a completed-arm export failure only, `python -m scripts.eval.checkpoint_comparison
+--assemble-only` verifies hashes and assembles without loading models.
+
+Validation: eight benchmark tests and nine comparison/failure-metric tests passed, including
+changed-executor rejection, cyclic wrong-time failure, recovery versus complete
+trajectory, mutually exclusive cyclic categories, post-error denominators and
+corrupted-audit rejection, mixed export schemas and assembly rejection after a
+checkpoint changes. The existing comparison tests remain preserved.
+Independent reference audits, figure layout inspection, export/provenance hashes,
+local links, compilation and whitespace checks pass. No training or new stage is
+selected by these descriptive diagnostics. Seed 29 stays closed.
