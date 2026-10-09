@@ -1,0 +1,22 @@
+{
+  "label": "Isolated full R + learned timer",
+  "queries": 810,
+  "nominal_final_correct": 0.9481481481481482,
+  "complete_trajectory": 0.9444444444444444,
+  "exact_stop": 1.0,
+  "early_stop": 0.0,
+  "late_stop": 0.0,
+  "missing_stop": 0.0,
+  "stopped_answer_correct": 0.9481481481481482,
+  "joint_success": 0.9481481481481482,
+  "strict_success": 0.9444444444444444,
+  "correct_letter_wrong_time": 0.0,
+  "seconds": 117.20903641599944,
+  "native_fidelity": {
+    "passed": true,
+    "questions": 54,
+    "mismatches": []
+  },
+  "inference_files_unchanged": true,
+  "reused_observations": true
+}

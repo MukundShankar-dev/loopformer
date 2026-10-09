@@ -9,8 +9,16 @@ including original full-sequence CE, joint hidden-state completion, fixed-prompt
 memory and its depth-12 recipe variant. Six checkpoints are declared on the same
 opened 27-graph/count panel, with only GRU and final timer representing frozen R.
 Historical CE stopping is undefined rather than scored as failure or success.
-Evaluation extensions and focused tests pass; new inference is in progress.
-No training, checkpoint selection or later research stage is opened.
+The comparison is complete: 4,860 independently audited decisions, 720 audited
+plot cells (60 N/A), 2,538 actual stopped calls and 54 batch-one forced calls.
+Four architecture plots now emphasize the early execution designs; four existing
+full-panel failure figures are reproduced unchanged. At N=9, complete prefixes
+are 13/27 for CE-only, 0/27 for joint completion and 16/27 for fixed-prompt depth 6;
+both isolated arms retain 25/27 through 256, with identical executor outputs but
+different stop timing. Twenty-three relevant tests pass. The
+[model history](pointer_model_evolution.md) supplies technical and plain-language
+accounts with training, inference, supervision and limitations. No training,
+checkpoint selection or later research stage is opened.
 
 The [all-figure audit](experiments/pointer_figure_audit.md) is complete. All thirteen
 figures were rescored, regenerated and inspected. The audit checks 345,600 main

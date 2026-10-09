@@ -138,6 +138,15 @@ def test_headless_metrics_are_undefined_and_audit_rejects_invented_stopping(tmp_
     (output / 'freeze.json').write_text(json.dumps({'source_graphs_sha256': sha256_file(graphs), 'selected_graph_indices': [0]}))
     write_csv(output / 'decisions.csv', [row])
     assert audit_comparison(output, graphs)['decisions_checked'] == 1
+    from scripts.eval.audit_checkpoint_comparison import audit_comparison_exports
+    export = {'model': 'ce', 'depth': 3, 'graphs': 1, 'nominal_final_correct': 1.,
+              'complete_trajectory': 1., 'exact_stop': None, 'joint_success': None}
+    write_csv(output / 'architecture_by_count.csv', [export])
+    assert audit_comparison_exports(output, output)['undefined_cells_checked'] == 2
+    export['exact_stop'] = 0.
+    write_csv(output / 'architecture_by_count.csv', [export])
+    with pytest.raises(ValueError, match='Undefined'):
+        audit_comparison_exports(output, output)
     row['exact_stop'] = False
     write_csv(output / 'decisions.csv', [row])
     with pytest.raises(ValueError, match='Headless'):

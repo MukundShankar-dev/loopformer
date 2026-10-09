@@ -1,5 +1,9 @@
 # Architecture and implementation boundaries
 
+For technical and plain-language accounts of the earlier models and why they
+changed, see [model evolution](pointer_model_evolution.md). This guide retains
+historical mechanics alongside the current isolated executor contracts.
+
 Status: Stage 0, pointer data, Stage 1 training, and saved-checkpoint full-loop evaluation implemented. Pretrained CUDA training and final-answer/full-loop runs are audited in [status](status.md). Absorbing-terminal overscaling evaluation is implemented but pretrained execution is deferred. See the [validation report](experiments/stage0_validation.md) for architecture evidence and limits, and [data report](experiments/stage1_data_validation.md) for pointer validation. The research specification is [the project plan](project_plan.md).
 
 The [inference smoke test](../scripts/smoke_test_qwen.py) exercises ordinary Qwen. The [Stage 0 entry point](../scripts/validate_stage0.py) loads the checkpoint, constructs the recurrent model, attaches LoRA, and validates the architecture. Stage 0 defaults to cached files at an immutable revision. Usage is in [setup](setup.md).

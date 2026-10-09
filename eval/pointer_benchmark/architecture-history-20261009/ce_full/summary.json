@@ -1,0 +1,22 @@
+{
+  "label": "Full sequence \u00b7 CE only",
+  "queries": 810,
+  "nominal_final_correct": 0.29259259259259257,
+  "complete_trajectory": 0.24567901234567902,
+  "exact_stop": null,
+  "early_stop": null,
+  "late_stop": null,
+  "missing_stop": null,
+  "stopped_answer_correct": null,
+  "joint_success": null,
+  "strict_success": null,
+  "correct_letter_wrong_time": null,
+  "seconds": 263.8140983560006,
+  "native_fidelity": {
+    "passed": true,
+    "questions": 54,
+    "scope": "Batch-one forced inference; learned stopping not applicable",
+    "trace_sha256": "0b127359ffe87c2fe8132a1fef0e3d9654fbb343110d7660e716b2dd7a022097"
+  },
+  "inference_files_unchanged": true
+}

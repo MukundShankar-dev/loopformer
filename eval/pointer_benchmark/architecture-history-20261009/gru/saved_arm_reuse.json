@@ -1,0 +1,82 @@
+{
+  "passed": true,
+  "source": "eval/pointer_benchmark/checkpoint-comparison-20261008",
+  "source_freeze_sha256": "39261f18094a000152e299b58f25d56c8f1ed3d0179222631f6d65fccbd43d3a",
+  "source_audit": {
+    "passed": true,
+    "decisions_checked": 4050,
+    "graphs": 27,
+    "models": 5,
+    "success_counts": {
+      "legacy_lora": {
+        "nominal_final_correct": 357,
+        "complete_trajectory": 313,
+        "exact_stop": 291,
+        "early_stop": 519,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 366,
+        "joint_success": 286,
+        "strict_success": 282,
+        "correct_letter_wrong_time": 80
+      },
+      "gru": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 190,
+        "early_stop": 414,
+        "late_stop": 206,
+        "missing_stop": 0,
+        "stopped_answer_correct": 295,
+        "joint_success": 186,
+        "strict_success": 186,
+        "correct_letter_wrong_time": 109
+      },
+      "positional": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 594,
+        "early_stop": 216,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 599,
+        "joint_success": 567,
+        "strict_success": 565,
+        "correct_letter_wrong_time": 32
+      },
+      "shared": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 810,
+        "early_stop": 0,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 768,
+        "joint_success": 768,
+        "strict_success": 765,
+        "correct_letter_wrong_time": 0
+      },
+      "final": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 810,
+        "early_stop": 0,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 768,
+        "joint_success": 768,
+        "strict_success": 765,
+        "correct_letter_wrong_time": 0
+      }
+    },
+    "inputs_sha256": {
+      "summary.json": "05832e071c811f7fd377688161737715d03c857963787accd2894be468755c30",
+      "decisions.csv": "ecfde98b4f574be4bac81d6410710912f15a4a76587ae49c0f2e71dfdfacdc19",
+      "freeze.json": "39261f18094a000152e299b58f25d56c8f1ed3d0179222631f6d65fccbd43d3a"
+    },
+    "graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+    "audit_source_sha256": "85249d34a50ba917542d0e21909ba70de44786e08f66ac9aa1482ed74e9d1d92"
+  },
+  "native_files_copied": true,
+  "checkpoint_and_inference_code_unchanged": true
+}

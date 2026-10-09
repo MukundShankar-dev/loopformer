@@ -1,5 +1,11 @@
 # Paired checkpoint failure diagnostics
 
+The [2026-10-09 architecture history](pointer_architecture_history.md) supersedes
+this controller-focused selection for explaining the earlier model evolution.
+It adds original CE-only, full-sequence joint completion and fixed-prompt depth-6
+checkpoints, keeps depth 12 as a training variant, and retains only GRU/final timer
+from the frozen-executor regime. This report preserves the original measured panel.
+
 ## Declared protocol, 2026-10-08
 
 The user requested failure-mode matrices and earlier architecture comparisons
@@ -118,8 +124,9 @@ failing executor graphs. Repeated count variants are dependent.
 | Final shared reader + precision | 94.81% | 94.44% | 100.00% | 94.81% | 0.00% |
 
 The old LoRA model stops early for all tested requests above 12, typically near
-10–11 at large counts. Its forced final accuracy is 4/27 at count 16; complete
-trajectories are zero at every tested count from 17 onward. Both execution and
+10–11 at large counts. Its forced final accuracy is 4/27 at count 16; one graph
+has a complete trajectory at counts 16 and 17, and none does at sampled counts
+24 onward. The surviving count-17 graph starts at a fixed point. Both execution and
 control fail. Differences from the new executor are confounded by data,
 capacity, bridge, routing and training recipe; this is not a LoRA-only ablation.
 

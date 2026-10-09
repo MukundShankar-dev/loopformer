@@ -15,6 +15,15 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-09 architecture-history amendment:** The user requested the earlier
+executor architectures rather than a comparison dominated by frozen-R controller
+repairs. The [historical reconstruction](experiments/pointer_architecture_history.md)
+compares original CE-only recurrence, joint completion, fixed prompt memory and
+its depth-12 training variant, retaining GRU/final timer as two later examples.
+Use the same opened graph/count panel and explicitly undefined stopping metrics
+for the headless CE checkpoint. This is descriptive evaluation and documentation,
+not fitting, checkpoint selection, fresh confirmation or a later research stage.
+
 **2026-10-08 failure-matrix amendment:** The user requested richer diagnostics and
 earlier frozen architecture comparisons on the opened full benchmark. The
 [paired diagnostic protocol](experiments/pointer_checkpoint_comparison.md) declares

@@ -4,6 +4,18 @@ This document records choices that affect implementation or interpretation. The 
 
 ## Established constraints
 
+2026-10-09 historical architecture comparison: use matched update 3,250 for the
+three early depth-6 configurations, rather than select a better extrapolation
+checkpoint on the new panel. Keep depth 12 as a training variant and retain only
+GRU/final timer from the frozen-executor regime. The original CE-only checkpoint
+has no learned stopping mechanism; external stop-at-N is an execution baseline,
+so stopping metrics are undefined (CSV blank / JSON null / gray N/A), not counted
+as either success or missing-stop failure. Existing audited arms may be reused
+only with identical weights, input panel, policy and recurrent implementation.
+The [report](experiments/pointer_architecture_history.md) separates descriptive
+architecture evolution from controlled causal claims and records the original
+fixed-point count-17 prose correction without changing metrics.
+
 2026-10-08 final full benchmark: directly confirm the frozen repaired checkpoint
 on fresh seeds 307/311/313 with unchanged training exposure, rather than inheriting
 the earlier executor panel. Reuse the existing count-free trajectory evaluator,

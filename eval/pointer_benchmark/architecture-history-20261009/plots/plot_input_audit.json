@@ -1,0 +1,194 @@
+{
+  "benchmark": {
+    "passed": true,
+    "graphs": 1350,
+    "decisions_checked": 345600,
+    "stratum_count_rows_checked": 11776,
+    "loop_rows_checked": 256,
+    "first_c_error_counts": {
+      "4": 4,
+      "none": 1308,
+      "5": 5,
+      "6": 3,
+      "16": 2,
+      "9": 3,
+      "3": 3,
+      "7": 3,
+      "10": 4,
+      "20": 1,
+      "13": 1,
+      "2": 1,
+      "28": 2,
+      "15": 1,
+      "17": 1,
+      "14": 1,
+      "8": 1,
+      "25": 2,
+      "30": 1,
+      "29": 1,
+      "21": 1,
+      "24": 1
+    },
+    "depth_checks": [
+      {
+        "requested_steps": 1,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1350,
+        "final_answer_and_exact_stop_graphs": 1350,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 12,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1323,
+        "final_answer_and_exact_stop_graphs": 1330,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 30,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1320,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 31,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1320,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 64,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1319,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 128,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1320,
+        "exact_stop_graphs": 1350
+      },
+      {
+        "requested_steps": 256,
+        "denominator_graphs": 1350,
+        "all_steps_correct_graphs": 1308,
+        "final_answer_and_exact_stop_graphs": 1320,
+        "exact_stop_graphs": 1350
+      }
+    ],
+    "metric_definitions": {
+      "joint_success": "correct C letter at actual stop AND first stop equals N",
+      "complete_trajectory": "every C letter at loops 1..N matches the reference; no recovery",
+      "first_error": "first incorrect intermediate C letter; not a first joint-success failure"
+    },
+    "inputs_sha256": {
+      "graphs.csv": "a9bfba654d74b71518e773c5c33c05f264b3ef73478cc79afd6d84722b9bf60a",
+      "controller_counts.csv": "cae696def023d0101e772dcce418e5bcc3307834ad3c94d8ea03d97977c3f84e",
+      "per_count_and_stratum.csv": "9cc78872dca436a9acd23e52929f82153936144f14d016053c8d0f2903419674",
+      "per_loop.csv": "1696ebc00305ac8db3d2b0e680e5924fb218a85e6aafb7f65be975868d1a51a9",
+      "decisions.csv.gz": "aa2c0fd72792e8b9f1844280a9ba5b486be71354e820efbe3c627afc032a9569",
+      "summary.json": "df47f3117ba0a31814adc44d8b25f67274059cdbd15b2494849b4c1a268d2bd4"
+    },
+    "raw_graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285"
+  },
+  "comparison": {
+    "passed": true,
+    "decisions_checked": 4860,
+    "graphs": 27,
+    "models": 6,
+    "success_counts": {
+      "ce_full": {
+        "nominal_final_correct": 237,
+        "complete_trajectory": 199
+      },
+      "joint_full": {
+        "nominal_final_correct": 181,
+        "complete_trajectory": 165,
+        "exact_stop": 133,
+        "early_stop": 677,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 236,
+        "joint_success": 132,
+        "strict_success": 132,
+        "correct_letter_wrong_time": 104
+      },
+      "fixed6": {
+        "nominal_final_correct": 237,
+        "complete_trajectory": 205,
+        "exact_stop": 135,
+        "early_stop": 675,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 240,
+        "joint_success": 135,
+        "strict_success": 135,
+        "correct_letter_wrong_time": 105
+      },
+      "legacy_lora": {
+        "nominal_final_correct": 357,
+        "complete_trajectory": 313,
+        "exact_stop": 291,
+        "early_stop": 519,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 366,
+        "joint_success": 286,
+        "strict_success": 282,
+        "correct_letter_wrong_time": 80
+      },
+      "gru": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 190,
+        "early_stop": 414,
+        "late_stop": 206,
+        "missing_stop": 0,
+        "stopped_answer_correct": 295,
+        "joint_success": 186,
+        "strict_success": 186,
+        "correct_letter_wrong_time": 109
+      },
+      "final": {
+        "nominal_final_correct": 768,
+        "complete_trajectory": 765,
+        "exact_stop": 810,
+        "early_stop": 0,
+        "late_stop": 0,
+        "missing_stop": 0,
+        "stopped_answer_correct": 768,
+        "joint_success": 768,
+        "strict_success": 765,
+        "correct_letter_wrong_time": 0
+      }
+    },
+    "inputs_sha256": {
+      "summary.json": "ec103ce169f9128b924c91f3916927656d84fa67c38d171f197feac45cad79ef",
+      "decisions.csv": "3837baf5143d4ed5e8d25a1121dca9dbe22b7908716411a8be89bd1f41d93f62",
+      "freeze.json": "8a22dcd04d1725e854a0e3d5fa8f5ee9fd83e17660323299b8eb256cca3249fa"
+    },
+    "graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+    "audit_source_sha256": "95c9ba860eb039604569d38f29b10b0a6e60bac15df123ef685c950988ddcf56"
+  },
+  "numeric": {},
+  "failure_exports": {
+    "passed": true,
+    "failing_graphs_checked": 42,
+    "confusion_cells_checked": 676,
+    "final_letter_rates_checked": 26,
+    "cycle_matrix_cells_checked": 6656,
+    "error_episode_entries_checked": 264,
+    "category_cells_checked": 12,
+    "dynamics_cells_checked": 9
+  },
+  "comparison_exports": {
+    "passed": true,
+    "cells_checked": 720,
+    "undefined_cells_checked": 60,
+    "csv_sha256": "6e4649023fbdfebcec59b515954a5eea23dce6fe5a11d9382db3bc6e98665432"
+  }
+}

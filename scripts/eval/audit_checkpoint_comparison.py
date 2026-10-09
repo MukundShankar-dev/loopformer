@@ -3,6 +3,7 @@ import argparse
 from collections import Counter
 import csv
 import json
+import math
 from pathlib import Path
 
 from scripts.eval.pointer_task import sha256_file
@@ -110,12 +111,46 @@ def audit_comparison(results: Path, graphs_file: Path) -> dict:
         if not summary['models'][model]['native_fidelity']['passed'] or not summary['models'][model]['inference_files_unchanged']:
             raise ValueError('Model native fidelity/freeze failed')
         for metric, count in counts.items():
-            if abs(summary['models'][model][metric] - count / summary['questions_per_model']) > 1e-12:
+            if not math.isclose(summary['models'][model][metric], count / summary['questions_per_model'], rel_tol=0, abs_tol=1e-12):
                 raise ValueError('Summary aggregate differs from decision arithmetic')
     return {'passed': True, 'decisions_checked': len(rows), 'graphs': summary['graphs'],
         'models': len(summary['models']), 'success_counts': {k: dict(v) for k, v in totals.items()},
         'inputs_sha256': {name: sha256_file(results / name) for name in ('summary.json', 'decisions.csv', 'freeze.json')},
         'graphs_sha256': sha256_file(graphs_file), 'audit_source_sha256': sha256_file(Path(__file__))}
+
+
+def audit_comparison_exports(results: Path, output: Path) -> dict:
+    """Check every architecture/count plot cell, including undefined stopping."""
+    summary = json.loads((results / 'summary.json').read_text())
+    with (results / 'decisions.csv').open() as handle:
+        decisions = list(csv.DictReader(handle))
+    with (output / 'architecture_by_count.csv').open() as handle:
+        saved = list(csv.DictReader(handle))
+    expected = {(arm['name'], depth) for arm in summary['config']['models'] for depth in summary['config']['counts']}
+    seen, undefined = set(), 0
+    metrics = ('nominal_final_correct', 'complete_trajectory', 'exact_stop', 'joint_success')
+    for row in saved:
+        key = row['model'], int(row['depth'])
+        if key not in expected or key in seen or int(row['graphs']) != summary['graphs']:
+            raise ValueError('Architecture plot coverage or denominator differs')
+        seen.add(key)
+        selected = [r for r in decisions if (r['model'], int(r['depth'])) == key]
+        if len(selected) != summary['graphs']:
+            raise ValueError('Architecture plot source denominator differs')
+        for metric in metrics:
+            values = [r[metric] for r in selected]
+            if all(value == '' for value in values):
+                if row[metric] != '':
+                    raise ValueError('Undefined controller plot cell cannot become zero')
+                undefined += 1
+            elif any(value not in ('True', 'False') for value in values):
+                raise ValueError('Mixed plot metric applicability')
+            elif not row[metric] or not math.isclose(float(row[metric]), values.count('True') / len(values), rel_tol=0, abs_tol=1e-12):
+                raise ValueError('Architecture plot rate differs from audited decisions')
+    if seen != expected:
+        raise ValueError('Incomplete architecture plot cells')
+    return {'passed': True, 'cells_checked': len(saved) * len(metrics), 'undefined_cells_checked': undefined,
+            'csv_sha256': sha256_file(output / 'architecture_by_count.csv')}
 
 
 def main() -> None:

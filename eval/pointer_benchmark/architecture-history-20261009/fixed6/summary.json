@@ -1,0 +1,42 @@
+{
+  "label": "Fixed prompt \u00b7 depth 6",
+  "queries": 810,
+  "nominal_final_correct": 0.29259259259259257,
+  "complete_trajectory": 0.25308641975308643,
+  "exact_stop": 0.16666666666666666,
+  "early_stop": 0.8333333333333334,
+  "late_stop": 0.0,
+  "missing_stop": 0.0,
+  "stopped_answer_correct": 0.2962962962962963,
+  "joint_success": 0.16666666666666666,
+  "strict_success": 0.16666666666666666,
+  "correct_letter_wrong_time": 0.12962962962962962,
+  "seconds": 272.81639108900345,
+  "native_fidelity": {
+    "passed": true,
+    "questions": 810,
+    "native_nominal_prefix_matches": 4024,
+    "native_reference_audit": {
+      "passed": true,
+      "native_questions": 810,
+      "transition_rows_checked": 4024,
+      "success_counts": {
+        "correct": 240,
+        "complete_trajectory": 135,
+        "exact_stop": 135,
+        "early_stop": 675,
+        "late_stop": 0,
+        "cap_fallback": 0,
+        "joint_success": 135
+      },
+      "data_sha256": "cc662890b67295ebda08fd5a5c8efe147f86ded7402c5cae264717dfd3fe2474",
+      "inputs_sha256": {
+        "summary.json": "a8d1256c7f5cf43594a47c05c193a234c095ff427966156e42a9decfe4165ddb",
+        "decisions.csv": "eea33de3b443fa8ca2ffcc293e372eba03fdbb4498c4ce5e38d074b7a27e135d",
+        "trajectories.csv": "2d0d6a45b2fcde8c073190428ef0900848f9825405a89b7f34e9db03cc67ff41"
+      },
+      "audit_source_sha256": "a41edc03961dd6521aabafbeeb3d7ddd433a3667c176b6cae9b3cefe567b00fa"
+    }
+  },
+  "inference_files_unchanged": true
+}

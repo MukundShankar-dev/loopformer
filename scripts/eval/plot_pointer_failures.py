@@ -12,6 +12,10 @@ from scripts.eval.plot_pointer_benchmark import read_csv, save_figure
 from scripts.eval.pointer_task import sha256_file
 from scripts.eval.audit_pointer_figures import audit_plot_tables, audit_numeric, audit_failure_exports
 
+ARM_COLORS = {'ce_full': '#64748b', 'joint_full': '#c2413a', 'fixed6': '#ba7d24',
+              'legacy_lora': '#8b5bb0', 'gru': '#197c78', 'final': '#2563a6',
+              'positional': '#ba7d24', 'shared': '#9c6c97'}
+
 
 def label_figure(fig, title: str, footer: str) -> None:
     fig.suptitle(title, x=.04, y=.985, ha='left', fontsize=16, fontweight='bold')
@@ -197,10 +201,11 @@ def comparison_figures(path: Path, output: Path) -> None:
         cohorts = [(1, 12), (13, 69), (70, 256)]
         wrongtime = [100 * sum(r['correct_letter_wrong_time'] == 'True' for r in selected if lo <= int(r['depth']) <= hi) /
             sum(lo <= int(r['depth']) <= hi for r in selected) for lo, hi in cohorts]
-        axes[0].plot(range(3), wrongtime, marker='o', label=arm['label'])
+        color = ARM_COLORS.get(arm['name'], '#64748b')
+        axes[0].plot(range(3), wrongtime, marker='o', color=color, label=arm['label'])
         late = [100 * sum(r['early_stop'] == 'True' for r in selected if int(r['depth']) == n) / summary['graphs'] for n in counts]
         # Sparse requests are measured points, not observations of intervening counts.
-        axes[1].scatter(counts, late, s=14, label=arm['label'])
+        axes[1].scatter(counts, late, s=14, color=color, label=arm['label'])
     axes[0].set_xticks(range(3), ['Counts 1–12', '13–69', '70–256'])
     axes[0].set(title='Correct letter at the wrong time', ylabel='Paired queries (%)', ylim=(0, 102))
     axes[1].set(title='Premature stopping by requested count', xlabel='Requested count', ylabel='Graphs stopping early (%)', ylim=(0, 102))
@@ -211,11 +216,10 @@ def comparison_figures(path: Path, output: Path) -> None:
     save_figure(fig, output, 'cyclic_coincidence_and_early_stops'); plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(13, 6))
-    colors = ('#64748b', '#c2413a', '#ba7d24', '#8b5bb0', '#197c78', '#2563a6')
     for i, arm in enumerate(arms):
         for ax, metric in zip(axes, metrics[:2], strict=True):
             ax.scatter(counts, [100 * rate(arm, n, metric) for n in counts],
-                       s=22, color=colors[i % len(colors)], marker=('o', 'x', '^', 's', 'D', '+')[i % 6], label=arm['label'])
+                       s=22, color=ARM_COLORS.get(arm['name'], '#64748b'), marker=('o', 'x', '^', 's', 'D', '+')[i % 6], label=arm['label'])
     for ax, title in zip(axes, ('Correct letter at requested loop N', 'Every intermediate letter through N correct'), strict=True):
         ax.set(title=title, xlabel='Requested count N · logarithmic axis', ylabel='Graphs passing criterion (%)',
                xscale='log', ylim=(-2, 102))
@@ -223,7 +227,9 @@ def comparison_figures(path: Path, output: Path) -> None:
         ax.grid(alpha=.2)
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(.5, .91), ncol=3, fontsize=8, frameon=False)
-    label_figure(fig, 'How execution evolved before and after separating the controller', footer + '\nMeasured sparse counts only; no interpolation. Correct final letters can recur on cyclic graphs despite earlier errors.')
+    label_figure(fig, 'How execution evolved before and after separating the controller', footer +
+        '\nHistorical Steps changes can alter the trajectory; each count is executed separately. Isolated R ignores Steps.\n'
+        'Measured sparse counts only; no interpolation. Correct final letters can recur on cycles despite earlier errors.')
     fig.subplots_adjust(top=.73, bottom=.21)
     save_figure(fig, output, 'architecture_execution_depth'); plt.close(fig)
 
@@ -311,6 +317,8 @@ def main() -> None:
     plot_audit['failure_exports'] = audit_failure_exports(args.results, args.graphs, args.output)
     if args.comparison:
         comparison_figures(args.comparison, args.output)
+        from scripts.eval.audit_checkpoint_comparison import audit_comparison_exports
+        plot_audit['comparison_exports'] = audit_comparison_exports(args.comparison, args.output)
     inputs = {'graphs': sha256_file(args.graphs), 'source_summary': sha256_file(args.results / 'summary.json'),
               'source_trajectories': sha256_file(args.results / 'graphs.csv')}
     if args.comparison:
@@ -321,7 +329,7 @@ def main() -> None:
     (args.output / 'plot_input_audit.json').write_text(json.dumps(plot_audit, indent=2) + '\n')
     provenance = {'matplotlib': matplotlib.__version__, 'inputs_sha256': inputs,
         'sources_sha256': {name: sha256_file(Path(__file__).with_name(name)) for name in
-                           ('plot_pointer_failures.py', 'pointer_failure_metrics.py', 'plot_pointer_benchmark.py', 'audit_pointer_figures.py', 'loop_metrics.py', 'pointer_task.py')},
+                           ('plot_pointer_failures.py', 'pointer_failure_metrics.py', 'plot_pointer_benchmark.py', 'audit_pointer_figures.py', 'audit_checkpoint_comparison.py', 'loop_metrics.py', 'pointer_task.py')},
         'exports_sha256': {p.name: sha256_file(p) for p in args.output.iterdir() if p.suffix in ('.png', '.pdf', '.svg')},
         'data_sha256': {p.name: sha256_file(p) for p in args.output.iterdir() if p.suffix in ('.csv', '.json')}}
     (args.output / 'provenance.json').write_text(json.dumps(provenance, indent=2) + '\n')

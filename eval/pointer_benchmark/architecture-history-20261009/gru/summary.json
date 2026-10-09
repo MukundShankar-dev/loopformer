@@ -1,0 +1,22 @@
+{
+  "label": "Isolated full R + GRU",
+  "queries": 810,
+  "nominal_final_correct": 0.9481481481481482,
+  "complete_trajectory": 0.9444444444444444,
+  "exact_stop": 0.2345679012345679,
+  "early_stop": 0.5111111111111111,
+  "late_stop": 0.254320987654321,
+  "missing_stop": 0.0,
+  "stopped_answer_correct": 0.36419753086419754,
+  "joint_success": 0.22962962962962963,
+  "strict_success": 0.22962962962962963,
+  "correct_letter_wrong_time": 0.1345679012345679,
+  "seconds": 93.63267041799918,
+  "native_fidelity": {
+    "passed": true,
+    "questions": 54,
+    "mismatches": []
+  },
+  "inference_files_unchanged": true,
+  "reused_observations": true
+}

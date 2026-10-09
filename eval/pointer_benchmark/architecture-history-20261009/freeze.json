@@ -1,0 +1,171 @@
+{
+  "config": {
+    "source_results": "eval/pointer_benchmark/final-full-20261008/independent",
+    "graphs": "data/pointer/benchmark-seeds307-311-313/graphs.jsonl",
+    "output": "eval/pointer_benchmark/architecture-history-20261009",
+    "graphs_per_stratum": 3,
+    "counts": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      16,
+      17,
+      24,
+      29,
+      32,
+      41,
+      53,
+      63,
+      64,
+      69,
+      70,
+      80,
+      99,
+      100,
+      101,
+      128,
+      192,
+      256
+    ],
+    "native_counts": [
+      1,
+      9,
+      12,
+      70,
+      100,
+      256
+    ],
+    "threshold": 0.5,
+    "safety_cap": 272,
+    "batch_size": 16,
+    "device": "cuda",
+    "models": [
+      {
+        "name": "ce_full",
+        "label": "Full sequence \u00b7 CE only",
+        "model": "models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-003250",
+        "mode": "forced_only"
+      },
+      {
+        "name": "joint_full",
+        "label": "Full sequence \u00b7 joint stop",
+        "model": "models/stage1_pointer/depth6-completion-seed37/step-003250",
+        "mode": "legacy"
+      },
+      {
+        "name": "fixed6",
+        "label": "Fixed prompt \u00b7 depth 6",
+        "model": "models/stage1_pointer/depth6-fixed-prompt-seed37/step-003250",
+        "mode": "legacy"
+      },
+      {
+        "name": "legacy_lora",
+        "label": "Fixed prompt \u00b7 depth 12",
+        "model": "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-005000",
+        "mode": "legacy",
+        "saved_results": "eval/pointer_benchmark/checkpoint-comparison-20261008"
+      },
+      {
+        "name": "gru",
+        "label": "Isolated full R + GRU",
+        "model": "models/stage1_pointer/controller-prefix-seed83/best",
+        "mode": "isolated",
+        "saved_results": "eval/pointer_benchmark/checkpoint-comparison-20261008"
+      },
+      {
+        "name": "final",
+        "label": "Isolated full R + learned timer",
+        "model": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+        "mode": "isolated",
+        "saved_results": "eval/pointer_benchmark/checkpoint-comparison-20261008"
+      }
+    ]
+  },
+  "config_sha256": "bbee081f34ca0f78d5fbb34c7da06cb63337ea29403f4efe8b438dacfc6649f1",
+  "inference_sha256": {
+    "ce_full": {
+      "adapter_model.pt": "8a088eee4204fd9e0833715c5750d3740ebe83182dd5d46f6fd6e92b2fe44675",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "8791505f331fd361fe62c8efc4fe1a9759d47adac6b781205f5104f3a08b2383",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "joint_full": {
+      "adapter_model.pt": "e00e370387f302245fb96d70811b65a29fa13853362ba6f11799df00faadfa51",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "74d4d368787625cb4443a5ab947579cb9f8e3dbaedefa04dc168038429b97d91",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "fixed6": {
+      "adapter_model.pt": "28b76fe23300b1d01ce8fadf3d2fa252396177b1027a1b02a8cc81046512fa15",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "2b51fbe67c6aba39e09615eecea325c445c1440e46d40c3af2616b403295587d",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "legacy_lora": {
+      "adapter_model.pt": "59ee306f8d02fbe88c929da7009987ede66b336f01765af38a2568d1247a2469",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "fc36844b002a300aa2bf601ddf4330cc95bfe2d95b0025311515f5ad2fb5c537",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "gru": {
+      "adapter_model.pt": "7a9f4237957b95087de9df0474413f59254d9b19a3cd3999ebb4608d1f70cb30",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "fe8516731eef30bee20868c1e724c73a15458a69131dc902d273d1757c93e72f",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    },
+    "final": {
+      "adapter_model.pt": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+      "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "recurrent_config.json": "6ea5b38e2b8c0a7fe1261ccccb8670d3e7a4ff692f11aadc28d4e0db0ff4e8b2",
+      "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+    }
+  },
+  "source_summary_sha256": "df47f3117ba0a31814adc44d8b25f67274059cdbd15b2494849b4c1a268d2bd4",
+  "source_graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+  "selected_graph_indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152,
+    300,
+    301,
+    302,
+    450,
+    451,
+    452,
+    600,
+    601,
+    602,
+    750,
+    751,
+    752,
+    900,
+    901,
+    902,
+    1050,
+    1051,
+    1052,
+    1200,
+    1201,
+    1202
+  ],
+  "panel_selection": "First graphs in each seed/mode, independent of outcomes; opened-panel diagnosis, not fresh confirmation",
+  "git_head": "a3c04626851bdbfca0ebdb427d8e0e63b1853016"
+}

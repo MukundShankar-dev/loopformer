@@ -1,0 +1,63 @@
+Frozen checkpoint comparison: 6 models · 3 graphs per stratum · 30 counts
+Full sequence · CE only
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/290 [00:00<00:42,  6.87it/s]
+Loading weights:  40%|████      | 117/290 [00:00<00:00, 575.57it/s]
+Loading weights:  64%|██████▍   | 185/290 [00:00<00:00, 602.30it/s]
+Loading weights:  87%|████████▋ | 252/290 [00:00<00:00, 613.55it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 594.94it/s]
+CE-only forced traces ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:04:22
+Full sequence · joint stop
+Pointer task · adaptive stopping
+810 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and
+nominal-prefix scoring
+Results:
+/home/mukund/loopformer/eval/pointer_benchmark/architecture-history-20261009/joi
+nt_full/native
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/290 [00:00<00:47,  6.13it/s]
+Loading weights:  96%|█████████▌| 279/290 [00:00<00:00, 1297.90it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1086.75it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 810/810 0:01:15 0:00:00
+Stopped accuracy: 29.14%; mean loops: 3.97; p95 latency: 0.1932s
+Saved stopped trajectories.csv, decisions.csv, summary.json to
+/home/mukund/loopformer/eval/pointer_benchmark/architecture-history-20261009/joi
+nt_full/native
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights:  35%|███▍      | 101/290 [00:00<00:00, 1009.08it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1826.25it/s]
+Legacy forced nominal traces ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:02:59
+Fixed prompt · depth 6
+Pointer task · adaptive stopping
+810 examples · up to 272 loops each · cuda · float32 · batch 1
+Raw dataset prompts · A–Z readout · cache disabled · stopped-answer and
+nominal-prefix scoring
+Results:
+/home/mukund/loopformer/eval/pointer_benchmark/architecture-history-20261009/fix
+ed6/native
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/290 [00:00<00:42,  6.78it/s]
+Loading weights:  96%|█████████▌| 279/290 [00:00<00:00, 1335.33it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1139.44it/s]
+Stopping evaluation ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 810/810 0:01:24 0:00:00
+Stopped accuracy: 29.63%; mean loops: 4.97; p95 latency: 0.2054s
+Saved stopped trajectories.csv, decisions.csv, summary.json to
+/home/mukund/loopformer/eval/pointer_benchmark/architecture-history-20261009/fix
+ed6/native
+
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]
+Loading weights:  42%|████▏     | 123/290 [00:00<00:00, 1212.33it/s]
+Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1705.20it/s]
+Legacy forced nominal traces ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:03:03
+Fixed prompt · depth 12
+Reused audited observations with unchanged weights, inputs and inference code.
+Isolated full R + GRU
+Reused audited observations with unchanged weights, inputs and inference code.
+Isolated full R + learned timer
+Reused audited observations with unchanged weights, inputs and inference code.
+All frozen comparison arms complete, reference-audited, and fidelity checked.

@@ -1,0 +1,13 @@
+graph_mode,category,graphs,total_graphs,failed_graphs
+random_function,repeat previous state,0,450,12
+random_function,earlier visited state,5,450,12
+random_function,later reachable state,4,450,12
+random_function,outside start orbit,3,450,12
+permutation,repeat previous state,0,450,12
+permutation,earlier visited state,5,450,12
+permutation,later reachable state,1,450,12
+permutation,outside start orbit,6,450,12
+full_cycle,repeat previous state,0,450,18
+full_cycle,earlier visited state,6,450,18
+full_cycle,later reachable state,12,450,18
+full_cycle,outside start orbit,0,450,18

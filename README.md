@@ -35,8 +35,9 @@ See [repair commands and data](docs/number_reader_repair.md),
 [controller architecture](docs/architecture.md), and the saved
 [figures](docs/experiments/pointer_final_benchmark.md#commands-figures-and-artifacts).
 Weights remain on the desktop; Git carries metrics, audits and metadata.
-The [paired architecture diagnostics](docs/experiments/pointer_checkpoint_comparison.md)
-add failure matrices and compare earlier frozen models on identical inputs.
+See [how the architectures evolved](docs/pointer_model_evolution.md) for technical
+and plain-language explanations, and the [historical comparison](docs/experiments/pointer_architecture_history.md)
+for original full-sequence/fixed-prompt models and two frozen-R examples.
 
 The [repair runbook](docs/number_reader_repair.md) fits a shared number reader,
 then tightens its two countdown parameters on the same training labels.

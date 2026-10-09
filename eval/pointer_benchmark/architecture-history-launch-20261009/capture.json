@@ -1,0 +1,6 @@
+{
+  "source": "desktop raw terminal capture",
+  "original_sha256": "c71a798b629cf85ee56558aed371cb3c7089474bf29589c32e815da0b24c3bbe",
+  "git_capture_sha256": "6f64fc5ecb60d48b6d1058cccce1f7a677cdabe6713f62bf5057d964b4c673ea",
+  "normalization": "Normalize terminal line endings and strip trailing whitespace; model metric files unchanged"
+}

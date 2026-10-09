@@ -4,6 +4,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 
 | Need | Canonical document |
 | --- | --- |
+| Earlier pointer architectures, training/inference and plain-language explanations | [Model evolution](pointer_model_evolution.md) |
 | Shared number reader with unchanged training depth/count exposure | [Number-reader repair](number_reader_repair.md) |
 | Frozen reserved-test and larger pointer benchmark | [Benchmark protocol](pointer_benchmark.md) |
 | Current controller repair and acceptance criteria | [Controller repair](controller_repair.md) |
@@ -25,7 +26,9 @@ The adaptive-compute guide is the **single source for that extension**. The rese
 The [architecture-history reconstruction](experiments/pointer_architecture_history.md)
 extends the comparison to original full-sequence CE, joint completion and fixed
 prompt memory, with depth-12 training recorded as a recipe variant and only two
-frozen-executor controller examples. Its new inference is in progress.
+frozen-executor controller examples. All 4,860 paired decisions and the regenerated
+architecture figures are audited; [model evolution](pointer_model_evolution.md)
+explains training/inference and the reasons for each change.
 
 The [all-figure audit](experiments/pointer_figure_audit.md) independently rescored
 and regenerated all thirteen current figures, with unchanged results, explicit
