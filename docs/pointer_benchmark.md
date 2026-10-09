@@ -6,6 +6,9 @@ The final repaired checkpoint now has a separately declared
 The default launcher retains the historical affine-model protocol below.
 Both use the same evaluator, criteria, native fidelity and independent audit;
 the existing test is a regression check when rerun after the repair.
+The final full panel has completed: **97.81% joint success**, **96.89% complete
+trajectories through 256**, and **100% exact timing**. All native and reference
+audits pass. Results and the five figures are in the linked final report.
 
 The user authorized opening the current reserved test and a larger independent
 pointer benchmark after the controller repair. Freeze the first predeclared

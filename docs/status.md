@@ -4,12 +4,31 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
-The user has now authorized the [final full benchmark](experiments/pointer_final_benchmark.md):
-all existing seed-61 test queries plus fresh seeds 307/311/313, 1,350 graphs and
-every depth 1–256. The final checkpoint stays frozen; training is unchanged.
-Native stopped calls and independent saved-result audits precede acceptance.
-Results are pending. This directly tests the final model rather than composing
-the earlier executor result with separate controller checks.
+The [final full benchmark](experiments/pointer_final_benchmark.md) completed and
+passed all six predeclared criteria. The frozen final checkpoint scores **100%**
+on all 1,536 existing test queries and **97.81% answer-plus-exact-stop success**
+on fresh seeds 307/311/313: 1,350 disjoint graphs, every count 1–256, 345,600 paired
+queries. **96.89%** of graphs have complete trajectories through 256; exact stopping
+is **100%** at every count. The overall joint graph-cluster 95% interval is
+97.04–98.53%. All 42 first errors occur at loops 2–30; no new first errors appear
+at 31–256. Training/count exposure and all checkpoint inference files are unchanged.
+
+All **189 native calls match replay**, including failures. Their nine-graph panel
+scores 89.42% because one selected graph fails at 20 horizons; this is a fidelity
+check, not the population benchmark. Independent audits pass all **345,600**
+decisions and **27,309** native transitions; zero overlap with 38,988 excluded tables.
+Five Matplotlib figures are saved in PNG/PDF/SVG with uncertainty, training markers,
+graph-type strata, first-error survival, stop residuals and intermediate readouts.
+
+This directly confirms the complete final checkpoint on a fresh panel rather than
+inheriting the preceding reader-only checkpoint's graph score. The verified claim
+is finite depth generalization on fixed-format 26-state pointer graphs. Whole-model
+pointer quality above 256, longer nonrepeating paths and cross-family transfer
+remain untested. Next: review the finite claim before choosing another experiment;
+no training or later stage is selected. Newly evaluated panels are now opened;
+further tuning needs fresh confirmation. Seed 29 remains closed.
+
+## Reader and precision repair before the full benchmark
 
 The [number-reader and countdown repair](experiments/controller_number_reader.md)
 is complete. The final checkpoint is

@@ -1,0 +1,15 @@
+{
+  "checkpoint": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+  "inference_sha256": {
+    "adapter_model.pt": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+    "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "recurrent_config.json": "6ea5b38e2b8c0a7fe1261ccccb8670d3e7a4ff692f11aadc28d4e0db0ff4e8b2",
+    "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+    "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+  },
+  "threshold": 0.5,
+  "safety_cap": 272,
+  "selection": "Configured seed-83 checkpoint; frozen before this benchmark; no selection on results",
+  "test_data_sha256": "9b383af72722fff74660627fd35042f34238652492a0de6f7ee431a9c0b06bfa",
+  "protocol_sha256": "95029fb96559da42e0fe99bbeba532244ee8ecdeeb68d2791da2ce1b1a43f256"
+}

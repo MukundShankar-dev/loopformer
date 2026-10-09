@@ -1,0 +1,36 @@
+{
+  "matplotlib": "3.11.2",
+  "script_sha256": "220705b660163986ecdc09b91d729fa94cc7af7339b24b840698863a91754f2b",
+  "inputs_sha256": {
+    "summary.json": "df47f3117ba0a31814adc44d8b25f67274059cdbd15b2494849b4c1a268d2bd4",
+    "per_count_and_stratum.csv": "9cc78872dca436a9acd23e52929f82153936144f14d016053c8d0f2903419674",
+    "controller_counts.csv": "cae696def023d0101e772dcce418e5bcc3307834ad3c94d8ea03d97977c3f84e",
+    "graphs.csv": "a9bfba654d74b71518e773c5c33c05f264b3ef73478cc79afd6d84722b9bf60a",
+    "per_loop.csv": "1696ebc00305ac8db3d2b0e680e5924fb218a85e6aafb7f65be975868d1a51a9",
+    "result_reference_audit.json": "cbdd70db493dace33da777c2aff250cf010da674fcb2369f59560a64a4932e0e"
+  },
+  "vertical_lines": {
+    "12": "maximum supervised recurrent prefix",
+    "63": "maximum trained requested count; five excluded",
+    "100": "three-digit boundary"
+  },
+  "uncertainty": "Per-count marginal graph-level Wilson intervals; no independent count-query sample assumption.",
+  "limitations": "Fixed prompt and 26-state graphs; controller ignores graphs; finite tested range only.",
+  "figures_sha256": {
+    "controller_diagnostics.pdf": "8bebb21b699b723eace7644e07092e862a60ca63b0ee41836109073051c3adae",
+    "controller_diagnostics.png": "e905f9cf200a70db615a565ebd25fdffd474d2446c0acaf1a84e1ec4850f5437",
+    "controller_diagnostics.svg": "f679e44ef6d5df3bdff4ccf5921fffd79e00adf732c78da31aea642fce2d3522",
+    "intermediate_readouts.pdf": "15192e5d5de3ddf0aef94bcc06d70c33ba40305652fc9b62a3f99d39205edd0f",
+    "intermediate_readouts.png": "97f19810986017b3ac4300a1e26a1fce87a08e6dbd026c1ac2652f6435f79fb2",
+    "intermediate_readouts.svg": "e7906eb54caee9db530654bc3a159b122c8f71d03d2fcb0e2e94f402264b184b",
+    "quality_by_graph_type.pdf": "83860d8fe2478a0e52cb5e624bf7c3b0362dd47dbb318827b42eb50193482104",
+    "quality_by_graph_type.png": "f89131481f4bc999ec1c5dd7df48b3b659d596492c1dd6f303f949425ee3795a",
+    "quality_by_graph_type.svg": "54286e33d17669448587778557b7a349c7adc23a897abf594c3ddab4e8bbd946",
+    "quality_over_depth.pdf": "ec98e36af424fedfcc2ba798af7a1d3e1bf765f7386dfa14adf216b4c4133088",
+    "quality_over_depth.png": "d1850e3e3f6b991acf22764c9867cf92b03600c3d02a2e0bd97b1a6470901bbe",
+    "quality_over_depth.svg": "59205c0aa4f95685d036eda11c71b82fad98a54159e1aa3092382ab9456f6f09",
+    "trajectory_failures.pdf": "5793ed0889b892c2145e67ff036c7f96ea5222d3476264dcfb846e51e96de0c5",
+    "trajectory_failures.png": "6a5b59c7e7cebc881c59197ccd562c704a6cb3cee189856be759e8285cc19d56",
+    "trajectory_failures.svg": "09675af9ed5dd60e65e76befcb367990b935d721157deab758d47e4e0fa337b5"
+  }
+}

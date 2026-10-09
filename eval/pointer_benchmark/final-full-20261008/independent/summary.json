@@ -1,0 +1,1125 @@
+{
+  "status": "complete",
+  "config": {
+    "model": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+    "existing_data": "data/pointer/seed-61-independent",
+    "seeds": [
+      307,
+      311,
+      313
+    ],
+    "graphs_per_seed_mode": 150,
+    "graph_modes": [
+      "random_function",
+      "permutation",
+      "full_cycle"
+    ],
+    "max_depth": 256,
+    "safety_cap": 272,
+    "threshold": 0.5,
+    "batch_size": 64,
+    "native_counts": [
+      1,
+      9,
+      12,
+      17,
+      29,
+      41,
+      53,
+      63,
+      64,
+      69,
+      70,
+      79,
+      80,
+      99,
+      100,
+      101,
+      128,
+      199,
+      200,
+      255,
+      256
+    ],
+    "native_graphs_per_seed_mode": 1,
+    "bootstrap_repeats": 2000,
+    "bootstrap_seed": 239,
+    "criteria": {
+      "overall_joint_success": 0.95,
+      "overall_complete_trajectory": 0.95,
+      "overall_exact_stop": 0.99,
+      "minimum_depth_joint_success": 0.9,
+      "minimum_depth_complete_trajectory": 0.9,
+      "minimum_depth_exact_stop": 0.95
+    },
+    "exclusion_files": [
+      "data/pointer/benchmark-seeds211-223-227/graphs.jsonl",
+      "data/pointer/benchmark-seeds281-283-293/graphs.jsonl"
+    ]
+  },
+  "config_sha256": "95029fb96559da42e0fe99bbeba532244ee8ecdeeb68d2791da2ce1b1a43f256",
+  "checkpoint": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+  "checkpoint_sha256": {
+    "adapter_model.pt": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+    "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "recurrent_config.json": "6ea5b38e2b8c0a7fe1261ccccb8670d3e7a4ff692f11aadc28d4e0db0ff4e8b2",
+    "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+    "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+  },
+  "source_sha256": {
+    "scripts/eval/frozen_pointer_benchmark.py": "fcf4f47a4fcbf5458548480f4e4f73f913eecda4d001e3baecb6382da4a27b96",
+    "scripts/eval/benchmark_metrics.py": "06c632a700b70b16f1db9d3e1dea1822ba873f4b1ee73ccdc0a3981bc7da8e24",
+    "scripts/dataset/benchmark.py": "55b7b2d13f19116acf84b408f35f6f74173c7e9bd3dba0ecb87e91a429ccf7fb",
+    "scripts/dataset/pointer.py": "9e5126976c53963ed070ec838891971b24f4b017642ec34fbcac61448fc939fb",
+    "scripts/eval/controller_learning.py": "7c05e4c4c3ccc3ba10af22d3f70b36fba8d94ab41d20b15175bed1aedab836ea",
+    "scripts/recurrent_qwen/model.py": "38a9c5723803259293469b00023fb614f6ed87cdca22dc33101239b708862261",
+    "scripts/recurrent_qwen/interfaces.py": "0a1aeded9eee9bba1a07cab90fa5228a8fb21978247022442196556191b55168"
+  },
+  "command": [
+    "/home/mukund/loopformer/scripts/eval/frozen_pointer_benchmark.py",
+    "--config",
+    "configs/pointer_full_benchmark.json",
+    "--freeze",
+    "eval/pointer_benchmark/final-full-20261008/freeze.json",
+    "--output",
+    "eval/pointer_benchmark/final-full-20261008/independent",
+    "--dataset-output",
+    "data/pointer/benchmark-seeds307-311-313",
+    "--wandb-mode",
+    "disabled"
+  ],
+  "git_head": "f8a14cb24e0b1c828b34cd14c47b652af83b541b",
+  "python": "3.11.8",
+  "torch": "2.14.0+cu130",
+  "device": "cuda",
+  "dtype": "float32",
+  "attention": "sdpa",
+  "batch_size": 64,
+  "target_semantics": "One R loop is one transition; exact first crossing at N required",
+  "compute_scope": "One forced count-free trajectory per graph; controller replay for every count; bounded native fidelity panel",
+  "graphs": 1350,
+  "queries": 345600,
+  "cohorts": {
+    "all": {
+      "graphs": 1350,
+      "queries": 345600,
+      "counts": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9780844907407408,
+          "graph_bootstrap_95": [
+            0.9703697916666666,
+            0.9853285590277778
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9701765046296297,
+          "graph_bootstrap_95": [
+            0.9613780381944445,
+            0.9787037037037037
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9780844907407408,
+          "graph_bootstrap_95": [
+            0.9703697916666666,
+            0.9853285590277778
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9780844907407408,
+          "graph_bootstrap_95": [
+            0.9703697916666666,
+            0.9853285590277778
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9701765046296297,
+          "graph_bootstrap_95": [
+            0.9613780381944445,
+            0.9787037037037037
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "1_12": {
+      "graphs": 1350,
+      "queries": 16200,
+      "counts": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9912962962962963,
+          "graph_bootstrap_95": [
+            0.9873456790123457,
+            0.9948148148148148
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9885802469135802,
+          "graph_bootstrap_95": [
+            0.9839506172839507,
+            0.9929012345679011
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9912962962962963,
+          "graph_bootstrap_95": [
+            0.9873456790123457,
+            0.9948148148148148
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9912962962962963,
+          "graph_bootstrap_95": [
+            0.9873456790123457,
+            0.9948148148148148
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9885802469135802,
+          "graph_bootstrap_95": [
+            0.9839506172839507,
+            0.9929012345679011
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "13_63": {
+      "graphs": 1350,
+      "queries": 68850,
+      "counts": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9782570806100217,
+          "graph_bootstrap_95": [
+            0.9705864197530865,
+            0.9854469862018883
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9707189542483661,
+          "graph_bootstrap_95": [
+            0.9619313725490195,
+            0.9792160493827161
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9782570806100217,
+          "graph_bootstrap_95": [
+            0.9705864197530865,
+            0.9854469862018883
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9782570806100217,
+          "graph_bootstrap_95": [
+            0.9705864197530865,
+            0.9854469862018883
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9707189542483661,
+          "graph_bootstrap_95": [
+            0.9619313725490195,
+            0.9792160493827161
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "64_99": {
+      "graphs": 1350,
+      "queries": 48600,
+      "counts": [
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9771399176954733,
+          "graph_bootstrap_95": [
+            0.9690534979423868,
+            0.9847736625514403
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9688888888888889,
+          "graph_bootstrap_95": [
+            0.9599814814814814,
+            0.9777777777777777
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9771399176954733,
+          "graph_bootstrap_95": [
+            0.9690534979423868,
+            0.9847736625514403
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9771399176954733,
+          "graph_bootstrap_95": [
+            0.9690534979423868,
+            0.9847736625514403
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9688888888888889,
+          "graph_bootstrap_95": [
+            0.9599814814814814,
+            0.9777777777777777
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "100_256": {
+      "graphs": 1350,
+      "queries": 211950,
+      "counts": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9772351969804199,
+          "graph_bootstrap_95": [
+            0.9692094833687189,
+            0.9847140835102618
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9688888888888889,
+          "graph_bootstrap_95": [
+            0.9599814814814814,
+            0.9777777777777777
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9772351969804199,
+          "graph_bootstrap_95": [
+            0.9692094833687189,
+            0.9847140835102618
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9772351969804199,
+          "graph_bootstrap_95": [
+            0.9692094833687189,
+            0.9847140835102618
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9688888888888889,
+          "graph_bootstrap_95": [
+            0.9599814814814814,
+            0.9777777777777777
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "held_out_values": {
+      "graphs": 1350,
+      "queries": 6750,
+      "counts": [
+        9,
+        17,
+        29,
+        41,
+        53
+      ],
+      "metrics": {
+        "nominal_final_correct": {
+          "rate": 0.9794074074074074,
+          "graph_bootstrap_95": [
+            0.9721481481481482,
+            0.9863703703703703
+          ]
+        },
+        "complete_trajectory": {
+          "rate": 0.9731851851851854,
+          "graph_bootstrap_95": [
+            0.9648888888888888,
+            0.9810370370370372
+          ]
+        },
+        "exact_stop": {
+          "rate": 1.0,
+          "graph_bootstrap_95": [
+            1.0,
+            1.0
+          ]
+        },
+        "early_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "late_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "missing_stop": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        },
+        "stopped_answer_correct": {
+          "rate": 0.9794074074074074,
+          "graph_bootstrap_95": [
+            0.9721481481481482,
+            0.9863703703703703
+          ]
+        },
+        "joint_success": {
+          "rate": 0.9794074074074074,
+          "graph_bootstrap_95": [
+            0.9721481481481482,
+            0.9863703703703703
+          ]
+        },
+        "strict_success": {
+          "rate": 0.9731851851851854,
+          "graph_bootstrap_95": [
+            0.9648888888888888,
+            0.9810370370370372
+          ]
+        },
+        "correct_letter_wrong_time": {
+          "rate": 0.0,
+          "graph_bootstrap_95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    }
+  },
+  "acceptance": {
+    "passed": true,
+    "checks": {
+      "overall_joint_success": true,
+      "minimum_depth_joint_success": true,
+      "overall_complete_trajectory": true,
+      "minimum_depth_complete_trajectory": true,
+      "overall_exact_stop": true,
+      "minimum_depth_exact_stop": true
+    },
+    "thresholds": {
+      "overall_joint_success": 0.95,
+      "overall_complete_trajectory": 0.95,
+      "overall_exact_stop": 0.99,
+      "minimum_depth_joint_success": 0.9,
+      "minimum_depth_complete_trajectory": 0.9,
+      "minimum_depth_exact_stop": 0.95
+    }
+  },
+  "native_fidelity": {
+    "passed": true,
+    "questions": 189,
+    "mismatches": []
+  },
+  "inference_files_unchanged": true,
+  "executor_evaluation_seconds": 326.6138697290007,
+  "forced_executor_example_loops": 367200,
+  "native_fidelity_questions": 189,
+  "confidence_interval_scope": "Percentile bootstrap of whole graphs within dataset-seed/graph-mode strata; horizons stay clustered",
+  "limitations": [
+    "26-state cyclic graphs",
+    "fixed raw prompt template",
+    "three-digit token-layout boundary",
+    "reused executor trajectories, not native adaptive latency",
+    "single frozen model seed"
+  ]
+}

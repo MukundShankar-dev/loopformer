@@ -22,18 +22,18 @@ One recurrent block is reused across all loops. The executor experiment trained 
 
 ## Current result and diagnostics
 
-The [repaired model](docs/experiments/controller_number_reader.md) passes the
-larger pointer benchmark with unchanged training count/depth exposure: 98.02%
-answer-plus-exact-stop success across 1,350 graphs at depths 1–256, and 97.33%
-complete trajectories through 256. Its controller alone stops exactly for every
-count through 8,192; pointer execution at those larger depths is untested. All
-graphs have 26 states and long executions can cycle. The earlier
+The frozen model passes the [full benchmark](docs/experiments/pointer_final_benchmark.md):
+100% on the 1,536-query existing test, **97.81% answer-plus-exact-stop success**
+across 1,350 new graphs at every depth 1–256, and **96.89% complete trajectories
+through 256**. Training exposure stayed unchanged: R unrolled through 12;
+controller count labels through 63, with held-out values. Exact stopping is 100%
+through 256. All graphs have 26 states and long executions can cycle. The earlier
 [frozen benchmark](docs/experiments/pointer_frozen_benchmark.md) records the
 number-reading failure that motivated this repair.
 
 See [repair commands and data](docs/number_reader_repair.md),
 [controller architecture](docs/architecture.md), and the saved
-[figure](eval/pointer_benchmark/shared-number-20261008/independent/plots/quality_and_initialization.png).
+[figures](docs/experiments/pointer_final_benchmark.md#commands-figures-and-artifacts).
 Weights remain on the desktop; Git carries metrics, audits and metadata.
 
 The [repair runbook](docs/number_reader_repair.md) fits a shared number reader,
@@ -41,6 +41,10 @@ then tightens its two countdown parameters on the same training labels.
 `bash repair_number_reader.sh --dry-run` and `bash refine_countdown.sh --dry-run`
 preview the two stages. The completed final checkpoint is
 `models/stage1_pointer/controller-shared-number-precision-seed83/best`.
+`bash benchmark_pointer.sh --full --dry-run` previews the full benchmark;
+see the [report](docs/experiments/pointer_final_benchmark.md) for reproduction
+and plotting commands. Controller-only stopping through 8,192 is a separate
+numerical result; whole-model pointer quality above 256 remains untested.
 
 Start with the [research plan](docs/project_plan.md), [current status](docs/status.md),
 and [documentation index](docs/README.md). Historical experiments remain in the

@@ -4,6 +4,19 @@ This document records choices that affect implementation or interpretation. The 
 
 ## Established constraints
 
+2026-10-08 final full benchmark: directly confirm the frozen repaired checkpoint
+on fresh seeds 307/311/313 with unchanged training exposure, rather than inheriting
+the earlier executor panel. Reuse the existing count-free trajectory evaluator,
+then require native batch-one fidelity and independent raw-graph audits. Batch
+64 changes scheduling only. The existing test is a regression check; 1,350 graphs
+are the independent sampling units for 345,600 paired queries. All declared
+criteria pass: 97.81% joint success, 96.89% complete trajectories through 256 and
+100% exact stop. The nine-graph native panel includes failed execution and must
+not replace population accuracy. The [report](experiments/pointer_final_benchmark.md)
+and standalone figures preserve finite-range/26-state limitations. No checkpoint,
+threshold or training choice is selected on these results; future tuning requires
+fresh confirmation.
+
 2026-10-08 completed repair: the shared reader passes the larger graph benchmark
 on unchanged training labels, while the unchanged timer's longer stress panel
 reveals accumulated optimization error beginning at 1,038. Fit only the two cell
