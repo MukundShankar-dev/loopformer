@@ -4,6 +4,17 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
+The user authorized [repairing the number reader](number_reader_repair.md)
+without increasing training count exposure or rollout length. The implementation
+shares a learned token projection and accumulation gain across positions/lengths,
+fitted only on the same 58 training count labels. R, bridge, learned countdown
+and stopping readout are kept bitwise unchanged. A fresh 1–256 benchmark on seeds
+281/283/293 is declared before fitting. Sixteen focused reader/affine/benchmark
+tests passed, including unseen positions and longer strings, a learned alternate
+radix, padding, export/loading, executor count invariance, and native/reuse checks
+on deliberately failed policies. Pretrained results are pending; no claim of
+successful repair is made yet.
+
 The [frozen pointer benchmark](experiments/pointer_frozen_benchmark.md) completed.
 The fixed seed-83 checkpoint scores **100% exact timing, complete trajectories and
 joint success** on the reserved seed-61 test (1,536 questions, 128 graphs, depths
@@ -22,8 +33,8 @@ and no new graph overlaps any old split. Eleven focused benchmark/affine tests
 pass; optional figures render. The [runbook](pointer_benchmark.md) owns reproduction.
 W&B upload was disallowed by automatic review; outputs are local/repository only.
 
-The model remains frozen. Review the initial number reader before selecting
-another training experiment. These panels are now opened: later tuning would
+That benchmark model remains preserved. The authorized reader-only repair above
+supersedes its no-new-training scope. These panels are now opened: later tuning would
 require fresh held-out confirmation. Seed 29 and other stages remain closed.
 The finite controller repair below remains a valid result through 64, but cannot
 be extended to arbitrary counts based on its smaller development panel.

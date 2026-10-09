@@ -361,6 +361,17 @@ and portable export remain unchanged; the completed pilot failed to repair timin
 
 ## Learned affine suffix controller — 2026-10-08
 
+The later [shared number-reader repair](number_reader_repair.md) replaces only
+the initializer with `SharedNumberReader`: frozen routed Steps-token embeddings
+and validity masks `[B,8*(H+1)]` feed a shared token projection and learned
+left-to-right accumulation gain. No numeric conversion, digit-value lookup,
+requested-count tensor or elapsed-loop feature enters inference. Gain/projection
+are fitted from the same training count labels; the learned cell and stop readout
+are copied unchanged. Checkpoints mark `controller_kind=shared_number` and load
+through the common factory. This is a task-specific compositional number reader,
+with an eight-character input bound and finite numerical precision, not a generic
+confidence-based stopping mechanism. The old suffix controller remains supported.
+
 The [repair protocol](controller_repair.md#suffix-initializer-and-learned-affine-memory)
 specifies the new optional controller. Frozen final-eight embeddings `[B,8H]`
 feed a supervised learned linear initializer `[B,1]`; a shared affine cell evolves

@@ -150,7 +150,8 @@ def main() -> None:
     model_path = Path(config['model']); before = checkpoint_hashes(model_path)
     frozen = json.loads(args.freeze.read_text())
     if (frozen['checkpoint'] != config['model'] or frozen['inference_sha256'] != before
-            or frozen['threshold'] != config['threshold'] or frozen['safety_cap'] != config['safety_cap']):
+            or frozen['threshold'] != config['threshold'] or frozen['safety_cap'] != config['safety_cap']
+            or ('protocol_sha256' in frozen and frozen['protocol_sha256'] != sha256_file(args.config))):
         raise ValueError('Model or stopping policy differs from pre-test freeze')
     torch.set_num_threads(4); torch.manual_seed(239); torch.use_deterministic_algorithms(True)
     args.output.mkdir(parents=True); args.dataset_output.mkdir(parents=True)
@@ -167,19 +168,25 @@ def main() -> None:
         'compute_scope': 'One forced count-free trajectory per graph; controller replay for every count; bounded native fidelity panel'}
     (args.output / 'summary.json').write_text(json.dumps(provenance, indent=2) + '\n')
     excluded = exclusion_hashes(Path(config['existing_data']))
+    extra_exclusions = {}
+    for filename in config.get('exclusion_files', []):
+        path = Path(filename)
+        extra_exclusions[filename] = sha256_file(path)
+        for line in path.read_text().splitlines():
+            excluded.add(json.loads(line)['mapping_sha256'])
     tasks, metadata = independent_graphs(config, excluded)
     graph_file = args.dataset_output / 'graphs.jsonl'
     graph_file.write_text(''.join(json.dumps(t.to_dict()) + '\n' for t in tasks))
     manifest = {'generator': 'frozen-pointer-benchmark-v1', 'config': config, 'graphs': n,
         'queries': n * config['max_depth'], 'exclusion_graphs': len(excluded),
         'old_dataset_sha256': {p.name: sha256_file(p) for p in Path(config['existing_data']).glob('*.jsonl')},
-        'graphs_sha256': sha256_file(graph_file), 'graph_metadata': metadata}
+        'graphs_sha256': sha256_file(graph_file), 'extra_exclusion_sha256': extra_exclusions, 'graph_metadata': metadata}
     (args.dataset_output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     (args.output / 'dataset_manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     model, tokenizer, spec = load_recurrent_checkpoint(model_path, device=args.device)
     model.eval().requires_grad_(False); model.config._attn_implementation = 'sdpa'
-    if model.router is None or model.completion_head.kind != 'affine_suffix' or any(p.requires_grad for p in model.parameters()):
-        raise ValueError('Reuse requires a frozen isolated executor and affine suffix controller')
+    if model.router is None or model.completion_head.kind not in ('affine_suffix', 'shared_number') or any(p.requires_grad for p in model.parameters()):
+        raise ValueError('Reuse requires a frozen isolated executor and an executor-independent scalar controller')
     logits, stops, controller_rows = controller_panel(model, tokenizer, spec['token_ids'], tasks, metadata,
                                                      config['max_depth'], config['safety_cap'])
     write_csv(args.output / 'controller_counts.csv', controller_rows)

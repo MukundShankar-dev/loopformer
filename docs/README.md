@@ -4,6 +4,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 
 | Need | Canonical document |
 | --- | --- |
+| Shared number reader with unchanged training depth/count exposure | [Number-reader repair](number_reader_repair.md) |
 | Frozen reserved-test and larger pointer benchmark | [Benchmark protocol](pointer_benchmark.md) |
 | Current controller repair and acceptance criteria | [Controller repair](controller_repair.md) |
 | Current executor/controller implementation checklist | [Pipeline upgrade](pipeline_upgrade.md) |

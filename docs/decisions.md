@@ -4,6 +4,15 @@ This document records choices that affect implementation or interpretation. The 
 
 ## Established constraints
 
+2026-10-08: At the user's request, repair positional number-reading generalization
+without broader count/depth exposure. Fit one shared embedding projection and
+shared accumulation gain on the same 58 count labels, preserving all non-reader
+tensors, including the countdown/stop head. No decimal radix is installed and
+no new digit labels are provided. This adds an explicit task-specific composition
+bias; fresh graph seeds and unchanged quality criteria are declared in the
+[protocol](number_reader_repair.md). Longer numeric diagnostics cannot establish
+executor accuracy or indefinite counting. The old failed model remains evidence.
+
 - Study single-family recurrent dynamics before generality.
 - Start with the specified pretrained Qwen, shared recurrence, frozen base weights, recurrent LoRA, and an optional bridge.
 - Gate training on one-loop equivalence, weight sharing, and gradient scope.

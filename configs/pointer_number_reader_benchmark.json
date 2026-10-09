@@ -1,0 +1,56 @@
+{
+  "model": "models/stage1_pointer/controller-shared-number-seed83/best",
+  "existing_data": "data/pointer/seed-61-independent",
+  "seeds": [
+    281,
+    283,
+    293
+  ],
+  "graphs_per_seed_mode": 150,
+  "graph_modes": [
+    "random_function",
+    "permutation",
+    "full_cycle"
+  ],
+  "max_depth": 256,
+  "safety_cap": 272,
+  "threshold": 0.5,
+  "batch_size": 16,
+  "native_counts": [
+    1,
+    9,
+    12,
+    17,
+    29,
+    41,
+    53,
+    63,
+    64,
+    69,
+    70,
+    79,
+    80,
+    99,
+    100,
+    101,
+    128,
+    199,
+    200,
+    255,
+    256
+  ],
+  "native_graphs_per_seed_mode": 1,
+  "bootstrap_repeats": 2000,
+  "bootstrap_seed": 239,
+  "criteria": {
+    "overall_joint_success": 0.95,
+    "overall_complete_trajectory": 0.95,
+    "overall_exact_stop": 0.99,
+    "minimum_depth_joint_success": 0.9,
+    "minimum_depth_complete_trajectory": 0.9,
+    "minimum_depth_exact_stop": 0.95
+  },
+  "exclusion_files": [
+    "data/pointer/benchmark-seeds211-223-227/graphs.jsonl"
+  ]
+}

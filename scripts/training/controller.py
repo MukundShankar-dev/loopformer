@@ -158,7 +158,7 @@ def export_checkpoint(source: Path, destination: Path, head, provenance: dict) -
     weights = torch.load(source / 'adapter_model.pt', map_location='cpu', weights_only=True)
     new = {f'completion_head.{name}': value.detach().cpu().clone() for name, value in head.state_dict().items()}
     expected = {name for name in weights if name.startswith('completion_head.')}
-    if head.kind == 'affine_suffix':
+    if head.kind in ('affine_suffix', 'shared_number'):
         template = controller_head(head.width, 1, head.kind).state_dict()
         expected = {f'completion_head.{k}' for k in template}
         spec = {**spec, 'executor': {**spec['executor'], 'controller_kind': head.kind, 'controller_size': 1},

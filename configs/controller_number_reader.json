@@ -1,0 +1,5 @@
+{
+  "source": "models/stage1_pointer/controller-affine-seed83/best",
+  "training_config": "configs/controller_affine.json",
+  "output": "models/stage1_pointer/controller-shared-number-seed83"
+}

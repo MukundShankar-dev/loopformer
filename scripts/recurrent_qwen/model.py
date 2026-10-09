@@ -13,7 +13,8 @@ from .completion import CompletionHead
 from .memory import PromptMemory
 from .prefix import fixed_prefix_layer
 from torch.utils.checkpoint import checkpoint
-from .interfaces import PromptRouter, ReentryBridge, RecurrentController, AffineSuffixController, controller_head
+from .interfaces import PromptRouter, ReentryBridge, RecurrentController, AffineSuffixController, SharedNumberController, controller_head
+from .number_reader import MAX_NUMBER_TOKENS, number_token_ids
 
 
 def _answer_readout(hidden: Tensor, positions: list[int]) -> Tensor:
@@ -158,13 +159,25 @@ class RecurrentQwen(nn.Module):
 
         This interface runs neither R nor C and consumes only token IDs/mask.
         GRU uses full-prompt P's answer position; affine_suffix uses the final
-        eight frozen token embeddings. Neither branch parses numeric values.
+        eight frozen token embeddings. Shared-number uses routed field-token
+        embeddings and validity masks. No branch interprets a numeric value.
         """
         if input_ids.ndim != 2 or attention_mask.shape != input_ids.shape or not attention_mask.any(-1).all():
             raise ValueError('Need aligned nonempty [B,S] prompt IDs and mask')
         if answer_positions is None:
             answer_positions = (attention_mask.long() * torch.arange(1, input_ids.shape[1] + 1,
                                 device=input_ids.device)).argmax(-1)
+        if isinstance(self.completion_head, SharedNumberController):
+            rows = []
+            for ids, mask in zip(input_ids.detach().cpu().tolist(), attention_mask.detach().cpu().tolist(), strict=True):
+                valid = tuple(t for t, active in zip(ids, mask, strict=True) if active)
+                rows.append(number_token_ids(self.router.tokenizer, valid))
+            with torch.no_grad():
+                context = self.embed_tokens.weight.new_zeros(len(rows), MAX_NUMBER_TOKENS, self.config.hidden_size + 1)
+                for i, tokens in enumerate(rows):
+                    context[i, :len(tokens), :-1] = self.embed_tokens(torch.tensor(tokens, device=input_ids.device))
+                    context[i, :len(tokens), -1] = 1
+            return context.flatten(1)
         if isinstance(self.completion_head, AffineSuffixController):
             k = self.completion_head.suffix_tokens
             if (answer_positions < k - 1).any():

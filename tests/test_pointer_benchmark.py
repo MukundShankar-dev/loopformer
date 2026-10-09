@@ -17,7 +17,7 @@ from scripts.dataset.dataset import DatasetConfig, generate_dataset, write_datas
 from scripts.dataset.pointer import execute, generate_unconditioned_example
 from scripts.eval.benchmark_metrics import clustered_summary, criteria_result, quality_arrays, wilson_interval
 from scripts.eval.frozen_pointer_benchmark import checkpoint_hashes
-from scripts.recurrent_qwen.interfaces import AffineSuffixController
+from scripts.recurrent_qwen.interfaces import AffineSuffixController, SharedNumberController
 from scripts.training.controller import export_checkpoint
 
 
@@ -76,11 +76,13 @@ def test_cluster_bootstrap_keeps_paired_horizons_together():
     assert result['metrics']['joint_success']['graph_bootstrap_95']==[0.,1.]
 
 
-def test_frozen_benchmark_cli_native_agrees_on_failures_and_files_unchanged(setup):
+@pytest.mark.parametrize('kind',['affine_suffix','shared_number'])
+def test_frozen_benchmark_cli_native_agrees_on_failures_and_files_unchanged(setup,kind):
     model, tokenizer, tokens, path = source_checkpoint(setup)
-    head=AffineSuffixController(model.config.hidden_size)
+    head=(AffineSuffixController if kind=='affine_suffix' else SharedNumberController)(model.config.hidden_size)
     with torch.no_grad():
-        head.context.weight.zero_();head.context.bias.zero_()
+        for parameter in head.context.parameters():
+            parameter.zero_()
         head.readout.weight.zero_();head.readout.bias.fill_(1)  # Always stops at one; deliberate failures.
     export_checkpoint(path/'source',path/'affine',head,{'step':0})
     dataset_config=DatasetConfig(seed=61,train_count=2,validation_count=2,test_count=2,

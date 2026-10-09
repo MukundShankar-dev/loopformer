@@ -36,6 +36,10 @@ See [benchmark commands and data](docs/pointer_benchmark.md),
 Weights remain on the desktop; Git carries metrics, audits and metadata.
 `bash benchmark_pointer.sh --dry-run` previews the suite without writes.
 
+The [number-reader repair](docs/number_reader_repair.md) changes only the initial
+reader, with training counts and rollout lengths unchanged.
+`bash repair_number_reader.sh --dry-run` previews its fit and fresh benchmark.
+
 Start with the [research plan](docs/project_plan.md), [current status](docs/status.md),
 and [documentation index](docs/README.md). Historical experiments remain in the
 linked reports; development results are not independent confirmation.

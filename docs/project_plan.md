@@ -15,6 +15,14 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-08 number-reader repair amendment:** After the frozen benchmark failed
+at unfamiliar positional digit roles, the user authorized fixing generalization
+without extending training depth or count exposure. Replace only the initial
+reader with shared token projection and learned positional accumulation; keep
+the executor, learned countdown and stop readout unchanged. The
+[repair protocol](number_reader_repair.md) declares the same training labels and
+a fresh finite confirmation panel before fitting. No later research stage opens.
+
 **2026-10-08 frozen-benchmark amendment:** The user authorized freezing the
 repaired model, opening the existing seed-61 reserved test, and evaluating a larger
 independent pointer benchmark with longer depths. The [predeclared protocol](pointer_benchmark.md)

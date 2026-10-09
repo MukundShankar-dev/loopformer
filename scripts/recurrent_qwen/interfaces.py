@@ -6,6 +6,8 @@ from typing import Any
 import torch
 from torch import Tensor, nn
 
+from .number_reader import SharedNumberReader
+
 
 class PromptRouter:
     """Remove the Steps line without parsing its value or changing public inputs.
@@ -117,10 +119,21 @@ class AffineSuffixController(RecurrentController):
         return self.readout(memory.detach()).squeeze(-1), memory
 
 
+class SharedNumberController(AffineSuffixController):
+    """Same learned countdown; share the number reader across positions/lengths."""
+    kind = 'shared_number'
+
+    def __init__(self, width: int) -> None:
+        super().__init__(width)
+        self.context = SharedNumberReader(width)
+
+
 def controller_head(width: int, intermediate: int, kind: str = 'gru') -> RecurrentController:
     """Explicit architecture factory; historical checkpoints default to GRU."""
     if kind == 'gru':
         return RecurrentController(width, intermediate)
     if kind == 'affine_suffix' and intermediate == 1:
         return AffineSuffixController(width)
+    if kind == 'shared_number' and intermediate == 1:
+        return SharedNumberController(width)
     raise ValueError('Unknown controller kind or incompatible memory width')
