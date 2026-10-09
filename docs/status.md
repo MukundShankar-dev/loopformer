@@ -4,6 +4,33 @@ Last updated: 2026-10-09.
 
 ## Current priority
 
+The current priority is the [population analysis and agent handoff](analysis.md),
+following the user's rejection of the 27-graph panel as the main architecture
+comparison. A full inventory at `b49030e` captured 1,314 Mac files and 2,383
+desktop files; 83 configured inference checkpoints have weights on the desktop,
+none on the Mac, and 65 additional old adapter directories lack current loader
+metadata. The selected registry and metadata are saved under
+`eval/pointer_analysis/evidence-20261009/`; see the [inventory report](experiments/pointer_evidence_inventory.md).
+
+Offline raw execution rechecked all 1,350 final graphs through 256. There are 42
+first failures at loops 2–30: 18/450 full cycles and 12/450 in each other mode.
+Five have correct direct-R/wrong-C at first error; 37 readouts agree on the wrong
+letter; 13 errors are one transition ahead and none repeats the previous state.
+Twelve failed-prefix graphs are correct at 256. These are descriptive failure
+observations, not a causal explanation.
+
+The design uses all 1,350 graphs and every request 1–256 for selected-candidate
+architecture characterization, fixed-request first-error/risk sets, structural
+rates and exact-stop failure decomposition; final all-integer coverage remains
+separate. Progression is limited to the successful system. Collection, selection
+provenance and analysis design are complete. Full-population historical inference,
+expanded aggregation and paper figures remain pending. No training or new model
+inference ran; closed test records and existing artifacts were preserved.
+Validation: 11 focused inventory/comparison/failure tests pass, compilation and
+319 local file/directory documentation links pass, and whitespace checks pass.
+
+The completed smaller comparison below remains historical exploratory evidence.
+
 The user requested the [earlier architecture history](experiments/pointer_architecture_history.md),
 including original full-sequence CE, joint hidden-state completion, fixed-prompt
 memory and its depth-12 recipe variant. Six checkpoints are declared on the same

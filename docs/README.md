@@ -4,6 +4,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 
 | Need | Canonical document |
 | --- | --- |
+| Paper-style population analysis, selected checkpoints, metrics and agent handoff | [Analysis contract](analysis.md) |
 | Earlier pointer architectures, training/inference and plain-language explanations | [Model evolution](pointer_model_evolution.md) |
 | Shared number reader with unchanged training depth/count exposure | [Number-reader repair](number_reader_repair.md) |
 | Frozen reserved-test and larger pointer benchmark | [Benchmark protocol](pointer_benchmark.md) |
@@ -22,6 +23,12 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 The adaptive-compute guide is the **single source for that extension**. The research plan states its place in the stage sequence; evaluation documents shared metric conventions; status records current evidence. Stage 3 asymmetric dynamics and Stages 4–6 transfer remain planned in the research plan. No separate phase-guide directory is needed.
 
 ## Evidence, not instructions
+
+The [complete evidence inventory](experiments/pointer_evidence_inventory.md)
+records both hosts' saved datasets, checkpoint availability, schemas and run
+coverage. The [analysis contract](analysis.md) supersedes the small historical
+panel as the next priority: full-population failure characterization for selected
+architectures, with learning progression only for the successful system.
 
 The [architecture-history reconstruction](experiments/pointer_architecture_history.md)
 extends the comparison to original full-sequence CE, joint completion and fixed

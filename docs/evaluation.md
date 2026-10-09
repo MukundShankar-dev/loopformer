@@ -1,5 +1,13 @@
 # Evaluation and reproducibility
 
+The current [analysis contract](analysis.md) specifies a full 1,350-graph selected
+architecture comparison, execution/structural/stopping diagnostics and successful
+model progression. Its [inventory](experiments/pointer_evidence_inventory.md)
+separates available records from missing population measurements. Collection and
+offline final-reference checks are complete; new population extraction/figures
+are pending. The historical 27-graph comparison below remains valid exploratory
+evidence and is not the main population report.
+
 The [architecture-history protocol](experiments/pointer_architecture_history.md)
 uses the same paired evaluator for the earlier full-sequence and fixed-prompt
 models. `forced_only` arms have no learned controller: their stopping CSV cells

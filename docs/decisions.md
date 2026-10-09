@@ -4,6 +4,18 @@ This document records choices that affect implementation or interpretation. The 
 
 ## Established constraints
 
+2026-10-09 population analysis: the user requested selected-candidate architecture
+failures on all 1,350 opened graphs, with checkpoint progression only for the
+successful model. Use CE step 2,500 as the documented development extrapolation
+candidate; retain step 3,250 only in the older matched-update report. Other
+representatives retain their recorded development selection. No architecture is
+claimed globally optimized. The [analysis contract](analysis.md) defines every
+metric/denominator, fixed-request survival versus count-dependent input changes,
+paired graph-cluster uncertainty and missing measurements. Internal scalar
+confidence/norm plots are not default paper evidence. Inventory binary presence
+does not certify tensor identity; inference reuse must still pass existing hash,
+native fidelity and reference gates. No new fitting or closed test is opened.
+
 2026-10-09 historical architecture comparison: use matched update 3,250 for the
 three early depth-6 configurations, rather than select a better extrapolation
 checkpoint on the new panel. Keep depth 12 as a training variant and retain only

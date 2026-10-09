@@ -1,0 +1,62 @@
+[
+  {
+    "name": "ce_full",
+    "path": "models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500",
+    "mode": "forced_only",
+    "selection": "Documented development extrapolation candidate (validation depths 7\u20138); not proven best over every saved checkpoint",
+    "desktop_inference_weights_present": true,
+    "mac_inference_weights_present": false,
+    "mac_config_present": true,
+    "recurrent_config_sha256": "8791505f331fd361fe62c8efc4fe1a9759d47adac6b781205f5104f3a08b2383"
+  },
+  {
+    "name": "joint_full",
+    "path": "models/stage1_pointer/depth6-completion-seed37/step-003250",
+    "mode": "legacy",
+    "selection": "Original minimum trained-depth validation CE",
+    "desktop_inference_weights_present": true,
+    "mac_inference_weights_present": false,
+    "mac_config_present": true,
+    "recurrent_config_sha256": "74d4d368787625cb4443a5ab947579cb9f8e3dbaedefa04dc168038429b97d91"
+  },
+  {
+    "name": "fixed6",
+    "path": "models/stage1_pointer/depth6-fixed-prompt-seed37/step-003250",
+    "mode": "legacy",
+    "selection": "Original minimum trained-depth validation CE",
+    "desktop_inference_weights_present": true,
+    "mac_inference_weights_present": false,
+    "mac_config_present": true,
+    "recurrent_config_sha256": "2b51fbe67c6aba39e09615eecea325c445c1440e46d40c3af2616b403295587d"
+  },
+  {
+    "name": "fixed12",
+    "path": "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-005000",
+    "mode": "legacy",
+    "selection": "Original minimum trained-count validation CE; same architecture as fixed6",
+    "desktop_inference_weights_present": true,
+    "mac_inference_weights_present": false,
+    "mac_config_present": true,
+    "recurrent_config_sha256": "fc36844b002a300aa2bf601ddf4330cc95bfe2d95b0025311515f5ad2fb5c537"
+  },
+  {
+    "name": "gru",
+    "path": "models/stage1_pointer/controller-prefix-seed83/best",
+    "mode": "isolated",
+    "selection": "Original trained-count controller-development selection, update 5800",
+    "desktop_inference_weights_present": true,
+    "mac_inference_weights_present": false,
+    "mac_config_present": false,
+    "recurrent_config_sha256": "fe8516731eef30bee20868c1e724c73a15458a69131dc902d273d1757c93e72f"
+  },
+  {
+    "name": "final",
+    "path": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+    "mode": "isolated",
+    "selection": "Predetermined reader and two-cell-parameter fits; successful frozen final artifact",
+    "desktop_inference_weights_present": true,
+    "mac_inference_weights_present": false,
+    "mac_config_present": true,
+    "recurrent_config_sha256": "6ea5b38e2b8c0a7fe1261ccccb8670d3e7a4ff692f11aadc28d4e0db0ff4e8b2"
+  }
+]

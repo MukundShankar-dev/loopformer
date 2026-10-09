@@ -1,0 +1,1211 @@
+{
+  "scope": "Opened full-final panel only; raw reference execution independently recomputed; exploratory strata, not causal tests",
+  "graphs": 1350,
+  "loops": 256,
+  "graph_source_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+  "failed_graphs": 42,
+  "mean_correct_prefix_truncated_at_256": 248.3651851851852,
+  "first_error_counts": {
+    "2": 1,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 3,
+    "7": 3,
+    "8": 1,
+    "9": 3,
+    "10": 4,
+    "13": 1,
+    "14": 1,
+    "15": 1,
+    "16": 2,
+    "17": 1,
+    "20": 1,
+    "21": 1,
+    "24": 1,
+    "25": 2,
+    "28": 2,
+    "29": 1,
+    "30": 1
+  },
+  "failed_graphs_correct_at_256": 12,
+  "r_correct_at_first_c_error": 5,
+  "r_c_agree_at_first_c_error": 37,
+  "repeat_previous_reference_state": 0,
+  "one_reference_step_ahead": 13,
+  "strata": [
+    {
+      "field": "graph_mode",
+      "value": "full_cycle",
+      "graphs": 450,
+      "failed_graphs": 18,
+      "failure_rate": 0.04,
+      "wilson_95": [
+        0.02544935013681325,
+        0.06233782321711977
+      ]
+    },
+    {
+      "field": "graph_mode",
+      "value": "permutation",
+      "graphs": 450,
+      "failed_graphs": 12,
+      "failure_rate": 0.02666666666666667,
+      "wilson_95": [
+        0.01531903348595833,
+        0.04602718837098723
+      ]
+    },
+    {
+      "field": "graph_mode",
+      "value": "random_function",
+      "graphs": 450,
+      "failed_graphs": 12,
+      "failure_rate": 0.02666666666666667,
+      "wilson_95": [
+        0.01531903348595833,
+        0.04602718837098723
+      ]
+    },
+    {
+      "field": "dataset_seed",
+      "value": "307",
+      "graphs": 450,
+      "failed_graphs": 15,
+      "failure_rate": 0.03333333333333333,
+      "wilson_95": [
+        0.020302719086163813,
+        0.05426397851927549
+      ]
+    },
+    {
+      "field": "dataset_seed",
+      "value": "311",
+      "graphs": 450,
+      "failed_graphs": 15,
+      "failure_rate": 0.03333333333333333,
+      "wilson_95": [
+        0.020302719086163813,
+        0.05426397851927549
+      ]
+    },
+    {
+      "field": "dataset_seed",
+      "value": "313",
+      "graphs": 450,
+      "failed_graphs": 12,
+      "failure_rate": 0.02666666666666667,
+      "wilson_95": [
+        0.01531903348595833,
+        0.04602718837098723
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "1",
+      "graphs": 132,
+      "failed_graphs": 5,
+      "failure_rate": 0.03787878787878788,
+      "wilson_95": [
+        0.016286179128381463,
+        0.08560803594305971
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "10",
+      "graphs": 21,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.154639018924847
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "11",
+      "graphs": 19,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.16817922405261626
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "12",
+      "graphs": 24,
+      "failed_graphs": 2,
+      "failure_rate": 0.08333333333333333,
+      "wilson_95": [
+        0.023158815297043306,
+        0.25848802193210685
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "13",
+      "graphs": 17,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.1843181350088518
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "14",
+      "graphs": 24,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        1.3877787807814457e-17,
+        0.13797620467498017
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "15",
+      "graphs": 20,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.16112515805281938
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "16",
+      "graphs": 17,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.1843181350088518
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "17",
+      "graphs": 11,
+      "failed_graphs": 1,
+      "failure_rate": 0.09090909090909091,
+      "wilson_95": [
+        0.016232172885884855,
+        0.37735843645159567
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "18",
+      "graphs": 14,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        1.3877787807814457e-17,
+        0.2153108027376358
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "19",
+      "graphs": 13,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.22809537235419838
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "2",
+      "graphs": 98,
+      "failed_graphs": 2,
+      "failure_rate": 0.02040816326530612,
+      "wilson_95": [
+        0.0056146141550348985,
+        0.07138211106371997
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "20",
+      "graphs": 15,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.20388330103584862
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "21",
+      "graphs": 19,
+      "failed_graphs": 1,
+      "failure_rate": 0.05263157894736842,
+      "wilson_95": [
+        0.009351994062300362,
+        0.24638731166898786
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "22",
+      "graphs": 20,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.16112515805281938
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "23",
+      "graphs": 17,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.1843181350088518
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "24",
+      "graphs": 15,
+      "failed_graphs": 1,
+      "failure_rate": 0.06666666666666667,
+      "wilson_95": [
+        0.011866895493268553,
+        0.2981652987378003
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "25",
+      "graphs": 20,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.16112515805281938
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "26",
+      "graphs": 467,
+      "failed_graphs": 19,
+      "failure_rate": 0.04068522483940043,
+      "wilson_95": [
+        0.02619868735112748,
+        0.06266659423536128
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "3",
+      "graphs": 84,
+      "failed_graphs": 2,
+      "failure_rate": 0.023809523809523808,
+      "wilson_95": [
+        0.006553902690167361,
+        0.08271441008569919
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "4",
+      "graphs": 64,
+      "failed_graphs": 2,
+      "failure_rate": 0.03125,
+      "wilson_95": [
+        0.008612138346171874,
+        0.10697291770958313
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "5",
+      "graphs": 67,
+      "failed_graphs": 2,
+      "failure_rate": 0.029850746268656716,
+      "wilson_95": [
+        0.008224694838897963,
+        0.10246555563352011
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "6",
+      "graphs": 52,
+      "failed_graphs": 1,
+      "failure_rate": 0.019230769230769232,
+      "wilson_95": [
+        0.0034028080709451597,
+        0.10120511127892247
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "7",
+      "graphs": 39,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.08966685370757144
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "8",
+      "graphs": 34,
+      "failed_graphs": 3,
+      "failure_rate": 0.08823529411764706,
+      "wilson_95": [
+        0.030465943674648555,
+        0.22960486562808868
+      ]
+    },
+    {
+      "field": "cycle_period",
+      "value": "9",
+      "graphs": 27,
+      "failed_graphs": 1,
+      "failure_rate": 0.037037037037037035,
+      "wilson_95": [
+        0.006568145980785103,
+        0.18283465933575843
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "0",
+      "graphs": 1002,
+      "failed_graphs": 31,
+      "failure_rate": 0.03093812375249501,
+      "wilson_95": [
+        0.021880074435624695,
+        0.04357900785144906
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "1",
+      "graphs": 86,
+      "failed_graphs": 3,
+      "failure_rate": 0.03488372093023256,
+      "wilson_95": [
+        0.01193379807740838,
+        0.09760871102560764
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "10",
+      "graphs": 1,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.7934506856227626
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "11",
+      "graphs": 1,
+      "failed_graphs": 1,
+      "failure_rate": 1.0,
+      "wilson_95": [
+        0.20654931437723745,
+        1.0
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "12",
+      "graphs": 2,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.6576197724933469
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "2",
+      "graphs": 72,
+      "failed_graphs": 1,
+      "failure_rate": 0.013888888888888888,
+      "wilson_95": [
+        0.002455951882905767,
+        0.07456602147476155
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "3",
+      "graphs": 56,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        6.938893903907228e-18,
+        0.06419393671876342
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "4",
+      "graphs": 42,
+      "failed_graphs": 1,
+      "failure_rate": 0.023809523809523808,
+      "wilson_95": [
+        0.004215404134432499,
+        0.12321201573766646
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "5",
+      "graphs": 24,
+      "failed_graphs": 1,
+      "failure_rate": 0.041666666666666664,
+      "wilson_95": [
+        0.0073934561655057685,
+        0.20241806478655938
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "6",
+      "graphs": 26,
+      "failed_graphs": 2,
+      "failure_rate": 0.07692307692307693,
+      "wilson_95": [
+        0.0213550884722762,
+        0.2414155377162906
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "7",
+      "graphs": 21,
+      "failed_graphs": 1,
+      "failure_rate": 0.047619047619047616,
+      "wilson_95": [
+        0.008455987809826399,
+        0.22669360074122563
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "8",
+      "graphs": 9,
+      "failed_graphs": 0,
+      "failure_rate": 0.0,
+      "wilson_95": [
+        0.0,
+        0.2991450484195441
+      ]
+    },
+    {
+      "field": "transient_length",
+      "value": "9",
+      "graphs": 8,
+      "failed_graphs": 1,
+      "failure_rate": 0.125,
+      "wilson_95": [
+        0.02241749145005667,
+        0.4708881822128535
+      ]
+    }
+  ],
+  "first_failures": [
+    {
+      "graph_index": 0,
+      "dataset_seed": 307,
+      "graph_mode": "random_function",
+      "cycle_period": 2,
+      "transient_length": 11,
+      "first_error_loop": 4,
+      "target": "M",
+      "prediction": "Z",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 253
+    },
+    {
+      "graph_index": 16,
+      "dataset_seed": 307,
+      "graph_mode": "random_function",
+      "cycle_period": 8,
+      "transient_length": 7,
+      "first_error_loop": 5,
+      "target": "B",
+      "prediction": "N",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 252
+    },
+    {
+      "graph_index": 28,
+      "dataset_seed": 307,
+      "graph_mode": "random_function",
+      "cycle_period": 9,
+      "transient_length": 1,
+      "first_error_loop": 6,
+      "target": "L",
+      "prediction": "K",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 251
+    },
+    {
+      "graph_index": 33,
+      "dataset_seed": 307,
+      "graph_mode": "random_function",
+      "cycle_period": 1,
+      "transient_length": 6,
+      "first_error_loop": 16,
+      "target": "P",
+      "prediction": "K",
+      "r_correct_at_first_c_error": true,
+      "r_c_agree_at_first_c_error": false,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 241
+    },
+    {
+      "graph_index": 39,
+      "dataset_seed": 307,
+      "graph_mode": "random_function",
+      "cycle_period": 6,
+      "transient_length": 0,
+      "first_error_loop": 9,
+      "target": "W",
+      "prediction": "V",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 125
+    },
+    {
+      "graph_index": 86,
+      "dataset_seed": 307,
+      "graph_mode": "random_function",
+      "cycle_period": 3,
+      "transient_length": 1,
+      "first_error_loop": 3,
+      "target": "H",
+      "prediction": "M",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 1
+    },
+    {
+      "graph_index": 154,
+      "dataset_seed": 307,
+      "graph_mode": "permutation",
+      "cycle_period": 12,
+      "transient_length": 0,
+      "first_error_loop": 6,
+      "target": "T",
+      "prediction": "L",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 21
+    },
+    {
+      "graph_index": 167,
+      "dataset_seed": 307,
+      "graph_mode": "permutation",
+      "cycle_period": 3,
+      "transient_length": 0,
+      "first_error_loop": 5,
+      "target": "H",
+      "prediction": "I",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 252
+    },
+    {
+      "graph_index": 201,
+      "dataset_seed": 307,
+      "graph_mode": "permutation",
+      "cycle_period": 12,
+      "transient_length": 0,
+      "first_error_loop": 7,
+      "target": "L",
+      "prediction": "F",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 230
+    },
+    {
+      "graph_index": 252,
+      "dataset_seed": 307,
+      "graph_mode": "permutation",
+      "cycle_period": 2,
+      "transient_length": 0,
+      "first_error_loop": 6,
+      "target": "V",
+      "prediction": "T",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 251
+    },
+    {
+      "graph_index": 254,
+      "dataset_seed": 307,
+      "graph_mode": "permutation",
+      "cycle_period": 1,
+      "transient_length": 0,
+      "first_error_loop": 5,
+      "target": "U",
+      "prediction": "A",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 252
+    },
+    {
+      "graph_index": 323,
+      "dataset_seed": 307,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 4,
+      "target": "Z",
+      "prediction": "B",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 253
+    },
+    {
+      "graph_index": 348,
+      "dataset_seed": 307,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 10,
+      "target": "J",
+      "prediction": "I",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 247
+    },
+    {
+      "graph_index": 353,
+      "dataset_seed": 307,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 20,
+      "target": "P",
+      "prediction": "L",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 237
+    },
+    {
+      "graph_index": 391,
+      "dataset_seed": 307,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 10,
+      "target": "W",
+      "prediction": "V",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 10
+    },
+    {
+      "graph_index": 473,
+      "dataset_seed": 311,
+      "graph_mode": "random_function",
+      "cycle_period": 8,
+      "transient_length": 2,
+      "first_error_loop": 7,
+      "target": "N",
+      "prediction": "K",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 222
+    },
+    {
+      "graph_index": 494,
+      "dataset_seed": 311,
+      "graph_mode": "random_function",
+      "cycle_period": 5,
+      "transient_length": 1,
+      "first_error_loop": 5,
+      "target": "F",
+      "prediction": "K",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 252
+    },
+    {
+      "graph_index": 552,
+      "dataset_seed": 311,
+      "graph_mode": "random_function",
+      "cycle_period": 1,
+      "transient_length": 9,
+      "first_error_loop": 13,
+      "target": "D",
+      "prediction": "U",
+      "r_correct_at_first_c_error": true,
+      "r_c_agree_at_first_c_error": false,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 164
+    },
+    {
+      "graph_index": 559,
+      "dataset_seed": 311,
+      "graph_mode": "random_function",
+      "cycle_period": 1,
+      "transient_length": 6,
+      "first_error_loop": 2,
+      "target": "V",
+      "prediction": "B",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 1
+    },
+    {
+      "graph_index": 702,
+      "dataset_seed": 311,
+      "graph_mode": "permutation",
+      "cycle_period": 8,
+      "transient_length": 0,
+      "first_error_loop": 4,
+      "target": "T",
+      "prediction": "P",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 32
+    },
+    {
+      "graph_index": 712,
+      "dataset_seed": 311,
+      "graph_mode": "permutation",
+      "cycle_period": 17,
+      "transient_length": 0,
+      "first_error_loop": 4,
+      "target": "N",
+      "prediction": "A",
+      "r_correct_at_first_c_error": true,
+      "r_c_agree_at_first_c_error": false,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 1
+    },
+    {
+      "graph_index": 724,
+      "dataset_seed": 311,
+      "graph_mode": "permutation",
+      "cycle_period": 24,
+      "transient_length": 0,
+      "first_error_loop": 9,
+      "target": "P",
+      "prediction": "T",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 218
+    },
+    {
+      "graph_index": 791,
+      "dataset_seed": 311,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 28,
+      "target": "U",
+      "prediction": "Q",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 229
+    },
+    {
+      "graph_index": 793,
+      "dataset_seed": 311,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 15,
+      "target": "E",
+      "prediction": "L",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 242
+    },
+    {
+      "graph_index": 808,
+      "dataset_seed": 311,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 17,
+      "target": "T",
+      "prediction": "A",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 239
+    },
+    {
+      "graph_index": 813,
+      "dataset_seed": 311,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 5,
+      "target": "X",
+      "prediction": "P",
+      "r_correct_at_first_c_error": true,
+      "r_c_agree_at_first_c_error": false,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 252
+    },
+    {
+      "graph_index": 817,
+      "dataset_seed": 311,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 14,
+      "target": "A",
+      "prediction": "E",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 240
+    },
+    {
+      "graph_index": 842,
+      "dataset_seed": 311,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 7,
+      "target": "U",
+      "prediction": "G",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 236
+    },
+    {
+      "graph_index": 845,
+      "dataset_seed": 311,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 10,
+      "target": "W",
+      "prediction": "Z",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 247
+    },
+    {
+      "graph_index": 881,
+      "dataset_seed": 311,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 28,
+      "target": "B",
+      "prediction": "M",
+      "r_correct_at_first_c_error": true,
+      "r_c_agree_at_first_c_error": false,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": true,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 9
+    },
+    {
+      "graph_index": 947,
+      "dataset_seed": 313,
+      "graph_mode": "random_function",
+      "cycle_period": 1,
+      "transient_length": 5,
+      "first_error_loop": 10,
+      "target": "D",
+      "prediction": "G",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 72
+    },
+    {
+      "graph_index": 980,
+      "dataset_seed": 313,
+      "graph_mode": "random_function",
+      "cycle_period": 5,
+      "transient_length": 4,
+      "first_error_loop": 8,
+      "target": "T",
+      "prediction": "P",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 221
+    },
+    {
+      "graph_index": 1051,
+      "dataset_seed": 313,
+      "graph_mode": "permutation",
+      "cycle_period": 21,
+      "transient_length": 0,
+      "first_error_loop": 16,
+      "target": "A",
+      "prediction": "K",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 164
+    },
+    {
+      "graph_index": 1091,
+      "dataset_seed": 313,
+      "graph_mode": "permutation",
+      "cycle_period": 4,
+      "transient_length": 0,
+      "first_error_loop": 9,
+      "target": "I",
+      "prediction": "O",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 248
+    },
+    {
+      "graph_index": 1119,
+      "dataset_seed": 313,
+      "graph_mode": "permutation",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 25,
+      "target": "P",
+      "prediction": "Z",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 9
+    },
+    {
+      "graph_index": 1187,
+      "dataset_seed": 313,
+      "graph_mode": "permutation",
+      "cycle_period": 4,
+      "transient_length": 0,
+      "first_error_loop": 3,
+      "target": "G",
+      "prediction": "U",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 254
+    },
+    {
+      "graph_index": 1285,
+      "dataset_seed": 313,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 30,
+      "target": "G",
+      "prediction": "J",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 227
+    },
+    {
+      "graph_index": 1291,
+      "dataset_seed": 313,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 29,
+      "target": "P",
+      "prediction": "T",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 216
+    },
+    {
+      "graph_index": 1293,
+      "dataset_seed": 313,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 25,
+      "target": "O",
+      "prediction": "V",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 232
+    },
+    {
+      "graph_index": 1296,
+      "dataset_seed": 313,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 21,
+      "target": "D",
+      "prediction": "N",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 10
+    },
+    {
+      "graph_index": 1309,
+      "dataset_seed": 313,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 3,
+      "target": "E",
+      "prediction": "U",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": false,
+      "wrong_loops_through_256": 245
+    },
+    {
+      "graph_index": 1340,
+      "dataset_seed": 313,
+      "graph_mode": "full_cycle",
+      "cycle_period": 26,
+      "transient_length": 0,
+      "first_error_loop": 24,
+      "target": "M",
+      "prediction": "A",
+      "r_correct_at_first_c_error": false,
+      "r_c_agree_at_first_c_error": true,
+      "repeats_previous_reference_state": false,
+      "one_reference_step_ahead": false,
+      "correct_at_256": true,
+      "wrong_loops_through_256": 216
+    }
+  ],
+  "source_readouts_path": "eval/pointer_benchmark/final-full-20261008/independent/graphs.csv",
+  "source_readouts_sha256": "a9bfba654d74b71518e773c5c33c05f264b3ef73478cc79afd6d84722b9bf60a",
+  "reference_method": "Parse original mapping and initial_state; execute 256 dictionary transitions; compare every C letter and annotated first error; compare direct-R at first C mismatch",
+  "capture_git_commit": "b49030e"
+}

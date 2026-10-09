@@ -15,6 +15,15 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-09 population-analysis amendment:** The user rejected the small
+architecture panel as the main comparison and requested a complete evidence
+inventory and paper-style failure analysis. The [analysis contract](analysis.md)
+fixes selected development checkpoints, all 1,350 opened graphs, execution and
+structural failures, exact stopping, and progression only for the successful
+system. Inventory and offline final-panel reference observations are complete;
+population extensions/figures remain pending. This is retrospective analysis,
+not new training, threshold selection, fresh confirmation or another research stage.
+
 **2026-10-09 architecture-history amendment:** The user requested the earlier
 executor architectures rather than a comparison dominated by frozen-R controller
 repairs. The [historical reconstruction](experiments/pointer_architecture_history.md)

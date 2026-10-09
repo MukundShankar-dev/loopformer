@@ -35,6 +35,8 @@ See [repair commands and data](docs/number_reader_repair.md),
 [controller architecture](docs/architecture.md), and the saved
 [figures](docs/experiments/pointer_final_benchmark.md#commands-figures-and-artifacts).
 Weights remain on the desktop; Git carries metrics, audits and metadata.
+The [analysis handoff](docs/analysis.md) records the full evidence inventory,
+selected architectures/checkpoints and the planned population failure analysis.
 See [how the architectures evolved](docs/pointer_model_evolution.md) for technical
 and plain-language explanations, and the [historical comparison](docs/experiments/pointer_architecture_history.md)
 for original full-sequence/fixed-prompt models and two frozen-R examples.
