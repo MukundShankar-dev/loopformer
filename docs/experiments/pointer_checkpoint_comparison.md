@@ -55,3 +55,39 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8 python -u -m scripts.eval.checkpoint_comparison
 Outputs: `eval/pointer_benchmark/checkpoint-comparison-20261008/`. Existing paths
 are refused. Full-benchmark failure matrices are computed offline from audited
 trajectories and raw tables, without further inference. Results follow execution.
+
+## Full-panel execution failure signatures
+
+These offline measurements use **all 1,350** final-benchmark graphs, independently
+traversed from their raw rule tables. They do not use the smaller model-comparison
+panel. The cumulative green complete-trajectory curve is flat after loop 30
+because all 42 graphs that ever first fail have already failed. Remaining graphs
+have no first error through 256. Later recoveries do not restore strict-prefix
+success, and later errors on already-failed graphs do not decrease it again.
+
+The decoded trajectories remain active: there are **234 wrong-to-correct
+transitions** and **222 subsequent entries into another error episode**. Twelve
+of the 42 failing graphs have a correct final letter at 256. Thus the plateau
+must not be interpreted as constant decoded states or an absence of later errors.
+
+At the first failure, direct R and C decode the same wrong symbol on **37 graphs**;
+on **five**, the direct R readout is correct while C is wrong. No first failure
+simply repeats the immediately previous reference state. Mutually exclusive
+categories, with the declared priority, are: 16 earlier visited states, 17 later
+reachable states, nine states outside the start-reachable orbit. Thirteen first
+wrong symbols equal the next reference state's successor, consistent with a
+one-step phase displacement at that readout, without proving an extra internal
+transition. The most frequent first wrong symbol is K (5/42); errors span 18
+letters. This small table cannot establish or exclude a general symbol bias.
+
+Among **7,544 transitions immediately following a wrong C decode**, 6,912
+(**91.62%**) follow the table's edge from that prior decoded symbol while remaining
+wrong against the original reference path. There are 234 recoveries (**3.10%**)
+and 398 other wrong transitions (**5.28%**). These observations support coherent
+propagation of many decoded errors, rather than wholly random later outputs.
+They are not a causal test of what R's hidden state represents. Repeated graph
+loops are dependent; these percentages are not independent-trial estimates.
+
+Cycle-period strata and per-letter final-error rates retain their graph
+counts/denominators. Small strata are noisy; pooling graph types confounds cycle
+structure with other properties. No causal conclusion is drawn from the heatmap.

@@ -416,3 +416,14 @@ digit values/place-value composition. At 70 an unseen tens-role digit gives an
 initial estimate near 49.26; three-digit layouts introduce further unseen slot
 tokens. The observed early stops occur despite strong forced executor trajectories.
 This architecture remains frozen; no new reader is implemented from the result.
+
+## Frozen architecture comparison verification
+
+The [paired diagnostic](experiments/pointer_checkpoint_comparison.md) changes no
+model mechanics. Its controlled controller comparison verifies exact identity
+of every non-controller tensor, tokenizer, recurrent implementation and executor
+specification before reusing count-free trajectories. GRU replay receives actual
+R working vectors and context recomputed for every full raw prompt; scalar
+controllers may ignore observations only because their native implementation
+does so. Legacy coupled R is evaluated separately for each displayed count.
+Native stopped calls and independent raw-table auditing guard all comparisons.

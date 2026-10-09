@@ -100,10 +100,52 @@ def aggregate(rows: list[dict]) -> dict:
 
 
 def compose_row(task, metadata: dict, stopped: dict, predictions: list[int]) -> dict:
-    row = {**metadata, **stopped, **nominal_fields(task, predictions)}
+    # Keep a common decision schema across legacy/native and controller replay.
+    # Probability traces remain available in the native evaluator artifacts.
+    shared = {k: v for k, v in stopped.items() if k not in ('condition', 'executor_nominal_correct', 'stop_probability')}
+    row = {**metadata, **shared, **nominal_fields(task, predictions)}
     row['strict_success'] = row['complete_trajectory'] and row['exact_stop']
     row['correct_letter_wrong_time'] = row['stopped_answer_correct'] and not row['exact_stop']
     return row
+
+
+def assemble_comparison(config: dict, output: Path) -> dict:
+    """Validate completed frozen arms and assemble exports without model inference."""
+    freeze = json.loads((output / 'freeze.json').read_text())
+    if freeze['config'] != config:
+        raise ValueError('Cannot assemble under a changed protocol')
+    combined, results = [], {}
+    for arm in config['models']:
+        name = arm['name']; arm_output = output / name
+        summary = json.loads((arm_output / 'summary.json').read_text())
+        if (not summary['native_fidelity']['passed'] or not summary['inference_files_unchanged']
+                or checkpoint_hashes(Path(arm['model'])) != freeze['inference_sha256'][name]):
+            raise ValueError('Cannot assemble unverified or changed checkpoint')
+        rows = read_csv(arm_output / 'decisions.csv')
+        if len(rows) != summary['queries']:
+            raise ValueError('Arm decision coverage differs')
+        for row in rows:
+            for key in ('condition', 'executor_nominal_correct', 'stop_probability'):
+                row.pop(key, None)
+            for key in METRICS:
+                if row[key] not in ('True', 'False'):
+                    raise ValueError('Invalid boolean result')
+                row[key] = row[key] == 'True'
+            for key in ('depth', 'graph_index', 'dataset_seed', 'cycle_period', 'transient_length', 'executed_loops'):
+                row[key] = int(row[key])
+            for key in ('first_stop', 'first_error_loop'):
+                row[key] = int(row[key]) if row[key] else None
+        if any(abs(aggregate(rows)[key] - summary[key]) > 1e-12 for key in METRICS):
+            raise ValueError('Saved arm summary differs from decisions')
+        results[name] = summary
+        combined.extend(rows)
+    write_csv(output / 'decisions.csv', combined)
+    result = {'status': 'complete', 'config': config, 'graphs': len(freeze['selected_graph_indices']),
+        'questions_per_model': len(freeze['selected_graph_indices']) * len(config['counts']),
+        'models': results, 'inference_files_unchanged': True,
+        'scope': 'Paired descriptive diagnostic on opened benchmark; legacy training/capacity/data differ; isolated arms have identical non-controller tensors.'}
+    (output / 'summary.json').write_text(json.dumps(result, indent=2) + '\n')
+    return result
 
 
 def legacy_evaluation(config: dict, output: Path, tasks: list, metadata: list[dict],
@@ -206,13 +248,24 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, default=Path('configs/pointer_checkpoint_comparison.json'))
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--assemble-only', action='store_true', help='Validate completed saved arms and assemble CSV/summary, without inference')
     args = parser.parse_args(); config = json.loads(args.config.read_text())
     console = Console()
     console.print(f'[cyan]Frozen checkpoint comparison: {len(config["models"])} models · {config["graphs_per_stratum"]} graphs per stratum · {len(config["counts"])} counts[/cyan]')
     if args.dry_run:
         console.print(config); return
     output = Path(config['output'])
-    if output.exists() or config['threshold'] != .5 or config['safety_cap'] != 272:
+    if args.assemble_only:
+        if (output / 'summary.json').exists():
+            raise ValueError('Completed comparison exists; refuse overwrite')
+        assemble_comparison(config, output)
+        console.print('[green]Assembled verified saved arms without inference.[/green]'); return
+    if (output.exists() or config['threshold'] != .5 or config['safety_cap'] != 272
+            or config['counts'] != sorted(set(config['counts']))
+            or not config['counts'] or not 1 <= min(config['counts']) <= max(config['counts']) <= 256
+            or config['batch_size'] < 1 or config['graphs_per_stratum'] < 1
+            or not set(config['native_counts']) <= set(config['counts'])
+            or len({a['name'] for a in config['models']}) != len(config['models'])):
         raise ValueError('Need fresh output and declared stopping protocol')
     source = Path(config['source_results'])
     summary = json.loads((source / 'summary.json').read_text())
@@ -271,11 +324,7 @@ def main() -> None:
         (arm_output / 'summary.json').write_text(json.dumps(results[arm['name']], indent=2) + '\n')
         combined.extend(rows)
         gc.collect(); torch.cuda.empty_cache()
-    write_csv(output / 'decisions.csv', combined)
-    result = {'status': 'complete', 'config': config, 'graphs': len(graphs), 'questions_per_model': len(tasks),
-              'models': results, 'inference_files_unchanged': True,
-              'scope': 'Paired descriptive diagnostic on opened benchmark; legacy training/capacity/data differ; isolated arms have identical non-controller tensors.'}
-    (output / 'summary.json').write_text(json.dumps(result, indent=2) + '\n')
+    assemble_comparison(config, output)
     console.print('[green]All frozen comparison arms complete, reference-audited, and fidelity checked.[/green]')
 
 

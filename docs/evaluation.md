@@ -7,6 +7,15 @@ protocol. It composes the existing actual-stop evaluator, replay and independent
 audit; GRU observations remain actual R vectors, and legacy count-dependent R is
 executed per count. No fitting or threshold selection occurs.
 
+`python -m scripts.eval.audit_checkpoint_comparison --graphs <benchmark-graphs.jsonl>`
+independently checks every matched decision against the raw rule tables.
+`python -m scripts.eval.plot_pointer_failures --graphs <benchmark-graphs.jsonl>
+--comparison eval/pointer_benchmark/checkpoint-comparison-20261008 --output <fresh-directory>`
+adds trajectory, symbol-confusion, cycle-period, architecture-quality and stopping
+matrices. Supply `--numeric-results <numeric-dir> <numeric-dir>` to compare existing
+controller-only countdown diagnostics; the figure explicitly separates that scope
+from full pointer inference. Plotting requires `requirements-plots.txt`.
+
 The [final full benchmark](experiments/pointer_final_benchmark.md) directly
 evaluates the frozen repaired checkpoint on the entire existing test and a new
 independent graph panel. `bash benchmark_pointer.sh --full` reuses the standard
