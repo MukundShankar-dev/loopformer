@@ -10,6 +10,7 @@ import gc
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 from time import perf_counter
@@ -93,10 +94,18 @@ def nominal_fields(task, predictions: list[int]) -> dict:
 METRICS = ('nominal_final_correct', 'complete_trajectory', 'exact_stop', 'early_stop',
            'late_stop', 'missing_stop', 'stopped_answer_correct', 'joint_success',
            'strict_success', 'correct_letter_wrong_time')
+STOP_METRICS = METRICS[2:]
 
 
 def aggregate(rows: list[dict]) -> dict:
-    return {'queries': len(rows), **{key: sum(r[key] for r in rows) / len(rows) for key in METRICS}}
+    """Absent learned stopping is undefined, never scored as success or failure."""
+    result = {'queries': len(rows)}
+    for key in METRICS:
+        values = [r[key] for r in rows if r[key] is not None]
+        if values and len(values) != len(rows):
+            raise ValueError('Mixed metric applicability within an arm')
+        result[key] = sum(values) / len(values) if values else None
+    return result
 
 
 def compose_row(task, metadata: dict, stopped: dict, predictions: list[int]) -> dict:
@@ -128,14 +137,20 @@ def assemble_comparison(config: dict, output: Path) -> dict:
             for key in ('condition', 'executor_nominal_correct', 'stop_probability'):
                 row.pop(key, None)
             for key in METRICS:
+                headless = arm['mode'] == 'forced_only' if 'mode' in arm else False
+                if headless and key in STOP_METRICS and row[key] == '':
+                    row[key] = None
+                    continue
                 if row[key] not in ('True', 'False'):
                     raise ValueError('Invalid boolean result')
                 row[key] = row[key] == 'True'
-            for key in ('depth', 'graph_index', 'dataset_seed', 'cycle_period', 'transient_length', 'executed_loops'):
+            for key in ('depth', 'graph_index', 'dataset_seed', 'cycle_period', 'transient_length'):
                 row[key] = int(row[key])
-            for key in ('first_stop', 'first_error_loop'):
+            for key in ('first_stop', 'first_error_loop', 'executed_loops'):
                 row[key] = int(row[key]) if row[key] else None
-        if any(abs(aggregate(rows)[key] - summary[key]) > 1e-12 for key in METRICS):
+        measured = aggregate(rows)
+        if any((measured[key] is None) != (summary[key] is None) or
+               (measured[key] is not None and abs(measured[key] - summary[key]) > 1e-12) for key in METRICS):
             raise ValueError('Saved arm summary differs from decisions')
         results[name] = summary
         combined.extend(rows)
@@ -151,6 +166,8 @@ def assemble_comparison(config: dict, output: Path) -> dict:
 def legacy_evaluation(config: dict, output: Path, tasks: list, metadata: list[dict],
                       device: str, batch_size: int) -> tuple[list[dict], dict]:
     """Actual learned-stop calls plus forced nominal traces for coupled legacy R."""
+    if config.get('mode') == 'forced_only':
+        return forced_only_evaluation(config, output, tasks, metadata, device, batch_size)
     path = output / 'native_tasks.jsonl'
     path.write_text(''.join(json.dumps(t.to_dict()) + '\n' for t in tasks))
     subprocess.run([sys.executable, '-u', '-m', 'scripts.eval.loop_test', '--model', config['model'],
@@ -177,6 +194,8 @@ def legacy_evaluation(config: dict, output: Path, tasks: list, metadata: list[di
             with torch.inference_mode():
                 _, scores = forward_symbols(model, batch['input_ids'], batch['attention_mask'],
                                             spec['token_ids'], num_loops=depth)
+            if not torch.isfinite(scores).all():
+                raise FloatingPointError('Nonfinite legacy forced readout')
             for i, predicted in zip(indices[start:start + batch_size], scores.argmax(-1).cpu().tolist(), strict=True):
                 task, actual = tasks[i], decisions[tasks[i].example_id]
                 prefix = native_predictions[task.example_id][:depth]
@@ -191,6 +210,87 @@ def legacy_evaluation(config: dict, output: Path, tasks: list, metadata: list[di
                 rows.append(compose_row(task, metadata[i], stopped, predicted))
     return rows, {'passed': True, 'questions': len(tasks), 'native_nominal_prefix_matches': matched,
                   'native_reference_audit': audit}
+
+
+def forced_only_evaluation(config: dict, output: Path, tasks: list, metadata: list[dict],
+                           device: str, batch_size: int) -> tuple[list[dict], dict]:
+    """Historical CE checkpoint: externally forced depth, no invented stop policy.
+
+    R sees the full prompt, so each displayed count is executed separately.
+    Independently invoked batch-one calls verify selected batched predictions.
+    """
+    model, tokenizer, spec = load_recurrent_checkpoint(Path(config['model']), device=device)
+    model.eval().requires_grad_(False); model.config._attn_implementation = 'sdpa'
+    if model.router is not None or model.completion_head is not None:
+        raise ValueError('Forced-only historical arm must have no controller or router')
+    rows, native = [], []
+    first_indices, seen = set(), set()
+    for meta in metadata:
+        stratum = meta['dataset_seed'], meta['graph_mode']
+        if stratum not in seen:
+            first_indices.add(meta['graph_index']); seen.add(stratum)
+    for depth in track(sorted({t.task_depth for t in tasks}), description='CE-only forced traces'):
+        indices = [i for i, task in enumerate(tasks) if task.task_depth == depth]
+        items = encode_tasks([tasks[i] for i in indices], tokenizer,
+                             dict(zip(SYMBOLS, spec['token_ids'], strict=True)), 512)
+        for start in range(0, len(items), batch_size):
+            batch = collate(items[start:start + batch_size], tokenizer.pad_token_id, device, depth)
+            with torch.inference_mode():
+                _, scores = forward_symbols(model, batch['input_ids'], batch['attention_mask'], spec['token_ids'], num_loops=depth)
+            if not torch.isfinite(scores).all():
+                raise FloatingPointError('Nonfinite CE-only readout')
+            predicted = scores.argmax(-1).cpu().tolist()
+            for offset, (i, trace) in enumerate(zip(indices[start:start + batch_size], predicted, strict=True)):
+                task = tasks[i]
+                row = {**metadata[i], **nominal_fields(task, trace),
+                       **dict.fromkeys(STOP_METRICS), 'first_stop': None,
+                       'executed_loops': None, 'prediction': None, 'target': task.final_state}
+                rows.append(row)
+                if metadata[i]['graph_index'] in first_indices and depth in config['native_counts']:
+                    single = collate([items[start + offset]], tokenizer.pad_token_id, device, depth)
+                    with torch.inference_mode():
+                        _, actual = forward_symbols(model, single['input_ids'], single['attention_mask'], spec['token_ids'], num_loops=depth)
+                    if not torch.isfinite(actual).all():
+                        raise FloatingPointError('Nonfinite CE-only batch-one readout')
+                    letters = ''.join(SYMBOLS[p] for p in actual.argmax(-1)[0].cpu().tolist())
+                    if letters != row['forced_predictions']:
+                        raise ValueError('CE-only batch-one trace differs from batched forced trace')
+                    native.append({**metadata[i], 'forced_predictions': letters, 'targets': row['targets']})
+    write_csv(output / 'forced_native.csv', native)
+    return rows, {'passed': True, 'questions': len(native), 'scope': 'Batch-one forced inference; learned stopping not applicable',
+                  'trace_sha256': sha256_file(output / 'forced_native.csv')}
+
+
+def reuse_saved_arm(arm: dict, config: dict, freeze: dict, output: Path) -> None:
+    """Reuse already audited calls only with identical inputs, policy and weights."""
+    from scripts.eval.audit_checkpoint_comparison import audit_comparison
+    source = Path(arm['saved_results'])
+    old = json.loads((source / 'freeze.json').read_text())
+    old_arm = next(a for a in old['config']['models'] if a['name'] == arm['name'])
+    if (old_arm['model'] != arm['model'] or old_arm['mode'] != arm['mode'] or
+            old['inference_sha256'][arm['name']] != freeze['inference_sha256'][arm['name']] or
+            old['selected_graph_indices'] != freeze['selected_graph_indices'] or
+            old['source_graphs_sha256'] != freeze['source_graphs_sha256'] or
+            old['source_summary_sha256'] != freeze['source_summary_sha256'] or
+            any(old['config'][key] != config[key] for key in ('counts', 'native_counts', 'threshold', 'safety_cap', 'batch_size', 'device'))):
+        raise ValueError('Saved arm differs from the new frozen paired protocol')
+    for path in sorted(Path('scripts/recurrent_qwen').glob('*.py')):
+        original = subprocess.check_output(['git', 'show', f'{old["git_head"]}:{path}'])
+        if hashlib.sha256(original).hexdigest() != sha256_file(path):
+            raise ValueError('Inference implementation changed since saved calls')
+    audit = audit_comparison(source, Path(config['graphs']))
+    shutil.copytree(source / arm['name'], output)
+    rows = read_csv(output / 'decisions.csv')
+    for row in rows:
+        row['model_label'] = arm['label']
+    write_csv(output / 'decisions.csv', rows)
+    summary = json.loads((output / 'summary.json').read_text())
+    summary['label'] = arm['label']
+    summary['reused_observations'] = True
+    (output / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+    (output / 'saved_arm_reuse.json').write_text(json.dumps({'passed': True, 'source': str(source),
+        'source_freeze_sha256': sha256_file(source / 'freeze.json'), 'source_audit': audit,
+        'native_files_copied': True, 'checkpoint_and_inference_code_unchanged': True}, indent=2) + '\n')
 
 
 def isolated_evaluation(config: dict, output: Path, graphs: list, graph_metadata: list[dict],
@@ -265,6 +365,7 @@ def main() -> None:
             or not config['counts'] or not 1 <= min(config['counts']) <= max(config['counts']) <= 256
             or config['batch_size'] < 1 or config['graphs_per_stratum'] < 1
             or not set(config['native_counts']) <= set(config['counts'])
+            or any(a['mode'] not in ('legacy', 'isolated', 'forced_only') for a in config['models'])
             or len({a['name'] for a in config['models']}) != len(config['models'])):
         raise ValueError('Need fresh output and declared stopping protocol')
     source = Path(config['source_results'])
@@ -302,9 +403,14 @@ def main() -> None:
     torch.set_num_threads(4); torch.manual_seed(239); torch.use_deterministic_algorithms(True)
     for arm in config['models']:
         console.print(f'[bold cyan]{arm["label"]}[/bold cyan]'); began = perf_counter()
-        arm_output = output / arm['name']; arm_output.mkdir()
-        settings = {**config, 'model': arm['model']}
-        if arm['mode'] == 'legacy':
+        arm_output = output / arm['name']
+        if arm.get('saved_results'):
+            reuse_saved_arm(arm, config, freeze, arm_output)
+            console.print('[green]Reused audited observations with unchanged weights, inputs and inference code.[/green]')
+            continue
+        arm_output.mkdir()
+        settings = {**config, 'model': arm['model'], 'mode': arm['mode']}
+        if arm['mode'] in ('legacy', 'forced_only'):
             rows, fidelity = legacy_evaluation(settings, arm_output, tasks, metadata, config['device'], config['batch_size'])
         else:
             identity = verify_reuse(Path(summary['checkpoint']), Path(arm['model']), summary)

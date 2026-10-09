@@ -22,6 +22,11 @@ The adaptive-compute guide is the **single source for that extension**. The rese
 
 ## Evidence, not instructions
 
+The [architecture-history reconstruction](experiments/pointer_architecture_history.md)
+extends the comparison to original full-sequence CE, joint completion and fixed
+prompt memory, with depth-12 training recorded as a recipe variant and only two
+frozen-executor controller examples. Its new inference is in progress.
+
 The [all-figure audit](experiments/pointer_figure_audit.md) independently rescored
 and regenerated all thirteen current figures, with unchanged results, explicit
 metric definitions and graph denominators, native-record rechecks and per-figure

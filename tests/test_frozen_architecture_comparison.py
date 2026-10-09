@@ -110,3 +110,43 @@ def test_assemble_mixed_schemas_without_inference_and_reject_changed_checkpoint(
     (tmp_path / 'gru/metadata.json').write_text('{"changed":true}')
     with pytest.raises(ValueError, match='changed checkpoint'):
         assemble_comparison(config, output)
+
+
+def test_headless_metrics_are_undefined_and_audit_rejects_invented_stopping(tmp_path):
+    import json
+    from scripts.eval.checkpoint_comparison import aggregate, STOP_METRICS
+    from scripts.eval.audit_checkpoint_comparison import audit_comparison
+    from scripts.eval.loop_metrics import write_csv
+    from scripts.eval.pointer_task import sha256_file
+    task = generate_unconditioned_example(30, 3, 'benchmark', 0)
+    graphs = tmp_path / 'graphs.jsonl'; graphs.write_text(json.dumps(task.to_dict()) + '\n')
+    output = tmp_path / 'result'; output.mkdir(); (output / 'ce').mkdir()
+    row = {'model': 'ce', 'graph_index': 0, 'depth': 3, 'mapping_sha256': task.mapping_sha256,
+           'example_id': f'{task.example_id}-steps-3', 'forced_predictions': ''.join(task.intermediate_states),
+           'targets': ''.join(task.intermediate_states), 'target': task.final_state, 'first_error_loop': None,
+           'nominal_final_correct': True, 'complete_trajectory': True,
+           **dict.fromkeys(STOP_METRICS), 'first_stop': None, 'executed_loops': None, 'prediction': None}
+    write_csv(output / 'ce/forced_native.csv', [row])
+    measured = aggregate([row])
+    assert measured['nominal_final_correct'] == 1 and measured['joint_success'] is None
+    assert measured['missing_stop'] is None
+    summary = {'status': 'complete', 'inference_files_unchanged': True, 'graphs': 1, 'questions_per_model': 1,
+        'config': {'models': [{'name': 'ce', 'mode': 'forced_only'}], 'counts': [3], 'safety_cap': 4},
+        'models': {'ce': {**measured, 'native_fidelity': {'passed': True, 'questions': 1,
+            'trace_sha256': sha256_file(output / 'ce/forced_native.csv')}, 'inference_files_unchanged': True}}}
+    (output / 'summary.json').write_text(json.dumps(summary))
+    (output / 'freeze.json').write_text(json.dumps({'source_graphs_sha256': sha256_file(graphs), 'selected_graph_indices': [0]}))
+    write_csv(output / 'decisions.csv', [row])
+    assert audit_comparison(output, graphs)['decisions_checked'] == 1
+    row['exact_stop'] = False
+    write_csv(output / 'decisions.csv', [row])
+    with pytest.raises(ValueError, match='Headless'):
+        audit_comparison(output, graphs)
+
+
+def test_aggregate_rejects_mixed_metric_applicability():
+    from scripts.eval.checkpoint_comparison import aggregate, METRICS
+    one = dict.fromkeys(METRICS, True)
+    two = {**one, 'exact_stop': None}
+    with pytest.raises(ValueError, match='Mixed metric'):
+        aggregate([one, two])

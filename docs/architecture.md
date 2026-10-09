@@ -419,6 +419,13 @@ This architecture remains frozen; no new reader is implemented from the result.
 
 ## Frozen architecture comparison verification
 
+The [architecture-history reconstruction](experiments/pointer_architecture_history.md)
+also includes the original CE-only full-sequence model, joint hidden-state head,
+fixed-prompt depth-6 model and its depth-12 training variant. The CE checkpoint has
+no stopping head; external forced-depth execution remains an executor baseline,
+and autonomous stopping metrics are explicitly not applicable. Earlier stored
+architectures are reconstructed without changing their model mechanics.
+
 The [paired diagnostic](experiments/pointer_checkpoint_comparison.md) changes no
 model mechanics. Its controlled controller comparison verifies exact identity
 of every non-controller tensor, tokenizer, recurrent implementation and executor

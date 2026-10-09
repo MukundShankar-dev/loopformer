@@ -1,8 +1,16 @@
 # Project status
 
-Last updated: 2026-10-08.
+Last updated: 2026-10-09.
 
 ## Current priority
+
+The user requested the [earlier architecture history](experiments/pointer_architecture_history.md),
+including original full-sequence CE, joint hidden-state completion, fixed-prompt
+memory and its depth-12 recipe variant. Six checkpoints are declared on the same
+opened 27-graph/count panel, with only GRU and final timer representing frozen R.
+Historical CE stopping is undefined rather than scored as failure or success.
+Evaluation extensions and focused tests pass; new inference is in progress.
+No training, checkpoint selection or later research stage is opened.
 
 The [all-figure audit](experiments/pointer_figure_audit.md) is complete. All thirteen
 figures were rescored, regenerated and inspected. The audit checks 345,600 main

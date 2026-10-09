@@ -1,5 +1,12 @@
 # Evaluation and reproducibility
 
+The [architecture-history protocol](experiments/pointer_architecture_history.md)
+uses the same paired evaluator for the earlier full-sequence and fixed-prompt
+models. `forced_only` arms have no learned controller: their stopping CSV cells
+are empty and JSON metrics null; plots show N/A rather than zero. Batch-one
+forced checks still verify their executor predictions. Previously audited arms
+can be reused only with identical weights, inputs, policy and inference code.
+
 The [complete figure audit](experiments/pointer_figure_audit.md) rescored and
 regenerated all thirteen current benchmark/comparison figures. At requested
 count N, **joint success** requires the correct final C letter and an actual

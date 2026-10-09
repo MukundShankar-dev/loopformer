@@ -129,34 +129,47 @@ def comparison_figures(path: Path, output: Path) -> None:
     for arm in arms:
         if not summary['models'][arm['name']]['native_fidelity']['passed']:
             raise ValueError('Unverified native/replay comparison')
+    def rate(arm: dict, depth: int, metric: str) -> float | None:
+        selected = [r[metric] for r in rows if r['model'] == arm['name'] and int(r['depth']) == depth]
+        if len(selected) != summary['graphs']:
+            raise ValueError('Wrong comparison cell denominator')
+        if all(value == '' for value in selected):
+            return None
+        if any(value not in ('True', 'False') for value in selected):
+            raise ValueError('Mixed metric applicability')
+        return sum(value == 'True' for value in selected) / len(selected)
+
     write_csv(output / 'architecture_by_count.csv', [{'model': arm['name'], 'depth': n,
-        'graphs': summary['graphs'], **{metric: sum(r[metric] == 'True' for r in rows
-            if r['model'] == arm['name'] and int(r['depth']) == n) / summary['graphs']
+        'graphs': summary['graphs'], **{metric: rate(arm, n, metric)
             for metric in ('nominal_final_correct', 'complete_trajectory', 'exact_stop', 'joint_success')}}
         for arm in arms for n in counts])
-    footer = 'Paired diagnostic: same 27 graphs × 30 counts per model; opened panel, not independent confirmation.\nLegacy LoRA differs in data/recipe/capacity. Other four arms have bitwise identical non-controller tensors.'
-    fig, axes = plt.subplots(4, 1, figsize=(15, 11), sharex=True)
+    footer = (f'Paired diagnostic: same {summary["graphs"]} graphs × {len(counts)} counts per model; opened panel, not confirmation.\n'
+              'Historical models differ in memory, objectives, data and capacity. Isolated arms share an identical executor.')
+    fig, axes = plt.subplots(4, 1, figsize=(15, 12.5), sharex=True)
     metrics = ('nominal_final_correct', 'complete_trajectory', 'exact_stop', 'joint_success')
+    cmap = plt.colormaps['RdYlGn'].copy(); cmap.set_bad('#e5e7eb')
     for ax, metric, title in zip(axes, metrics, ('Forced final answer', 'Forced: all nominal intermediate steps', 'Exact stopping loop', 'Actual answer + exact stopping loop'), strict=True):
-        rates = np.array([[100 * sum(r[metric] == 'True' for r in rows if r['model'] == arm['name'] and int(r['depth']) == count) / summary['graphs']
+        rates = np.array([[100 * value if (value := rate(arm, count, metric)) is not None else np.nan
                            for count in counts] for arm in arms])
-        im = ax.imshow(rates, aspect='auto', cmap='RdYlGn', vmin=0, vmax=100)
+        im = ax.imshow(np.ma.masked_invalid(rates), aspect='auto', cmap=cmap, vmin=0, vmax=100)
         ax.set_yticks(range(len(arms)), [a['label'] for a in arms], fontsize=8)
         ax.set_title(title, fontsize=11, loc='left')
         for i in range(len(arms)):
             for j in range(len(counts)):
-                ax.text(j, i, f'{rates[i, j]:.0f}', ha='center', va='center', fontsize=6.5,
+                ax.text(j, i, f'{rates[i, j]:.0f}' if np.isfinite(rates[i, j]) else 'N/A', ha='center', va='center', fontsize=6.5,
                         color='white' if rates[i, j] < 15 or rates[i, j] > 85 else '#253747')
     axes[-1].set_xticks(range(len(counts)), counts, fontsize=8)
     axes[-1].set_xlabel('Requested count · columns are the declared discrete counts, not a linear axis')
-    label_figure(fig, 'Separate execution failure from stopping failure across architectures', footer)
+    label_figure(fig, 'Separate execution failure from stopping failure across architectures', footer + '\nGray N/A: the original CE model has no learned controller; its forced loop count is not a learned stop.')
     fig.subplots_adjust(left=.21, top=.90, bottom=.11, hspace=.45, right=.91)
     fig.colorbar(im, ax=axes.tolist(), fraction=.025, pad=.02, label='Correct (%)')
     save_figure(fig, output, 'architecture_metric_matrices'); plt.close(fig)
 
-    fig, axes = plt.subplots(1, len(arms), figsize=(17, 7), sharey=True)
+    stopped_arms = [arm for arm in arms if arm.get('mode') != 'forced_only']
+    fig, axes = plt.subplots(1, len(stopped_arms), figsize=(17, 7), sharey=True, squeeze=False)
+    axes = axes[0]
     cmap = plt.colormaps['Blues'].copy(); cmap.set_bad('#fafbfc')
-    for ax, arm in zip(axes, arms, strict=True):
+    for ax, arm in zip(axes, stopped_arms, strict=True):
         matrix = np.zeros((summary['config']['safety_cap'] + 1, len(counts)))
         for r in rows:
             if r['model'] == arm['name']:
@@ -179,7 +192,7 @@ def comparison_figures(path: Path, output: Path) -> None:
     save_figure(fig, output, 'requested_actual_stop_matrices'); plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.5))
-    for arm in arms:
+    for arm in stopped_arms:
         selected = [r for r in rows if r['model'] == arm['name']]
         cohorts = [(1, 12), (13, 69), (70, 256)]
         wrongtime = [100 * sum(r['correct_letter_wrong_time'] == 'True' for r in selected if lo <= int(r['depth']) <= hi) /
@@ -196,6 +209,23 @@ def comparison_figures(path: Path, output: Path) -> None:
         ax.grid(axis='y', alpha=.2)
     label_figure(fig, 'Final-letter scoring alone conceals control failures', footer + '\nCohorts contain only sampled counts; right panel shows measured points without interpolation.')
     save_figure(fig, output, 'cyclic_coincidence_and_early_stops'); plt.close(fig)
+
+    fig, axes = plt.subplots(1, 2, figsize=(13, 6))
+    colors = ('#64748b', '#c2413a', '#ba7d24', '#8b5bb0', '#197c78', '#2563a6')
+    for i, arm in enumerate(arms):
+        for ax, metric in zip(axes, metrics[:2], strict=True):
+            ax.scatter(counts, [100 * rate(arm, n, metric) for n in counts],
+                       s=22, color=colors[i % len(colors)], marker=('o', 'x', '^', 's', 'D', '+')[i % 6], label=arm['label'])
+    for ax, title in zip(axes, ('Correct letter at requested loop N', 'Every intermediate letter through N correct'), strict=True):
+        ax.set(title=title, xlabel='Requested count N · logarithmic axis', ylabel='Graphs passing criterion (%)',
+               xscale='log', ylim=(-2, 102))
+        ax.set_xticks([1, 6, 12, 32, 64, 128, 256], ['1', '6', '12', '32', '64', '128', '256'])
+        ax.grid(alpha=.2)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(.5, .91), ncol=3, fontsize=8, frameon=False)
+    label_figure(fig, 'How execution evolved before and after separating the controller', footer + '\nMeasured sparse counts only; no interpolation. Correct final letters can recur on cyclic graphs despite earlier errors.')
+    fig.subplots_adjust(top=.73, bottom=.21)
+    save_figure(fig, output, 'architecture_execution_depth'); plt.close(fig)
 
 
 def numeric_figure(paths: list[Path], output: Path, comparison: Path | None) -> dict:

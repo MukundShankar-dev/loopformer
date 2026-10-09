@@ -1,0 +1,91 @@
+{
+  "source_results": "eval/pointer_benchmark/final-full-20261008/independent",
+  "graphs": "data/pointer/benchmark-seeds307-311-313/graphs.jsonl",
+  "output": "eval/pointer_benchmark/architecture-history-20261009",
+  "graphs_per_stratum": 3,
+  "counts": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    16,
+    17,
+    24,
+    29,
+    32,
+    41,
+    53,
+    63,
+    64,
+    69,
+    70,
+    80,
+    99,
+    100,
+    101,
+    128,
+    192,
+    256
+  ],
+  "native_counts": [
+    1,
+    9,
+    12,
+    70,
+    100,
+    256
+  ],
+  "threshold": 0.5,
+  "safety_cap": 272,
+  "batch_size": 16,
+  "device": "cuda",
+  "models": [
+    {
+      "name": "ce_full",
+      "label": "Full sequence \u00b7 CE only",
+      "model": "models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-003250",
+      "mode": "forced_only"
+    },
+    {
+      "name": "joint_full",
+      "label": "Full sequence \u00b7 joint stop",
+      "model": "models/stage1_pointer/depth6-completion-seed37/step-003250",
+      "mode": "legacy"
+    },
+    {
+      "name": "fixed6",
+      "label": "Fixed prompt \u00b7 depth 6",
+      "model": "models/stage1_pointer/depth6-fixed-prompt-seed37/step-003250",
+      "mode": "legacy"
+    },
+    {
+      "name": "legacy_lora",
+      "label": "Fixed prompt \u00b7 depth 12",
+      "model": "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/step-005000",
+      "mode": "legacy",
+      "saved_results": "eval/pointer_benchmark/checkpoint-comparison-20261008"
+    },
+    {
+      "name": "gru",
+      "label": "Isolated full R + GRU",
+      "model": "models/stage1_pointer/controller-prefix-seed83/best",
+      "mode": "isolated",
+      "saved_results": "eval/pointer_benchmark/checkpoint-comparison-20261008"
+    },
+    {
+      "name": "final",
+      "label": "Isolated full R + learned timer",
+      "model": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+      "mode": "isolated",
+      "saved_results": "eval/pointer_benchmark/checkpoint-comparison-20261008"
+    }
+  ]
+}
