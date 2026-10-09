@@ -22,6 +22,10 @@ The adaptive-compute guide is the **single source for that extension**. The rese
 
 ## Evidence, not instructions
 
+The [final full benchmark](experiments/pointer_final_benchmark.md) declares the
+fresh evaluation of the complete repaired checkpoint, with native regression,
+depth/graph-stratum metrics and standalone scientific figures.
+
 The dated reports in [`experiments/`](experiments/) preserve experiment configuration, observations, and limitations. They are not current runbooks. For the latest pretrained result, see the [isolated executor audit](experiments/stage1_executor_seed61.md). The [fresh 30k report](experiments/stage1_fresh30k.md), the earlier [CUDA run](experiments/stage1_cuda_5k.md) and [Stage 0 validation](experiments/stage0_validation.md) provide historical evidence. The [adaptive nominal-trace analysis](experiments/adaptive_nominal_analysis.md) is observational and is not a pretrained terminal or adaptive-policy result.
 
 The [completed loop-balanced ablation](experiments/stage1_loopbalanced.md) did not extend the frontier. The [completed baseline diagnostics](experiments/baseline2500_diagnostics.md) support investigating recurrent-history sensitivity and measured execution cost; [the guide](diagnostics_and_performance.md) describes the interfaces. Pretrained terminal overscaling and confirmation evaluation remain deferred. [AGENTS.md](../AGENTS.md) contains repository conventions.

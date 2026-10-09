@@ -4,6 +4,13 @@ Last updated: 2026-10-08.
 
 ## Current priority
 
+The user has now authorized the [final full benchmark](experiments/pointer_final_benchmark.md):
+all existing seed-61 test queries plus fresh seeds 307/311/313, 1,350 graphs and
+every depth 1–256. The final checkpoint stays frozen; training is unchanged.
+Native stopped calls and independent saved-result audits precede acceptance.
+Results are pending. This directly tests the final model rather than composing
+the earlier executor result with separate controller checks.
+
 The [number-reader and countdown repair](experiments/controller_number_reader.md)
 is complete. The final checkpoint is
 `models/stage1_pointer/controller-shared-number-precision-seed83/best`.

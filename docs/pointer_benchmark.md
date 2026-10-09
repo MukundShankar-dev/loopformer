@@ -1,5 +1,12 @@
 # Frozen pointer benchmark — 2026-10-08
 
+The final repaired checkpoint now has a separately declared
+[full benchmark](experiments/pointer_final_benchmark.md) on fresh seeds
+307/311/313. Run `bash benchmark_pointer.sh --full [--dry-run]` for that panel.
+The default launcher retains the historical affine-model protocol below.
+Both use the same evaluator, criteria, native fidelity and independent audit;
+the existing test is a regression check when rerun after the repair.
+
 The user authorized opening the current reserved test and a larger independent
 pointer benchmark after the controller repair. Freeze the first predeclared
 controller, `controller-affine-seed83/best`, including R, prelude/coda, bridge,

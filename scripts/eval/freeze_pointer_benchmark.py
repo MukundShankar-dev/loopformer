@@ -26,7 +26,7 @@ def main() -> None:
     config = json.loads(args.config.read_text())
     frozen = {'checkpoint': config['model'], 'inference_sha256': checkpoint_hashes(Path(config['model'])),
         'threshold': config['threshold'], 'safety_cap': config['safety_cap'],
-        'selection': 'First predeclared repair seed 83; frozen before reserved test',
+        'selection': 'Configured seed-83 checkpoint; frozen before this benchmark; no selection on results',
         'test_data_sha256': sha256_file(Path(config['existing_data']) / 'test.jsonl')}
     if args.output.exists():
         existing = json.loads(args.output.read_text())

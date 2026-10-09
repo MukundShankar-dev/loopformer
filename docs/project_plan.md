@@ -15,6 +15,14 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-08 final full-benchmark amendment:** The user requested a full benchmark
+of the frozen final reader/precision checkpoint and informative plots. Run the
+existing test as a regression check and fresh graph seeds 307/311/313 through
+depth 256 with the original finite criteria, unchanged training exposure, native
+fidelity and independent reference audits. The
+[predeclared report](experiments/pointer_final_benchmark.md) owns the exact panel.
+No further training or later research stage is opened by this evaluation.
+
 **2026-10-08 number-reader repair amendment:** After the frozen benchmark failed
 at unfamiliar positional digit roles, the user authorized fixing generalization
 without extending training depth or count exposure. Replace only the initial
