@@ -1,5 +1,10 @@
 # Evaluation and reproducibility
 
+The [final full benchmark](experiments/pointer_final_benchmark.md) directly
+evaluates the frozen repaired checkpoint on the entire existing test and a new
+independent graph panel. `bash benchmark_pointer.sh --full` reuses the standard
+benchmark and native evaluator, with fresh graph seeds and no training changes.
+
 The [shared number-reader repair](number_reader_repair.md) reuses the frozen
 benchmark and normal checkpoint loader. Its fresh panel excludes opened graph
 tables as well as old dataset splits. It measures exact stop and joint success
@@ -12,6 +17,21 @@ match reuse. No numeric stress result establishes pointer execution at that dept
 every compressed decision, overall/per-count aggregates, first-error annotations,
 data bytes and exclusions. It does not call the inference scorer or fit any model.
 The number-reader launcher runs this after inference and numeric diagnostics.
+
+The same auditor accepts `--native-results <native-output> --native-data <jsonl>`
+to independently check every native intermediate target, first threshold crossing,
+stop/cap semantics, final verdict and aggregate. It does not run inference or
+reuse its scorer. The full launcher audits both native panels as well as all
+compressed graph/count decisions.
+
+`plot_pointer_benchmark` uses optional `requirements-plots.txt` and requires a
+completed result with passed native fidelity and a current independent audit.
+It saves five figures as PNG/SVG/PDF, plus input/script/render hashes: full-scale
+and zoomed quality, graph-type strata, first-error survival/histogram, numeric
+initialization/stop residuals, and intermediate R/C readouts. Use `--output` for
+a fresh alternative figure directory. Rates are unsmoothed; graph-level Wilson
+bands are pointwise, not simultaneous depth guarantees. Exact controller timing
+has one outcome per integer because its input ignores graph content.
 
 Status: nominal per-loop evaluation is implemented through the [full-loop checkpoint CLI](evaluation.md) and training monitoring. Repair/damage and censored survival are implemented for the separate [absorbing-terminal diagnostic](evaluation.md), whose pretrained execution is deferred. The conventions derive from project plan sections 6–8 and 23–27. Allowed-token raw-logit margins are implemented and tested in [outputs](../scripts/recurrent_qwen/outputs.py). [Stage 0](experiments/stage0_validation.md) records architecture measurements only.
 

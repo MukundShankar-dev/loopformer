@@ -56,3 +56,19 @@ python -m scripts.eval.plot_pointer_benchmark \
 
 Results, measured timing, validations and figure interpretation will be recorded
 here after the run. No performance or acceptance outcome is established yet.
+
+## Implementation checks while the run proceeds
+
+The eight focused benchmark tests pass (31.86 s), including tiny-model native
+replay on correct and incorrect stopping, cyclic coincidence rejection, strict
+trajectory semantics, freeze verification and graph clustering. The native
+reference audit now also checks raw prompts, independent scalar traversal,
+every emitted target/flag, first threshold crossing and overall arithmetic.
+Deliberate corruption of a native trajectory is rejected. The same audit checks
+all 17,325 historical native transition rows without changing those artifacts.
+Five preview figures render from prior audited results; labels and layout were
+visually inspected. These previews are not new benchmark results.
+
+The shell started before the additional native-audit commands were added. Those
+two read-only audits will therefore run explicitly after completion; the launched
+config, model and inference source remain unchanged.

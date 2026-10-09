@@ -37,7 +37,11 @@ mkdir -p "$root"
   fi
   python -m scripts.eval.freeze_pointer_benchmark --config "$config" --output "$root/freeze.json" \
     --verify-result "$root/existing_test/summary.json"
+  python -m scripts.eval.audit_pointer_benchmark --native-results "$root/existing_test" \
+    --native-data data/pointer/seed-61-independent/test.jsonl
   python -u -m scripts.eval.frozen_pointer_benchmark --config "$config" \
     --freeze "$root/freeze.json" --output "$root/independent" --dataset-output "$dataset" --wandb-mode disabled
   python -m scripts.eval.audit_pointer_benchmark --results "$root/independent" --graphs "$dataset/graphs.jsonl"
+  python -m scripts.eval.audit_pointer_benchmark --native-results "$root/independent/native" \
+    --native-data "$root/independent/native_tasks.jsonl"
 } 2>&1 | tee "$root/benchmark-launch.log"

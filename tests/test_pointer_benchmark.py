@@ -108,6 +108,16 @@ def test_frozen_benchmark_cli_native_agrees_on_failures_and_files_unchanged(setu
     assert checkpoint_hashes(path/'affine')==before
     from scripts.eval.audit_pointer_benchmark import audit_benchmark
     assert audit_benchmark(path/'result',path/'benchmark/graphs.jsonl')['decisions_checked']==8
+    from scripts.eval.audit_pointer_benchmark import audit_native_results
+    native_audit = audit_native_results(path/'result/native', path/'result/native_tasks.jsonl')
+    assert native_audit['native_questions'] == 4
+    assert native_audit['transition_rows_checked'] == 4  # Deliberately stops early at one.
+    native_path = path/'result/native/trajectories.csv'
+    native_text = native_path.read_text()
+    native_path.write_text(native_text.replace(',True,', ',False,', 1))
+    with pytest.raises(ValueError, match='Native trajectory'):
+        audit_native_results(path/'result/native', path/'result/native_tasks.jsonl')
+    native_path.write_text(native_text)
     import csv
     import gzip
     decisions=path/'result/decisions.csv.gz'
