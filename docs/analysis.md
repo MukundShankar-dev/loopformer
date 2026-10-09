@@ -192,7 +192,10 @@ bit on both CE and fixed-memory full-horizon tests. Discovering active rows once
 and reusing indices reduced fixed-memory chunk time 29.51→26.66 seconds (~10%)
 and CE 44.60→43.81 seconds (~2%). It changes no model arithmetic, precision,
 question coverage, batch size, parameters or training. The implementation is
-validated locally; the desktop extraction is being resumed with this optimization.
+validated locally; the desktop suite is running with this optimization. The
+explicit migration retained and hash-verified 182 completed CE chunks; source
+reuse checks passed and extraction continued at graph 729. Eighteen focused
+indexing/migration/scoring/export checks passed.
 Existing completed chunks retain their original-source provenance through
 `freeze-pre-single-index.json` and `indexing_migration.json`. The migration
 checks that this is the only permitted source change; normal resume remains

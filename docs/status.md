@@ -14,6 +14,17 @@ Final historical population figures and any hosted demo remain pending.
 
 Last updated: 2026-10-09.
 
+## Applied population-inference optimization — 2026-10-09
+
+The full suite resumed with bitwise-validated FP32 ordered-index pruning: about
+10% lower fixed-memory batch time and 2% lower CE batch time in bounded tests.
+TF32 and LoRA merging were rejected because they changed intermediate readouts.
+All 182 completed CE chunks were retained and hash-verified; old source/freeze
+provenance is archived and an explicit migration records the sole source change.
+Original-source reuse checks passed; extraction continues without changing
+weights, batch size, datasets, requested depths or scoring. Eighteen focused
+checks passed. See [analysis](analysis.md#measured-accelerator-candidates-and-selected-exact-optimization).
+
 ## Current priority
 
 The current priority is the [population analysis and agent handoff](analysis.md),
