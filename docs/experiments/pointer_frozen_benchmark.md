@@ -185,7 +185,9 @@ independently checked against reference targets and saved model predictions. All
 match the pre-test freeze. Local links, shell syntax, whitespace and standalone
 figure rendering were checked.
 
-[Standalone figure](../../eval/pointer_benchmark/frozen-20261008/independent/plots/quality_and_initialization.png)
+Original render exports are superseded by the [organized population suite](../analysis.md#runbook-outputs-and-rendering-contract).
+The replacement is generated after full-suite audits pass. Prior renders remain
+recoverable from Git history at `b49030e`; raw metrics and numeric audits are retained.
 compares execution, stopping and pre-loop initialization. Dotted boundaries mark
 12 supervised recurrent loops, maximum training request 63 (five exclusions),
 and the three-digit boundary at 100. Plot provenance records Matplotlib 3.11.2,

@@ -21,7 +21,8 @@ inventory and paper-style failure analysis. The [analysis contract](analysis.md)
 fixes selected development checkpoints, all 1,350 opened graphs, execution and
 structural failures, exact stopping, and progression only for the successful
 system. Inventory and offline final-panel reference observations are complete;
-population extensions/figures remain pending. This is retrospective analysis,
+the resumable full-population suite is implemented and running; completed
+population evidence and final figures remain pending. This is retrospective analysis,
 not new training, threshold selection, fresh confirmation or another research stage.
 
 **2026-10-09 architecture-history amendment:** The user requested the earlier

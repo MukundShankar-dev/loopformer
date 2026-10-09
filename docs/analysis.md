@@ -14,13 +14,19 @@ comparison. Use **every one of the 1,350 graphs** in the existing seeds
 307/311/313 panel. Show training/checkpoint progression only for the final executor
 and its controller development, not sweeps across every old architecture.
 
-This turn completed the evidence inventory and analysis design, plus an offline
-reference check of all final-model graph trajectories. It did **not** run the
-new population comparison, train a model, change thresholds, or regenerate the
-paper figures. The collection script is implemented; the additional aggregation,
-population inference and plotting work below is pending. The machine-readable
-[protocol](../configs/pointer_analysis_protocol.json) is a design specification,
-not an argument to an existing evaluation CLI.
+The full suite is implemented in [the launcher](../analyze_pointer.sh), using the
+frozen [protocol](../configs/pointer_analysis_protocol.json). It runs all six
+selected checkpoints, all integer requests, nine retained successful-executor
+snapshots, independent scoring/audits, and one organized replacement figure set.
+No training, threshold fitting or new checkpoint selection is performed.
+
+<!-- paper-run-status:start -->
+**Running on the desktop.** The CE checkpoint passed all 54 predeclared native
+checks (largest absolute logit difference 0.0000496; exact decoded agreement).
+Full historical population results and replacement plots are not yet complete.
+The launcher automatically scores/audits, renders PNG/PDF/SVG, retires old render
+exports, and writes the completion report after the remaining inference finishes.
+<!-- paper-run-status:end -->
 
 The central questions are:
 
@@ -34,6 +40,58 @@ The central questions are:
 Confidence scores and hidden-state norms are not required main-paper metrics.
 They do not identify a failure mechanism by themselves. No new internal probes
 are selected just to produce more plots.
+
+## Runbook, outputs and rendering contract
+
+Run on the configured CUDA desktop, which holds the checkpoint weights:
+
+```bash
+bash analyze_pointer.sh
+python -m scripts.eval.paper_status
+```
+
+The default output is `eval/pointer_analysis/paper-20261009/`. Rerunning the same
+launcher resumes atomic graph chunks; changed weights, protocol, inference code
+or batch shapes cause an error. Historical models use four graphs × 256 independent
+count suffixes per chunk. Isolated R and its snapshots use graph batches of 64;
+GRU replay processes at most 1,024 questions together. FP32/SDPA is explicit.
+The progress reader reports measured extraction ETA only, excluding later arms,
+native gates and reporting. `run.log`, `RUNNING`, `FAILED`, and `COMPLETE` show the
+pipeline state; a failure preserves recoverable chunks and prevents completion.
+
+The current desktop job is already launched; another launcher must wait for it
+rather than run concurrently against the same output. No additional training run
+is needed. Historical inference is expensive even with exact prefix sharing:
+the measured CE chunk takes about 43 seconds for four graphs, implying roughly
+four hours for that arm. Other arms have different costs; no aggregate ETA has
+been measured.
+
+| Stage | Implementation and saved evidence |
+| --- | --- |
+| Frozen historical and isolated extraction | [`paper_suite.py`](../scripts/eval/paper_suite.py); per-arm `freeze.json`, `native_fidelity.json`, atomic `graphs-*.npz`, `summary.json` |
+| Successful R snapshot population progression | [`paper_snapshots.py`](../scripts/eval/paper_snapshots.py); `executor_snapshots/step-*/` |
+| Raw-reference outcome and failure scoring | [`paper_metrics.py`](../scripts/eval/paper_metrics.py); `decisions.csv.gz`, `quality_by_depth.csv`, `fixed_request_loops.csv`, `first_errors.csv`, `execution_statistics.csv`, `wrong_episodes.csv`, `timing_residuals.csv` |
+| Structure and secondary exposure denominators | [`paper_structure.py`](../scripts/eval/paper_structure.py); `graph_features.csv`, `structure_failure_rates.csv`, `first_error_exposures.csv` |
+| Uncertainty and paired changes | `cluster_intervals.csv`, `paired_deltas.csv`; 2,000 same stratified graph-cluster bootstrap draws |
+| Independent scalar rescore | [`audit_paper_analysis.py`](../scripts/eval/audit_paper_analysis.py); checks all 2,073,600 model/query decisions and cross-checks all 345,600 reused final decisions |
+| Scientific exports | [`plot_paper_analysis.py`](../scripts/eval/plot_paper_analysis.py); `plots/01_quality/` through `05_learning/`, `plots/numeric/`, `plots/manifest.json`, `plots/index.md` |
+| Completion report and safe export retirement | [`paper_report.py`](../scripts/eval/paper_report.py), [`retire_pointer_plots.py`](../scripts/eval/retire_pointer_plots.py); [population report](experiments/pointer_population_analysis.md) |
+| Read-only progress | [`paper_status.py`](../scripts/eval/paper_status.py); chunk-derived coverage and remaining extraction time |
+
+Five groups contain fifteen figure families. The five primary questions are
+quality, execution failure, structure, stopping, and successful-model learning;
+the extra panels expose denominators and diagnostic detail rather than checkpoint
+sweeps. Exact duplicate curves are drawn once with every represented label;
+GRU and final timer explicitly share R execution. Different metrics occupy
+separate panels; model lines use different colors/dashes/markers and staggered
+marker placement **without coordinate jitter**. Heatmaps have colorbars and
+undefined/empty cells are N/A. Error intervals must fit within axes. Controller
+learning uses named aggregate cohorts, excluding duplicated per-depth views.
+
+Old PNG/PDF/SVG exports are removed only after all replacement audits succeed.
+Raw old CSV/JSON/NPZ, logs, checkpoint weights and numeric provenance are retained;
+Git history preserves prior render exports. `retired_plot_exports.json` records
+removed paths and hashes. No 27-graph plot is relabeled as full-population evidence.
 
 ## Checkpoint registry: freeze these choices before population inference
 
@@ -237,7 +295,7 @@ These curves measure learning on development monitoring, not a fresh test.
 
 Retained R snapshots are updates 0/250/500/750/1250/1500/1750/2000/2250.
 Update 1,000 monitoring exists, but its weights were not found; do not invent a
-population result there. If population depth-learning curves are needed, evaluate
+population result there. The suite evaluates
 these retained executor snapshots on all 1,350 graphs through 256 once each,
 holding the final timer fixed as an explicitly labeled composed diagnostic.
 Do not call that the historical controller attached at each training step.
@@ -251,7 +309,7 @@ different stages or compare different population panels as paired progress.
 The final reader/cell fits do not have exported checkpoint sequences; their
 recorded objective before/after is the available fitting evidence.
 
-## Proposed paper figures and statistical presentation
+## Implemented paper figures and statistical presentation
 
 1. **Architecture/data table and main quality figure:** selected candidates,
    trainability/training exposure/data support; final-letter, complete-trajectory,
@@ -306,7 +364,12 @@ ablations, multiple successful executor seeds, larger state spaces/nonrepeating
 
 ## Handoff checklist
 
-Local validation: 11 focused inventory/comparison/failure tests passed. Collection
+Local validation: 23 focused inference/scoring/export/comparison/failure tests pass.
+A separate synthetic reporting fixture checked all 2,073,600 decisions and 15,360
+aggregate cells, rendered all fifteen figure families, and was visually inspected.
+It is a reporting contract check, **not** measured historical-model population evidence.
+The selected CE checkpoint passed its 54 pretrained native checks.
+Previously, 11 focused inventory/comparison/failure tests passed. Collection
 completed on both hosts; the archived collector matches both snapshot hashes.
 Compilation, 319 local file/directory links and whitespace checks pass. These
 checks validate this handoff/inventory; they do not pass the pending population suite.
@@ -315,14 +378,15 @@ checks validate this handoff/inventory; they do not pass the pending population 
 - [x] Record checkpoint availability, selection provenance and architecture/source map.
 - [x] Independently reconstruct all full-final first-error/structural observations.
 - [x] Define the population, requests, target semantics, uncertainty and figure questions.
-- [ ] Extend existing extraction/reuse to the full selected-candidate panel; freeze weights.
-- [ ] Extend shared failure aggregation with optional direct R fields, fixed-N risk sets,
+- [x] Implement resumable full selected-candidate extraction; freeze weights and protocol.
+- [x] Implement shared failure aggregation with optional direct R fields, fixed-N risk sets,
   exposure-normalized structural tables, and mutually exclusive stop failures.
 - [ ] Audit raw targets, missing/undefined metrics, replay/native fidelity and plot cells.
-- [ ] Run recoverable population jobs on the desktop; retain every result, including failures.
+- [x] Launch recoverable population jobs on the desktop; retain every result, including failures.
+- [ ] Complete all model and successful-R snapshot population jobs.
 - [ ] Assemble figures/tables and update this document with actual results and exact commands.
 
-Next bounded work is **analysis implementation/population evaluation**, not
+Next bounded work is **completion and review of population evaluation**, not
 another training run. Read host Git status before syncing; preserve untracked
 desktop weights/metrics. Do not overwrite existing experiment directories or
 silently relabel the 27-graph plots as full coverage. Other agents should record

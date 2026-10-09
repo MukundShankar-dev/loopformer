@@ -55,6 +55,30 @@ def assert_executor_tensors(old: dict, new: dict) -> int:
     return len(preserved)
 
 
+def verify_recurrent_code(git_head: str) -> dict[str, str]:
+    """Check original inference modules, allowing new unused analysis modules.
+
+    Unchanged original imports ensure an added helper cannot enter that original
+    model path. Checking today's whole directory would falsely reject an unused
+    new file merely because it was absent in the source revision.
+    """
+    paths = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', git_head,
+                                     'scripts/recurrent_qwen'], text=True).splitlines()
+    result = {}
+    for filename in paths:
+        if not filename.endswith('.py'):
+            continue
+        path = Path(filename)
+        original = subprocess.check_output(['git', 'show', f'{git_head}:{filename}'])
+        expected = hashlib.sha256(original).hexdigest()
+        if not path.exists() or sha256_file(path) != expected:
+            raise ValueError(f'Recurrent inference implementation changed: {filename}')
+        result[filename] = expected
+    if not result:
+        raise ValueError('Original recurrent inference modules unavailable')
+    return result
+
+
 def verify_reuse(source: Path, candidate: Path, source_summary: dict) -> dict:
     if checkpoint_hashes(source) != source_summary['checkpoint_sha256']:
         raise ValueError('Confirmed source checkpoint changed')
@@ -65,13 +89,7 @@ def verify_reuse(source: Path, candidate: Path, source_summary: dict) -> dict:
     for name, value in old_files.items():
         if name not in ('adapter_model.pt', 'recurrent_config.json') and new_files.get(name) != value:
             raise ValueError('Tokenizer/inference payload changed')
-    code = {}
-    for path in sorted(Path('scripts/recurrent_qwen').glob('*.py')):
-        original = subprocess.check_output(['git', 'show', f'{source_summary["git_head"]}:{path}'])
-        expected = hashlib.sha256(original).hexdigest()
-        if sha256_file(path) != expected:
-            raise ValueError(f'Recurrent inference implementation changed: {path}')
-        code[str(path)] = expected
+    code = verify_recurrent_code(source_summary['git_head'])
     old = torch.load(source / 'adapter_model.pt', weights_only=True, map_location='cpu')
     new = torch.load(candidate / 'adapter_model.pt', weights_only=True, map_location='cpu')
     tensors = assert_executor_tensors(old, new)
@@ -274,10 +292,7 @@ def reuse_saved_arm(arm: dict, config: dict, freeze: dict, output: Path) -> None
             old['source_summary_sha256'] != freeze['source_summary_sha256'] or
             any(old['config'][key] != config[key] for key in ('counts', 'native_counts', 'threshold', 'safety_cap', 'batch_size', 'device'))):
         raise ValueError('Saved arm differs from the new frozen paired protocol')
-    for path in sorted(Path('scripts/recurrent_qwen').glob('*.py')):
-        original = subprocess.check_output(['git', 'show', f'{old["git_head"]}:{path}'])
-        if hashlib.sha256(original).hexdigest() != sha256_file(path):
-            raise ValueError('Inference implementation changed since saved calls')
+    verify_recurrent_code(old['git_head'])
     audit = audit_comparison(source, Path(config['graphs']))
     shutil.copytree(source / arm['name'], output)
     rows = read_csv(output / 'decisions.csv')

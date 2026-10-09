@@ -23,11 +23,23 @@ The design uses all 1,350 graphs and every request 1–256 for selected-candidat
 architecture characterization, fixed-request first-error/risk sets, structural
 rates and exact-stop failure decomposition; final all-integer coverage remains
 separate. Progression is limited to the successful system. Collection, selection
-provenance and analysis design are complete. Full-population historical inference,
-expanded aggregation and paper figures remain pending. No training or new model
-inference ran; closed test records and existing artifacts were preserved.
-Validation: 11 focused inventory/comparison/failure tests pass, compilation and
-319 local file/directory documentation links pass, and whitespace checks pass.
+provenance and analysis design are complete. The resumable [full-suite launcher](../analyze_pointer.sh)
+now implements extraction, retained R snapshots, scoring, structure/exposure tables,
+independent scalar auditing, scientific exports and safe retirement of old renders.
+
+<!-- paper-run-status:start -->
+Full-population inference is running on the desktop. The CE candidate passed 54
+native checks with exact decoded agreement and maximum logit difference 0.0000496.
+All historical results, nine snapshot results, and final replacement exports are
+still pending; no full-suite success is claimed. The pipeline completes reporting
+and plot replacement automatically after its audits pass.
+<!-- paper-run-status:end -->
+
+Validation: 23 focused tests pass. A separate synthetic reporting fixture checked
+2,073,600 decisions/15,360 aggregate cells and rendered fifteen figure families;
+this tests the reporting pipeline, not the pending historical population results.
+No training or threshold selection occurred; closed tests remain closed. See
+[the live population report](experiments/pointer_population_analysis.md).
 
 The completed smaller comparison below remains historical exploratory evidence.
 

@@ -36,7 +36,11 @@ See [repair commands and data](docs/number_reader_repair.md),
 [figures](docs/experiments/pointer_final_benchmark.md#commands-figures-and-artifacts).
 Weights remain on the desktop; Git carries metrics, audits and metadata.
 The [analysis handoff](docs/analysis.md) records the full evidence inventory,
-selected architectures/checkpoints and the planned population failure analysis.
+selected architectures/checkpoints and the full population failure-analysis suite.
+Run `bash analyze_pointer.sh` on the desktop for all six models, all 1,350 graphs
+and depths 1–256, followed by audited, organized plots. It resumes unchanged
+chunks; `python -m scripts.eval.paper_status` shows coverage and extraction ETA.
+See [run state and results](docs/experiments/pointer_population_analysis.md).
 See [how the architectures evolved](docs/pointer_model_evolution.md) for technical
 and plain-language explanations, and the [historical comparison](docs/experiments/pointer_architecture_history.md)
 for original full-sequence/fixed-prompt models and two frozen-R examples.

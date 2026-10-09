@@ -4,8 +4,10 @@ The current [analysis contract](analysis.md) specifies a full 1,350-graph select
 architecture comparison, execution/structural/stopping diagnostics and successful
 model progression. Its [inventory](experiments/pointer_evidence_inventory.md)
 separates available records from missing population measurements. Collection and
-offline final-reference checks are complete; new population extraction/figures
-are pending. The historical 27-graph comparison below remains valid exploratory
+offline final-reference checks are complete. Run `bash analyze_pointer.sh` for
+the implemented resumable population suite; its full run and figure replacement
+are in progress. Read `python -m scripts.eval.paper_status` and the
+[population report](experiments/pointer_population_analysis.md) for actual completion. The historical 27-graph comparison below remains valid exploratory
 evidence and is not the main population report.
 
 The [architecture-history protocol](experiments/pointer_architecture_history.md)
@@ -16,7 +18,7 @@ forced checks still verify their executor predictions. Previously audited arms
 can be reused only with identical weights, inputs, policy and inference code.
 
 The [complete figure audit](experiments/pointer_figure_audit.md) rescored and
-regenerated all thirteen current benchmark/comparison figures. At requested
+regenerated all thirteen then-current benchmark/comparison figures. At requested
 count N, **joint success** requires the correct final C letter and an actual
 first stop at N; an earlier intermediate error does not automatically fail it.
 **Complete trajectory** requires every C letter at loops 1 through N to be

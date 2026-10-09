@@ -1,5 +1,5 @@
 {
-  "status": "analysis design frozen; population extension and figures pending",
+  "status": "Implemented frozen protocol; completion is determined by audited output files",
   "handoff": "docs/analysis.md",
   "inventory": "eval/pointer_analysis/evidence-20261009",
   "source_results": "eval/pointer_benchmark/final-full-20261008/independent",
@@ -374,7 +374,7 @@
       2250
     ],
     "missing_weight_step": 1000,
-    "population_snapshot_evaluation": "Pending; all graphs; fixed final timer composition must be labeled"
+    "population_snapshot_evaluation": "Implemented: all graphs, retained snapshots, fixed final-timer composition labeled as diagnostic"
   },
   "uncertainty": {
     "unit": "graph cluster",
@@ -452,7 +452,7 @@
     "correct_letter_wrong_time",
     "execution_timing_failure_decomposition"
   ],
-  "reproduction_notice": "Design specification only. Do not pass this file to an existing CLI. Extend shared extraction/scoring/audits first.",
+  "reproduction_notice": "Run bash analyze_pointer.sh; or python -m scripts.eval.paper_suite --config configs/pointer_analysis_protocol.json. Frozen FP32/SDPA; resumable graph chunks; all outputs must pass independent audits before figures.",
   "historical_forced_example_loops_per_model": 44409600,
   "query_count_per_model": 345600
 }

@@ -161,14 +161,9 @@ The provenance records input, source and export hashes. CSVs retain first-error
 categories, first-error confusion, post-error dynamics, final-letter denominators,
 cycle-period/loop rates, and architecture/count rates.
 
-- [Every failing graph × recurrent loop](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/failed_trajectory_matrix.png)
-- [First-error symbol confusion and final-letter error rates](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/symbol_confusion.png)
-- [First-error categories, R/C agreement and propagation/recovery](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/failure_signatures.png)
-- [Cycle period × loop error rates](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/cycle_period_matrix.png)
-- [Architecture × count matrices for four quality metrics](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/architecture_metric_matrices.png)
-- [Requested count × actual stopping-loop matrices](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/requested_actual_stop_matrices.png)
-- [Wrong-time letters and premature stops](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/cyclic_coincidence_and_early_stops.png)
-- [Saved controller-only numerical precision comparison](../../eval/pointer_benchmark/final-full-20261008/independent/failure_matrices/numeric_precision_comparison.png)
+Original render exports are superseded by the [organized population suite](../analysis.md#runbook-outputs-and-rendering-contract).
+The replacement is generated after full-suite audits pass. Prior renders remain
+recoverable from Git history at `b49030e`; raw metrics and numeric audits are retained.
 
 The numeric figure reuses previously measured results, with checkpoint hashes
 matched to the current freeze: the pre-precision controller is exact for

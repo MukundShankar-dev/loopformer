@@ -24,6 +24,11 @@ The adaptive-compute guide is the **single source for that extension**. The rese
 
 ## Evidence, not instructions
 
+The [full population suite](experiments/pointer_population_analysis.md) is implemented
+and running; `bash analyze_pointer.sh` performs frozen extraction, independent
+audits, retained successful-R snapshots and clean plot replacement. The report
+distinguishes current run state from completed evidence.
+
 The [complete evidence inventory](experiments/pointer_evidence_inventory.md)
 records both hosts' saved datasets, checkpoint availability, schemas and run
 coverage. The [analysis contract](analysis.md) supersedes the small historical
@@ -38,7 +43,7 @@ architecture figures are audited; [model evolution](pointer_model_evolution.md)
 explains training/inference and the reasons for each change.
 
 The [all-figure audit](experiments/pointer_figure_audit.md) independently rescored
-and regenerated all thirteen current figures, with unchanged results, explicit
+and regenerated all thirteen then-current figures, with unchanged results, explicit
 metric definitions and graph denominators, native-record rechecks and per-figure
 validation coverage.
 

@@ -164,15 +164,11 @@ python -m scripts.eval.plot_pointer_benchmark \
 Five figures are saved in PNG/PDF/SVG, including unsmoothed rates, clearly labeled
 zoomed axes, pointwise graph-level uncertainty bands and training-range markers:
 
-- [Overall quality](../../eval/pointer_benchmark/final-full-20261008/independent/plots/quality_over_depth.png)
-- [Graph-type strata](../../eval/pointer_benchmark/final-full-20261008/independent/plots/quality_by_graph_type.png)
-- [First failures and survival](../../eval/pointer_benchmark/final-full-20261008/independent/plots/trajectory_failures.png)
-- [Number reading and actual stop residuals](../../eval/pointer_benchmark/final-full-20261008/independent/plots/controller_diagnostics.png)
-- [Intermediate R/C readouts](../../eval/pointer_benchmark/final-full-20261008/independent/plots/intermediate_readouts.png)
+Original render exports are superseded by the [organized population suite](../analysis.md#runbook-outputs-and-rendering-contract).
+The replacement is generated after full-suite audits pass. Prior renders remain
+recoverable from Git history at `b49030e`; raw metrics and numeric audits are retained.
 
-![Frozen model quality across requested depth](../../eval/pointer_benchmark/final-full-20261008/independent/plots/quality_over_depth.png)
 
-![First failures and complete trajectory survival](../../eval/pointer_benchmark/final-full-20261008/independent/plots/trajectory_failures.png)
 
 Outputs already exist; launchers refuse overwriting them. For a deterministic
 replay on the same panel, use fresh paths with the frozen protocol:

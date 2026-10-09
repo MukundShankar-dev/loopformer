@@ -438,3 +438,23 @@ R working vectors and context recomputed for every full raw prompt; scalar
 controllers may ignore observations only because their native implementation
 does so. Legacy coupled R is evaluated separately for each displayed count.
 Native stopped calls and independent raw-table auditing guard all comparisons.
+
+## Inference-only causal partitioning for historical population evaluation
+
+[`partitioned.py`](../scripts/recurrent_qwen/partitioned.py) accelerates the older
+count-dependent models without changing their recurrent inputs. It computes
+identical causal prompt prefixes once per graph while keeping an independent
+continuous suffix state for every requested count. Full-sequence prefixes still
+evolve at every loop; fixed-prompt layers retain first-pass K/V and replace only
+the working position. R outputs return to R, and C outputs remain readouts.
+
+This is local attention algebra within one frozen evaluation, not generation KV
+cache or a persistent cache across examples/updates. The original model remains
+the batch-one reference. Focused multi-loop tests cover both recurrence modes,
+LoRA, padding, eager/SDPA and completion logits. Every historical arm must also
+pass predeclared real-checkpoint native comparisons with exact decoded/first-stop
+agreement; numerical FP32 kernel differences are recorded. The CE arm's largest
+observed logit difference was 0.0000496 over 54 checks. Full-panel inference is
+pending. The scheduler may discard a query after its requested readout and first
+stop have both been recorded; that horizon is never an input to R or its head.
+Training and ordinary model mechanics are unchanged.

@@ -364,3 +364,22 @@ after bitwise tensor/spec/tokenizer/code identity; retain actual observations
 and per-prompt contexts for GRU replay. Never count a correct cyclic letter at
 the wrong loop as joint success. The protocol is recorded in the
 [diagnostic report](experiments/pointer_checkpoint_comparison.md).
+
+
+## 2026-10-09 — full population suite and clean figure replacement
+
+Implement the frozen analysis contract for all six selected representatives, all
+1,350 opened graphs and every request 1–256; retain the successful R snapshot
+progression only. Historical requested-depth dependence prevents reusing one
+rollout across counts. Use exact causal-prefix partitioning with independent
+suffix states, fixed-memory K/V reuse, native numerical/decoded checks, atomic
+resume identities and independent raw-table rescoring. Keep FP32/SDPA and frozen
+weights/thresholds; measure extraction cost rather than reduce coverage.
+
+Publish one organized set in five groups with fifteen figure families. Every
+categorical color has a legend/colorbar; exact coincident traces are combined
+and labeled, not hidden or numerically jittered. Correct cyclic letters at wrong
+stops remain failures. Retire old render exports only after the replacement
+audits pass, preserving raw evidence and model weights. The full run is underway,
+so implementation/tests are distinguished from completed population evidence.
+See [analysis](analysis.md) and [the completion report](experiments/pointer_population_analysis.md).

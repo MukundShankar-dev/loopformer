@@ -138,10 +138,9 @@ long-range execution.
 Four architecture figures are regenerated under
 `eval/pointer_benchmark/architecture-history-20261009/plots/`, in PNG/PDF/SVG:
 
-- [Execution versus requested depth](../../eval/pointer_benchmark/architecture-history-20261009/plots/architecture_execution_depth.png)
-- [Four separate execution/control metrics by model and count](../../eval/pointer_benchmark/architecture-history-20261009/plots/architecture_metric_matrices.png)
-- [Requested versus actual first stops](../../eval/pointer_benchmark/architecture-history-20261009/plots/requested_actual_stop_matrices.png)
-- [Correct letters at the wrong time and premature stopping](../../eval/pointer_benchmark/architecture-history-20261009/plots/cyclic_coincidence_and_early_stops.png)
+Original render exports are superseded by the [organized population suite](../analysis.md#runbook-outputs-and-rendering-contract).
+The replacement is generated after full-suite audits pass. Prior renders remain
+recoverable from Git history at `b49030e`; raw metrics and numeric audits are retained.
 
 The same directory contains four regenerated final-model failure figures. Their
 PNG bytes match the previously reviewed full-panel exports. Those figures retain
