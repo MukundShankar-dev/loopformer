@@ -1,5 +1,22 @@
 # Pointer analysis and agent handoff
 
+## Additional ordinary trace comparisons — 2026-10-10
+
+The user authorized original Qwen generating an explicit full trace and ordinary
+Qwen trained with **full SFT**, replacing the proposed middle-layer-only baseline.
+See [trace baselines](trace_baselines.md) for data, optimization, scoring, speed
+profiling, exact commands and comparison limitations. Adapt all 494,032,768 Qwen
+parameters on the same 36,000 examples and one-epoch/effective-batch schedule as R;
+this is a stronger ordinary baseline, not a capacity-matched ablation. The final
+controller's separate count-label exposure is also a stopping-comparison confound.
+
+The added outputs live at `eval/pointer_traces/seed61-20261010/`, with original/SFT
+arms, raw atomic chunks, independent audits, per-count/graph-stratum metrics,
+paired bootstrap differences and four figure families. The existing 25-family
+bundle and recurrent weights remain frozen. Do not invent latent-loop metrics
+for trace tokens or credit cyclic final letters as exact termination. Full-run
+quality remains pending until the new independent audits complete.
+
 Updated 2026-10-10. This is the active analysis contract. Start here before
 expanding the figures or running another benchmark. The [research plan](project_plan.md)
 still owns scientific stage gates; [model evolution](pointer_model_evolution.md)

@@ -1,5 +1,14 @@
 # Evaluation and reproducibility
 
+The added [ordinary trace baselines](trace_baselines.md) use the same graph/count
+panel but ask original and fully SFT-trained Qwen to generate whole traces.
+Their evaluator reuses the ordinary generation/loader interfaces and existing
+graph-cluster metrics. Exact termination means N emitted states plus EOS,
+separately from final-letter correctness and the complete prefix. Trace tokens
+are not recurrent passes. `bash trace_baselines.sh` queues training, both arms,
+independent raw-response audits and a separate figure bundle; it does not replace
+the completed population protocol below.
+
 For the live full-population suite, use `python -m scripts.eval.paper_watch`
 on the desktop or `python -m scripts.eval.paper_watch --remote desktop` from the
 Mac repository. The [monitoring guide](analysis.md#live-terminal-monitor) explains

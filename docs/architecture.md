@@ -10,6 +10,14 @@ The [inference smoke test](../scripts/smoke_test_qwen.py) exercises ordinary Qwe
 
 ## Recurrent computation
 
+The [ordinary trace SFT baseline](trace_baselines.md) is a separate standard
+24-layer Qwen model. The user requested **all 494 million parameters** be adapted,
+including embeddings and the tied LM head. It emits successive states as tokens
+with EOS, using a KV cache at inference; it has no recurrent wrapper, re-entry
+bridge or controller. Its teacher-forced response-token supervision and trainable
+capacity differ from R. Existing recurrent mechanics and checkpoints below are
+unchanged.
+
 The following full-sequence recurrence remains the historical default. The new `fixed_prompt` mode is an explicit checkpoint/configuration choice, described below; loading an old checkpoint never changes its recurrence.
 
 Inspection of Transformers 5.17.0 confirmed `Qwen2ForCausalLM`, `Qwen2Model`, and tensor-returning `Qwen2DecoderLayer.forward`. The Qwen2.5-0.5B-Instruct checkpoint has 24 layers, hidden size 896, 14 attention heads, two KV heads, full attention, default RoPE, and tied embedding/head weights.

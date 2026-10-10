@@ -1,5 +1,11 @@
 # Train recurrent pointer execution
 
+For the newly authorized **full ordinary-Qwen trace SFT** comparison, use
+[trace baselines](trace_baselines.md) and `bash trace_baselines.sh`. It trains all
+Qwen weights on the successful executor's unchanged one-epoch examples/schedule,
+then benchmarks freely generated traces. That separate ordinary model has no
+recurrent wrapper or controller and does not retrain the frozen executor below.
+
 The original repaired model remains frozen as the
 [reserved-test and larger benchmark](pointer_benchmark.md) reference. The user
 subsequently authorized [replacing only its number reader](number_reader_repair.md)

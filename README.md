@@ -50,6 +50,10 @@ The completed suite includes ordinary Qwen on the same current questions:
 **6.25% final-answer accuracy** using the existing 3-shot prompt. The older 6%
 baseline remains separately labelled. Browse the [organized plots](eval/pointer_analysis/paper-20261009/plots/index.md)
 for per-attempt learning/evaluation panels, comparisons and failure analysis. See [the baseline setup](docs/analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09).
+The new [trace baselines](docs/trace_baselines.md) compare original Qwen with
+explicit traces and **full ordinary-Qwen SFT**, using the existing training data
+and full benchmark. `bash trace_baselines.sh` queues training, both evaluations,
+independent audits and a separate plot bundle.
 See [how the architectures evolved](docs/pointer_model_evolution.md) for technical
 and plain-language explanations, and the [historical comparison](docs/experiments/pointer_architecture_history.md)
 for original full-sequence/fixed-prompt models and two frozen-R examples.

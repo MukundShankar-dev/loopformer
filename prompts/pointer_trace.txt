@@ -1,0 +1,28 @@
+Follow the pointer rules. Each pair (X,Y) means the next state after X is Y.
+Begin at Start and follow exactly Steps transitions, looking up the current state each time.
+Output the state reached AFTER EACH transition, in order, separated by single spaces.
+Do not include the starting state, explanations, numbering, punctuation, or any other text.
+There must be exactly Steps uppercase letters. End your response immediately after the last letter.
+
+Three independent examples; each has its own rules. Rule order is not execution order.
+
+Rules: ( C, D) ( A, F) ( F, B) ( D, E) ( B, C) ( E, A)
+Start: A
+Steps: 1
+Trace: F
+
+Rules: ( D, E) ( F, C) ( A, D) ( C, B) ( B, F) ( E, A)
+Start: A
+Steps: 2
+Trace: D E
+
+Rules: ( D, E) ( B, A) ( F, D) ( C, F) ( A, C) ( E, B)
+Start: E
+Steps: 3
+Trace: B A C
+
+Now solve this independent task using only its rules.
+Rules: {rules}
+Start: {start}
+Steps: {steps}
+Trace:

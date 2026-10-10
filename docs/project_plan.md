@@ -15,6 +15,17 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-10 ordinary-trace baseline amendment:** The user requested original
+Qwen with explicit trace prompting, and ordinary Qwen trained with **full SFT**
+to emit traces. Full-model training is explicitly authorized for this comparison;
+the earlier proposal to train only the middle twelve layers was rejected.
+Keep the successful executor's exact training examples, epoch, effective batch
+and schedule, then evaluate both arms on the existing graph/count panel and
+opened test. The [trace-baseline contract](trace_baselines.md) records objectives,
+capacity/exposure differences, strict termination and independent audits. This
+adds the missing task-trained ordinary baseline; it does not modify the frozen
+recurrent system or introduce new transfer/overscaling claims.
+
 **2026-10-09 population-analysis amendment:** The user rejected the small
 architecture panel as the main comparison and requested a complete evidence
 inventory and paper-style failure analysis. The [analysis contract](analysis.md)

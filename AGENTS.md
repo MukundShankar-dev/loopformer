@@ -8,6 +8,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 
 | Working on | Read |
 | --- | --- |
+| Original-Qwen trace prompting and full ordinary trace SFT baselines | [Trace baselines](docs/trace_baselines.md) |
 | Paper-style analysis, evidence inventory, selected checkpoints and agent handoff | [Analysis contract](docs/analysis.md) |
 | Explaining or comparing earlier pointer architectures | [Model evolution](docs/pointer_model_evolution.md) and [historical comparison](docs/experiments/pointer_architecture_history.md) |
 | Research objectives, stage gates, transfer, and claim hierarchy | [Project plan](docs/project_plan.md) |

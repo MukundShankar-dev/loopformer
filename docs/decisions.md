@@ -451,3 +451,27 @@ differences are a comparison limitation, not an isolated architecture ablation.
 Do not invent recurrent timing/trajectory metrics or convert generated tokens to
 R-pass costs. Retain the old baseline as clearly labelled historical context.
 See [the implementation and inference contract](analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09).
+
+## 2026-10-10 — Add original-trace and full ordinary-SFT baselines
+
+The user requested explicit trace prompting for the original model and standard
+ordinary SFT as the key comparison to task-trained recurrence. They explicitly
+corrected the initial middle-twelve-layer proposal: train **all** Qwen weights.
+Keep the successful executor's exact 36,000 examples, one epoch, effective batch
+16 and optimizer schedule; adapt embeddings, all 24 layers, norm and tied head.
+This has more capacity than R and is deliberately a stronger ordinary baseline.
+
+Use one prompt and freely generated whole traces, with response-only full-vocab
+CE over each state and EOS. Never reprompt/repair an intermediate state or force
+output length. Select on trained-count validation CE, not benchmark quality.
+Reuse the existing opened graph/count panel, loader and clustered statistics;
+independently audit raw tokens and score exact EOS/state length so cyclic aliases
+cannot pass strict success. Report the controller's additional count exposure
+and inference-precision differences from the older final-only baseline.
+
+Full-SFT GPU smoke comparisons support batch 16 with gradient checkpointing;
+keep FP32 parameters/AdamW state and BF16 autocast. Profile cached inference batch
+sizes and compilation on validation queries before freezing each arm. Do not
+claim that a compiled/cache policy is bitwise equivalent when measured responses
+differ. Existing recurrent weights and completed figures stay frozen. See the
+[trace contract](trace_baselines.md) and [preflight report](experiments/ordinary_trace_baselines.md).

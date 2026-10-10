@@ -4,6 +4,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 
 | Need | Canonical document |
 | --- | --- |
+| Original-Qwen trace prompting and full ordinary-Qwen trace SFT baselines | [Trace baselines](trace_baselines.md) |
 | Paper-style population analysis, selected checkpoints, metrics and agent handoff | [Analysis contract](analysis.md) |
 | Earlier pointer architectures, training/inference and plain-language explanations | [Model evolution](pointer_model_evolution.md) |
 | Shared number reader with unchanged training depth/count exposure | [Number-reader repair](number_reader_repair.md) |
@@ -23,6 +24,10 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 The adaptive-compute guide is the **single source for that extension**. The research plan states its place in the stage sequence; evaluation documents shared metric conventions; status records current evidence. Stage 3 asymmetric dynamics and Stages 4–6 transfer remain planned in the research plan. No separate phase-guide directory is needed.
 
 ## Evidence, not instructions
+
+The [ordinary trace baseline report](experiments/ordinary_trace_baselines.md)
+records full-SFT resource preflight and the newly authorized original-trace/
+full-SFT comparison. Results remain pending until its independent audits finish.
 
 The [full population suite](experiments/pointer_population_analysis.md) is complete:
 six recurrent representatives, ordinary Qwen on all 345,600 matched questions,

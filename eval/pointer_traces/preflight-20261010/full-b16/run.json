@@ -1,0 +1,71 @@
+{
+  "config": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "reference_config": "configs/executor_r.json",
+    "train_data": "data/pointer/seed-61-independent/train.jsonl",
+    "train_sha256": "ea70dfb3e4b8822a7c889a949ba82a22466cbd303af14d8f0be9294bd31667fb",
+    "validation_data": "data/pointer/seed-61-independent/validation.jsonl",
+    "validation_sha256": "5ab3c4ad9dbd0390af9e2597b8dbebbf777543668207e2a93b3b08da12605c4c",
+    "prompt": "prompts/pointer_trace.txt",
+    "device": "cuda",
+    "seed": 17,
+    "threads": 4,
+    "train_scope": "full",
+    "train_layer_start": 0,
+    "train_layer_end": 24,
+    "train_depths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "validation_per_depth": 64,
+    "max_sequence_tokens": 768,
+    "epochs": 1,
+    "batch_size": 16,
+    "gradient_accumulation": 1,
+    "learning_rate": 2e-05,
+    "warmup_steps": 100,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "eval_every": 250,
+    "save_every": 750,
+    "precision": "bf16",
+    "attention": "sdpa",
+    "gradient_checkpointing": true,
+    "bucket_by_depth": true,
+    "lr_schedule": "cosine",
+    "schedule_steps": 2250,
+    "min_lr_ratio": 0.1,
+    "output": "models/trace_sft/seed61-full"
+  },
+  "initial_weights_sha256": {
+    "model.safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe"
+  },
+  "prompt_sha256": "1e25827c79c78586a170761d4a17dfeab44db1cabda2ccd00c65e8dc2686ddc0",
+  "reference_config_sha256": "b4b120906b049d95e12aa339e55d618d8f69799c4ef67cc3c7091a6ed0c596d7",
+  "train_ids_sha256": "1d1f4f1523b6671644d27ecc48bf6e4d64a7981994c459384c73b5187117f4ce",
+  "validation_ids_sha256": "fd94735bb510462279abadd32d85341f76e16fa77fd7aa276f5400dd99a87f86",
+  "smoke_test": true,
+  "sources_sha256": {
+    "scripts/trace_task.py": "cda26c6c71a81a0edb1d193f1276bcd42cbf9eb8727749d3e62480463b3831d2",
+    "scripts/training/train_trace.py": "04a2c14b37499058b8ab610400eb49ef07afcbfe243a28a396ab4905044ee3ff",
+    "scripts/training/trace_runner.py": "dbfdaaab7a8f184a79b537b0f57ac9a1aa39d67dddf518d49b4e010430f09048",
+    "scripts/eval/pointer_task.py": "9b15bafe28d8d14b243b2e703fc6790ab2c06bcd6664395afd6294a5147d47c0",
+    "scripts/training/data.py": "0e8f2a6cb68a924a6b1a3347eeed8607c00d3ad7b2bbf14e67b8393dbae5e3f7",
+    "scripts/training/runner.py": "cf7a24a0d5788336139fe321d5681b59c0986eef4998c792b5f5b6eea89addee",
+    "scripts/training/precision.py": "0adb2439eb7ea8155780da30a7a1caac4275432d9ca3553c20834ea6fdea1450",
+    "scripts/dataset/pointer.py": "9e5126976c53963ed070ec838891971b24f4b017642ec34fbcac61448fc939fb"
+  },
+  "packages": {
+    "torch": "2.14.0+cu130",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2"
+  }
+}

@@ -1,5 +1,18 @@
 # Project status
 
+## Current work — ordinary trace baselines, 2026-10-10
+
+The user requested two additional baselines: original Qwen generating explicit
+traces, and **full ordinary-Qwen SFT** on the successful executor's unchanged
+36,000-example, one-epoch recipe. Both will run all 345,600 existing graph/count
+queries and the opened 1,536-query test. See [the implementation contract](trace_baselines.md).
+The new trainer, cached evaluator, independent raw-response audit, separate
+four-family plotting bundle and resumable launcher are implemented. Full SFT
+is running on the desktop: all 494,032,768 parameters, batch 16 with activation
+checkpointing, 2,250 updates. W&B run `bew2vujj` is live. Both full evaluations
+and audits/plots follow automatically; no full-run quality is yet established. The completed recurrent analysis and 25-family figure bundle remain
+unchanged. The next milestone is completing and auditing these two baselines.
+
 ## Writeup coverage update — 2026-10-10
 
 The user's five-attempt outline is mapped in [analysis.md](analysis.md#writeup-coverage--user-outline-2026-10-09).
