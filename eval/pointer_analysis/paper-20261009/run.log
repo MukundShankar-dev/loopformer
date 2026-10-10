@@ -1,0 +1,60 @@
+Pointer paper suite: eval/pointer_analysis/paper-20261009
+Frozen weights; 1350 graphs × all depths 1–256; FP32/SDPA.
+Original source and 11 original recurrent modules verified unchanged.
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:35,  8.16it/s]Loading weights:  75%|███████▌  | 218/290 [00:00<00:00, 1171.55it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1046.53it/s]
+ce_full ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1350/1350 graphs 1:53:38 0:00:00
+Pointer paper suite: eval/pointer_analysis/paper-20261009
+Frozen weights; 1350 graphs × all depths 1–256; FP32/SDPA.
+Original source and 11 original recurrent modules verified unchanged.
+ce_full: complete, retained verified chunks
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:51,  5.61it/s]Loading weights:  45%|████▌     | 131/290 [00:00<00:00, 541.91it/s]Loading weights:  68%|██████▊   | 197/290 [00:00<00:00, 490.98it/s]Loading weights:  89%|████████▊ | 257/290 [00:00<00:00, 504.41it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 493.27it/s]
+joint_full: checking original batch-one inference
+joint_full ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1350/1350 graphs 4:20:49 0:00:00
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:48,  5.98it/s]Loading weights:  84%|████████▍ | 243/290 [00:00<00:00, 1090.98it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 928.23it/s] 
+fixed6: checking original batch-one inference
+fixed6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1350/1350 graphs 2:28:56 0:00:00
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:31,  9.04it/s]Loading weights:  72%|███████▏  | 209/290 [00:00<00:00, 1158.62it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1039.96it/s]
+fixed12: checking original batch-one inference
+fixed12 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1350/1350 graphs 2:30:55 0:00:00
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:47,  6.07it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1106.11it/s]
+gru: checking original batch-one inference
+gru ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1350/1350 graphs 0:15:47 0:00:00
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:40,  7.22it/s]Loading weights:  82%|████████▏ | 239/290 [00:00<00:00, 1206.92it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1054.01it/s]
+final: checking original batch-one inference
+final ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1350/1350 graphs 0:00:09 0:00:00
+Ordinary Qwen · 345,600 questions · 3-shot · FP32/SDPA · batch 16
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:57,  5.01it/s]Loading weights:  74%|███████▍  | 214/290 [00:00<00:00, 890.30it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 728.05it/s]
+[transformers] The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Ordinary Qwen generation ━━━━━━━━━━━━━━━━━━━━━━━ 345,600/345,600 3:07:36 0:00:00
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:31,  9.24it/s]Loading weights:  76%|███████▌  | 219/290 [00:00<00:00, 1241.70it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1081.70it/s]
+Frozen executor update 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:04:49
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  38%|███▊      | 110/290 [00:00<00:00, 1098.67it/s]Loading weights:  87%|████████▋ | 251/290 [00:00<00:00, 1275.67it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1283.50it/s]
+Frozen executor update 250 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:04:47
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<01:00,  4.75it/s]Loading weights:  88%|████████▊ | 256/290 [00:00<00:00, 994.27it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 866.79it/s]
+Frozen executor update 500 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:05:07
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:59,  4.86it/s]Loading weights:  82%|████████▏ | 237/290 [00:00<00:00, 955.25it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 817.86it/s]
+Frozen executor update 750 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:05:34
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:46,  6.26it/s]Loading weights:  66%|██████▌   | 192/290 [00:00<00:00, 904.47it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 805.54it/s]
+Frozen executor update 1250 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:05:31
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:46,  6.22it/s]Loading weights:  76%|███████▌  | 221/290 [00:00<00:00, 1021.22it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 901.31it/s] 
+Frozen executor update 1500 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:05:44
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:47,  6.03it/s]Loading weights:  63%|██████▎   | 184/290 [00:00<00:00, 685.24it/s]Loading weights:  88%|████████▊ | 256/290 [00:00<00:00, 449.25it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 416.90it/s]
+Frozen executor update 1750 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:05:46
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:57,  5.00it/s]Loading weights:  80%|███████▉  | 231/290 [00:00<00:00, 912.68it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 510.33it/s]
+Frozen executor update 2000 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:05:43
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<01:16,  3.77it/s]Loading weights:  52%|█████▏    | 152/290 [00:00<00:00, 531.32it/s]Loading weights:  84%|████████▍ | 243/290 [00:00<00:00, 647.32it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 490.65it/s]
+Frozen executor update 2250 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:05:30
+Independent scalar decision audit ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:07
+{
+  "passed": true,
+  "scalar_decisions_checked": 2073600,
+  "graphs": 1350,
+  "models": 6,
+  "aggregate_cells_checked": 15360,
+  "original_final_decisions_crosschecked": 345600,
+  "source_sha256": "aa2c0fd72792e8b9f1844280a9ba5b486be71354e820efbe3c627afc032a9569",
+  "audit_code_sha256": "5b7040d99659192ed06bf50b3d03f8c869e77cc41345181817c63a1d890d0acb"
+}
+Wrote 25 audited figure families to eval/pointer_analysis/paper-20261009/plots
+Retired 69 obsolete render exports; raw evidence preserved.
+Complete. Read eval/pointer_analysis/paper-20261009/plots/index.md

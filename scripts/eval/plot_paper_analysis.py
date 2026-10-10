@@ -120,7 +120,7 @@ def quality_figures(figures,arrays,names,g)->None:
     for ax,metric,title in zip(axes.flat,('nominal_final_correct','complete_trajectory','exact_stop','joint_success'),
                               ('Forced final letter','Strict complete trajectory','Exact first stop at N','Final letter + exact first stop')):
         matrix=np.array([data(name,metric).mean(0) if f'{name}__{metric}' in arrays else np.full(256,np.nan) for name in names])
-        im=ax.imshow(np.ma.masked_invalid(100*matrix),aspect='auto',vmin=0,vmax=100,cmap='viridis',extent=(.5,256.5,5.5,-.5))
+        im=ax.imshow(np.ma.masked_invalid(100*matrix),aspect='auto',interpolation='nearest',vmin=0,vmax=100,cmap='viridis',extent=(.5,256.5,5.5,-.5))
         ax.set_yticks(range(6),[NAMES[n] for n in names],fontsize=8);ax.set(xlabel='Requested N',title=title)
         if np.isnan(matrix[0]).all():ax.text(128,0,'Not applicable: no controller',ha='center',va='center',color='#555')
         fig.colorbar(im,ax=ax,label='Graphs correct (%)',shrink=.85);matrix_arrays[metric]=matrix
@@ -154,7 +154,7 @@ def execution_figures(figures,config,arrays,names,g,loops,first)->None:
         for j,n in enumerate(config['fixed_prompt_failure_requests']):
             rows=[r for r in loops if r['model']==name and int(r['requested_depth'])==n]
             for r in rows:matrix[j,int(r['loop'])-1]=float(r['hazard']) if r['hazard'] else np.nan
-        im=ax.imshow(np.ma.masked_invalid(matrix),aspect='auto',vmin=0,vmax=1,cmap='magma',extent=(.5,256.5,3.5,-.5))
+        im=ax.imshow(np.ma.masked_invalid(matrix),aspect='auto',interpolation='nearest',vmin=0,vmax=1,cmap='magma',extent=(.5,256.5,3.5,-.5))
         ax.set_yticks(range(4),['N=6','N=12','N=32','N=256']);ax.set(title=NAMES[name],xlabel='Actual loop t')
         fig.colorbar(im,ax=ax,label='First failures / graphs still at risk',shrink=.8);hazards[name]=matrix
     figures.save(fig,'02_execution','first_error_hazard','Conditional first-error hazard',
@@ -165,7 +165,7 @@ def execution_figures(figures,config,arrays,names,g,loops,first)->None:
             rows=[r for r in first if r['model']==name and int(r['requested_depth'])==n]
             counts=Counter(r['category'] for r in rows);taxonomy[i*4+j]=[counts[c] for c in CATEGORIES]
             labels.append(f'{NAMES[name]} · N={n} · {len(rows)}/{g} failed')
-    im=ax.imshow(taxonomy,aspect='auto',cmap='Blues',vmin=0)
+    im=ax.imshow(taxonomy,aspect='auto',interpolation='nearest',cmap='Blues',vmin=0)
     ax.set_yticks(range(24),labels,fontsize=7);ax.set_xticks(range(4),['Previous state','Earlier visited','Later in orbit','Outside orbit'],fontsize=8)
     for i in range(24):
         for j in range(4):ax.text(j,i,str(taxonomy[i,j]),ha='center',va='center',fontsize=7,color='white' if taxonomy[i,j]>taxonomy.max()*.55 else '#222')
@@ -191,7 +191,7 @@ def structure_figures(figures,config,arrays,names,g,metadata,structure)->None:
                 for j,binlabel in enumerate(bins):
                     selected=[r for r in structure if r['model']==name and int(r['requested_depth'])==n and r['feature']=='cycle_bin' and r['graph_mode']==mode and r['value']==binlabel]
                     if selected:matrix[i*3+m,j]=float(selected[0]['failure_rate']);denom[i*3+m,j]=int(selected[0]['graphs'])
-        im=ax.imshow(np.ma.masked_invalid(matrix*100),aspect='auto',vmin=0,vmax=100,cmap='YlOrRd')
+        im=ax.imshow(np.ma.masked_invalid(matrix*100),aspect='auto',interpolation='nearest',vmin=0,vmax=100,cmap='YlOrRd')
         ax.set_yticks(range(18),labels,fontsize=6.5);ax.set_xticks(range(5),bins);ax.set(title=f'Steps = {n}',xlabel='Cycle period (within graph mode)')
         for i in range(18):
             for j in range(5):
@@ -244,7 +244,7 @@ def stopping_figures(figures,arrays,names,g)->None:
         for j in range(256):
             actual=stop[:,j];columns=np.where(actual>0,actual-1,272)
             matrix[j]=np.bincount(columns,minlength=273)
-        im=ax.imshow(np.ma.masked_where(matrix.T==0,matrix.T/g),aspect='auto',origin='lower',cmap='viridis',norm=LogNorm(vmin=1/g,vmax=1),extent=(.5,256.5,.5,273.5))
+        im=ax.imshow(np.ma.masked_where(matrix.T==0,matrix.T/g),aspect='auto',interpolation='nearest',origin='lower',cmap='viridis',norm=LogNorm(vmin=1/g,vmax=1),extent=(.5,256.5,.5,273.5))
         ax.set(title=NAMES[name],xlabel='Requested N',ylabel='Actual first stop t');ax.set_yticks([1,64,128,192,256,273],['1','64','128','192','256','Missing'])
         fig.colorbar(im,ax=ax,label='Fraction of graphs for that N (log scale)',shrink=.75);stop_matrices[name]=matrix
     figures.save(fig,'04_stopping','requested_actual_stops','Requested versus actual stopping loops',
@@ -264,7 +264,7 @@ def stopping_figures(figures,arrays,names,g)->None:
         execution=data(name,'nominal_final_correct');timed=data(name,'exact_stop')
         groups=np.array([(execution&timed).mean(0),(~execution&timed).mean(0),(execution&~timed).mean(0),(~execution&~timed).mean(0)])
         ax.stackplot(x,groups*100,labels=['Correct answer + exact stop','Execution only fails','Timing only fails','Both fail'],colors=['#298476','#ce6a38','#547bab','#8060b0'])
-        axis(ax);ax.set_title(NAMES[name]);ax.legend(fontsize=7,loc='upper right');decomp[name]=groups
+        axis(ax);ax.set_title(NAMES[name]);ax.legend(fontsize=7,loc='upper right',frameon=True,facecolor='white',framealpha=.9);decomp[name]=groups
     figures.save(fig,'04_stopping','execution_timing_decomposition','Execution and timing failures are separate problems',
         'Execution here means the forced letter at requested N, not strict trajectory correctness.\nTiming is the first crossing at N. These four exclusive outcomes distinguish execution failure from controller failure.',decomp)
     fig,axes=plt.subplots(1,2,figsize=(15,5.5));residuals={}
@@ -294,7 +294,7 @@ def learning_figures(figures,config,arrays,g,root)->None:
     fig,axes=plt.subplots(1,2,figsize=(14,5.5));trajectory=np.array([r['validation']['trajectory_accuracy'] for r in validation])
     accuracy=np.array([r['validation']['intermediate_accuracy'] for r in validation]);loss=np.array([[r['validation']['per_loop'][str(t)]['loss'] for r in validation] for t in range(1,13)])
     axes[0].plot(steps,100*trajectory,'o-',label='Strict trajectory',color='#298476');axes[0].plot(steps,100*accuracy,'s--',label='Intermediate symbol',color='#2467af');axes[0].set(xlabel='Executor optimizer update',ylabel='Fixed validation accuracy (%)',ylim=(-2,102));axes[0].legend();axes[0].grid(axis='y',alpha=.2)
-    im=axes[1].imshow(loss,aspect='auto',cmap='magma_r');axes[1].set_xticks(range(len(steps)),steps,rotation=45);axes[1].set_yticks(range(12),range(1,13));axes[1].set(xlabel='Executor optimizer update',ylabel='Actual supervised loop');fig.colorbar(im,ax=axes[1],label='Mean symbol cross-entropy')
+    im=axes[1].imshow(loss,aspect='auto',interpolation='nearest',cmap='magma_r');axes[1].set_xticks(range(len(steps)),steps,rotation=45);axes[1].set_yticks(range(12),range(1,13));axes[1].set(xlabel='Executor optimizer update',ylabel='Actual supervised loop');fig.colorbar(im,ax=axes[1],label='Mean symbol cross-entropy')
     figures.save(fig,'05_learning','executor_validation_learning','How the successful executor learned',
         'Fixed 768-query development monitoring from the original run. Each loop has its own eligible denominator.\nStep 1000 has monitoring records but no retained weights. This is executor development, not a solver checkpoint-selection curve.',{'steps':steps,'trajectory':trajectory,'intermediate':accuracy,'per_loop_loss':loss})
     snapshot_root=root/'executor_snapshots';snapshot_steps=config['final_executor_history']['retained_weight_steps'];snapdata=[]

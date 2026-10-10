@@ -1,0 +1,6 @@
+{
+  "passed": true,
+  "identical_executor_tensors": 148,
+  "source_graphs_sha256": "a9bfba654d74b71518e773c5c33c05f264b3ef73478cc79afd6d84722b9bf60a",
+  "source_summary_sha256": "df47f3117ba0a31814adc44d8b25f67274059cdbd15b2494849b4c1a268d2bd4"
+}

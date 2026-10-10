@@ -1,0 +1,8 @@
+{
+  "status": "complete",
+  "step": 250,
+  "graphs": 1350,
+  "elapsed_seconds": 288.8762029579957,
+  "weights_unchanged": true,
+  "scope": "Frozen count-free executor; final timer composition is diagnostic, not its historical controller"
+}

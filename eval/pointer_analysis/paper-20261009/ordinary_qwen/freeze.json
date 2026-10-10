@@ -1,0 +1,55 @@
+{
+  "config": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "graphs_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+    "prompt": "prompts/pointer_task.txt",
+    "prompt_sha256": "b21beb6d6de45972329143ce2d7dcabe409da97641e691ff9984d6cc474e353f",
+    "prompt_format": "chat",
+    "shots": 3,
+    "batch_size": 16,
+    "max_new_tokens": 8,
+    "dtype": "float32",
+    "attention": "sdpa",
+    "use_cache": false,
+    "do_sample": false,
+    "seed": 239,
+    "native_counts": [
+      1,
+      6,
+      12,
+      32,
+      128,
+      256
+    ],
+    "scope": "All graphs and requests from the unchanged recurrent protocol; ordinary unconstrained final-letter generation. Same questions, different prompt/readout procedure; not a causal architecture ablation."
+  },
+  "protocol_sha256": "33e40fe21b93fcca9fa5dc78db7cc37d80a8b21485dd2322822b336552dcc54c",
+  "device": "cuda",
+  "sources_sha256": {
+    "/home/mukund/loopformer/scripts/eval/paper_baseline.py": "0ce7df6209df66d67649d0c7a84f60734bc2fe3f6c59f3357237cd1387731a04",
+    "scripts/eval/pointer_task.py": "46ba5361dcfb36295f612d6176d800393d5bc3bfd1e5f2769e970af7e5cf0cdf",
+    "scripts/eval/loading.py": "fccc8abd7bf6d4ee155c2d053c195ba7ebaa42d54656a24636527184fe02c6c7",
+    "scripts/eval/paper_suite.py": "89ca4341f305bb3925c2beb366169ed8f091a497bc9d956ede204931761a3be1",
+    "scripts/dataset/benchmark.py": "55b7b2d13f19116acf84b408f35f6f74173c7e9bd3dba0ecb87e91a429ccf7fb",
+    "scripts/dataset/pointer.py": "9e5126976c53963ed070ec838891971b24f4b017642ec34fbcac61448fc939fb"
+  },
+  "snapshot_sha256": {
+    "config.json": "18e18afcaccafade98daf13a54092927904649e1dd4eba8299ab717d5d94ff45",
+    "generation_config.json": "e558847a8b4402616f1273797b015104dc266fe4b520056fca88823ba8f8ebe6",
+    "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+    "model.safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+    "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "tokenizer_config.json": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "packages": {
+    "torch": "2.14.0+cu130",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2",
+    "huggingface-hub": "1.31.0"
+  },
+  "cuda_version": "13.0",
+  "matmul_allow_tf32": false,
+  "cudnn_allow_tf32": false
+}

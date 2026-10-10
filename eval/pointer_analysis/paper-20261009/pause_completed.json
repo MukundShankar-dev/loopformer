@@ -1,0 +1,9 @@
+{
+  "reason": "User requested pause after CE-only finishes",
+  "launcher_pid": 12588,
+  "extractor_pid": 12617,
+  "watcher_pid": 21031,
+  "ce_graphs": 1350,
+  "paused_at_unix": 1791568802.015208,
+  "gpu_processes_released": true
+}

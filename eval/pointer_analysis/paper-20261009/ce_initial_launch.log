@@ -1,0 +1,2 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:38,  7.45it/s]Loading weights:  84%|████████▍ | 244/290 [00:00<00:00, 1225.59it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1105.61it/s]
+ce_full: checking original batch-one inference

@@ -1,18 +1,20 @@
 # Project status
 
-## Writeup coverage update — 2026-10-09
+## Writeup coverage update — 2026-10-10
 
 The user's five-attempt outline is mapped in [analysis.md](analysis.md#writeup-coverage--user-outline-2026-10-09).
 Six saved-history figure families (baseline plus five attempt sections) are
 rendered from actual original logs without model inference. Original training
-cohorts and the three-shot baseline remain distinct from the running paired
-population. The final plot job adds audited population curves to those panels.
+cohorts and the historical three-shot baseline remain separately labelled.
+All paired population curves, the matched ordinary-Qwen baseline and nine
+executor snapshots are complete and independently audited.
 A bounded batch-4/8/16 profile found only about 9% more graph throughput at 16;
 mean active CE GPU utilization was 90.4% over ten samples. The existing frozen
 run was briefly paused for profiling and resumed; no training or precision change.
-Final historical population figures and any hosted demo remain pending.
+The final population figures are complete and copied to the Mac. A hosted demo
+remains unimplemented.
 
-Last updated: 2026-10-09.
+Last updated: 2026-10-10.
 
 ## Applied population-inference optimization — 2026-10-09
 
@@ -21,30 +23,29 @@ The full suite resumed with bitwise-validated FP32 ordered-index pruning: about
 TF32 and LoRA merging were rejected because they changed intermediate readouts.
 All 182 completed CE chunks were retained and hash-verified; old source/freeze
 provenance is archived and an explicit migration records the sole source change.
-Original-source reuse checks passed; extraction continues without changing
+Original-source reuse checks passed; extraction completed without changing
 weights, batch size, datasets, requested depths or scoring. Eighteen focused
 checks passed. See [analysis](analysis.md#measured-accelerator-candidates-and-selected-exact-optimization).
 
 ## Current priority
 
-The queued final exports now include two observed-policy Pareto comparisons:
+The completed exports include two observed-policy Pareto comparisons:
 answer/trajectory-plus-exact-stop quality versus mean recurrent passes, with
 missing stops charged the cap. This logical budget is not matched hardware cost
 or measured latency. Per-attempt panels, aggregate comparisons and failure
-matrices remain queued automatically. The newly requested ordinary-Qwen baseline
-adds 345,600 generations on the identical graph/count panel after recurrent
-extraction, under a separate frozen 3-shot configuration; it has not run yet.
-Independent response audits, final-letter comparisons, graph-stratum metrics and
-paired intervals are queued too. The required bundle now has seven groups/25
+matrices are complete. Ordinary Qwen completed 345,600 generations on the
+identical graph/count panel under a separate frozen 3-shot configuration, scoring
+6.25% final-letter accuracy. Independent response audits, final-letter comparisons,
+graph-stratum metrics and paired intervals are complete. The required bundle now has seven groups/25
 named families. Ordinary generation is excluded from recurrent timing/trajectory
 and R-pass Pareto metrics. See [the baseline contract](analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09).
 
 Live monitoring is available with `.venv/bin/python -m scripts.eval.paper_watch
 --remote desktop` from the Mac, or without `--remote` on the desktop. It reports
 per-model extraction, current stage, snapshots and remaining audits/plots without
-loading a model or interfering with the running job. See [monitoring](analysis.md#live-terminal-monitor).
+loading a model; the completed pipeline has no active job. See [monitoring](analysis.md#live-terminal-monitor).
 
-The current priority is the [population analysis and agent handoff](analysis.md),
+The current priority is the writeup using the [completed population analysis and agent handoff](analysis.md),
 following the user's rejection of the 27-graph panel as the main architecture
 comparison. A full inventory at `b49030e` captured 1,314 Mac files and 2,383
 desktop files; 83 configured inference checkpoints have weights on the desktop,
@@ -68,14 +69,14 @@ now implements extraction, retained R snapshots, scoring, structure/exposure tab
 independent scalar auditing, scientific exports and safe retirement of old renders.
 
 <!-- paper-run-status:start -->
-**Resumed on the desktop; extraction continues.** CE retains all 1,350 graphs and 54 passing native checks. Joint-full has passed native checks and reached 300/1,350 graphs at the latest captured check. Launcher/extractor PIDs are 42791/42863; verify live metadata before acting. The ordinary-Qwen baseline is deployed and queued after recurrent extraction (0/345,600 questions), followed by nine snapshots, full audits and 25 replacement figure families. Its separate frozen configuration preserves the active recurrent protocol and chunks. Thirty-seven focused tests pass on both hosts; pretrained baseline results and final population figures remain pending. See [the analysis handoff](analysis.md).
+The full suite is **complete and independently audited**: six models, 1,350 graphs, all requested depths 1–256, 2,073,600 checked decisions and nine retained successful-executor snapshots. Ordinary Qwen additionally has 345,600 independently checked matched questions. The clean figure set has seven groups with twenty-five figure families, including historical/matched baselines, final-letter comparisons, five-attempt writeup panels and two logical-compute Pareto comparisons; legends/colorbars, coincident-series labels, denominators and source hashes are included. See [the population report](experiments/pointer_population_analysis.md) for results and the figure index. Obsolete render exports are retired; raw evidence is retained.
 <!-- paper-run-status:end -->
 
 Validation: 28 focused tests pass. A separate synthetic reporting fixture checked
 2,073,600 decisions/15,360 aggregate cells and rendered twenty-one figure families;
-this tests the reporting pipeline, not the pending historical population results.
+this tested the reporting pipeline before the now-completed population run.
 No training or threshold selection occurred; closed tests remain closed. See
-[the live population report](experiments/pointer_population_analysis.md).
+[the completed population report](experiments/pointer_population_analysis.md).
 
 The completed smaller comparison below remains historical exploratory evidence.
 

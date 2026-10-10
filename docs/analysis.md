@@ -1,6 +1,6 @@
 # Pointer analysis and agent handoff
 
-Updated 2026-10-09. This is the active analysis contract. Start here before
+Updated 2026-10-10. This is the active analysis contract. Start here before
 expanding the figures or running another benchmark. The [research plan](project_plan.md)
 still owns scientific stage gates; [model evolution](pointer_model_evolution.md)
 owns the detailed technical/plain-language architecture explanations.
@@ -24,17 +24,29 @@ scoring/audits, and one organized replacement figure set.
 No training, threshold fitting or new checkpoint selection is performed.
 
 <!-- paper-run-status:start -->
-**Resumed on the desktop at the user's request.** All 1,350 completed CE
-graphs were retained and skipped; its 54 native checks remain passed. Original
-source and all 11 original recurrent modules passed the reuse guard again.
-`joint_full` passed native checks and is extracting population graphs (248/1,350
-at the recorded check; it subsequently reached 300). Launcher PID 42791 and extractor PID 42863 identify this
-resume; `resume_request.json` records authorization and launch time. The remaining
-models, nine snapshots, population scoring/audits and final plots are pending.
-The recurrent protocol, checkpoints, precision and batch sizes are unchanged.
-A separately configured ordinary-Qwen baseline is now queued after recurrent
-extraction; it needs new generation, with results still pending.
+The full suite is **complete and independently audited**: six models, 1,350 graphs, all requested depths 1–256, 2,073,600 checked decisions and nine retained successful-executor snapshots. Ordinary Qwen additionally has 345,600 independently checked matched questions. The clean figure set has seven groups with twenty-five figure families, including historical/matched baselines, final-letter comparisons, five-attempt writeup panels and two logical-compute Pareto comparisons; legends/colorbars, coincident-series labels, denominators and source hashes are included. See [the population report](experiments/pointer_population_analysis.md) for results and the figure index. Obsolete render exports are retired; raw evidence is retained.
 <!-- paper-run-status:end -->
+
+## Completed review — 2026-10-10
+
+All outputs are available on both hosts under `eval/pointer_analysis/paper-20261009/`.
+The [figure index](../eval/pointer_analysis/paper-20261009/plots/index.md) follows the
+baseline/five-attempt writeup order and links all comparison, failure and Pareto
+exports. The [completed review](experiments/pointer_population_review.md) records
+copy hashes, actual visual coverage, checkpoint progression and claim limits.
+
+Ordinary Qwen scores 6.25% final-letter accuracy. Earlier models lose execution
+beyond their trained horizons; depth-12 fixed memory postpones that failure.
+GRU and final timer have identical R execution: 97.81% mean final-letter accuracy
+and 96.89% strict trajectories through 256. Their exact-stop rates differ sharply:
+4.57% versus 100%. Thus the final solver's remaining errors are execution errors
+on this finite panel, rather than stop-timing errors.
+
+Snapshot step 2000 has 1,315/1,350 strict trajectories through 256; step 2250 has
+1,308/1,350. The paired change loses 29 graphs and gains 22. Keep the frozen
+step-2250 executor as the reported final model: this opened retrospective panel
+must not silently become a checkpoint-selection set. There is one successful R
+training seed; these bundled changes do not isolate a unique causal explanation.
 
 ## Pause and resume handoff — 2026-10-09
 
@@ -156,12 +168,12 @@ native gates and reporting. `run.log`, `RUNNING`, `FAILED`, and `COMPLETE` show 
 pipeline state; a failure preserves recoverable chunks and prevents completion.
 
 A finite follow-up, [`sync_paper_analysis.sh`](../scripts/eval/sync_paper_analysis.sh),
-is waiting for this desktop run to complete or fail. It copies this output only
+completed after the desktop run finished. It copies this output only
 (no model weights), updates the owned handoff status, and retires local old renders
 only after a passing replacement. It does not commit or push future user edits.
 
-The desktop job has resumed; another launcher must not run concurrently against
-the same output. The pause/resume handoff records the preserved boundary.
+The desktop job is complete and no pipeline process remains active. The
+pause/resume handoff records the historical preserved boundary.
 No additional training run is needed. Historical inference is expensive even with exact prefix sharing:
 the measured CE chunk takes about 43 seconds for four graphs, implying roughly
 four hours for that arm. Other arms have different costs; no aggregate ETA has
@@ -189,7 +201,7 @@ the extra panels expose denominators and diagnostic detail rather than checkpoin
 sweeps. Exact duplicate curves are drawn once with every represented label;
 GRU and final timer explicitly share R execution. Different metrics occupy
 separate panels; model lines use different colors/dashes/markers and staggered
-marker placement **without coordinate jitter**. Heatmaps have colorbars and
+marker placement **without coordinate jitter**. Heatmaps use nearest-cell rendering, have colorbars and
 undefined/empty cells are N/A. Error intervals must fit within axes. Controller
 learning uses named aggregate cohorts, excluding duplicated per-depth views.
 
@@ -217,16 +229,16 @@ python -m scripts.eval.paper_writeup
 
 | Article section | Evidence / figure | Readiness and limitation |
 | --- | --- | --- |
-| 1–2. TL;DR and intro | Research question and bounded results in the project plan, architecture guide and current report | Existing final-model results are available; full historical population comparison is still running. |
+| 1–2. TL;DR and intro | Research question and bounded results in the project plan, architecture guide and current report | Full historical population comparison and independent audits are complete. |
 | 3. Task definition and data | Dataset/reference guide, benchmark manifest, graph features and structure plots | Ready; specify 26 states, cycles, exact transitions and each distinct training distribution. Long rollout is not a nonrepeating long graph. |
 | 4. Metrics and experiments | Definitions below, native fidelity, independent reference audit, exact stopping and graph-level denominators | Implemented; retrospective opened population, not new confirmation. |
-| 5. Base checkpoint | `06_writeup/baseline`: original seed-17 60/1000; `06_writeup/matched_baseline`: current graph/count panel, format/budget and graph-type metrics | Historical predictions recounted; full 345,600-question baseline queued. Same questions, different prompt/readout procedure. |
-| 6. Attempt 1 | `attempt_01`: CE-only full-sequence LoRA; selected step 2500; original loss and trained/untrained development cohorts | Learning panels ready, new eval column pending. This is the retained fresh-30k representative; earlier small pilots are archival context. |
-| 7. Attempt 2 | `attempt_02`: joint completion, then fixed-memory subvariant; two explicitly named rows | Original training panels ready; new eval columns pending. Include fixed memory as 2b rather than silently omitting an architecture. |
-| 8. Attempt 3 | `attempt_03`: fixed-memory depth-12 recipe, requested-count gaps 7/9/11 | Learning ready, eval pending. Depth, dataset seed, precision, batching and update count all changed; this is not an isolated data ablation. |
-| 9. Attempt 4 | `attempt_04`, `executor_validation_learning`, `controller_development`, `executor_population_progression` | Saved R/GRU development ready; population/snapshot extraction pending. Later GRU checkpoint uses the trained frozen R, not the unsuccessful controller from the original executor run. |
-| 10. Attempt 5 | `attempt_05`: scalar pilot development, separate shared-reader and cell fits, final-model eval | Fit evidence ready; final model's original full population already exists, integrated comparison pending. Reader least-squares and ten L-BFGS objective evaluations have no saved epoch curves; report summaries honestly. |
-| 11. Comparisons | `01_quality`, first-error survival/hazard, graph strata, `04_stopping` and `07_compute` Pareto panels | Await complete paired extraction/audit; separate forced execution from actual first stopping. |
+| 5. Base checkpoint | `06_writeup/baseline`: original seed-17 60/1000; `06_writeup/matched_baseline`: current graph/count panel, format/budget and graph-type metrics | Historical predictions recounted; full 345,600-question baseline complete at 6.25%. Same questions, different prompt/readout procedure. |
+| 6. Attempt 1 | `attempt_01`: CE-only full-sequence LoRA; selected step 2500; original loss and trained/untrained development cohorts | Learning panels and new evaluation column complete. This is the retained fresh-30k representative; earlier small pilots are archival context. |
+| 7. Attempt 2 | `attempt_02`: joint completion, then fixed-memory subvariant; two explicitly named rows | Original training panels and new evaluation columns complete. Include fixed memory as 2b rather than silently omitting an architecture. |
+| 8. Attempt 3 | `attempt_03`: fixed-memory depth-12 recipe, requested-count gaps 7/9/11 | Learning and evaluation complete. Depth, dataset seed, precision, batching and update count all changed; this is not an isolated data ablation. |
+| 9. Attempt 4 | `attempt_04`, `executor_validation_learning`, `controller_development`, `executor_population_progression` | Saved R/GRU development, population and all nine snapshots complete. Later GRU checkpoint uses the trained frozen R, not the unsuccessful controller from the original executor run. |
+| 10. Attempt 5 | `attempt_05`: scalar pilot development, separate shared-reader and cell fits, final-model eval | Fit evidence and integrated full-population comparison complete. Reader least-squares and ten L-BFGS objective evaluations have no saved epoch curves; report summaries honestly. |
+| 11. Comparisons | `01_quality`, first-error survival/hazard, graph strata, `04_stopping` and `07_compute` Pareto panels | Complete paired extraction/audit; separate forced execution from actual first stopping. |
 | 12. Takeaways | Claim boundaries in this document and model evolution | One successful R seed, bundled architecture/recipe changes, 26-state cyclic tables, task-specific numeric timer. Do not claim a uniquely proven failure cause or cross-task generality. |
 | 13. Demo | Not implemented/hosted by this analysis request | A demo must invoke the custom recurrent executor/controller, rather than ordinary Hugging Face text generation. Packaging, hosting and latency checks are a separate follow-up. |
 
@@ -366,7 +378,8 @@ visually checked. Its synthetic values are not pretrained results. All 345 local
 documentation targets checked exist; shell syntax, compilation and whitespace
 checks pass. Desktop source reuse still verifies all 11 original recurrent
 modules unchanged; launcher/extractor PIDs 42791/42863 remain active. The new
-baseline row is pending at 0/345,600, with no fabricated ETA or accuracy.
+baseline row was pending at 0/345,600 at that validation boundary. It has
+subsequently completed; current results above supersede this historical snapshot.
 
 ### Actual compute measurements (earlier CE capture)
 
@@ -709,7 +722,7 @@ The selected CE checkpoint passed its 54 pretrained native checks.
 Previously, 11 focused inventory/comparison/failure tests passed. Collection
 completed on both hosts; the archived collector matches both snapshot hashes.
 Compilation, 319 local file/directory links and whitespace checks pass. These
-checks validate this handoff/inventory; they do not pass the pending population suite.
+checks validated the handoff/inventory before the now-completed population suite.
 
 - [x] Inventory both hosts without model execution or opening closed tests.
 - [x] Record checkpoint availability, selection provenance and architecture/source map.
@@ -718,13 +731,13 @@ checks validate this handoff/inventory; they do not pass the pending population 
 - [x] Implement resumable full selected-candidate extraction; freeze weights and protocol.
 - [x] Implement shared failure aggregation with optional direct R fields, fixed-N risk sets,
   exposure-normalized structural tables, and mutually exclusive stop failures.
-- [ ] Audit raw targets, missing/undefined metrics, replay/native fidelity and plot cells.
+- [x] Audit raw targets, missing/undefined metrics, replay/native fidelity and plot cells.
 - [x] Launch recoverable population jobs on the desktop; retain every result, including failures.
-- [ ] Complete all model and successful-R snapshot population jobs.
-- [ ] Assemble figures/tables and update this document with actual results and exact commands.
+- [x] Complete all model and successful-R snapshot population jobs.
+- [x] Assemble figures/tables and update this document with actual results and exact commands.
 
-Next bounded work is **completion and review of population evaluation**, not
-another training run. Read host Git status before syncing; preserve untracked
+Next bounded work is **the project writeup from the completed evidence**.
+No additional training or inference is queued. Read host Git status before syncing; preserve untracked
 desktop weights/metrics. Do not overwrite existing experiment directories or
 silently relabel the 27-graph plots as full coverage. Other agents should record
 completed work and unresolved gaps here, with evidence in `docs/experiments/`.

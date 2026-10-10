@@ -1,0 +1,447 @@
+{
+  "passed": true,
+  "questions": 54,
+  "counts": [
+    1,
+    6,
+    12,
+    32,
+    128,
+    256
+  ],
+  "scope": "Exact continuations/decisions on first graph of each seed/mode stratum",
+  "observations": [
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-1",
+      "response": "U",
+      "generated_token_ids": "[52, 151645]",
+      "stop_reason": "eos",
+      "prediction": "U",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-6",
+      "response": "U",
+      "generated_token_ids": "[52, 151645]",
+      "stop_reason": "eos",
+      "prediction": "U",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-12",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-32",
+      "response": "U",
+      "generated_token_ids": "[52, 151645]",
+      "stop_reason": "eos",
+      "prediction": "U",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-128",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-256",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-1",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-6",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-12",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-32",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-128",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-256",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-1",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-6",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-12",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-32",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-128",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-256",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-1",
+      "response": "L",
+      "generated_token_ids": "[43, 151645]",
+      "stop_reason": "eos",
+      "prediction": "L",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-6",
+      "response": "L",
+      "generated_token_ids": "[43, 151645]",
+      "stop_reason": "eos",
+      "prediction": "L",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-12",
+      "response": "L",
+      "generated_token_ids": "[43, 151645]",
+      "stop_reason": "eos",
+      "prediction": "L",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-32",
+      "response": "L",
+      "generated_token_ids": "[43, 151645]",
+      "stop_reason": "eos",
+      "prediction": "L",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-128",
+      "response": "L",
+      "generated_token_ids": "[43, 151645]",
+      "stop_reason": "eos",
+      "prediction": "L",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-256",
+      "response": "L",
+      "generated_token_ids": "[43, 151645]",
+      "stop_reason": "eos",
+      "prediction": "L",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-1",
+      "response": "N",
+      "generated_token_ids": "[45, 151645]",
+      "stop_reason": "eos",
+      "prediction": "N",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-6",
+      "response": "N",
+      "generated_token_ids": "[45, 151645]",
+      "stop_reason": "eos",
+      "prediction": "N",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-12",
+      "response": "N",
+      "generated_token_ids": "[45, 151645]",
+      "stop_reason": "eos",
+      "prediction": "N",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-32",
+      "response": "N",
+      "generated_token_ids": "[45, 151645]",
+      "stop_reason": "eos",
+      "prediction": "N",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-128",
+      "response": "N",
+      "generated_token_ids": "[45, 151645]",
+      "stop_reason": "eos",
+      "prediction": "N",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-256",
+      "response": "N",
+      "generated_token_ids": "[45, 151645]",
+      "stop_reason": "eos",
+      "prediction": "N",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-1",
+      "response": "M",
+      "generated_token_ids": "[44, 151645]",
+      "stop_reason": "eos",
+      "prediction": "M",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-6",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-12",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-32",
+      "response": "M",
+      "generated_token_ids": "[44, 151645]",
+      "stop_reason": "eos",
+      "prediction": "M",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-128",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-256",
+      "response": "M",
+      "generated_token_ids": "[44, 151645]",
+      "stop_reason": "eos",
+      "prediction": "M",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-1",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-6",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-12",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-32",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-128",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-256",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-1",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-6",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-12",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-32",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-128",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-256",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-1",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-6",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-12",
+      "response": "N",
+      "generated_token_ids": "[45, 151645]",
+      "stop_reason": "eos",
+      "prediction": "N",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-32",
+      "response": "P",
+      "generated_token_ids": "[47, 151645]",
+      "stop_reason": "eos",
+      "prediction": "P",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-128",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-256",
+      "response": "Z",
+      "generated_token_ids": "[57, 151645]",
+      "stop_reason": "eos",
+      "prediction": "Z",
+      "correct": false
+    }
+  ]
+}

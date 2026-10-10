@@ -1,0 +1,5 @@
+{
+  "predictions": "Symbol class IDs 0\u201325. Historical optimized arrays are padded with zero after the last observed loop; those positions are NOT model predictions.",
+  "valid_lengths": "observed_trace_lengths.npz: [graph,count] observed loops per arm. CE=N; historical controller=max(N,first_stop), or cap for missing stops; isolated R always cap.",
+  "scoring": "Only actual observed transitions are scored. Fixed-request diagnostics stop at N."
+}

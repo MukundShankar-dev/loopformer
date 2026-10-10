@@ -10,8 +10,8 @@ cross-model comparisons and observed-policy Pareto figures. These compare
 exact-stop quality against logical recurrent-pass cost, not extraction time or
 matched hardware latency. See [output organization](analysis.md#queued-output-organization-and-pareto-comparisons).
 
-Ordinary Qwen is now additionally queued on **all 345,600 current graph/count
-questions**, using the existing 3-shot chat prompt and strict final-letter
+Ordinary Qwen completed **all 345,600 current graph/count
+questions**, scoring **6.25% final-letter accuracy**, using the existing 3-shot chat prompt and strict final-letter
 generation scoring. It has separate atomic outputs and frozen provenance,
 complete response/target audits, depth/graph-stratum summaries, paired
 graph-cluster intervals and final-answer comparison plots. The original 6%
@@ -25,7 +25,7 @@ model progression. Its [inventory](experiments/pointer_evidence_inventory.md)
 separates available records from missing population measurements. Collection and
 offline final-reference checks are complete. Run `bash analyze_pointer.sh` for
 the implemented resumable population suite; its full run and figure replacement
-are in progress. Read `python -m scripts.eval.paper_status` and the
+are complete and independently audited. Read `python -m scripts.eval.paper_status` and the
 [population report](experiments/pointer_population_analysis.md) for actual completion. The historical 27-graph comparison below remains valid exploratory
 evidence and is not the main population report.
 

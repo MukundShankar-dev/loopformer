@@ -1,0 +1,642 @@
+{
+  "status": "complete",
+  "figures": [
+    {
+      "group": "01_quality",
+      "name": "architecture_quality",
+      "title": "Execution and complete-solver quality",
+      "caption": "Each depth has 1,350 graphs. Headless CE has no learned-stop score. Shared-executor curves are drawn once.\nCE uses selected step 2500; architecture, data, capacity and recipes differ, so these are descriptive comparisons.",
+      "numeric": "numeric/architecture_quality.npz",
+      "numeric_sha256": "c86d2f2e338fd457b32d70b35047057fb6170686b389205c7eeda345543d6fd7",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "01_quality/architecture_quality.png",
+          "sha256": "07c1d613b0ebb2cba7b4b937f049412ff889790094141e16c2113723f94019b4"
+        },
+        "pdf": {
+          "path": "01_quality/architecture_quality.pdf",
+          "sha256": "f55380a63fcf0868b921b89dcb6f33252a35459be56fdc070b1e913f54925480"
+        },
+        "svg": {
+          "path": "01_quality/architecture_quality.svg",
+          "sha256": "adb62c76e09836e96c46710a09f7e62a842c72e7149921db38ffe6601a80ee29"
+        }
+      }
+    },
+    {
+      "group": "01_quality",
+      "name": "quality_matrices",
+      "title": "Quality at every requested depth",
+      "caption": "All integer depths 1\u2013256 are shown. Blank cells mean undefined metrics, not zero accuracy.\nStrict trajectory cannot recover after an earlier error; final-letter accuracy can.",
+      "numeric": "numeric/quality_matrices.npz",
+      "numeric_sha256": "d5d2834c2fbfcc6debc6be637fa1111284a9f4220a7c7fc9070ccc7f44f881ce",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "01_quality/quality_matrices.png",
+          "sha256": "98bc40a5e72d8d5ddc5136b94e614500f94c82fca0889c10f8dbffebf409524e"
+        },
+        "pdf": {
+          "path": "01_quality/quality_matrices.pdf",
+          "sha256": "f4d33c9fd592e0072c269f860a2af958fd71e726191e4a0f22f717f54ff9c859"
+        },
+        "svg": {
+          "path": "01_quality/quality_matrices.svg",
+          "sha256": "48ffd0fffcabf0a7e7aa64597391df9f75ba46acd248d3e10cc333338e0eeab8"
+        }
+      }
+    },
+    {
+      "group": "02_execution",
+      "name": "first_error_survival",
+      "title": "Where execution first fails, with the prompt held fixed",
+      "caption": "Survival denominator is always all 1,350 graphs for each fixed N. A first error ends survival permanently.\nThese curves do not compare different requested counts as though they were one rollout.",
+      "numeric": "numeric/first_error_survival.npz",
+      "numeric_sha256": "921ab26d26e886ec4904fbf8eb9fcd16a2975a18bd2280fdd81bf9cf7567c182",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "02_execution/first_error_survival.png",
+          "sha256": "c33ddbbb7eefb56293d466e0d066252dad19e870285622e4b4c8a37f8d699b35"
+        },
+        "pdf": {
+          "path": "02_execution/first_error_survival.pdf",
+          "sha256": "e422f4dfc970b33101b5718bc054711f10bcd9395e2d6271ec5b003dae2d74ba"
+        },
+        "svg": {
+          "path": "02_execution/first_error_survival.svg",
+          "sha256": "94eba1f80df7293cf055ac67d750954a0f4bcc36b5a4544c76248d88e3005259"
+        }
+      }
+    },
+    {
+      "group": "02_execution",
+      "name": "first_error_hazard",
+      "title": "Conditional first-error hazard",
+      "caption": "Only graphs correct before loop t enter its risk set. Blank: beyond requested N or an empty risk set.\nZero hazard remains a measured zero; raw at-risk denominators are in fixed_request_loops.csv.",
+      "numeric": "numeric/first_error_hazard.npz",
+      "numeric_sha256": "4814f8664cb4d0faabd676d564be355383ead42e825d83ec318cda131b0bc458",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "02_execution/first_error_hazard.png",
+          "sha256": "945ae7c86b5aff4484479918e15c90f9dc189c8fad46cc93425a10bd9ae99f56"
+        },
+        "pdf": {
+          "path": "02_execution/first_error_hazard.pdf",
+          "sha256": "cb0265ae5bf64bdc86c1308f7f26dc562fd241bc4a7555fff3b2e20093942fa6"
+        },
+        "svg": {
+          "path": "02_execution/first_error_hazard.svg",
+          "sha256": "979b03218d3836f5d82f9bcc3574bf2388da463627be3e04771e730a2448723f"
+        }
+      }
+    },
+    {
+      "group": "02_execution",
+      "name": "first_error_taxonomy",
+      "title": "Mutually exclusive first-error types",
+      "caption": "Each failed graph contributes once per fixed requested depth. Priority: previous \u2192 earlier visited \u2192 later reachable \u2192 outside orbit.\nThese describe decoded letters, not a causal explanation of latent-state mechanics.",
+      "numeric": "numeric/first_error_taxonomy.npz",
+      "numeric_sha256": "dd47d8b27581fabca549fae7e33998196729c7bc197894207e33389405429297",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "02_execution/first_error_taxonomy.png",
+          "sha256": "b386cffdfb774144e1fcd865cda86412c43dab346ffdd1d33e01141ab6e29097"
+        },
+        "pdf": {
+          "path": "02_execution/first_error_taxonomy.pdf",
+          "sha256": "28e63579734b89bd9e8c8654105ab74bb7b2c905894eba4415df0e106c143fab"
+        },
+        "svg": {
+          "path": "02_execution/first_error_taxonomy.svg",
+          "sha256": "d4826d6592a059842c06b5c71ce9a6203e7e0bd0e8b2c96b7f34e012adc6e4f7"
+        }
+      }
+    },
+    {
+      "group": "03_structure",
+      "name": "cycle_strata",
+      "title": "Which graph structures break each executor?",
+      "caption": "Rates and graph denominators appear in every observed cell. Empty bins are N/A. Full cycles have period 26 by construction.\nCycle period is compared within graph mode; these associations cannot isolate a causal graph feature.",
+      "numeric": "numeric/cycle_strata.npz",
+      "numeric_sha256": "ab8b1d73296f5346efe57cfaacd2cecb219c825141d8f6d9923da2e186235c53",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "03_structure/cycle_strata.png",
+          "sha256": "24d0d9346957c836c10e4574ea41622ec4022f6fa410d18aa483331fd8a83172"
+        },
+        "pdf": {
+          "path": "03_structure/cycle_strata.pdf",
+          "sha256": "56e5e1fb12866374465d3943d35580f220ae1f5b9b273a7903ba4782f5c4da0c"
+        },
+        "svg": {
+          "path": "03_structure/cycle_strata.svg",
+          "sha256": "344f2c689bfa0d06db41c9ce3c4af6051c8b5734a6411ee932398bb0d5a90ea7"
+        }
+      }
+    },
+    {
+      "group": "03_structure",
+      "name": "final_strata",
+      "title": "Final executor failures by mode, seed and transient",
+      "caption": "All 1,350 graphs, one binary trajectory outcome per graph at N=256. Pointwise graph-level intervals.\nTransient bins mix graph modes and are descriptive; within-mode strata and secondary risk exposures are saved as tables.",
+      "numeric": "numeric/final_strata.npz",
+      "numeric_sha256": "ea37b0873219af565318c21ccbe4933cba78bb801bb9bc351e89d826cf7b7cb3",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "03_structure/final_strata.png",
+          "sha256": "6baa09a1d3f7571211a933bc563f475ff7db3a96f424eb070fd0272e2b005ac6"
+        },
+        "pdf": {
+          "path": "03_structure/final_strata.pdf",
+          "sha256": "fee45e246a68697aae2980495ee2edb2f7fbe2213aea8c0bb940553a0d13d61c"
+        },
+        "svg": {
+          "path": "03_structure/final_strata.svg",
+          "sha256": "9810073091575e48fc1b609b9e3d3a72ca97cf08ca863790ab52a2be3ad2afd1"
+        }
+      }
+    },
+    {
+      "group": "03_structure",
+      "name": "final_failed_trajectories",
+      "title": "All final-executor failing trajectories",
+      "caption": "42 graphs fail; 1,308 graphs correct throughout are omitted. \u03bb = cycle period; \u03bc = transient length.\nA later correct letter can recover final-answer accuracy, but cannot erase an earlier trajectory failure.",
+      "numeric": "numeric/final_failed_trajectories.npz",
+      "numeric_sha256": "38f2965c2a9a528605a93decbebbeff10c9db04dee3c89c159b70f6028d5ebb2",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "03_structure/final_failed_trajectories.png",
+          "sha256": "bb772102da0dc2c34cd4fc0705e11b4fb40204a758e5a642d84af64ad34b8191"
+        },
+        "pdf": {
+          "path": "03_structure/final_failed_trajectories.pdf",
+          "sha256": "ac1d5db51e51f807238821a41e6509e151b87fa4a3d978f189428c65d64d43d4"
+        },
+        "svg": {
+          "path": "03_structure/final_failed_trajectories.svg",
+          "sha256": "b854a75da733a45a8e912941cc0a1cebdd08aa913d736b3c7af2f85573d92533"
+        }
+      }
+    },
+    {
+      "group": "04_stopping",
+      "name": "requested_actual_stops",
+      "title": "Requested versus actual stopping loops",
+      "caption": "Every requested row contains 1,350 graphs. Missing means no crossing by cap 272; it is a separate bin.\nThe diagonal corresponds to exact completion. Blank cells contain zero observations.",
+      "numeric": "numeric/requested_actual_stops.npz",
+      "numeric_sha256": "be47170cfa0e89e6534d497b62c41d6e5202ba7ca762324d3a59adb1f4be2b82",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "04_stopping/requested_actual_stops.png",
+          "sha256": "b2bee504f9794448a3f03b3da8c791e0c2d151733d86478eddc1ea180b953e5b"
+        },
+        "pdf": {
+          "path": "04_stopping/requested_actual_stops.pdf",
+          "sha256": "3e660ac566a87fc68b25f5afd4ec026bd6aa41a7fb1499457656f695d77b068e"
+        },
+        "svg": {
+          "path": "04_stopping/requested_actual_stops.svg",
+          "sha256": "bf7240e6f95291af3d30a50db5adfb63461913ca82bead0724e4963e345a91e0"
+        }
+      }
+    },
+    {
+      "group": "04_stopping",
+      "name": "timing_failure_modes",
+      "title": "How learned stopping fails",
+      "caption": "Exact, early, late and missing are mutually exclusive and sum to 100% at each N.\nA correct letter at the wrong loop is still a timing failure, including cyclic coincidences.",
+      "numeric": "numeric/timing_failure_modes.npz",
+      "numeric_sha256": "4e7bbf8e91330c43571222cad3a5d03f9fd62fdb452b9547c0c7ada378a6f9ca",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "04_stopping/timing_failure_modes.png",
+          "sha256": "8dac983beb42e0f5bce737d675fac2a1696e19b1a39a48c8cf4f4759b575903d"
+        },
+        "pdf": {
+          "path": "04_stopping/timing_failure_modes.pdf",
+          "sha256": "d814b70b2a0cb6071af5bc66288de2439aef2e3f35b0a575e903d1c028954216"
+        },
+        "svg": {
+          "path": "04_stopping/timing_failure_modes.svg",
+          "sha256": "75a404fe23acd1451c1be1294eb61fe996dd28c01b936887d916d6a7699c877e"
+        }
+      }
+    },
+    {
+      "group": "04_stopping",
+      "name": "execution_timing_decomposition",
+      "title": "Execution and timing failures are separate problems",
+      "caption": "Execution here means the forced letter at requested N, not strict trajectory correctness.\nTiming is the first crossing at N. These four exclusive outcomes distinguish execution failure from controller failure.",
+      "numeric": "numeric/execution_timing_decomposition.npz",
+      "numeric_sha256": "7869d58e93ca1cdd1357e395686ce6e5b5ece58f2339b1feb8bdebfec089fee9",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "04_stopping/execution_timing_decomposition.png",
+          "sha256": "bea59d54d18ff9cf39e0fc2efaae2ee799f6d0f4582b6246fefac333f7e5fc36"
+        },
+        "pdf": {
+          "path": "04_stopping/execution_timing_decomposition.pdf",
+          "sha256": "e58526ae236f8b2d162db7b34177ede2aec6ebab670cf288f110e71b465d0a3b"
+        },
+        "svg": {
+          "path": "04_stopping/execution_timing_decomposition.svg",
+          "sha256": "c8fe473748973b4e887dc924dee548034d28eeec09c81bbee83060087c105d6f"
+        }
+      }
+    },
+    {
+      "group": "04_stopping",
+      "name": "stop_residuals_and_coincidences",
+      "title": "Timing errors and misleading correct letters",
+      "caption": "Missing crossings are excluded from residual quantiles and retained in the timing-category plot.\nRight panel uses all graphs: cyclic coincidences never count as joint success.",
+      "numeric": "numeric/stop_residuals_and_coincidences.npz",
+      "numeric_sha256": "67fa370c2274b7cc3cb5c995eac25fc03a885590af84626c2a225a7f6e8fdb14",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "04_stopping/stop_residuals_and_coincidences.png",
+          "sha256": "e608e63042bbed6a3c94cc25c7876b9d545ac73aa7a63377a72f881681e9c193"
+        },
+        "pdf": {
+          "path": "04_stopping/stop_residuals_and_coincidences.pdf",
+          "sha256": "4979a71ef96d2cb1cb06fad0784ec398976a7d50956f8131bd900f6c453b6582"
+        },
+        "svg": {
+          "path": "04_stopping/stop_residuals_and_coincidences.svg",
+          "sha256": "be80e7e46af1f979ed2c07d676b9fe78368809fc0d9c979d609b9cc2be76c3da"
+        }
+      }
+    },
+    {
+      "group": "05_learning",
+      "name": "executor_validation_learning",
+      "title": "How the successful executor learned",
+      "caption": "Fixed 768-query development monitoring from the original run. Each loop has its own eligible denominator.\nStep 1000 has monitoring records but no retained weights. This is executor development, not a solver checkpoint-selection curve.",
+      "numeric": "numeric/executor_validation_learning.npz",
+      "numeric_sha256": "eb5329b3fcb4adcd4d972017c2c3a57cbefd3313f04fefcb4c3c659675fdb8a9",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "05_learning/executor_validation_learning.png",
+          "sha256": "90cf88a7bee5ab151f703d25c0ed3ac844d525cf34d0db4f3ddf29b620ea5f7b"
+        },
+        "pdf": {
+          "path": "05_learning/executor_validation_learning.pdf",
+          "sha256": "a9f664e5b85fff56ad37b160664fb42906220379c0760a09bd44a0904f042f3a"
+        },
+        "svg": {
+          "path": "05_learning/executor_validation_learning.svg",
+          "sha256": "4302d65bdbe05fe6ee027eb07fa2bd6a237d97f59fd816b60172dc5fb1a8d36f"
+        }
+      }
+    },
+    {
+      "group": "05_learning",
+      "name": "executor_population_progression",
+      "title": "Long-range execution across retained successful-architecture snapshots",
+      "caption": "Same 1,350 graphs, frozen executor snapshots; N is hidden from R. Final exact timer composition would inherit final-letter quality.\nThese are diagnostic compositions, not historical autonomous solvers. Missing step-1000 weights are not interpolated.",
+      "numeric": "numeric/executor_population_progression.npz",
+      "numeric_sha256": "bbe4e767d334dc1a008543453175f6e96cc6f8ad59bfd50a2664da26e27e8731",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "05_learning/executor_population_progression.png",
+          "sha256": "5f5d493cdc50925dff68bfc159bd14aca2fcb2c9775165b1e8c0d8930aab2e76"
+        },
+        "pdf": {
+          "path": "05_learning/executor_population_progression.pdf",
+          "sha256": "c9d58a88bb7c4a7cddfaeaa61df9256074f827066d406dced4f8887af4d07868"
+        },
+        "svg": {
+          "path": "05_learning/executor_population_progression.svg",
+          "sha256": "7c7535d480611da3605cae494db74ffa1766d92f71f3e5dce0bbc67f53884de5"
+        }
+      }
+    },
+    {
+      "group": "05_learning",
+      "name": "controller_development",
+      "title": "Frozen-executor GRU controller development",
+      "caption": "Original controller-development cohorts, not the 1,350-graph paper panel. Cohort definitions are in controller_repair.md.\nReader and scalar-cell repair are later distinct fits; their numeric validation is tabulated separately, never spliced into this learning curve.",
+      "numeric": "numeric/controller_development.npz",
+      "numeric_sha256": "5600cd033739f791907cc1d3e9b503c8357afaa78d8b49846c930ceeda2a9a9e",
+      "source_sha256": {},
+      "exports": {
+        "png": {
+          "path": "05_learning/controller_development.png",
+          "sha256": "42b8ef12fd3a6f341cf24286e7c2c480c271a9c670362aeeaad06eab4574114b"
+        },
+        "pdf": {
+          "path": "05_learning/controller_development.pdf",
+          "sha256": "12ad643fb4dc74947282e566ddf62c0a3c4b2254f46a52f351fb7c3a15449380"
+        },
+        "svg": {
+          "path": "05_learning/controller_development.svg",
+          "sha256": "2d7f7897e5477617c558ea280d6721df28e2d089c81274043561d003e1770a92"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "baseline",
+      "title": "Ordinary base checkpoint \u00b7 6% final-answer accuracy",
+      "caption": "Original seed-17 test: 1,000 questions, 125 per depth, greedy 3-shot generation; 95% Wilson intervals.\nHistorical context: this is a different dataset/prompt/inference procedure from the recurrent population comparison.",
+      "numeric": "numeric/baseline.npz",
+      "numeric_sha256": "62455541aef1a735a226e603c439c12419f5496953b11511c89715c330fcef29",
+      "source_sha256": {
+        "eval/pointer_task/20260910-wsl-cuda-instruct-retry/predictions.csv": "4d82eecd681273b2129da9e3dd0b2697fd5546acadeb15c694a4100cde3e9eb1",
+        "eval/pointer_task/20260910-wsl-cuda-instruct-retry/summary.json": "4d030b2620af0ce6444cb3b3235130bc251148064f3aa1e79067b6d7b6c8b6ff"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/baseline.png",
+          "sha256": "824b67a420b2f56dc5abf2f07eb1ba72aa74a9b7fdcf31b863df781d5b6fb872"
+        },
+        "pdf": {
+          "path": "06_writeup/baseline.pdf",
+          "sha256": "9b1efc1383e87480167dc133a97cb3e403618c7cb7ee473f55638566859a6017"
+        },
+        "svg": {
+          "path": "06_writeup/baseline.svg",
+          "sha256": "5406bd9710e96a0a90bff0a4f829bf105f32f3d440cbf78bce34e2f338defc35"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_01",
+      "title": "Attempt 1 \u00b7 full-sequence intermediate supervision",
+      "caption": "Historical training: CE windows weight minibatch examples; validation cohorts weight questions.\nEach run retains its original development data. Requested-count holdouts can still be supervised intermediate loops.",
+      "numeric": "numeric/attempt_01.npz",
+      "numeric_sha256": "03e8416595c7bad1cfd1d84a32f6525d2feeaabbd321b88fbff166937e899a50",
+      "source_sha256": {
+        "models/stage1_pointer/depth6-fresh30k-seed37-batch4/metrics.jsonl": "b7009412b6a83b1f54fe6e4fa7d1f288c2bab70cbf0797fc802ac9b45a26f662",
+        "models/stage1_pointer/depth6-fresh30k-seed37-batch4/config.json": "6e551b93fc1f660476c4a7eabaad18c7049f4aa67e7d73b96a3085b70791f7ab"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_01.png",
+          "sha256": "08785b5b1c82d8bb99a330da1ccc9c2319cd4e5ac7b7e53fc82e368eba8d9928"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_01.pdf",
+          "sha256": "649e2c4b79076e0b408e4d0daaa1f710c12e483080018be3330f6e56b22b7456"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_01.svg",
+          "sha256": "4e1122c15bef59c0bd9a0b920293888651d590643c62d28331ddc2ae9a77db92"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_02",
+      "title": "Attempt 2 \u00b7 completion head and fixed prompt memory",
+      "caption": "Historical training: CE windows weight minibatch examples; validation cohorts weight questions.\nEach run retains its original development data. Requested-count holdouts can still be supervised intermediate loops.",
+      "numeric": "numeric/attempt_02.npz",
+      "numeric_sha256": "7e4c5760d1b054dc250ebe54c4c4ed35ad3964892fe069ed099aad83ca87ad56",
+      "source_sha256": {
+        "models/stage1_pointer/depth6-completion-seed37/metrics.jsonl": "8cc047d20392780224b80924f5cbff071c0e87a50d741cf3f406b9533a2a757a",
+        "models/stage1_pointer/depth6-completion-seed37/config.json": "2627ecec771a5d8f5aae4bf2cc75f40bf3b1e342f8782d4b8ff2cc1403204c55",
+        "models/stage1_pointer/depth6-fixed-prompt-seed37/metrics.jsonl": "c54c364accd82a5daad852878b4bf8f036ef1721a0a7b316d851f563fc1fb71e",
+        "models/stage1_pointer/depth6-fixed-prompt-seed37/config.json": "469dfd2cf284f18cd472459e99c95e7d0f4e6a8367883edbf2058dd1737e525b"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_02.png",
+          "sha256": "39c352edf45f1829a8a368d621125d8df006cf463ebf94b8df5aa7f9f7072249"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_02.pdf",
+          "sha256": "47e39406e350b4dd30a508a9314169fe97c1fd9cea356ef31ff86a239777e4b7"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_02.svg",
+          "sha256": "b34bb412abe5be8c5fbb235f9bfe4533639c468c74a1214be0121c5f8eca77cf"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_03",
+      "title": "Attempt 3 \u00b7 deeper training with the same architecture",
+      "caption": "Historical training: CE windows weight minibatch examples; validation cohorts weight questions.\nEach run retains its original development data. Requested-count holdouts can still be supervised intermediate loops.",
+      "numeric": "numeric/attempt_03.npz",
+      "numeric_sha256": "9a9b660c1467fb0217fa170443869f947218cf883b6bbf11e107c49d3a1c2742",
+      "source_sha256": {
+        "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/metrics.jsonl": "13713bcd0074af5d8f09fa1296acde3c50a8ec01f4f04133742b093e1f13b2b3",
+        "models/stage1_pointer/depth12-fixed-prompt-seed47-gaps/config.json": "610fb2888fe13b116470933e2bd210657eaafe2260de384d4944f91e81fb2a9d"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_03.png",
+          "sha256": "5b6810abfc13b22cbf62983dc2a455b504d5f548e45ab94a88340ad6ccd0d500"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_03.pdf",
+          "sha256": "e8470975ac3a99841e7ebf415e0d102ed5e949a19d9a4b861fc1175797360c44"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_03.svg",
+          "sha256": "f848b002496b33d71502f5cc6b552cd019910666c41d2a6d3453b948d7d28d9e"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_04",
+      "title": "Attempt 4 \u00b7 count-free executor and private controller",
+      "caption": "Successful R training shown here; later frozen-R GRU fitting is in controller_development.\nPopulation evaluation uses the later GRU controller; the executor training controller was replaced.",
+      "numeric": "numeric/attempt_04.npz",
+      "numeric_sha256": "e95c01e093a43001e66758fb4a2961f4888ee2f8da3efa162f5dd469efbcc2a1",
+      "source_sha256": {
+        "models/stage1_pointer/executor_r-seed61/metrics.jsonl": "0ddcfe05e7b8a5bbf7d1583912a9ccc670dfae9f54f4ed17fb87369b54b69e98",
+        "models/stage1_pointer/executor_r-seed61/config.json": "5f17d07c321c62f09e13a997d1bcf06eb4fb89b5ccee0c0c1e8a06934531ba89"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_04.png",
+          "sha256": "dfb5ea1f2d3751b950a6efd79daec3608c6bde7e1bf22e264218b0882110ddb8"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_04.pdf",
+          "sha256": "a983a0e9436a22949d4b87c843dc3834c1b25ca609ef13c234313302f4ddc5a0"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_04.svg",
+          "sha256": "1aebab13de03e200c7e9e0545accf2d0d1bcaa6f4798806d7ce3bd8ca0a7afa8"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "attempt_05",
+      "title": "Attempt 5 \u00b7 shared number reader and precise learned countdown",
+      "caption": "Left: earlier scalar-controller pilot. Middle: later separate fit on the same 58 requested counts and at most 12 labels per count.\nReader was fitted by least squares (maximum training-count error 3.8e-06); no reader/cell epoch history exists.",
+      "numeric": "numeric/attempt_05.npz",
+      "numeric_sha256": "09e0969743e6ecb71581814c4382d0c69a2b7786cdf1ad99c792a668de122d4f",
+      "source_sha256": {
+        "models/stage1_pointer/controller-affine-seed83/validation_history.csv": "23392c6999673395fdb8bcb546b5edca745a26848d4729fd8111febcf87ae157",
+        "models/stage1_pointer/controller-shared-number-seed83/summary.json": "899de71c49d8fa26da8fd906ff4ee0650300bb689e2f6eb677908ad3272168b7",
+        "models/stage1_pointer/controller-shared-number-precision-seed83/summary.json": "92e1a18710f5e8ba56191f27749ab971ee1567e553880b709c30f44c08f05380"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/attempt_05.png",
+          "sha256": "e18c2aa8cae56472e9eee266fdc0377bf7ab5875aa689ce16112aa9987a89d34"
+        },
+        "pdf": {
+          "path": "06_writeup/attempt_05.pdf",
+          "sha256": "bb69e5ca53945cc04d7d558ff513d4d4e75e5857924e2f976460525e7dff7f1e"
+        },
+        "svg": {
+          "path": "06_writeup/attempt_05.svg",
+          "sha256": "c91d88f549c9bf0e1aaaa184d27b4cad400a20b580f3ef9e60192e9533d2a235"
+        }
+      }
+    },
+    {
+      "group": "06_writeup",
+      "name": "matched_baseline",
+      "title": "Ordinary Qwen \u00b7 current full graph/count benchmark",
+      "caption": "Same 1,350 graphs, starts, rule order and requests 1\u2013256 as the recurrent suite; 345,600 unconstrained generations.\nExisting 3-shot chat prompt; greedy, max 8 new tokens. Invalid responses are failures. Prompt/readout differ from recurrent inference.\nPointwise intervals use 1,350 graphs; requests share graph clusters. Generation tokens are not recurrent transitions.",
+      "numeric": "numeric/matched_baseline.npz",
+      "numeric_sha256": "85a623c90099ec38ec0a594c2ec3fb81f0ad9d0189e669698e658d3bd6a438ca",
+      "source_sha256": {
+        "eval/pointer_analysis/paper-20261009/ordinary_qwen/outcomes.npz": "cb2e21de54406273aa2ba11669bc8159a6d31700291c1866d16bf7a0cbb3bc41",
+        "eval/pointer_analysis/paper-20261009/ordinary_qwen/quality_by_depth.csv": "7348a9d2b2a6a99a10df8e9ccd1439bfc71f73b8496631c641e693953afc1348",
+        "eval/pointer_analysis/paper-20261009/ordinary_qwen/independent_audit.json": "ce410f7435da8d57b15e93e195f7abeeee5e5e91fd11a5830eaa356b3e8928a6",
+        "eval/pointer_analysis/paper-20261009/ordinary_qwen/freeze.json": "57fc3ba3bbff063287a188d8a2febec4400111a924fbbc86af4e204482a26423",
+        "eval/pointer_analysis/paper-20261009/graph_metadata.json": "d449ad2a6d01518e3f670b563f0545db895139890aec79f92a65d63300c0f121",
+        "/Users/mukunds/Desktop/loopformer/scripts/eval/paper_baseline_plots.py": "febe83e9cbaf64a4519333254b15a5b5ef3c9f1b918b362b2f224bb802a7c32b"
+      },
+      "exports": {
+        "png": {
+          "path": "06_writeup/matched_baseline.png",
+          "sha256": "735d881e42ecddad6a34a6e8e1f25c214f0415c50a4ba10237ad6cd8ca5e6adb"
+        },
+        "pdf": {
+          "path": "06_writeup/matched_baseline.pdf",
+          "sha256": "a372fbdc13d0085dc9fb49d91e82a95cdc9aed70d6b964e3a34d7371c999e58e"
+        },
+        "svg": {
+          "path": "06_writeup/matched_baseline.svg",
+          "sha256": "aac477e4619f648b5114eb4bc86e9c1d7fdd24b67206c4b362d2c060fcffc42a"
+        }
+      }
+    },
+    {
+      "group": "01_quality",
+      "name": "final_letter_comparison",
+      "title": "Final answers on identical questions \u00b7 ordinary and recurrent",
+      "caption": "All models use the same 345,600 graph/count queries. Ordinary Qwen uses 3-shot chat generation; recurrent models use raw prompts/restricted readout.\nLeft: recurrent readout at N. Right: actual returned letter; correct letters at wrong loops count here, so this is NOT answer + exact-stop success.\nNo trajectory or loop-timing metric is assigned to ordinary generation. CE has no learned stop and is absent from the right panel.",
+      "numeric": "numeric/final_letter_comparison.npz",
+      "numeric_sha256": "1062002cdbfc07fae910a6e59c00a8950ce11e4decebff35f66cde805d4c3ba0",
+      "source_sha256": {
+        "eval/pointer_analysis/paper-20261009/ordinary_qwen/outcomes.npz": "cb2e21de54406273aa2ba11669bc8159a6d31700291c1866d16bf7a0cbb3bc41",
+        "eval/pointer_analysis/paper-20261009/ordinary_qwen/quality_by_depth.csv": "7348a9d2b2a6a99a10df8e9ccd1439bfc71f73b8496631c641e693953afc1348",
+        "eval/pointer_analysis/paper-20261009/ordinary_qwen/independent_audit.json": "ce410f7435da8d57b15e93e195f7abeeee5e5e91fd11a5830eaa356b3e8928a6",
+        "eval/pointer_analysis/paper-20261009/ordinary_qwen/freeze.json": "57fc3ba3bbff063287a188d8a2febec4400111a924fbbc86af4e204482a26423",
+        "eval/pointer_analysis/paper-20261009/graph_metadata.json": "d449ad2a6d01518e3f670b563f0545db895139890aec79f92a65d63300c0f121",
+        "/Users/mukunds/Desktop/loopformer/scripts/eval/paper_baseline_plots.py": "febe83e9cbaf64a4519333254b15a5b5ef3c9f1b918b362b2f224bb802a7c32b",
+        "eval/pointer_analysis/paper-20261009/outcomes.npz": "38d0889b4f82cf8731e0db1ec6bcc9b7d1df36322742bb2fc1938a397c69ac5b",
+        "eval/pointer_analysis/paper-20261009/ordinary_qwen/paired_deltas.csv": "dce4c2889a9ed4269d31cfa3694cad9fffb9eb5cab0dbfd95fde9a40aaf47b59"
+      },
+      "exports": {
+        "png": {
+          "path": "01_quality/final_letter_comparison.png",
+          "sha256": "ea4bf996981736fac37ab8660aa3d4ff3f225a8337022830493cc7b13ba77c2d"
+        },
+        "pdf": {
+          "path": "01_quality/final_letter_comparison.pdf",
+          "sha256": "76145f07bbb6a365a567f7e66dc686ee931bc0ccddf1173b0c37bb0aac6487ec"
+        },
+        "svg": {
+          "path": "01_quality/final_letter_comparison.svg",
+          "sha256": "7d15b7ae8f163e7a577053b6ef9a5079cc0801e75454f07b5bb3535d0a601409"
+        }
+      }
+    },
+    {
+      "group": "07_compute",
+      "name": "pareto_joint_success",
+      "title": "Answer-and-stop quality versus recurrent budget",
+      "caption": "Frozen policies on the same graphs/counts; 95% paired graph-cluster intervals. Missing stops cost all 272 passes.\nLoops are a logical budget, not FLOPs/latency; block costs differ. CE-only stopping is undefined and excluded.\nExact ties are drawn once with policy names. Frontier is among observed point estimates; no threshold fitting or interpolated policy.",
+      "numeric": "numeric/pareto_joint_success.npz",
+      "numeric_sha256": "fef95b485620d3144ebda24a366c154942b97849bf60f4f9d15e1a136736c18e",
+      "source_sha256": {
+        "eval/pointer_analysis/paper-20261009/quality_compute.csv": "9c0de6feef589ebbb57c6004c4b5446ab7ee05f6c355125098c368b3a39d27f2",
+        "eval/pointer_analysis/paper-20261009/outcomes.npz": "38d0889b4f82cf8731e0db1ec6bcc9b7d1df36322742bb2fc1938a397c69ac5b",
+        "eval/pointer_analysis/paper-20261009/cluster_intervals.csv": "da817296c53542a602eb42c9768569ac1bd01bb11e74f5a0859c7f0b7b723663",
+        "eval/pointer_analysis/paper-20261009/protocol.json": "33e40fe21b93fcca9fa5dc78db7cc37d80a8b21485dd2322822b336552dcc54c",
+        "eval/pointer_analysis/paper-20261009/graph_metadata.json": "d449ad2a6d01518e3f670b563f0545db895139890aec79f92a65d63300c0f121",
+        "/Users/mukunds/Desktop/loopformer/scripts/eval/paper_pareto.py": "9194006482472096ddad3cab4845687ea63b5cb045466621ad47e81a6daa697c"
+      },
+      "exports": {
+        "png": {
+          "path": "07_compute/pareto_joint_success.png",
+          "sha256": "a709bea0f6da58c58b010810c337cddcde4a5dba63bfefe12805178245f0eb6d"
+        },
+        "pdf": {
+          "path": "07_compute/pareto_joint_success.pdf",
+          "sha256": "ce871b9687c537f59b3ab58409413946d3ea8b55d4b24d1b0aaf2edcb89bddf7"
+        },
+        "svg": {
+          "path": "07_compute/pareto_joint_success.svg",
+          "sha256": "371b34222633a614022a2528f5b3f3a88cd9cd7ea3deeac0f50976e1553dee07"
+        }
+      }
+    },
+    {
+      "group": "07_compute",
+      "name": "pareto_strict_success",
+      "title": "Strict execution-and-stop quality versus recurrent budget",
+      "caption": "Frozen policies on the same graphs/counts; 95% paired graph-cluster intervals. Missing stops cost all 272 passes.\nLoops are a logical budget, not FLOPs/latency; block costs differ. CE-only stopping is undefined and excluded.\nExact ties are drawn once with policy names. Frontier is among observed point estimates; no threshold fitting or interpolated policy.",
+      "numeric": "numeric/pareto_strict_success.npz",
+      "numeric_sha256": "304bb5c3872a19a10c2087bc163c5f274e113fd8852d07d6210987b5a8be3fd7",
+      "source_sha256": {
+        "eval/pointer_analysis/paper-20261009/quality_compute.csv": "9c0de6feef589ebbb57c6004c4b5446ab7ee05f6c355125098c368b3a39d27f2",
+        "eval/pointer_analysis/paper-20261009/outcomes.npz": "38d0889b4f82cf8731e0db1ec6bcc9b7d1df36322742bb2fc1938a397c69ac5b",
+        "eval/pointer_analysis/paper-20261009/cluster_intervals.csv": "da817296c53542a602eb42c9768569ac1bd01bb11e74f5a0859c7f0b7b723663",
+        "eval/pointer_analysis/paper-20261009/protocol.json": "33e40fe21b93fcca9fa5dc78db7cc37d80a8b21485dd2322822b336552dcc54c",
+        "eval/pointer_analysis/paper-20261009/graph_metadata.json": "d449ad2a6d01518e3f670b563f0545db895139890aec79f92a65d63300c0f121",
+        "/Users/mukunds/Desktop/loopformer/scripts/eval/paper_pareto.py": "9194006482472096ddad3cab4845687ea63b5cb045466621ad47e81a6daa697c"
+      },
+      "exports": {
+        "png": {
+          "path": "07_compute/pareto_strict_success.png",
+          "sha256": "9a5d257530f5e2902900cd30f763c006a4ae133dacf5413560a66e95683e539e"
+        },
+        "pdf": {
+          "path": "07_compute/pareto_strict_success.pdf",
+          "sha256": "a8ddd4b92860a3c8fa616428eb2e52312519657dcbad652172b0734cdad61400"
+        },
+        "svg": {
+          "path": "07_compute/pareto_strict_success.svg",
+          "sha256": "7540e806b4b73ccce7608e8458ce7140672a7b32a399a0989e269123c2a43195"
+        }
+      }
+    }
+  ],
+  "input_sha256": {
+    "reference_audit.json": "d6efec1a81af7976b28e7e5bc527748ee8f053046e1db83f7ad3658edc6b72cc",
+    "quality_by_depth.csv": "86820de86439087e06b5844bf8a75f73c569304c8e6ab7906ae1d739369cef5e",
+    "outcomes.npz": "38d0889b4f82cf8731e0db1ec6bcc9b7d1df36322742bb2fc1938a397c69ac5b",
+    "fixed_request_loops.csv": "243c7f8af8718beb604e3769d4c5fe4367792e900eef1e1609ecb72bd01f681a",
+    "first_errors.csv": "d504365e8f6015d8274a0c1236f2baee000ddf96d2f1611a428cb95597d11505",
+    "structure_failure_rates.csv": "ba14f59e277da46d82ee71becd95562c4a4860063be8f0e1364cfe74c2823b90"
+  },
+  "plot_code_sha256": "05a9f7d63b052a0884bcdd1be34d7239773e01893e18b9363e7a830833a1c332",
+  "overlap_policy": "Identical executor curves grouped; separate metric panels; staggered marker locations only, no value jitter",
+  "coverage": "Population: 1350 graphs, requests 1\u2013256, including ordinary Qwen. Training histories and old seed-17 baseline are separately labelled."
+}

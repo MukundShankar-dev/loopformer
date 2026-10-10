@@ -24,21 +24,23 @@ The adaptive-compute guide is the **single source for that extension**. The rese
 
 ## Evidence, not instructions
 
-The [full population suite](experiments/pointer_population_analysis.md) is implemented
-and resumed at the user's request after the CE completion pause; `bash analyze_pointer.sh` performs frozen extraction, independent
-audits, retained successful-R snapshots and clean plot replacement. The report
-distinguishes current run state from completed evidence.
+The [full population suite](experiments/pointer_population_analysis.md) is complete:
+six recurrent representatives, ordinary Qwen on all 345,600 matched questions,
+nine executor snapshots, independent audits and 25 organized figure families.
+The [completed review](experiments/pointer_population_review.md) records findings,
+Mac copy verification and visual checks. `bash analyze_pointer.sh` reproduces
+the frozen extraction and reporting with resumable chunks.
 Read the [pause/resume handoff](analysis.md#pause-and-resume-handoff--2026-10-09)
 for the saved boundary; the user has now authorized resumption.
 
 The [writeup coverage map](analysis.md#writeup-coverage--user-outline-2026-10-09)
 now follows the baseline and five attempts. Original saved learning histories are
-rendered without model inference; full paired evaluation columns remain pending.
+rendered from original logs, with completed paired population evaluation columns.
 
 The [matched ordinary baseline](analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09)
-is queued on the same 1,350 graphs and requests 1–256, with frozen 3-shot
-generation, independent response audits and paired final-letter comparisons.
-Its results remain pending; the historical seed-17 baseline is retained separately.
+completed on the same 1,350 graphs and requests 1–256, with frozen 3-shot
+generation, independent response audits and paired final-letter comparisons:
+6.25% final-letter accuracy. The historical seed-17 baseline is retained separately.
 
 The [complete evidence inventory](experiments/pointer_evidence_inventory.md)
 records both hosts' saved datasets, checkpoint availability, schemas and run

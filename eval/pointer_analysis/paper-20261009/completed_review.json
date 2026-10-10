@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "date": "2026-10-10",
+  "host": "Mac",
+  "scope": "Post-transfer file-integrity verification and independent snapshot cell recomputation; no pretrained inference",
+  "figure_families": 25,
+  "exports_hash_checked": 75,
+  "numeric_files_hash_checked": 25,
+  "recurrent_chunks_hash_checked": 1396,
+  "ordinary_chunks_hash_checked": 1350,
+  "snapshot_plot_cells_recomputed": 72,
+  "final_exact_stop_queries": 345600,
+  "final_strict_256_graphs": 1308,
+  "snapshot_2000_strict_256_graphs": 1315,
+  "snapshot_2250_strict_256_graphs": 1308,
+  "paired_2000_to_2250": {
+    "lost": 29,
+    "gained": 22
+  },
+  "manifest_sha256": "2243c0c196d60a861be5742bfa949e0d25c79765fb2a436d193dc74527c0002c",
+  "reference_audit_sha256": "d6efec1a81af7976b28e7e5bc527748ee8f053046e1db83f7ad3658edc6b72cc",
+  "independent_audit_sha256": "e46974d28d30813692a7ad2b33300926952b2a62ef3d411dd5103b9c16d28968",
+  "baseline_audit_sha256": "ce410f7435da8d57b15e93e195f7abeeee5e5e91fd11a5830eaa356b3e8928a6",
+  "visual_review": "All 25 actual figure families inspected; changed discrete heatmaps and legend rechecked after rendering correction",
+  "absolute_source_mapping": "Desktop /home/mukund/loopformer paths mapped to same repository-relative files; recorded provenance unchanged"
+}

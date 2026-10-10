@@ -1,0 +1,28 @@
+{
+  "checkpoint_sha256": {
+    "adapter_model.pt": "5a53372639924222266e457e1b1c586aeaa8db7340192c449cb7f8fd288c4e95",
+    "chat_template.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "recurrent_config.json": "d356caf86698ae317f1bf9b4ea250a1aeb7f14f1b5fe43d47711fa54269d3b9e",
+    "tokenizer.json": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+    "tokenizer_config.json": "c4f4c62b741ab2940841480f9942f378d7d3878d47c2babb862af7381c59b952"
+  },
+  "graph_sha256": "60fd0af94dab587e43f0a20d452ca1bf1bb210ecc2e49875d8954f847eb7c285",
+  "dtype": "float32",
+  "attention": "sdpa",
+  "batch_size": 64,
+  "cap": 272,
+  "recurrent_source_sha256": {
+    "scripts/recurrent_qwen/partitioned.py": "a358af968434ef82f6c1eeaca8b85d4b9903df74ac29c0c5bd2648bde6306e2a",
+    "scripts/recurrent_qwen/outputs.py": "f384bea5eaf663c7e7ce0cfbc7cb5a0165a89186be078b7c12092b424bed9789",
+    "scripts/recurrent_qwen/memory.py": "81cb65bdd3fba5ef9954c4c09a91c115dd2e668bd3d7755af1246f9bf22f3fcd",
+    "scripts/recurrent_qwen/number_reader.py": "0e36ef99d768c8a75cb84efc8b765df94a39318e839026a0a0b09d6a13baca1a",
+    "scripts/recurrent_qwen/lora_utils.py": "4f2baf46c9a57f9aa79bf41e50c5fc1cc5bd8020c8e066e5829cfb8284a9b803",
+    "scripts/recurrent_qwen/interfaces.py": "0a1aeded9eee9bba1a07cab90fa5228a8fb21978247022442196556191b55168",
+    "scripts/recurrent_qwen/__init__.py": "33bb24196ba9676312779e3e3afba580f37f0d354c2fff31fa598ab7903301b2",
+    "scripts/recurrent_qwen/completion.py": "0e7155e9decaa56dafe44c6a31eb672a2c34e4229b0bac120d5f38281a91d476",
+    "scripts/recurrent_qwen/validation.py": "7aeb45730858b2bb5999ea18e36de70497de03564db99fd1bfa4599e0c36d511",
+    "scripts/recurrent_qwen/prefix.py": "bdefddcb3752ff7bb6bb389ede745837ce08c86d3d827c27164c7a91a1c32576",
+    "scripts/recurrent_qwen/checkpoint.py": "26b639d45645a82e2eed9cdf50377b599bd10fcb29a71664f9c1d8f85964015b",
+    "scripts/recurrent_qwen/model.py": "38a9c5723803259293469b00023fb614f6ed87cdca22dc33101239b708862261"
+  }
+}

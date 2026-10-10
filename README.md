@@ -24,7 +24,7 @@ One recurrent block is reused across all loops. The executor experiment trained 
 
 The frozen model passes the [full benchmark](docs/experiments/pointer_final_benchmark.md):
 100% on the 1,536-query existing test, **97.81% answer-plus-exact-stop success**
-across 1,350 new graphs at every depth 1–256, and **96.89% complete trajectories
+across 1,350 new graphs and requested depths 1–256, and **96.89% complete trajectories
 through 256**. Training exposure stayed unchanged: R unrolled through 12;
 controller count labels through 63, with held-out values. Exact stopping is 100%
 through 256. All graphs have 26 states and long executions can cycle. The earlier
@@ -46,9 +46,10 @@ See [run state and results](docs/experiments/pointer_population_analysis.md).
 The final bundle includes per-attempt training/eval panels, cross-model failure
 comparisons and Pareto plots; [the output map](docs/analysis.md#queued-output-organization-and-pareto-comparisons)
 explains the folders and logical-compute scope.
-The queue also evaluates ordinary Qwen on the same current questions using the
-existing 3-shot prompt, with audited final-answer comparisons; the older 6%
-baseline remains separately labelled. See [the baseline setup](docs/analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09).
+The completed suite includes ordinary Qwen on the same current questions:
+**6.25% final-answer accuracy** using the existing 3-shot prompt. The older 6%
+baseline remains separately labelled. Browse the [organized plots](eval/pointer_analysis/paper-20261009/plots/index.md)
+for per-attempt learning/evaluation panels, comparisons and failure analysis. See [the baseline setup](docs/analysis.md#ordinary-qwen-on-the-current-benchmark--2026-10-09).
 See [how the architectures evolved](docs/pointer_model_evolution.md) for technical
 and plain-language explanations, and the [historical comparison](docs/experiments/pointer_architecture_history.md)
 for original full-sequence/fixed-prompt models and two frozen-R examples.

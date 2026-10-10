@@ -55,6 +55,9 @@ def main()->None:
                   '', '## Limitations','',
                   'The graph panel is retrospective and opened. Historical architectures differ in data, trainable capacity and recipe; comparison does not isolate architectural causation. Only one successful R training seed exists. Tables have 26 states and long trajectories cycle; this is not evidence for a nonrepeating 50-state chain, unlimited depth, or cross-family transfer. The numeric timer ignores R correctness and does not establish quality-aware adaptive compute.',
                   '', 'Old render exports are retired only after this replacement passes. Raw historical metrics, weights, logs and numeric audits remain; prior render files remain recoverable from Git history.',''])
+    if Path('docs/experiments/pointer_population_review.md').exists():
+        lines.extend(['## Completed review', '',
+                      '[Post-transfer verification, visual review and interpretation](pointer_population_review.md).', ''])
     Path('docs/experiments/pointer_population_analysis.md').write_text('\n'.join(lines))
     message=(f'The full suite is **complete and independently audited**: six models, {audit["graphs"]:,} graphs, all requested depths 1–256, '
              f'{audit["scalar_decisions_checked"]:,} checked decisions and nine retained successful-executor snapshots. '

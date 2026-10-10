@@ -4,6 +4,15 @@ This document records choices that affect implementation or interpretation. The 
 
 ## Established constraints
 
+2026-10-10 completed population review: retain the predeclared step-2250
+executor/final controller despite step 2000's slightly higher retrospective
+strict-through-256 score (1,315 versus 1,308 of 1,350). The paired change loses
+29 graphs and gains 22; it is evidence of late regression, not authorization to
+reselect on an opened benchmark. Preserve the matched ordinary-Qwen 6.25%
+baseline and distinct prompt/readout conventions. All 25 figure families and
+raw evidence are copied to the Mac; new tuning would require fresh confirmation.
+See the [completed review](experiments/pointer_population_review.md).
+
 2026-10-09 population analysis: the user requested selected-candidate architecture
 failures on all 1,350 opened graphs, with checkpoint progression only for the
 successful model. Use CE step 2,500 as the documented development extrapolation

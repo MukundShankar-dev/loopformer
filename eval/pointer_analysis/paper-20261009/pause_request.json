@@ -1,0 +1,6 @@
+{
+  "reason": "User requested pause after CE-only finishes",
+  "launcher_pid": 12588,
+  "extractor_pid": 12617,
+  "watcher_pid": 21031
+}
