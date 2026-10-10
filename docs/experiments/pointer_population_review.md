@@ -98,8 +98,9 @@ The execution/timing decomposition legend now has a white background so its
 color swatches remain visible over filled regions. The full figure set was
 regenerated locally from audited cached outputs, with unchanged scores, and the
 changed panels were rechecked. No GPU inference was needed. All 16 focused reporting/export/writeup/Pareto/status
-tests passed in 15.69 seconds; 433 local Markdown targets exist, and whitespace
-checks pass. Old 69 historical
+tests passed in 15.69 seconds; 433 local Markdown targets exist. Source and
+documentation whitespace checks pass; original CSV line endings and raw terminal
+progress logs are preserved. Old 69 historical
 render exports were retired on each host after replacement passed; raw evidence
 and Git history remain available.
 
