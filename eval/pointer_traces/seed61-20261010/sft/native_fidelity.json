@@ -1,0 +1,386 @@
+{
+  "questions": 54,
+  "exact_continuations": false,
+  "exact_scores": true,
+  "observations": [
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 151645]",
+      "native_ids": "[41, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 431, 434, 386, 1863, 472, 151645]",
+      "native_ids": "[41, 431, 434, 386, 1863, 472, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 431, 434, 386, 1863, 472, 358, 350, 444, 809, 1599, 328, 151645]",
+      "native_ids": "[41, 431, 434, 386, 1863, 472, 358, 350, 444, 809, 1599, 328, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 431, 434, 151645]",
+      "native_ids": "[41, 431, 434, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 431, 434, 386, 1863, 472, 358, 350, 444, 809, 151645]",
+      "native_ids": "[41, 431, 434, 386, 1863, 472, 358, 350, 444, 809, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-256",
+      "raw_equal": false,
+      "scores_equal": true,
+      "batched_ids": "[41, 431, 434, 386, 1863, 472, 151645]",
+      "native_ids": "[41, 431, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[48, 151645]",
+      "native_ids": "[48, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[48, 362, 358, 386, 1599, 809, 151645]",
+      "native_ids": "[48, 362, 358, 386, 1599, 809, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[48, 362, 358, 386, 1599, 809, 647, 619, 547, 1207, 362, 358, 151645]",
+      "native_ids": "[48, 362, 358, 386, 1599, 809, 647, 619, 547, 1207, 362, 358, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[48, 362, 358, 151645]",
+      "native_ids": "[48, 362, 358, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[48, 362, 358, 386, 1599, 809, 647, 619, 547, 1207, 151645]",
+      "native_ids": "[48, 362, 358, 386, 1599, 809, 647, 619, 547, 1207, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[48, 362, 151645]",
+      "native_ids": "[48, 362, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[49, 151645]",
+      "native_ids": "[49, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[49, 468, 328, 362, 451, 1599, 151645]",
+      "native_ids": "[49, 468, 328, 362, 451, 1599, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[49, 468, 328, 362, 451, 1599, 467, 356, 647, 809, 444, 472, 151645]",
+      "native_ids": "[49, 468, 328, 362, 451, 1599, 467, 356, 647, 809, 444, 472, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[49, 468, 328, 151645]",
+      "native_ids": "[49, 468, 328, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[49, 468, 328, 362, 451, 1599, 467, 356, 647, 809, 151645]",
+      "native_ids": "[49, 468, 328, 362, 451, 1599, 467, 356, 647, 809, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[49, 468, 151645]",
+      "native_ids": "[49, 468, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 151645]",
+      "native_ids": "[41, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 422, 350, 386, 547, 479, 151645]",
+      "native_ids": "[41, 422, 350, 386, 547, 479, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 422, 350, 386, 547, 479, 425, 393, 472, 647, 386, 547, 151645]",
+      "native_ids": "[41, 422, 350, 386, 547, 479, 425, 393, 472, 647, 386, 547, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 422, 350, 151645]",
+      "native_ids": "[41, 422, 350, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 422, 350, 386, 547, 479, 425, 393, 472, 647, 151645]",
+      "native_ids": "[41, 422, 350, 386, 547, 479, 425, 393, 472, 647, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[41, 422, 151645]",
+      "native_ids": "[41, 422, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[40, 151645]",
+      "native_ids": "[40, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[40, 393, 547, 506, 1599, 619, 151645]",
+      "native_ids": "[40, 393, 547, 506, 1599, 619, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[40, 393, 547, 506, 1599, 619, 356, 467, 1863, 422, 434, 468, 151645]",
+      "native_ids": "[40, 393, 547, 506, 1599, 619, 356, 467, 1863, 422, 434, 468, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[40, 393, 547, 151645]",
+      "native_ids": "[40, 393, 547, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[40, 393, 547, 506, 1599, 619, 356, 467, 1863, 422, 151645]",
+      "native_ids": "[40, 393, 547, 506, 1599, 619, 356, 467, 1863, 422, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[40, 393, 151645]",
+      "native_ids": "[40, 393, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 350, 362, 1863, 467, 444, 151645]",
+      "native_ids": "[37, 350, 362, 1863, 467, 444, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 350, 362, 1863, 467, 444, 393, 328, 547, 1599, 425, 730, 151645]",
+      "native_ids": "[37, 350, 362, 1863, 467, 444, 393, 328, 547, 1599, 425, 730, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 350, 362, 151645]",
+      "native_ids": "[37, 350, 362, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 350, 362, 1863, 467, 444, 393, 328, 547, 1599, 151645]",
+      "native_ids": "[37, 350, 362, 1863, 467, 444, 393, 328, 547, 1599, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 350, 151645]",
+      "native_ids": "[37, 350, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[39, 151645]",
+      "native_ids": "[39, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[39, 647, 425, 647, 425, 647, 151645]",
+      "native_ids": "[39, 647, 425, 647, 425, 647, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[39, 647, 425, 647, 425, 647, 425, 647, 425, 647, 425, 647, 151645]",
+      "native_ids": "[39, 647, 425, 647, 425, 647, 425, 647, 425, 647, 425, 647, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[39, 647, 425, 151645]",
+      "native_ids": "[39, 647, 425, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[39, 647, 425, 647, 425, 647, 425, 647, 425, 647, 151645]",
+      "native_ids": "[39, 647, 425, 647, 425, 647, 425, 647, 425, 647, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[39, 647, 151645]",
+      "native_ids": "[39, 647, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[32, 151645]",
+      "native_ids": "[32, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[32, 468, 479, 809, 425, 422, 151645]",
+      "native_ids": "[32, 468, 479, 809, 425, 422, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[32, 468, 479, 809, 425, 422, 472, 619, 328, 451, 506, 1207, 151645]",
+      "native_ids": "[32, 468, 479, 809, 425, 422, 472, 619, 328, 451, 506, 1207, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[32, 468, 479, 151645]",
+      "native_ids": "[32, 468, 479, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[32, 468, 479, 809, 425, 422, 472, 619, 328, 451, 151645]",
+      "native_ids": "[32, 468, 479, 809, 425, 422, 472, 619, 328, 451, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[32, 468, 151645]",
+      "native_ids": "[32, 468, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 151645]",
+      "native_ids": "[44, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 809, 425, 356, 1863, 444, 151645]",
+      "native_ids": "[44, 809, 425, 356, 1863, 444, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 809, 425, 356, 1863, 444, 468, 506, 547, 362, 467, 647, 151645]",
+      "native_ids": "[44, 809, 425, 356, 1863, 444, 468, 506, 547, 362, 467, 647, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 809, 425, 151645]",
+      "native_ids": "[44, 809, 425, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 809, 425, 356, 1863, 444, 468, 506, 547, 362, 151645]",
+      "native_ids": "[44, 809, 425, 356, 1863, 444, 468, 506, 547, 362, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 809, 151645]",
+      "native_ids": "[44, 809, 151645]"
+    }
+  ],
+  "scope": "BF16 batch-shape sensitivity audit. Disagreements are reported, not hidden or used to select a checkpoint."
+}

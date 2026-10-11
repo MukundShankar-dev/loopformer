@@ -1,0 +1,6 @@
+{
+  "status": "complete",
+  "independent_audits_passed": true,
+  "queries_per_arm": 345600,
+  "plots": "plots/index.md"
+}

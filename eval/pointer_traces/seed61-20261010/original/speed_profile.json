@@ -1,0 +1,50 @@
+{
+  "selected": {
+    "batch_size": 512,
+    "cache": "dynamic",
+    "compiled": false,
+    "seconds": 12.920237219001137,
+    "questions_per_second": 39.62775538262003,
+    "tokens_per_second": 751.0698012362203,
+    "cuda_peak_bytes": 11707793920
+  },
+  "candidates": [
+    {
+      "batch_size": 64,
+      "cache": "dynamic",
+      "compiled": false,
+      "seconds": 5.276712326000052,
+      "questions_per_second": 12.12876428465723,
+      "tokens_per_second": 214.90654216877027,
+      "cuda_peak_bytes": 2365719552
+    },
+    {
+      "batch_size": 128,
+      "cache": "dynamic",
+      "compiled": false,
+      "seconds": 7.04860360100065,
+      "questions_per_second": 18.15962525993497,
+      "tokens_per_second": 409.01718456556654,
+      "cuda_peak_bytes": 3700053504
+    },
+    {
+      "batch_size": 256,
+      "cache": "dynamic",
+      "compiled": false,
+      "seconds": 7.826921720999962,
+      "questions_per_second": 32.707622373830716,
+      "tokens_per_second": 729.5332959163023,
+      "cuda_peak_bytes": 6366820864
+    },
+    {
+      "batch_size": 512,
+      "cache": "dynamic",
+      "compiled": false,
+      "seconds": 12.920237219001137,
+      "questions_per_second": 39.62775538262003,
+      "tokens_per_second": 751.0698012362203,
+      "cuda_peak_bytes": 11707793920
+    }
+  ],
+  "compilation": "Disabled after preflight static-cache decode was slower and changed continuations"
+}

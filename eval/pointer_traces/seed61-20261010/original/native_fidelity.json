@@ -1,0 +1,386 @@
+{
+  "questions": 54,
+  "exact_continuations": false,
+  "exact_scores": true,
+  "observations": [
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 647, 1207, 358, 350, 151645]",
+      "native_ids": "[52, 647, 1207, 358, 350, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-32",
+      "raw_equal": false,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 647, 1207, 358, 350, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-random_function-000000-991ed24ca01e4bf0-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-6",
+      "raw_equal": false,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 358, 386, 730, 730, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-permutation-000000-8d31b5316ed42ba7-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[52, 151645]",
+      "native_ids": "[52, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[47, 151645]",
+      "native_ids": "[47, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[47, 506, 422, 151645]",
+      "native_ids": "[47, 506, 422, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[47, 506, 422, 151645]",
+      "native_ids": "[47, 506, 422, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[47, 506, 422, 151645]",
+      "native_ids": "[47, 506, 422, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[47, 151645]",
+      "native_ids": "[47, 151645]"
+    },
+    {
+      "example_id": "benchmark-307-full_cycle-000000-cce88da52549973d-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[47, 151645]",
+      "native_ids": "[47, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[43, 151645]",
+      "native_ids": "[43, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[43, 619, 647, 425, 151645]",
+      "native_ids": "[43, 619, 647, 425, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[43, 619, 647, 425, 151645]",
+      "native_ids": "[43, 619, 647, 425, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[43, 619, 647, 425, 151645]",
+      "native_ids": "[43, 619, 647, 425, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[43, 151645]",
+      "native_ids": "[43, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-random_function-000000-321394dbe5beb8d3-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[43, 151645]",
+      "native_ids": "[43, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[45, 151645]",
+      "native_ids": "[45, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-6",
+      "raw_equal": false,
+      "scores_equal": true,
+      "batched_ids": "[45, 151645]",
+      "native_ids": "[45, 444, 350, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[45, 151645]",
+      "native_ids": "[45, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[45, 151645]",
+      "native_ids": "[45, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[45, 151645]",
+      "native_ids": "[45, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-permutation-000000-5d676c7a72812b0c-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[45, 151645]",
+      "native_ids": "[45, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 151645]",
+      "native_ids": "[44, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 647, 431, 151645]",
+      "native_ids": "[44, 647, 431, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 151645]",
+      "native_ids": "[44, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-32",
+      "raw_equal": false,
+      "scores_equal": true,
+      "batched_ids": "[44, 151645]",
+      "native_ids": "[44, 647, 431, 434, 350, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 151645]",
+      "native_ids": "[44, 151645]"
+    },
+    {
+      "example_id": "benchmark-311-full_cycle-000000-c906e14b0187b04c-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[44, 151645]",
+      "native_ids": "[44, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-random_function-000000-69980455223da067-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[57, 151645]",
+      "native_ids": "[57, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[57, 151645]",
+      "native_ids": "[57, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[57, 151645]",
+      "native_ids": "[57, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[57, 151645]",
+      "native_ids": "[57, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[57, 151645]",
+      "native_ids": "[57, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-permutation-000000-d15b42c5139c7f82-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[57, 151645]",
+      "native_ids": "[57, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-1",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-6",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-12",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-32",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-128",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    },
+    {
+      "example_id": "benchmark-313-full_cycle-000000-87372025bdfc9c80-steps-256",
+      "raw_equal": true,
+      "scores_equal": true,
+      "batched_ids": "[37, 151645]",
+      "native_ids": "[37, 151645]"
+    }
+  ],
+  "scope": "BF16 batch-shape sensitivity audit. Disagreements are reported, not hidden or used to select a checkpoint."
+}

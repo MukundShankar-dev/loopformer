@@ -1,0 +1,11 @@
+Ordinary trace SFT · 36,000 examples · 1 epoch · 2,250 updates
+Train scope full · microbatch 16 · accumulation 1 · effective batch 16 · 
+bf16/sdpa
+Maximum encoded training length 439 · no truncation
+Output: models/trace_sft/seed61-full
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:42,  6.75it/s]Loading weights:  76%|███████▌  | 221/290 [00:00<00:00, 994.18it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 909.80it/s]
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/mukund/.netrc.
+wandb: setting up run bew2vujj
+wandb: Syncing run seed61-full
+wandb: 🚀 View run at https://wandb.ai/mukunds/loopformer/runs/bew2vujj
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:07<00:00,  7.38s/it]Writing model shards: 100%|██████████| 1/1 [00:07<00:00,  7.38s/it]
