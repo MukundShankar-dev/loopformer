@@ -141,9 +141,9 @@ python -m scripts.demo --model HF_REPO_ID [--revision REV] --request request.jso
 
 `deploy` refuses any weights whose hash differs from the final hash. It uploads the checkpoint, `scripts/recurrent_qwen`, `scripts/dataset`, the runtime parts of `scripts/demo`, `demo/requirements-inference.txt` and [the model card](../demo/hf_model_card.md). The Space runs `demo/hf_space/app.py`. The static client is `demo/web/` (`config.json` names the Space and the proxy).
 
-## Code headroom probe (v2 M0, prepared, not run)
+## Code headroom probe (v2 M0a, prepared, not run)
 
-See [plan M0](plan.md#m0--headroom-probe-ready-not-run) for the checklist before running.
+See [plan milestones](plan.md#milestones-and-gates) (M0a) for the gate, and check the `--dry-run` flags against the installed tool versions before running.
 
 ```sh
 python -m scripts.codeprobe.commands                  # print every step from configs/probe_headroom.json

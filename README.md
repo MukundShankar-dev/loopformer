@@ -7,8 +7,9 @@ layers as one shared recurrent step, and post-train it.
   trained so one loop executes one transition of an in-context pointer-chasing
   task, with a stopping controller. There's a public demo. Results and
   limitations: [docs/history.md](docs/history.md).
-- **v2 (planned):** KV-cached looped generation, inference optimizations, and
-  RL on code tasks with execution-based rewards. See [docs/plan.md](docs/plan.md).
+- **v2 (planned):** a small looped coding agent, comparing three ways to spend
+  test-time compute: depth (loops), breadth (samples) and interaction (running
+  code and revising). See [docs/plan.md](docs/plan.md).
 
 ## Quick start
 
