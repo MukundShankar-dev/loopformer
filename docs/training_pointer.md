@@ -780,7 +780,7 @@ The depth-4 continuation reached update 1875 and full validation now shows 99.4%
 
 These commands describe the completed curriculum comparison. The current priority is [diagnosis and profiling](diagnostics_and_performance.md); see [status](status.md).
 
-Status: this document records the earlier depth-6 curriculum setup and paired-evaluation protocol. The later [fresh 30k depth-6 baseline and full evaluations](experiments/stage1_fresh30k.md) are complete; the loop-balanced ablation is also complete. See [status](status.md) for the latest evidence. Commands and resource expectations below describe that earlier protocol, not the current run instructions. Overscaling and knowledge-retention benchmarks remain deferred.
+Status: this document records the earlier depth-6 curriculum setup and paired-evaluation protocol. The later [fresh 30k depth-6 baseline and full evaluations](experiments/stage1_fresh30k.md) are complete; the loop-balanced ablation is also complete. See [status](status.md) for the latest evidence. Commands and resource expectations below describe that earlier protocol, not the current run instructions. Overscaling remains deferred; knowledge retention later ran as [one-loop MMLU](experiments/mmlu_retention_20261012.md).
 
 ### Question and comparison
 

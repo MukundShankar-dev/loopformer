@@ -140,7 +140,7 @@ def test_frozen_benchmark_cli_native_agrees_on_failures_and_files_unchanged(setu
         component_config=path/'component.json';component_config.write_text(json.dumps(settings))
         component_args=[sys.executable,'-m','scripts.eval.countdown_precision_test','--config',str(component_config)]
         failed=subprocess.run(component_args,capture_output=True,text=True)
-        assert failed.returncode!=0,failed.stdout+failed.stderr
+        assert failed.returncode!=0 and 'Precision repair failed' in failed.stderr,failed.stdout+failed.stderr
         composition=json.loads((path/'composition/summary.json').read_text())
         assert composition['status']=='complete' and not composition['passed']
         assert composition['matching_count_timings']==4 and composition['native_fidelity']['passed']
@@ -149,7 +149,8 @@ def test_frozen_benchmark_cli_native_agrees_on_failures_and_files_unchanged(setu
         payload[first]=payload[first]+.001
         torch.save(payload,path/'refined/adapter_model.pt')
         settings['output']=str(path/'invalid-composition');component_config.write_text(json.dumps(settings))
-        assert subprocess.run(component_args,capture_output=True,text=True).returncode!=0
+        changed=subprocess.run(component_args,capture_output=True,text=True)
+        assert changed.returncode!=0 and 'Tensor-likes are not equal' in changed.stderr,changed.stdout+changed.stderr
         assert not (path/'invalid-composition').exists()
     repeat=subprocess.run(args,capture_output=True,text=True)
     assert repeat.returncode!=0 and 'refuse overwrite' in repeat.stderr

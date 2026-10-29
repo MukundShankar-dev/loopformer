@@ -37,8 +37,9 @@ one ordinary question at one, two and four forced recurrent passes per token.
 It works at one loop; broader capability retention requires separate evaluation.
 
 The [ordinary trace baseline report](experiments/ordinary_trace_baselines.md)
-records full-SFT resource preflight and the newly authorized original-trace/
-full-SFT comparison. Results remain pending until its independent audits finish.
+is complete and audited. Strict success: original-Qwen trace prompting 0.013%,
+full trace SFT 3.52% (100% on trained counts, 0.15% on held-out 7/9/11, 0% above 12),
+final recurrent system 97.02%. SFT's failures are termination at a wrong length.
 
 The [full population suite](experiments/pointer_population_analysis.md) is complete:
 six recurrent representatives, ordinary Qwen on all 345,600 matched questions,

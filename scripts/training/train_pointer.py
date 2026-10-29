@@ -172,7 +172,9 @@ def main() -> None:
         model, gate = initialize(base, config, probe, token_ids)
         if "executor" in spec:
             model.configure_executor(tokenizer, **spec["executor"])
-            from scripts.training.executor_gates import validate_executor
+            from scripts.training.executor_gates import executor_view_equivalence, validate_executor
+            # initialize() checked the bare model; routing changes R's input, so re-gate T=1.
+            gate["executor_t1"] = executor_view_equivalence(model, base, probe, token_ids)
             gate["executor"] = validate_executor(model, probe, token_ids)
         if config.completion_loss_weight:
             if model.completion_head is None:

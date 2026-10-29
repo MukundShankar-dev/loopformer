@@ -198,7 +198,11 @@ def render(root: Path,config: dict,arms: dict,metadata: list) -> None:
     deltas=[]
     for arm in ('original','sft'):
         for metric in ('stopped_answer_correct','joint_success','strict_success'):
-            for cohort,mask in [('all',depth>0),('extrapolation',depth>12)]:
+            # SFT saw counts through 12 and the final controller through 63; report
+            # the in-range cohorts too, so the >12 gap is not read as an all-count gap.
+            for cohort,mask in [('all',depth>0),('trained',np.isin(depth,[1,2,3,4,5,6,8,10,12])),
+                                ('heldout',np.isin(depth,[7,9,11])),('extrapolation',depth>12),
+                                ('controller_trained_13_63',(depth>12)&(depth<=63)),('beyond_controller_64_256',depth>63)]:
                 differences=final[metric][:,mask].mean(1)-arms[arm][metric][:,mask].mean(1)
                 lo,hi=np.quantile(differences[draws].mean(1),[.025,.975])
                 deltas.append(dict(arm=arm,metric=metric,cohort=cohort,recurrent_minus_trace=float(differences.mean()),low=float(lo),high=float(hi)))

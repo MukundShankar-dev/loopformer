@@ -1,8 +1,10 @@
 # Ordinary trace baseline experiment — 2026-10-10
 
-Status: full-model production SFT launched and verified on the desktop. Both
-complete evaluations and independent audits/plots are queued automatically.
-No full-training or full-benchmark quality claim yet.
+Status: complete. Full SFT trained to update 2,250, both 345,600-query
+evaluations finished, and `trace_analysis` independent audits passed
+(`eval/pointer_traces/seed61-20261010/completion.json`). Results are in
+[Completed benchmark results](#completed-benchmark-results--2026-10-11). Sections
+below that describe launch, stopping and partial progress are a dated log.
 
 ## Protocol
 
@@ -117,7 +119,55 @@ Held-out teacher-forced CE at counts 7/9/11 is 1.321/1.050/0.696 respectively.
 Training optimization succeeded; count generalization is not demonstrated.
 
 Small logs and summaries were copied to the Mac at `models/trace_sft/seed61-full/`.
-The training-log preview is `eval/pointer_traces/seed61-20261010/previews/sft_learning.png`
-and `.pdf`, separate from the queued audited benchmark figures. Original-Qwen
-trace evaluation was running at 18,574/345,600 questions at inspection; SFT
-evaluation had not started. No run was launched or modified during this inspection.
+A training-log preview was rendered at the time, but it is not retained; the
+audited training figure is `plots/04_sft_training`. Original-Qwen trace
+evaluation was running at 18,574/345,600 questions at inspection; SFT evaluation
+had not started. No run was launched or modified during this inspection.
+
+## Completed benchmark results — 2026-10-11
+
+Both arms completed all 345,600 queries (1,350 graphs × counts 1–256) and passed
+the independent audit, which re-validates every raw response against the rules.
+Rates are graph-cluster bootstrap 95% intervals from each arm's
+`cluster_intervals.json`; the recurrent column is the frozen final system from
+[the population analysis](pointer_population_analysis.md), implied by
+`paired_deltas.csv`.
+
+| Strict success (exact states, exactly N, EOS) | Counts | Original Qwen trace prompt | Full trace SFT | Final recurrent |
+| --- | --- | --- | --- | --- |
+| Trained | 1–6, 8, 10, 12 | 0.37% (0.26–0.49) | 100% (100–100) | 99.05% |
+| Held out | 7, 9, 11 | 0% | 0.15% (0.05–0.27) | 98.30% |
+| Beyond SFT training | 13–256 | 0% | 0% | 96.93% |
+| All | 1–256 | 0.013% | 3.52% | 97.02% |
+
+Paired recurrent-minus-SFT strict-success differences (`paired_deltas.csv`):
+trained −0.95 pp (−1.35 to −0.58), held out +98.1 pp (97.5–98.8), counts 13–63
++97.1 pp (96.2–97.9), counts 64–256 +96.9 pp (96.0–97.8).
+
+Interpretation:
+
+- **SFT executes correctly but cannot stop at an unseen length.** In `sft/strata.csv`
+  every SFT failure is a termination error; no response continues past a wrong
+  state. Emitted state counts in the raw `sft/chunks/` (1,350 responses each):
+  count 7 → 6 states (1,344) or 7 (6); 9 → 8 (all); 11 → 12 (all, the first 11
+  correct); 13 → 12/11/10 (652/516/182); 40 → 4 (all); 256 → 2 (1,182) or 6 (168).
+  In range SFT snaps to a neighbouring trained length. For multi-digit counts it
+  appears to key on individual digits (40 → 4, 256 → 2 or 6) rather than the
+  number. It learned per-count lengths, not to read N.
+- **Inside the trained counts SFT is slightly better** than the recurrent system
+  (about 1 pp, with an interval that excludes zero), so the recurrent advantage
+  is entirely in counts SFT did not see, including the held-out in-range counts.
+- **The comparison is not exposure-matched for stopping.** The final controller
+  was trained on counts 1–63 and uses an engineered count reader and countdown;
+  SFT saw only the nine trained counts. The 13–63 cohort therefore compares
+  trained recurrent stopping with untrained SFT stopping. Counts 7/9/11 and
+  64–256 are unseen by both systems' stopping, and the recurrent system still
+  leads by about 97–98 pp there.
+- Original Qwen with the three-shot trace prompt almost never produces a complete
+  correct trace (0.013%): 90% of responses stop early and 6% are malformed.
+
+The cohort rows beyond `all` and `extrapolation` were added on 2026-10-29 by
+re-running `python -m scripts.eval.trace_analysis` on the unchanged saved
+responses. Outcomes, strata and intervals were byte-identical; only
+`paired_deltas.csv`, the recorded analysis-code hashes and `plots/provenance.json`
+changed.

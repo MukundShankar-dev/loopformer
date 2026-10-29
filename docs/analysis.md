@@ -14,8 +14,9 @@ The added outputs live at `eval/pointer_traces/seed61-20261010/`, with original/
 arms, raw atomic chunks, independent audits, per-count/graph-stratum metrics,
 paired bootstrap differences and four figure families. The existing 25-family
 bundle and recurrent weights remain frozen. Do not invent latent-loop metrics
-for trace tokens or credit cyclic final letters as exact termination. Full-run
-quality remains pending until the new independent audits complete.
+for trace tokens or credit cyclic final letters as exact termination. Both arms
+are complete and audited; results and per-cohort paired differences are in
+[the trace baseline report](experiments/ordinary_trace_baselines.md#completed-benchmark-results--2026-10-11).
 
 Updated 2026-10-10. This is the active analysis contract. Start here before
 expanding the figures or running another benchmark. The [research plan](project_plan.md)

@@ -19,7 +19,7 @@ from scripts.recurrent_qwen.checkpoint import save_checkpoint, load_recurrent_ch
 from scripts.training.config import TrainingConfig
 from scripts.training.data import encode_tasks, collate
 from scripts.training.objective import completion_loss, step_loss
-from scripts.training.executor_gates import validate_executor
+from scripts.training.executor_gates import executor_view_equivalence, validate_executor
 
 
 @pytest.fixture
@@ -114,6 +114,13 @@ def test_checkpoint_roundtrip(setup, scope):
     options = dict(train_scope=scope, bridge=True, direct_readout=True, controller_size=8,
                    isolated=True, prefix_reuse=True, gradient_checkpointing=True)
     model = configured(base, tokenizer, **options)
+    # Fresh R equals the reloaded base and the bridge starts at identity, so an
+    # unperturbed round trip passes even if restore drops trained tensors.
+    generator = torch.Generator().manual_seed(5)
+    with torch.no_grad():
+        for parameter in model.parameters():
+            if parameter.requires_grad:
+                parameter.add_(0.05 * torch.randn(parameter.shape, generator=generator))
     spec = dict(base_model=str(path / 'base'), revision='main', recurrent_start=1, recurrent_end=2,
         recurrence_mode='fixed_prompt', executor=options, completion_head={'intermediate': 8},
         symbols=list(SYMBOLS), token_ids=list(tokens.values()), prompt_format='dataset_raw', loss_vocabulary='symbols')
@@ -124,9 +131,46 @@ def test_checkpoint_roundtrip(setup, scope):
     with torch.no_grad():
         a = model(batch['input_ids'], batch['attention_mask'], num_loops=3)
         b = loaded(batch['input_ids'], batch['attention_mask'], num_loops=3)
-    for x, y in zip(a.loop_logits, b.loop_logits):
-        torch.testing.assert_close(x, y, atol=0, rtol=0)
-    torch.testing.assert_close(a.stop_logits, b.stop_logits, atol=0, rtol=0)
+        fresh = configured(base, tokenizer, **options)(batch['input_ids'], batch['attention_mask'], num_loops=3)
+    # Tensors are restored bitwise, but from_pretrained leaves CPU base weights
+    # unaligned, which changes CPU matmul rounding by about one ulp.
+    pairs = [*zip(a.loop_logits, b.loop_logits), (a.stop_logits, b.stop_logits), (a.state_logits, b.state_logits)]
+    for x, y in pairs:
+        torch.testing.assert_close(x, y, atol=1e-6, rtol=1e-6)
+    # A dropped tensor must move outputs far beyond that rounding tolerance.
+    for x, y in ((a.loop_logits[-1], fresh.loop_logits[-1]), (a.stop_logits, fresh.stop_logits),
+                 (a.state_logits, fresh.state_logits)):
+        assert (x - y).abs().max() > 1e-3
+
+
+def test_bridge_rewrites_only_working_state_on_reentry(setup):
+    base, tokenizer, tokens, items, _ = setup
+    model = configured(base, tokenizer, isolated=False, controller_size=0, direct_readout=False)
+    generator = torch.Generator().manual_seed(11)
+    with torch.no_grad():
+        for parameter in model.bridge.parameters():
+            parameter.add_(0.1 * torch.randn(parameter.shape, generator=generator))
+    inputs, outputs = [], []
+    hooks = [model.recurrent.register_forward_pre_hook(lambda _, args: inputs.append(args[0].clone())),
+             model.recurrent.register_forward_hook(lambda _, args, output: outputs.append(output.clone()))]
+    batch = collate(items[:1], 0, 'cpu')
+    position = int(batch['attention_mask'][0].nonzero()[-1])
+    try:
+        with torch.no_grad():
+            result = model(batch['input_ids'], batch['attention_mask'], num_loops=3)
+            initial = inputs[0][:, position]  # Loop 1 consumes P's output unchanged.
+            for loop in (1, 2):
+                expected = model.bridge(outputs[loop - 1][:, position], initial)
+                torch.testing.assert_close(inputs[loop][:, position], expected, atol=0, rtol=0)
+                others = torch.arange(inputs[loop].shape[1]) != position
+                torch.testing.assert_close(inputs[loop][:, others], outputs[loop - 1][:, others], atol=0, rtol=0)
+            model.bridge = None
+            plain = model(batch['input_ids'], batch['attention_mask'], num_loops=3)
+    finally:
+        for hook in hooks:
+            hook.remove()
+    torch.testing.assert_close(result.loop_logits[0], plain.loop_logits[0], atol=0, rtol=0)
+    assert not torch.equal(result.loop_logits[1], plain.loop_logits[1])
 
 
 def test_unconditioned_seed_replay_and_pairs(setup):
@@ -244,3 +288,15 @@ def test_controller_loss_cannot_change_executor_optimizer_update(setup):
     for (name, a), (_, b) in zip(first.named_parameters(), second.named_parameters()):
         if not name.startswith('completion_head.'):
             torch.testing.assert_close(a, b, atol=0, rtol=0)
+
+
+def test_executor_view_t1_equivalence_gate(setup):
+    base, tokenizer, tokens, items, _ = setup
+    batch = collate(items[1:2], 0, 'cpu')
+    for isolated in (True, False):
+        model = configured(base, tokenizer, isolated=isolated, prefix_reuse=True)
+        assert executor_view_equivalence(model, base, batch, list(tokens.values()))['passed']
+    with torch.no_grad():
+        next(model.recurrent.parameters()).add_(0.1)
+    with pytest.raises(AssertionError):
+        executor_view_equivalence(model, base, batch, list(tokens.values()))

@@ -1,8 +1,30 @@
 """Startup contracts for isolated control and richer executor supervision."""
 import torch
+from transformers import Qwen2ForCausalLM
 from scripts.recurrent_qwen.model import RecurrentQwen
 from scripts.recurrent_qwen.interfaces import RecurrentController
 from .objective import completion_loss
+
+
+def executor_view_equivalence(model: RecurrentQwen, base: Qwen2ForCausalLM, inputs: dict,
+                              token_ids: list[int]) -> dict:
+    """Gate T=1 of the configured executor against ordinary Qwen on its routed prompt.
+
+    The router removes the Steps line, so the reference is ordinary Qwen on the
+    contiguous routed tokens, not on the raw prompt. The bridge acts only on
+    re-entry and heads do not feed C, so T=1 must match before any training.
+    """
+    ids, mask = inputs['input_ids'][:1], inputs['attention_mask'][:1]
+    valid = tuple(ids[0][mask[0].bool()].tolist())
+    view = model.router.executor_ids(valid) if model.router is not None else valid
+    model.eval()
+    with torch.no_grad():
+        actual = model(ids, mask, num_loops=1, readout_token_ids=token_ids).loop_logits[0]
+        reference = base(input_ids=torch.tensor([view], device=ids.device), use_cache=False,
+                         logits_to_keep=1).logits[:, 0, token_ids]
+    torch.testing.assert_close(actual, reference, atol=1e-5, rtol=1e-5)
+    return {'passed': True, 'input_routing': 'steps_removed' if model.router is not None else 'raw',
+            'executor_view_tokens': len(view), 't1_max_logit_error': (actual - reference).abs().max().item()}
 
 
 def validate_executor(model: RecurrentQwen, inputs: dict, token_ids: list[int]) -> dict:

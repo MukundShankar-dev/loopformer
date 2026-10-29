@@ -251,7 +251,7 @@ The [integrated failure diagnostic](diagnostics_and_performance.md#integrated-fr
 
 The terminal evaluator exports every adjacent transition, per-depth and aggregate rates, raw final margins, continuous survival, and a hold-at-d decoded-answer baseline. Primary dynamics include only transitions starting at t >= d; all-loop counts remain observational. Survival is anchored to the first final-correct loop at or after d, and reports observed/censored denominators. Earlier final matches are separately counted as potential shortcuts. Post-completion CE is not introduced. Figures and hidden-state diagnostics are not implemented by these exports.
 
-A later [knowledge-retention regression check](project_plan.md#future-knowledge-retention-regression-check) will compare original versus adapted one-pass ordinary-model performance on a fixed small benchmark, potentially a seeded MMLU subset. Benchmark choice, scoring protocol, and implementation remain deferred. It will not reuse the pointer A–Z-only readout as a general knowledge evaluator or silently introduce anchor training.
+A later [knowledge-retention regression check](project_plan.md#future-knowledge-retention-regression-check) will compare original versus adapted one-pass ordinary-model performance on a fixed small benchmark, potentially a seeded MMLU subset. This has since run as full MMLU at one loop; see [General-capability retention](#general-capability-retention--mmlu) and the [MMLU report](experiments/mmlu_retention_20261012.md). It will not reuse the pointer A–Z-only readout as a general knowledge evaluator or silently introduce anchor training.
 
 
 ## Outward depth evaluation

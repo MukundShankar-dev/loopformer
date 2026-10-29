@@ -72,7 +72,8 @@ def test_loader_and_cli_reject_nonterminal_without_explicit_observational(tmp_pa
     traces = load_traces(path)
     assert traces[0].complete_trajectory and oracle_stop(traces[0]) == 2
     cmd = [sys.executable, "-m", "scripts.eval.adaptive_analyze", str(run), "--output", str(tmp_path / "out")]
-    assert subprocess.run(cmd, capture_output=True).returncode != 0
+    refused = subprocess.run(cmd, capture_output=True, text=True)
+    assert refused.returncode != 0 and "require --allow-observational" in refused.stderr
     subprocess.run([*cmd, "--allow-observational"], capture_output=True, check=True)
     result = json.loads((tmp_path / "out" / "summary.json").read_text())
     assert result["interpretation"] == "observational_only"

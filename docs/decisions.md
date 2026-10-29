@@ -437,7 +437,7 @@ rerun old checkpoint sweeps. Group joint completion and fixed prompt memory as
 Attempt 2/2b so five narrative sections retain all six representatives. Preserve
 separate original validation cohorts and new population evaluation columns.
 Record reader/cell numerical fits as summaries, since their full optimization
-histories were never logged; do not invent curves. A hosted demo remains planned.
+histories were never logged; do not invent curves. The hosted demo is live; see [Demo deployment](demo.md).
 
 The short CUDA batch profile changed no weights/config/precision and automatically
 resumed CE extraction. Batch 16 provided roughly 9% more throughput than 4 over

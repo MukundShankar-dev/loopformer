@@ -62,7 +62,7 @@ h_0 -> R -> h_1 -> R -> h_2 -> ... -> h_T
 
 `RecurrentQwen` groups the original decoder objects into `prelude`, `recurrent`, and `coda` (`DecoderBlock` modules), without copying weights or retaining duplicate registered paths. Embeddings, RoPE, final RMSNorm, and the LM head are reused; tied weights remain tied. Construction freezes and clears gradients on the supplied base **in place**. Adapter injection subsequently mutates its shared middle layers, so compute unadapted reference logits first or load a separate reference.
 
-The next iteration consumes the recurrent state, never the coda output or a decoded token. P runs once; intermediate C reads expose predictions without modifying the recurrent trajectory. There is no bridge: direct middle-to-middle recurrence passes Stage 0. This does not establish useful recurrent task execution or imply that `h_0` decodes to a start symbol.
+The next iteration consumes the recurrent state, never the coda output or a decoded token. P runs once; intermediate C reads expose predictions without modifying the recurrent trajectory. Stage 0 had no bridge: direct middle-to-middle recurrence passes Stage 0 (the later executor adds the opt-in re-entry bridge below). This does not establish useful recurrent task execution or imply that `h_0` decodes to a start symbol.
 
 ### Fixed prompt memory (2026-10-04)
 
@@ -111,7 +111,7 @@ The training startup gate compares ordinary-Qwen and fresh-adapter T=1 logits ov
 - `loop_logits` is a tuple of length T for fixed-depth calls (or the executed prefix when stopping), with tensors `[B,V]` by default or `[B,S,V]` in `"all"` mode. `.logits` returns the final item. Every loop reads C; no final-only supervision is imposed.
 - With hidden capture enabled, `initial_hidden_state` is `h_0`, and `hidden_states[t-1]` is `h_t`, each `[B,S,H]`. Otherwise both fields are `None`; autograd can still retain the activations required for backward.
 - Optional labels are long `[B,T]` **token IDs**, with an explicit unique allowed set `[A]` of at least two tokens. `margins[B,T]` uses the target raw logit minus the largest other allowed logit. Labels can differ by loop. Repeating a final label is an explicit caller choice. This interface neither computes CE nor shifts labels.
-- Outputs retain gradients when autograd is enabled. Use caller-side `torch.no_grad()` for evaluation. No bridge, KV cache, generation API, or detached-rollout training is implemented. Adapter save/load is provided separately by `scripts/recurrent_qwen/checkpoint.py`.
+- Outputs retain gradients when autograd is enabled. Use caller-side `torch.no_grad()` for evaluation. Stage 0 implemented no bridge; the executor's opt-in bridge is described below. No KV cache, generation API, or detached-rollout training is implemented. Adapter save/load is provided separately by `scripts/recurrent_qwen/checkpoint.py`.
 
 The wrapper inherits model device/dtype without conversion or downloads. Stage 0 measures short inputs and small loop counts; its resource results do not establish a training budget for longer sequences or unrolls.
 
@@ -289,8 +289,14 @@ available for legacy callers and equivalence tests.
 
 Tiny-model tests compare dense/reused outputs and all parameter gradients for
 LoRA/full R/full model under eager and SDPA, including checkpointing and different
-prompt lengths. Other tests cover count invariance, separate gradients, bridge
-T=1 behavior, save/reload and complete training/evaluation wiring. These prove
+prompt lengths (the dense/reuse pair shares one graph and differs only in its
+Steps line). Other tests cover count invariance, separate gradients, that the
+bridge leaves T=1 unchanged and rewrites only the working state from loop 2 on,
+save/reload with every trainable tensor perturbed (so a dropped tensor fails),
+and complete training/evaluation wiring. Training also gates T=1 of the
+configured executor against ordinary Qwen on the routed prompt
+(`executor_view_equivalence`), after `configure_executor`; the earlier
+`initialize` gate checks only the bare model. These prove
 implementation contracts to numerical tolerance, not pretrained learnability or
 unbounded algorithmic correctness. Pretrained CUDA startup checks remain required.
 

@@ -1177,5 +1177,5 @@
     ],
     "scope": "BF16 batch-shape sensitivity audit. Disagreements are reported, not hidden or used to select a checkpoint."
   },
-  "analysis_code_sha256": "0f3fec4c30dd00538229d590ed861274c4088dad5e4088ecc6093449e174bee7"
+  "analysis_code_sha256": "0c51655894b9ef641ed26e8a37889c4e29acfd2cc157be753b2650c571415efb"
 }

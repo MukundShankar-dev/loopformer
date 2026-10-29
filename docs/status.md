@@ -63,10 +63,13 @@ The four-example-per-depth free-generation panel has 100% strict success at
 trained counts, but 0% at held-out counts 7, 9 and 11. This is a small development
 panel, not the full benchmark or evidence of depth generalization.
 W&B resumed run: `ohjupgd1`. At the log inspection, original-Qwen trace evaluation
-was running (18,574/345,600 questions); SFT evaluation and audits/plots follow.
+was running (18,574/345,600 questions).
 The recipe trains all 494,032,768 parameters with batch 16 and activation
 checkpointing. The completed recurrent analysis and 25-family figure bundle remain
-unchanged. The next milestone is completing and auditing these two baselines.
+unchanged. Both baselines are now complete and audited (2026-10-11): strict
+success is 0.013% for original-Qwen trace prompting and 3.52% for trace SFT, which
+scores 100% on trained counts, 0.15% on held-out 7/9/11 and 0% above 12, always by
+stopping at a wrong length. See [the report](experiments/ordinary_trace_baselines.md#completed-benchmark-results--2026-10-11).
 The read-only dashboard is available with
 `python -m scripts.eval.trace_status --remote desktop --watch` from the Mac;
 it includes both benchmark bars, throughput, stage ETAs, audit/plot status and
@@ -457,7 +460,7 @@ At the user's request, superseded pre-30k recurrent runs/evaluations and redunda
 
 The historical runs used a frozen pretrained base and shared q/v LoRA. The authorized executor upgrade changes trainability explicitly; intermediate supervision and disabled generation caching remain required. The updated startup gate passed on the desktop with zero reported T=1 logit error. Batch changes can preserve optimizer/cursor state via explicit same-effective-batch resume, but bitwise numerical equivalence is not claimed. See [architecture](architecture.md) and [training](training_pointer.md).
 
-Overscaling execution, shortcut diagnostics, asymmetric training, multi-family transfer, and knowledge-retention benchmarks remain deferred. Gate 1 lacks predeclared thresholds and independent confirmation; Gate 2 lacks pretrained terminal-dynamics evidence. Supporting historical evidence lives in [the original CUDA report](experiments/stage1_cuda_5k.md) and the [documentation index](README.md).
+Overscaling execution, shortcut diagnostics, asymmetric training, and multi-family transfer remain deferred; the knowledge-retention check has run as [one-loop MMLU](experiments/mmlu_retention_20261012.md). Gate 1 lacks predeclared thresholds and independent confirmation; Gate 2 lacks pretrained terminal-dynamics evidence. Supporting historical evidence lives in [the original CUDA report](experiments/stage1_cuda_5k.md) and the [documentation index](README.md).
 
 ## Research direction after the current bounded experiment
 

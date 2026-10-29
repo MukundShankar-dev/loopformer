@@ -68,7 +68,7 @@ The [WSL desktop report](experiments/wsl_cuda_baseline.md) records the new Pytho
 
 Direct dependencies are pinned to give collaborators a common starting point. This is not a full environment lock: transitive dependencies can vary. Record the resolved package versions and model revision for experiments.
 
-Stage 1 data reproduction also pins `tokenizers==0.23.2`, the version already installed when seed 17 was generated and verified. All seven requirement pins match the local Python 3.11.8 environment and `pip check` passes; adding this pin requires no local package changes. See the [README reproduction instructions](../README.md#pointer-dataset-preview-and-reproduce).
+Stage 1 data reproduction also pins `tokenizers==0.23.2`, the version already installed when seed 17 was generated and verified. All seven requirement pins match the local Python 3.11.8 environment and `pip check` passes; adding this pin requires no local package changes. See the [README reproduction instructions](../README.md#original-pointer-dataset-preview-and-reproduce).
 
 Package versions and Python requirements were checked against PyPI metadata for [PyTorch](https://pypi.org/project/torch/2.14.0/), [Transformers](https://pypi.org/project/transformers/5.17.0/), and [Hugging Face Hub](https://pypi.org/project/huggingface-hub/1.31.0/). The pinned PyTorch release provides a Python 3.11 Apple Silicon wheel requiring macOS 14 or later.
 
