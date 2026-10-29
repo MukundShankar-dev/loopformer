@@ -8,6 +8,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 
 | Working on | Read |
 | --- | --- |
+| Public demo, streamed inference, downloadable model and hosting | [Demo deployment](docs/demo.md) |
 | Original-Qwen trace prompting and full ordinary trace SFT baselines | [Trace baselines](docs/trace_baselines.md) |
 | Paper-style analysis, evidence inventory, selected checkpoints and agent handoff | [Analysis contract](docs/analysis.md) |
 | Explaining or comparing earlier pointer architectures | [Model evolution](docs/pointer_model_evolution.md) and [historical comparison](docs/experiments/pointer_architecture_history.md) |
@@ -18,6 +19,7 @@ Before working, read [the documentation index](docs/README.md), [the research pl
 | Recurrent model, gradients, and Stage 0 validation | [Architecture](docs/architecture.md) |
 | Pointer data, training, checkpoints, and depth comparison | [Pointer execution and training](docs/training_pointer.md) |
 | Metrics, ordinary and recurrent baselines, and terminal overscaling | [Evaluation](docs/evaluation.md) |
+| General-capability retention, matched MMLU, and forced one-loop inference | [Evaluation](docs/evaluation.md#general-capability-retention--mmlu) and [MMLU protocol](docs/experiments/mmlu_retention_20261012.md) |
 | Frozen reserved-test and larger pointer benchmark | [Benchmark protocol](docs/pointer_benchmark.md) |
 | Adaptive inference, stopping, and its remaining research gates | [Adaptive-compute guide](docs/adaptive_compute.md) |
 | Failure diagnosis, proposed logging, and performance profiling | [Diagnostics and performance](docs/diagnostics_and_performance.md) |

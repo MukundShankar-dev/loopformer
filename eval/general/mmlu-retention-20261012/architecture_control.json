@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "contexts": 3,
+  "executor_settings": {
+    "train_scope": "recurrent",
+    "isolated": true,
+    "bridge": true,
+    "direct_readout": true,
+    "controller_size": 1,
+    "prefix_reuse": true,
+    "gradient_checkpointing": true,
+    "controller_kind": "shared_number"
+  },
+  "max_full_vocabulary_logit_difference": 0.0,
+  "router_and_timer_bypassed": true,
+  "unadapted_R": true,
+  "checkpoint_weights_modified": false
+}

@@ -209,6 +209,7 @@ class RecurrentQwen(nn.Module):
         stop_policy: Callable[[int, Tensor, Tensor], bool] | None = None,
         completion_threshold: float | None = None,
         readout_token_ids: list[int] | None = None,
+        loop_callback: Callable[[int, Tensor, Tensor | None, Tensor | None], None] | None = None,
     ) -> RecurrentOutput:
         """Run complete prompt states through shared recurrence, without KV cache.
 
@@ -224,9 +225,16 @@ class RecurrentQwen(nn.Module):
         independent of task depth, under the num_loops safety cap (batch 1).
         fixed_prompt keeps only the final unmasked position writable; returned
         full-shaped states contain fixed first-pass prefix outputs for diagnostics.
+        loop_callback receives one-based loop, C logits [1,A], optional stop
+        logits [1], and optional R logits [1,26] after each readout, including
+        the stopping loop. Detached copies protect inference from observer edits.
+        It is inference-only; its return value cannot choose when to stop.
         """
         if type(num_loops) is not int or num_loops < 1:
             raise ValueError("num_loops must be a positive integer")
+        if loop_callback is not None and (self.training or torch.is_grad_enabled() or
+                input_ids.shape[0] != 1 or labels is not None or logits_mode != "answer"):
+            raise ValueError("Loop observation requires eval/no_grad, batch 1, no labels, and answer logits")
         if stop_policy is not None and (self.training or torch.is_grad_enabled() or input_ids.shape[0] != 1 or labels is not None or logits_mode != "answer"):
             raise ValueError("Stopping requires eval/no_grad, batch 1, no labels, and answer logits")
         if completion_threshold is not None:
@@ -341,6 +349,10 @@ class RecurrentQwen(nn.Module):
                 ids = torch.tensor(readout_token_ids, device=device)
                 scores = nn.functional.linear(readout, self.lm_head.weight.index_select(0, ids))
             logits.append(scores)
+            if loop_callback is not None:
+                loop_callback(loop + 1, scores.detach().clone(),
+                              stop_logits[-1].detach().clone() if stop_logits else None,
+                              state_logits[-1].detach().clone() if state_logits else None)
             if labels is not None:
                 answer_scores = _answer_readout(scores, readout_positions) if logits_mode == "all" else scores
                 margins.append(answer_margin(answer_scores, labels[:, loop], allowed_token_ids))

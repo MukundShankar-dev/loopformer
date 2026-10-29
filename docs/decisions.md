@@ -1,5 +1,40 @@
 # Design decisions and unresolved questions
 
+## 2026-10-12 — Matched one-loop MMLU retention evaluation
+
+At the user's request, evaluate pinned original Qwen and the frozen trained
+recurrent pointer executor at one loop on the full standard five-shot MMLU
+test. Preserve the external harness's prompts, targets and accuracy definition.
+Bypass the pointer-specific router/timer only in evaluation memory, because
+general questions contain no Steps field. This isolates executor capability;
+it cannot establish that the learned controller works on language tasks.
+At one loop, the trained re-entry bridge is not invoked.
+
+Use matched FP32/SDPA inference, fixed batching, disabled cache/TF32, pinned
+dataset/model revisions and the same verified tokenizer. Score standard A–D
+likelihoods, retaining full-vocabulary probability normalization. Validate a
+compact final-position scorer against standard HFLM and fresh one-loop
+equivalence, then independently reconstruct every prompt and rescore results.
+Report paired changes and uncertainty without selecting an equivalence margin
+after seeing results. See [the declared protocol](experiments/mmlu_retention_20261012.md).
+This is a frozen evaluation; no training or broader adaptive-compute gate opens.
+
+## 2026-10-11 — Public demo with native streamed observations
+
+Deploy the frozen final checkpoint through a Gradio ZeroGPU service; keep the
+custom frontend on GitHub Pages with its service address in configuration. The
+user selected 26 nodes and up to 256 steps. Observe native loop readouts through
+detached copies, preserving learned stopping and independent reference scoring.
+Use cumulative transport snapshots and separate browser playback so fast
+inference stays inspectable. Saved audited runs remain explicitly labelled.
+
+HF's build enforces PyTorch <=2.13.0. Pin the Space to 2.13 while preserving
+the research/downloaded-model 2.14 runtime and all weights/precision settings.
+This is a serving compatibility change; require hosted decoded/stopping fidelity
+checks before enabling the website. It cannot be treated as full-population or
+bitwise equivalence across runtimes. No retraining or new research stage follows.
+See [deployment and validation](demo.md).
+
 This document records choices that affect implementation or interpretation. The [project plan](project_plan.md) supplies the established research constraints. Open entries below are questions to settle before their dependent work, not approved changes to the experiment.
 
 ## Established constraints
@@ -475,3 +510,14 @@ sizes and compilation on validation queries before freezing each arm. Do not
 claim that a compiled/cache policy is bitwise equivalent when measured responses
 differ. Existing recurrent weights and completed figures stay frozen. See the
 [trace contract](trace_baselines.md) and [preflight report](experiments/ordinary_trace_baselines.md).
+
+## Owner-sponsored demo requests — 2026-10-11
+
+The user authorized a server-side proxy after the anonymous ZeroGPU runs limit
+blocked the public playground. Host the relay inside the existing Space, store
+the owner token only in a Space secret, and authenticate the second HTTP hop
+through HF's gateway. Visitors share the owner's quota without browser sign-in.
+Bound requests globally and cache complete ordered-request results; keep direct
+Gradio access for callers with their own credentials. No paid hardware or plan
+is selected. This changes transport/accounting only, with no model or scientific
+protocol change. See [the proxy contract](demo.md#owner-authenticated-proxy--2026-10-11).

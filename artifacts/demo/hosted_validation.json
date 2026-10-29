@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "space": "mukunds/loopformer-demo",
+  "authenticated": true,
+  "cases": [
+    {
+      "label": "12 steps \u00b7 correct cycle",
+      "loops": 12,
+      "frames_received": 13,
+      "first_frame_loops": 1,
+      "first_frame_seconds": 7.906933000020217,
+      "wall_seconds": 8.175002917007077,
+      "server_inference_seconds": 3.2471720329485834,
+      "max_stop_probability_difference_from_recorded": 0.0,
+      "checkpoint": "mukunds/loopformer@e29f88cb85afdbf5c3f877e853a20067ce4fb313",
+      "predictions_and_summary_match": true
+    },
+    {
+      "label": "12 steps \u00b7 first error at 4",
+      "loops": 12,
+      "frames_received": 13,
+      "first_frame_loops": 1,
+      "first_frame_seconds": 0.3067698330269195,
+      "wall_seconds": 0.6292440830147825,
+      "server_inference_seconds": 0.2564849138725549,
+      "max_stop_probability_difference_from_recorded": 0.0,
+      "checkpoint": "mukunds/loopformer@e29f88cb85afdbf5c3f877e853a20067ce4fb313",
+      "predictions_and_summary_match": true
+    },
+    {
+      "label": "256 steps \u00b7 a long cycle",
+      "loops": 256,
+      "frames_received": 257,
+      "first_frame_loops": 1,
+      "first_frame_seconds": 0.4420315839815885,
+      "wall_seconds": 5.409474542015232,
+      "server_inference_seconds": 4.941212539095432,
+      "max_stop_probability_difference_from_recorded": 0.0,
+      "checkpoint": "mukunds/loopformer@e29f88cb85afdbf5c3f877e853a20067ce4fb313",
+      "predictions_and_summary_match": true
+    }
+  ],
+  "scope": "Bounded decoded/stop fidelity; not bitwise cross-runtime equivalence or a population benchmark"
+}

@@ -1,0 +1,26 @@
+{
+  "url": "https://mukunds-loopformer-demo.hf.space/api/predict",
+  "authenticated_browser": false,
+  "frames": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    12
+  ],
+  "incremental": true,
+  "first_frame_seconds": 3.7772503750165924,
+  "wall_seconds": 4.027978208032437,
+  "cached_replay": true,
+  "audited_predictions_and_stop_probabilities_match": true,
+  "invalid_request_rejected": true,
+  "missing_origin_rejected": true
+}

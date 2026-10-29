@@ -4,6 +4,7 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 
 | Need | Canonical document |
 | --- | --- |
+| Public playground, streamed inference, model downloads and hosting | [Demo deployment](demo.md) |
 | Original-Qwen trace prompting and full ordinary-Qwen trace SFT baselines | [Trace baselines](trace_baselines.md) |
 | Paper-style population analysis, selected checkpoints, metrics and agent handoff | [Analysis contract](analysis.md) |
 | Earlier pointer architectures, training/inference and plain-language explanations | [Model evolution](pointer_model_evolution.md) |
@@ -24,6 +25,16 @@ Start with the [research plan](project_plan.md) for the questions, stage gates, 
 The adaptive-compute guide is the **single source for that extension**. The research plan states its place in the stage sequence; evaluation documents shared metric conventions; status records current evidence. Stage 3 asymmetric dynamics and Stages 4–6 transfer remain planned in the research plan. No separate phase-guide directory is needed.
 
 ## Evidence, not instructions
+
+The [MMLU retention comparison](experiments/mmlu_retention_20261012.md)
+records the completed, independently audited full test comparing original Qwen
+and the trained recurrent executor at one loop: **46.92% versus 24.90%** on
+14,042 matched five-shot questions. This is substantial general-task degradation
+on MMLU, with unchanged weights and no repair fitting.
+
+The [recurrent language probe](experiments/recurrent_language_probe.md) records
+one ordinary question at one, two and four forced recurrent passes per token.
+It works at one loop; broader capability retention requires separate evaluation.
 
 The [ordinary trace baseline report](experiments/ordinary_trace_baselines.md)
 records full-SFT resource preflight and the newly authorized original-trace/

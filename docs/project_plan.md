@@ -15,6 +15,15 @@ The first question is the core project. The second question is the natural expan
 
 ## Current execution priority — user updates
 
+**2026-10-12 MMLU retention amendment:** The user requested full MMLU on original
+Qwen and the frozen recurrent pointer checkpoint forced to one loop, to measure
+general capability after adapting R. The [declared protocol and completed
+report](experiments/mmlu_retention_20261012.md) fixes the five-shot prompts,
+dataset/weight identities, controller bypass, matched answer likelihoods and
+independent paired audit. This authorizes a bounded preservation evaluation;
+it opens no repair fitting or later training stage. The completed result is
+46.92% versus 24.90%, with substantial one-pass MMLU degradation.
+
 **2026-10-10 ordinary-trace baseline amendment:** The user requested original
 Qwen with explicit trace prompting, and ordinary Qwen trained with **full SFT**
 to emit traces. Full-model training is explicitly authorized for this comparison;

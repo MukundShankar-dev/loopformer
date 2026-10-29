@@ -1,0 +1,3 @@
+# Install with --constraint requirements.txt to preserve research dependencies.
+lm_eval==0.4.13
+datasets==5.1.0

@@ -1,0 +1,45 @@
+{
+  "questions": 14042,
+  "base_correct": 6589,
+  "recurrent_correct": 3497,
+  "base_accuracy": 0.4692351516877938,
+  "recurrent_accuracy": 0.24903859849024357,
+  "difference": -0.22019655319755022,
+  "difference_ci95": [
+    -0.2307363623415468,
+    -0.209585529126905
+  ],
+  "base_correct_recurrent_wrong": 4880,
+  "base_wrong_recurrent_correct": 1788,
+  "prediction_agreement": 0.2706167212647771,
+  "bootstrap": {
+    "repetitions": 10000,
+    "seed": 0,
+    "unit": "paired question, stratified within subject"
+  },
+  "categories": {
+    "humanities": {
+      "questions": 4705,
+      "base_accuracy": 0.42869287991498406,
+      "recurrent_accuracy": 0.24952178533475028
+    },
+    "other": {
+      "questions": 3107,
+      "base_accuracy": 0.5220469906662375,
+      "recurrent_accuracy": 0.24654007080785323
+    },
+    "social_sciences": {
+      "questions": 3077,
+      "base_accuracy": 0.5375365615859603,
+      "recurrent_accuracy": 0.24016899577510561
+    },
+    "stem": {
+      "questions": 3153,
+      "base_accuracy": 0.4110371075166508,
+      "recurrent_accuracy": 0.2594354582936885
+    }
+  },
+  "subjects": 57,
+  "macro_subject_base_accuracy": 0.4852325018157899,
+  "macro_subject_recurrent_accuracy": 0.2486615802337736
+}

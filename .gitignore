@@ -44,3 +44,10 @@ wandb/
 
 # Oversized local launcher log; keep it out of GitHub while retaining it locally.
 /models/stage1_pointer/executor_r-seed61-launch-20261004T210218Z-581.log
+
+# macOS AppleDouble metadata.
+._*
+
+# Per-question MMLU sample logs (~360 MB); summaries, protocol and paired.csv stay tracked.
+/eval/general/**/mmlu_*.jsonl
+/eval/general/**/launcher.lock

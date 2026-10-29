@@ -1,0 +1,55 @@
+{
+  "protocol": {
+    "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "base_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "checkpoint": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+    "checkpoint_sha256": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+    "dataset": "cais/mmlu",
+    "dataset_revision": "c30699e8356da336a370243923dbaf21066bb9fe",
+    "task": "mmlu",
+    "num_fewshot": 5,
+    "apply_chat_template": false,
+    "batch_size": 4,
+    "dtype": "float32",
+    "attention": "sdpa",
+    "num_loops": 1,
+    "seed": 0,
+    "expected_subjects": 57,
+    "expected_questions": 14042,
+    "output": "eval/general/mmlu-retention-20261012"
+  },
+  "arm": "base",
+  "checkpoint_sha256": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+  "source_sha256": {
+    "scripts/recurrent_qwen/__init__.py": "33bb24196ba9676312779e3e3afba580f37f0d354c2fff31fa598ab7903301b2",
+    "scripts/recurrent_qwen/checkpoint.py": "26b639d45645a82e2eed9cdf50377b599bd10fcb29a71664f9c1d8f85964015b",
+    "scripts/recurrent_qwen/completion.py": "0e7155e9decaa56dafe44c6a31eb672a2c34e4229b0bac120d5f38281a91d476",
+    "scripts/recurrent_qwen/interfaces.py": "0a1aeded9eee9bba1a07cab90fa5228a8fb21978247022442196556191b55168",
+    "scripts/recurrent_qwen/lora_utils.py": "4f2baf46c9a57f9aa79bf41e50c5fc1cc5bd8020c8e066e5829cfb8284a9b803",
+    "scripts/recurrent_qwen/memory.py": "81cb65bdd3fba5ef9954c4c09a91c115dd2e668bd3d7755af1246f9bf22f3fcd",
+    "scripts/recurrent_qwen/model.py": "a488bdd0088e51d3fdd42f36743efa7fa55a60a00ead97c50e5a3251bcdb5634",
+    "scripts/recurrent_qwen/number_reader.py": "0e36ef99d768c8a75cb84efc8b765df94a39318e839026a0a0b09d6a13baca1a",
+    "scripts/recurrent_qwen/outputs.py": "f384bea5eaf663c7e7ce0cfbc7cb5a0165a89186be078b7c12092b424bed9789",
+    "scripts/recurrent_qwen/partitioned.py": "a358af968434ef82f6c1eeaca8b85d4b9903df74ac29c0c5bd2648bde6306e2a",
+    "scripts/recurrent_qwen/prefix.py": "bdefddcb3752ff7bb6bb389ede745837ce08c86d3d827c27164c7a91a1c32576",
+    "scripts/recurrent_qwen/validation.py": "7aeb45730858b2bb5999ea18e36de70497de03564db99fd1bfa4599e0c36d511"
+  },
+  "evaluation_sha256": {
+    "/home/mukund/loopformer/scripts/eval/mmlu.py": "9c6b0338a69f6512c6bb8c1c70beaac104b7da4cd0de7145935232b5669eacb3",
+    "scripts/eval/mmlu_backend.py": "3b7d86539713f0945ae6bb48f90df5bdf883fdf2859e81660273e155bc2e6e9b",
+    "scripts/eval/single_token.py": "3c6a9b3b33e9c3df52009ffddc3a0332898fa78fdb8301220b395e814a1815ac"
+  },
+  "packages": {
+    "torch": "2.14.0+cu130",
+    "transformers": "5.17.0",
+    "tokenizers": "0.23.2",
+    "lm_eval": "0.4.13",
+    "datasets": "5.1.0",
+    "numpy": "2.4.6",
+    "huggingface-hub": "1.31.0"
+  },
+  "git_commit": "e24f19bac0f57c9756d20a501746c19e46b8fe89",
+  "worktree": " M scripts/recurrent_qwen/model.py\n?? configs/mmlu_retention.json\n?? eval/general/\n?? mmlu_retention.sh\n?? requirements-mmlu.txt\n?? scripts/._demo\n?? scripts/demo/\n?? scripts/eval/mmlu.py\n?? scripts/eval/mmlu_backend.py\n?? scripts/eval/single_token.py\n?? tests/test_single_token.py\n",
+  "device": "NVIDIA GeForce RTX 5070 Ti",
+  "router_and_timer_bypassed": false
+}

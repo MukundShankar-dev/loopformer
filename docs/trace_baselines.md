@@ -126,6 +126,14 @@ time. Track it from the Mac:
 python -m scripts.eval.trace_status --remote desktop --watch
 ```
 
+On the desktop itself, omit `--remote desktop`. This read-only Rich dashboard
+shows training and both benchmark progress bars, coverage, throughput, current
+depth and measured stage ETA, plus the queued audit/plot stage and saved training
+checkpoint. Pending stages have no speculative ETA; stopped runs display no
+active countdown. Training ETA covers optimizer updates and excludes validation
+and saves. Audits/plots show stage status rather than an unmeasured percentage.
+Ctrl+C closes only the monitor, leaving the experiment unchanged.
+
 Cached generation profiles batch sizes 64/128/256/512 on depth-12 **validation** queries,
 selecting throughput alone. A preflight static-cache compilation attempt was
 slower and changed continuations, so **production compilation is disabled**.

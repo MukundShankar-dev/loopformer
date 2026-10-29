@@ -88,7 +88,36 @@ smoke model/optimizer tensors are not production inputs. The final code uses a
 cache adapter so the historical ordinary evaluator and its completed source
 freezes remain byte-identical. No new dependency is required.
 
-Resume/monitor with `python -m scripts.eval.trace_status --remote desktop --watch`.
+The user stopped the production run on 2026-10-10. Verified that no training
+or queued benchmark process remains. The saved best checkpoint at update 250
+is retained at `models/trace_sft/seed61-full/best/`; later unsaved updates will
+be repeated. Neither full benchmark has started. Restart from the desktop
+repository with `bash trace_baselines.sh`.
+
+Monitor with `python -m scripts.eval.trace_status --remote desktop --watch`.
 The launcher owns an exclusive lock, and will resume saved training state or
 unchanged generation chunks if interrupted. Keep the source/configuration stable
 while it runs. Do not interpret a partial trace benchmark as the final comparison.
+
+## Completed SFT log inspection — 2026-10-10
+
+The desktop run subsequently resumed from update 250 and completed update 2,250;
+its resumed invocation took 1,045.9 seconds for 2,000 updates. The selected best
+checkpoint is update 2,250. [Resumed W&B run](https://wandb.ai/mukunds/loopformer/runs/ohjupgd1).
+Trained-count validation response CE decreased from 2.706965 at initialization
+to 1.980952e-6. All 64 teacher-forced validation responses per trained count
+are correct at the final checkpoint.
+
+The free-generation development panel (four queries per count) achieves 100%
+strict success at all trained counts and 0% at held-out counts 7, 9 and 11.
+At count 11 all four generated prefixes through N are correct, but none stop
+exactly at N. This establishes a failure on the small held-out-count panel;
+it does not locate every failure or establish large-benchmark execution quality.
+Held-out teacher-forced CE at counts 7/9/11 is 1.321/1.050/0.696 respectively.
+Training optimization succeeded; count generalization is not demonstrated.
+
+Small logs and summaries were copied to the Mac at `models/trace_sft/seed61-full/`.
+The training-log preview is `eval/pointer_traces/seed61-20261010/previews/sft_learning.png`
+and `.pdf`, separate from the queued audited benchmark figures. Original-Qwen
+trace evaluation was running at 18,574/345,600 questions at inspection; SFT
+evaluation had not started. No run was launched or modified during this inspection.

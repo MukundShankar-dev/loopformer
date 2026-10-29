@@ -1,0 +1,35 @@
+{
+  "device": "cuda",
+  "torch": "2.14.0+cu130",
+  "dtype": "float32",
+  "attention": "sdpa",
+  "weights_sha256": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+  "passed": true,
+  "cases": [
+    {
+      "label": "12 steps \u00b7 correct cycle",
+      "loops": 12,
+      "frames": 13,
+      "stream_seconds": 0.4888521809999986,
+      "native_and_recorded_predictions_match": true,
+      "native_stop_probabilities_match": true
+    },
+    {
+      "label": "12 steps \u00b7 first error at 4",
+      "loops": 12,
+      "frames": 13,
+      "stream_seconds": 0.49326422600000797,
+      "native_and_recorded_predictions_match": true,
+      "native_stop_probabilities_match": true
+    },
+    {
+      "label": "256 steps \u00b7 a long cycle",
+      "loops": 256,
+      "frames": 257,
+      "stream_seconds": 10.204276572000026,
+      "native_and_recorded_predictions_match": true,
+      "native_stop_probabilities_match": true
+    }
+  ],
+  "timing_scope": "Warm batch-one forward plus observation, reference scoring and JSON snapshot construction; excludes model loading and network"
+}

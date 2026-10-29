@@ -1,0 +1,7 @@
+# Demo proxy/verification and tests/test_demo_proxy.py. Install with
+# --constraint requirements.txt to preserve research dependencies.
+# Pins follow demo/hf_space/requirements.txt; httpx arrives with gradio.
+gradio==6.30.0
+gradio-client==2.7.2
+fastapi==0.143.0
+uvicorn==0.54.0

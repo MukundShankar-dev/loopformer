@@ -1,0 +1,19 @@
+{
+  "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "base_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+  "checkpoint": "models/stage1_pointer/controller-shared-number-precision-seed83/best",
+  "checkpoint_sha256": "0f8a3f2572ec2caf4fafbcdd074b5283bd8c610602502763b3c04487ce1f123d",
+  "dataset": "cais/mmlu",
+  "dataset_revision": "c30699e8356da336a370243923dbaf21066bb9fe",
+  "task": "mmlu",
+  "num_fewshot": 5,
+  "apply_chat_template": false,
+  "batch_size": 4,
+  "dtype": "float32",
+  "attention": "sdpa",
+  "num_loops": 1,
+  "seed": 0,
+  "expected_subjects": 57,
+  "expected_questions": 14042,
+  "output": "eval/general/mmlu-retention-20261012"
+}

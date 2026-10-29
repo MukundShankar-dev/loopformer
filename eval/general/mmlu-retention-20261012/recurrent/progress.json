@@ -1,0 +1,8 @@
+{
+  "status": "complete",
+  "seconds": 675.6974560829999,
+  "questions": 14042,
+  "subjects": 57,
+  "peak_cuda_allocated_bytes": 4027010560,
+  "timing_scope": "harness dataset/task preparation, likelihood evaluation and raw-sample export; excludes model loading"
+}

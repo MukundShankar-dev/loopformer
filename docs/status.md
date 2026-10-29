@@ -1,5 +1,51 @@
 # Project status
 
+## General-capability retention — 2026-10-12
+
+The user requested a matched full MMLU comparison of original Qwen and the
+final recurrent pointer executor at one loop. The full five-shot comparison is
+complete and independently audited: 57 subjects and 14,042 paired questions.
+Base accuracy is **46.92%**, versus **24.90%** for the recurrent checkpoint;
+the paired difference is **−22.02 percentage points** (95% interval −23.07 to
+−20.96). Prediction agreement is 27.06%. This is substantial MMLU degradation
+at one loop; the result does not establish loss of every general capability.
+The pointer router/timer is explicitly bypassed for fixed one-pass readout.
+Six focused scoring/audit checks pass on both hosts. The reference preflight
+matches the compact scorer to standard HFLM (maximum likelihood residual
+0.00001681); fresh one-loop wrapper logits match base Qwen exactly on checked
+inputs, including a separate control with the exact saved prefix-memory
+executor settings. All documents, five-shot prompts, targets and accuracies
+are independently verified. Raw records and audit hashes are copied to the Mac
+under `eval/general/mmlu-retention-20261012/`. Weights remain unchanged, and
+no repair training is selected. See [the protocol and evidence](experiments/mmlu_retention_20261012.md).
+
+The earlier [sky-question probe](experiments/recurrent_language_probe.md)
+answers correctly at one loop, while two/four forced loops degrade the response.
+That single question does not establish broad retention or forgetting.
+
+## Public demo — 2026-10-11
+
+The user authorized a website playground with at most 26 nodes, requests through
+256 steps, streaming predictions and downloadable weights. The UI and native
+observation API are implemented; 58 focused Python tests and three Node tests
+pass. Local Gradio/browser streaming passed with a tiny model. The final
+checkpoint passed desktop native/recorded agreement at all 280 checked loops,
+including exact native stop probabilities. The model is published at
+`mukunds/loopformer`; free ZeroGPU Space `mukunds/loopformer-demo` is running.
+HF caps PyTorch at 2.13, so only serving changes from research 2.14. Hosted
+fidelity passed all 280 predictions, summaries and stop probabilities; anonymous
+browser inference also passed. The demo-only Pages deployment is live; a fresh
+24-step request through the public website passed with exact stopping. See
+[demo deployment](demo.md). After anonymous requests hit the HF runs limit, the
+user authorized an owner-authenticated proxy. It is deployed in the same Space,
+keeps the token in a secret, streams native outputs, caches complete runs and
+bounds sponsored calls. Twenty native/proxy Python tests, four Node tests and
+an anonymous hosted relay/cached replay passed. The website integration is
+live at Pages commit `02f94ae`; an unsigned browser passed cached replay and a
+fresh 256-step cycle with all predictions correct and exact stopping.
+Visitors still share the owner's finite quota. No paid service was selected,
+and no training or research stage is opened.
+
 ## Current work — ordinary trace baselines, 2026-10-10
 
 The user requested two additional baselines: original Qwen generating explicit
@@ -8,10 +54,23 @@ traces, and **full ordinary-Qwen SFT** on the successful executor's unchanged
 queries and the opened 1,536-query test. See [the implementation contract](trace_baselines.md).
 The new trainer, cached evaluator, independent raw-response audit, separate
 four-family plotting bundle and resumable launcher are implemented. Full SFT
-is running on the desktop: all 494,032,768 parameters, batch 16 with activation
-checkpointing, 2,250 updates. W&B run `bew2vujj` is live. Both full evaluations
-and audits/plots follow automatically; no full-run quality is yet established. The completed recurrent analysis and 25-family figure bundle remain
+was initially stopped at the user's request, then resumed on the desktop and
+completed all 2,250 updates. The selected checkpoint is
+`models/trace_sft/seed61-full/best/` at update 2,250. The resumed 2,000 updates
+took 1,045.9 seconds. Trained-depth validation response CE reached 1.981e-6;
+teacher-forced response accuracy is 100% on 64 examples per trained depth.
+The four-example-per-depth free-generation panel has 100% strict success at
+trained counts, but 0% at held-out counts 7, 9 and 11. This is a small development
+panel, not the full benchmark or evidence of depth generalization.
+W&B resumed run: `ohjupgd1`. At the log inspection, original-Qwen trace evaluation
+was running (18,574/345,600 questions); SFT evaluation and audits/plots follow.
+The recipe trains all 494,032,768 parameters with batch 16 and activation
+checkpointing. The completed recurrent analysis and 25-family figure bundle remain
 unchanged. The next milestone is completing and auditing these two baselines.
+The read-only dashboard is available with
+`python -m scripts.eval.trace_status --remote desktop --watch` from the Mac;
+it includes both benchmark bars, throughput, stage ETAs, audit/plot status and
+the saved checkpoint. It does not launch or resume experiments.
 
 ## Writeup coverage update — 2026-10-10
 
@@ -24,10 +83,9 @@ executor snapshots are complete and independently audited.
 A bounded batch-4/8/16 profile found only about 9% more graph throughput at 16;
 mean active CE GPU utilization was 90.4% over ten samples. The existing frozen
 run was briefly paused for profiling and resumed; no training or precision change.
-The final population figures are complete and copied to the Mac. A hosted demo
-remains unimplemented.
+The final population figures are complete and copied to the Mac. The [public demo](demo.md) is now implemented; its deployment evidence is recorded separately.
 
-Last updated: 2026-10-10.
+Last updated: 2026-10-12.
 
 ## Applied population-inference optimization — 2026-10-09
 

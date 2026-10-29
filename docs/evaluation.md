@@ -1,5 +1,38 @@
 # Evaluation and reproducibility
 
+## General-capability retention — MMLU
+
+The user authorized a full matched MMLU evaluation on 2026-10-12: pinned original
+Qwen versus the frozen recurrent pointer checkpoint forced to one pass.
+The [declared protocol](experiments/mmlu_retention_20261012.md) owns task/data
+versions, five-shot prompts, controller bypass, A–D likelihood scoring, paired
+audits and artifacts. This is evaluation of the executor, with no new training
+or learned stopping on general-language questions. Broader capability
+preservation is measured rather than inferred from the sky-question probe.
+
+Install only the extra evaluation dependencies on the CUDA desktop:
+
+```bash
+.venv/bin/python -m pip install -r requirements-mmlu.txt --constraint requirements.txt
+bash mmlu_retention.sh
+```
+
+The thin launcher uses an exclusive lock, reruns the reference/equivalence
+preflight, evaluates base and recurrent arms sequentially, then independently
+audits all documents, prompts, likelihood argmaxes and aggregates. Each arm uses
+a harness response cache and rejects source/config/weight identity changes
+before reuse. No model download is enabled. The pinned public MMLU dataset is
+downloaded on first setup by the harness. Machine-readable progress and raw
+question records are retained under `eval/general/mmlu-retention-20261012/`.
+
+The composing CLI is [`scripts.eval.mmlu`](../scripts/eval/mmlu.py), the narrow
+harness backend is [mmlu_backend.py](../scripts/eval/mmlu_backend.py), and the
+independent audit is [`scripts.eval.mmlu_analysis`](../scripts/eval/mmlu_analysis.py).
+The single-token scoring interface intentionally does not implement other
+likelihood/generation task types.
+
+## Pointer evaluation
+
 The added [ordinary trace baselines](trace_baselines.md) use the same graph/count
 panel but ask original and fully SFT-trained Qwen to generate whole traces.
 Their evaluator reuses the ordinary generation/loader interfaces and existing

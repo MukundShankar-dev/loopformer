@@ -1,0 +1,13 @@
+# ZeroGPU currently enforces torch<=2.13.0. Research/download pins remain 2.14.
+torch==2.13.0
+transformers==5.17.0
+tokenizers==0.23.2
+huggingface-hub==1.31.0
+peft==0.20.0
+numpy==2.4.6
+gradio==6.30.0
+spaces==0.51.3
+websockets==15.0.1
+gradio-client==2.7.2
+fastapi==0.143.0
+uvicorn==0.54.0

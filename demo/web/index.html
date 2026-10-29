@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Build a graph and watch LoopFormer follow it, one recurrent loop at a time.">
+  <title>LoopFormer playground · Mukund Shankar</title>
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="./demo.css">
+  <script type="module" src="./demo.mjs"></script>
+</head>
+<body>
+<a class="skip" href="#playground">Skip to playground</a>
+<div class="shell">
+  <nav class="topbar" aria-label="Main navigation"><a href="../">← LoopFormer journal</a><span>MUKUND SHANKAR <span class="nav-divider">/</span> INTERACTIVE RESEARCH</span><a href="https://github.com/MukundShankar-dev/loopformer">Source ↗</a></nav>
+  <header class="hero">
+    <div><p class="eyebrow">THE LOOPFORMER PLAYGROUND</p><h1>A graph. A state.<br>One more <em>loop.</em></h1><p class="intro">Give the model a set of arrows to follow. Watch its predictions unfold, and see exactly where they agree with the graph.</p></div>
+    <aside class="hero-note"><span class="note-index">01 → 02 → …</span><p>The same 12 transformer layers are reused at every step. Each loop gives us another prediction to inspect.</p><a href="../#architecture-5">How the model works ↗</a></aside>
+  </header>
+  <main id="playground">
+    <div class="section-heading"><h2>Make a path. Follow the model.</h2><span id="connection" class="connection">Checking live service…</span></div>
+    <section class="setup" aria-label="Configure graph">
+      <div class="setup-primary">
+        <label>Graph type<select id="graph-type"><option value="cycle">Full cycle</option><option value="random">Random function</option><option value="permutation">Permutation</option></select></label>
+        <label>Nodes<input id="node-count" type="number" min="2" max="26" value="26"></label>
+        <label>Seed<input id="seed" type="number" min="0" max="4294967295" value="42"></label>
+        <button id="generate" class="secondary">Generate graph <span aria-hidden="true">↻</span></button>
+        <span class="control-separator"></span>
+        <label>Start<select id="start" aria-label="Start node"></select></label>
+        <label>Steps<input id="steps" type="number" min="1" max="256" value="12"></label>
+        <button id="run" class="primary" disabled>Run model <span aria-hidden="true">↗</span></button>
+        <button id="cancel" class="secondary" hidden>Cancel run</button>
+      </div>
+      <div class="setup-bottom"><span id="graph-description">Every node points to exactly one other node.</span><label class="example-label">Or explore a recorded run<select id="examples"><option value="">Choose an example…</option></select></label></div>
+    </section>
+    <p id="status" class="status" role="status" aria-live="polite">Loading recorded model examples…</p>
+    <div class="workspace">
+      <section class="panel graph-panel" aria-labelledby="graph-title">
+        <div class="panel-heading"><div><span class="eyebrow">01 / THE INPUT</span><h3 id="graph-title">Your graph</h3></div><button id="edit-toggle" class="text-button" aria-expanded="false" aria-controls="editor">Edit rules ↗</button></div>
+        <div class="graph-wrap"><svg id="graph" viewBox="0 0 520 510" aria-label="Directed graph. Select a node to edit its outgoing edge." role="group"></svg><div class="graph-center"><span id="graph-center-label">STARTING AT</span><strong id="graph-center-value">A</strong><span id="graph-center-detail">ready for the first loop</span></div></div>
+        <div class="legend"><span><i class="legend-model"></i>Model prediction</span><span><i class="legend-reference"></i>Reference position</span></div>
+        <div id="editor" class="editor" hidden><div class="edge-editor"><label>From<select id="edge-source"></select></label><span aria-hidden="true">→</span><label>To<select id="edge-target"></select></label><button id="save-edge" class="secondary">Set edge</button></div><label>Paste rules <span class="muted">A → B, B → C, …</span><textarea id="rule-text" rows="4" spellcheck="false"></textarea></label><button id="apply-rules" class="text-button">Apply rules</button><p class="small">Include one outgoing rule for each visible node. Other A–Z nodes self-loop in the model’s full rule table.</p></div>
+        <p class="panel-footnote">Click a node to change its outgoing edge. Cycles and self-loops are allowed.</p>
+      </section>
+      <section class="panel architecture-panel" aria-labelledby="architecture-title">
+        <div class="panel-heading"><div><span class="eyebrow">02 / INSIDE THE MODEL</span><h3 id="architecture-title">Same layers. Next state.</h3></div><span id="source-badge" class="badge">Recorded run</span></div>
+        <div class="architecture" id="architecture">
+          <div class="prompt-row"><div class="prompt-chip">RULES + START <b>→</b> P <small>6 layers · once</small></div><div class="memory-chip">Fixed graph memory</div></div>
+          <div class="flow-down">↓ <span>initial state h₀</span></div>
+          <div class="loop-area"><div class="loop-return">↶ <span>hidden state → re-entry bridge → same R</span></div><div class="executor-row"><div class="module recurrent" id="r-module"><span class="module-label">R / EXECUTOR</span><strong>12 shared layers</strong><small id="r-detail">Waiting for a loop</small></div><span class="flow-arrow">→</span><div class="module readout" id="c-module"><span class="module-label">C / READOUT</span><strong>6 layers</strong><small>Observe the state</small></div><span class="flow-arrow">→</span><div class="answer-module"><span class="module-label">PREDICTION</span><strong id="architecture-answer">—</strong></div></div></div>
+          <div class="controller-row"><div><span class="module-label">STEPS → NUMBER READER → LEARNED TIMER</span><p>Updated once per executor loop</p></div><div class="stop-readout"><strong id="stop-probability">—</strong><span>stop probability</span></div></div>
+          <div class="stop-track"><div id="stop-fill"></div><span title="Stopping threshold: 0.5"></span></div>
+          <p id="controller-verdict" class="small">The timer decides when to stop; it does not judge whether the answer is correct.</p>
+        </div>
+        <div class="inspection"><div><span class="eyebrow">AT THE SELECTED LOOP</span><div class="comparison"><div><span>Expected</span><strong id="expected">—</strong></div><span class="versus">/</span><div><span>Model</span><strong id="predicted">—</strong></div><span id="step-verdict" class="verdict">Not run yet</span></div></div><div class="step-facts"><p><span>Valid edge from previous prediction</span><b id="edge-verdict">—</b></p><p><span>Direct R prediction</span><b id="direct-prediction">—</b></p></div></div>
+        <p class="panel-footnote">Letters are readouts, not inputs to the next loop. Playback speed is independent of inference speed.</p>
+      </section>
+    </div>
+    <section class="panel timeline-panel" aria-labelledby="timeline-title">
+      <div class="panel-heading"><div><span class="eyebrow">03 / THE TRAJECTORY</span><h3 id="timeline-title">Every step is inspectable.</h3></div><span id="received" class="small">0 predictions received</span></div>
+      <div class="playback"><button id="play" class="primary" disabled>Play</button><button id="previous" class="icon-button" aria-label="Previous step" disabled>←</button><button id="next" class="icon-button" aria-label="Next step" disabled>→</button><span id="step-count" class="step-count">0 / 0</span><input id="scrubber" aria-label="Selected loop" type="range" min="0" max="0" value="0" disabled><label class="speed-label">Pace<select id="speed"><option value="1000">1 step / sec</option><option value="500" selected>2 steps / sec</option><option value="200">5 steps / sec</option><option value="50">20 steps / sec</option></select></label><button id="first-error" class="text-button" disabled>First error ↗</button></div>
+      <div id="timeline" class="timeline" role="group" aria-label="Predictions by loop"></div>
+      <div class="timeline-key"><span>✓ Matches reference</span><span>× Differs from reference</span><span>Click any step to inspect it</span></div>
+      <div class="metrics"><div><span>Final answer</span><strong id="metric-answer">—</strong></div><div><span>Whole trajectory</span><strong id="metric-trajectory">—</strong></div><div><span>Stopped at requested step</span><strong id="metric-stop">—</strong></div><div><span>First wrong step</span><strong id="metric-error">—</strong></div></div>
+      <div class="run-footer"><p id="run-details" class="small">Reference answers are calculated separately and never fed to the model.</p><div><button id="export-request" class="text-button">Export graph ↓</button><button id="export-trace" class="text-button" disabled>Export trace ↓</button></div></div>
+    </section>
+    <section class="about-demo"><div><h2>Try a longer run.</h2><p>The model uses A–Z graphs. The evaluated range extends to 256 steps, with a learned stopping controller and intermediate supervision. Download the checkpoint and inference code to explore locally.</p><a id="download-model" href="https://github.com/MukundShankar-dev/loopformer">Model & inference code ↗</a></div><div><h3>What you’re seeing</h3><p>A prediction can return to the correct node after an earlier mistake. That is why final-answer correctness and the complete trajectory are scored separately.</p><p class="small">Recorded examples are real, audited runs of the final checkpoint. New graphs require the live model service. The compact architecture view is explanatory, not an attention visualization.</p></div></section>
+  </main>
+  <footer><a href="../">← Back to the research journal</a><span>LoopFormer · one transition at a time</span></footer>
+</div>
+<noscript>This playground needs JavaScript. The <a href="../">research journal</a> is available without it.</noscript>
+</body>
+</html>

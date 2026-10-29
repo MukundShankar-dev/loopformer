@@ -1,5 +1,35 @@
 # Architecture and implementation boundaries
 
+## General-capability readout at one loop — 2026-10-12
+
+The user-authorized [MMLU comparison](experiments/mmlu_retention_20261012.md)
+loads the actual final checkpoint and forces exactly one pass through shared R.
+Because MMLU lacks the pointer Steps field, its evaluation caller bypasses the
+input router and timer in memory. The bridge remains loaded but is unused on
+loop one. No checkpoint weights or native pointer interfaces change.
+
+[`last_logits`](../scripts/eval/single_token.py) uses the normal full-vocabulary
+coda readout `[B,V]` at the last valid token; the independent ordinary-model arm
+projects the same position. Inputs are left-padded `[B,S]` with an explicit mask.
+The external harness owns MMLU prompting and metrics. A narrow likelihood
+adapter rejects targets that are not exactly one token. This measures the
+trained executor's general-language one-pass behavior, not learned stopping
+or task-independent recurrence. The untrained wrapper's checked full-vocabulary
+logits matched ordinary Qwen exactly on the desktop preflight.
+
+## Public inference observations — 2026-10-11
+
+`RecurrentQwen.forward` accepts an optional inference-only `loop_callback`.
+It observes one-based loop, detached cloned C logits `[1,A]`, optional stop
+logits `[1]` and optional direct-R logits `[1,26]`, including the stopping loop.
+Callbacks cannot select a stop or mutate inference tensors through their copies;
+the ordinary forward and learned completion logic remain the shared path.
+The [demo service](demo.md) streams these observations through a cancellable
+worker, with reference scoring outside the model. Native CUDA checks preserve
+all predictions and stop probabilities on a bounded 280-loop panel. Hosted
+PyTorch 2.13 also passed the same bounded decoded/stop comparison; no
+full-population or cross-runtime bitwise equivalence is claimed.
+
 For technical and plain-language accounts of the earlier models and why they
 changed, see [model evolution](pointer_model_evolution.md). This guide retains
 historical mechanics alongside the current isolated executor contracts.

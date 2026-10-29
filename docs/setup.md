@@ -88,6 +88,8 @@ python -m scripts.validate_stage0 --device cpu --output artifacts/stage0/cpu.jso
 python -m scripts.validate_stage0 --device mps --output artifacts/stage0/mps.json
 ```
 
+`tests/test_demo_proxy.py` needs the demo web stack. Install it with `python -m pip install -r requirements-demo.txt --constraint requirements.txt`; without it, test collection fails on `fastapi`.
+
 The [CLI](../scripts/validate_stage0.py) composes the implementation in `scripts/recurrent_qwen/`. It creates the configurable P/R/C split, freezes original parameters, attaches recurrent LoRA, and verifies the architecture. It prints Rich tables and saves JSON with exact inputs, all package versions, source hashes, model revision, gradient evidence, timing, and peak process RSS.
 
 Unlike the older smoke test, this command defaults to **local files only** at model revision `7ae557604adf67be50417f59c2c2f167def9a775`. Add `--download` explicitly when files are missing. No model was downloaded during the recorded Stage 0 validation. MPS may be hidden by an execution sandbox; the recorded MPS checks ran outside it. Device fallback is never automatic.

@@ -1,0 +1,8 @@
+{
+  "space": "mukunds/loopformer-demo",
+  "modelUrl": "https://huggingface.co/mukunds/loopformer",
+  "journalUrl": null,
+  "maxSteps": 256,
+  "clientModule": "https://cdn.jsdelivr.net/npm/@gradio/client@2.7.1/+esm",
+  "proxyUrl": "https://mukunds-loopformer-demo.hf.space/api/predict"
+}
