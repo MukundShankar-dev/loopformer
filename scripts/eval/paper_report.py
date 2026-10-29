@@ -1,4 +1,4 @@
-"""Write the completion report and handoff status from audited suite artifacts."""
+"""Write the completion report next to the audited suite artifacts."""
 import argparse
 import csv
 import json
@@ -6,14 +6,6 @@ from pathlib import Path
 
 import numpy as np
 from scripts.eval.paper_plot_contract import validate_manifest
-
-
-def replace_status(path:Path,message:str)->None:
-    start='<!-- paper-run-status:start -->';end='<!-- paper-run-status:end -->'
-    text=path.read_text()
-    if start not in text or end not in text:raise ValueError(f'{path}: missing owned status region')
-    before,rest=text.split(start,1);_,after=rest.split(end,1)
-    path.write_text(before+start+'\n'+message+'\n'+end+after)
 
 
 def main()->None:
@@ -42,10 +34,10 @@ def main()->None:
                   'It uses the existing three-shot chat prompt, unconstrained greedy generation and eight new tokens; recurrent models use raw prompts and restricted readout. This is a matched-question baseline, not an isolated architecture/prompt ablation. The historical seed-17 6% result is retained separately.',
                   f"Raw compressed continuations, reconstruction hashes, depth/graph-stratum metrics, graph-cluster intervals and paired recurrent-minus-ordinary final-letter deltas are in `{root}/ordinary_qwen/`. Every response is independently decoded and checked against scalar dictionary execution; 54 predeclared native generation checks must pass.",
                   'Ordinary generation has no recurrent trajectory or exact stopping-loop metric. It is excluded from the logical-R-pass Pareto frontiers. Generated tokens/s is not recurrent transitions/s.', '',
-                  '## Reproduction and evidence','', '```bash','bash analyze_pointer.sh','python -m scripts.eval.paper_status','```','',
+                  '## Reproduction and evidence','', '```bash','bash scripts/launch/analyze_pointer.sh','python -m scripts.eval.paper_status','```','',
                   f'Output: `{root}`. The same launcher resumes unchanged atomic extraction chunks. A changed protocol, checkpoint, implementation or batch shape is rejected.',
-                  '',f'[Organized figure index](../../{root}/plots/index.md). Five scientific groups, the baseline/five-attempt writeup group and observed-policy Pareto comparisons; PNG/PDF/SVG, exact plotted arrays, captions and hashes.',
-                  '',f'[Independent decision audit](../../{root}/independent_audit.json), [reference/chunk coverage](../../{root}/reference_audit.json), [figure manifest](../../{root}/plots/manifest.json).',
+                  '',f'[Organized figure index](plots/index.md). Five scientific groups, the baseline/five-attempt writeup group and observed-policy Pareto comparisons; PNG/PDF/SVG, exact plotted arrays, captions and hashes.',
+                  '',f'[Independent decision audit](independent_audit.json), [reference/chunk coverage](reference_audit.json), [figure manifest](plots/manifest.json).',
                   '', 'The scalar audit reconstructs raw dictionary transitions separately from vectorized scoring. Native batch-one calls verify 54 predeclared graph/count questions per model, including counts 1/6/12/32/128/256 and all nine graph strata. Historical inference uses mathematically equivalent causal-prefix partitioning; each count keeps its own continuous suffix state. No reference state is injected into R.',
                   '', '## Learning and uncertainty','',
                   'Nine retained executor snapshots run on the same 1,350 graphs. Step 1000 has monitoring but no retained weights. Final-timer composition is explicitly diagnostic; old snapshots are not presented as historical autonomous solvers.',
@@ -55,16 +47,8 @@ def main()->None:
                   '', '## Limitations','',
                   'The graph panel is retrospective and opened. Historical architectures differ in data, trainable capacity and recipe; comparison does not isolate architectural causation. Only one successful R training seed exists. Tables have 26 states and long trajectories cycle; this is not evidence for a nonrepeating 50-state chain, unlimited depth, or cross-family transfer. The numeric timer ignores R correctness and does not establish quality-aware adaptive compute.',
                   '', 'Old render exports are retired only after this replacement passes. Raw historical metrics, weights, logs and numeric audits remain; prior render files remain recoverable from Git history.',''])
-    if Path('docs/experiments/pointer_population_review.md').exists():
-        lines.extend(['## Completed review', '',
-                      '[Post-transfer verification, visual review and interpretation](pointer_population_review.md).', ''])
-    Path('docs/experiments/pointer_population_analysis.md').write_text('\n'.join(lines))
-    message=(f'The full suite is **complete and independently audited**: six models, {audit["graphs"]:,} graphs, all requested depths 1–256, '
-             f'{audit["scalar_decisions_checked"]:,} checked decisions and nine retained successful-executor snapshots. '
-             f'Ordinary Qwen additionally has {baseline["queries"]:,} independently checked matched questions. '
-             'The clean figure set has seven groups with twenty-five figure families, including historical/matched baselines, final-letter comparisons, five-attempt writeup panels and two logical-compute Pareto comparisons; legends/colorbars, coincident-series labels, denominators and source hashes are included. '
-             'See [the population report](experiments/pointer_population_analysis.md) for results and the figure index. Obsolete render exports are retired; raw evidence is retained.')
-    for path in (Path('docs/analysis.md'),Path('docs/status.md')):replace_status(path,message)
+    # The report lives with its evidence; docs link to it rather than being rewritten.
+    (root/'report.md').write_text('\n'.join(lines))
 
 
 if __name__=='__main__':main()

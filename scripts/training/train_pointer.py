@@ -181,7 +181,6 @@ def main() -> None:
                 model.enable_completion(config.completion_head_hidden_size)
             if not config.isolated_controller:
                 gate["completion"] = validate_completion_gradients(model, probe)
-            gate["trainable_parameters"] = sum(p.numel() for p in model.parameters() if p.requires_grad)
     gate["trainable_parameters"] = sum(p.numel() for p in model.parameters() if p.requires_grad)
     if config.precision == "bf16":
         from scripts.training.precision import validate_compute_batch

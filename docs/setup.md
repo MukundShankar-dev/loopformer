@@ -1,8 +1,8 @@
-# Python environment
+# Setup
 
-For the Windows RTX 5070 Ti desktop, use the [WSL2/CUDA setup guide](windows_cuda_setup.md). It covers Linux Python 3.11.8, the matching CUDA PyTorch build, dataset/history migration, and checks before training.
+Use Python 3.11 (3.11.8 is recorded) in a repository-local `.venv`. Both `.venv/` and `venv/` are gitignored. Commands are in [usage](usage.md).
 
-Use Python 3.11 and a repository-local virtual environment. From the repository root:
+## Mac (Apple Silicon, CPU/MPS)
 
 ```sh
 python3.11 -m venv .venv
@@ -12,86 +12,71 @@ python -m pip install -r requirements.txt
 python -m pip check
 ```
 
-Use `deactivate` to leave the environment, and `source .venv/bin/activate` to return. Both `.venv/` and `venv/` are gitignored. Commit dependency changes to [requirements.txt](../requirements.txt), not the environment directory.
+[requirements.txt](../requirements.txt) pins the direct dependencies: torch 2.14.0, transformers 5.17.0, tokenizers 0.23.2 (this version reproduces the dataset tokenization), huggingface-hub 1.31.0, peft 0.20.0, numpy 2.4.6, rich 15.0.0, pytest 9.1.1, wandb 0.30.0 and matplotlib 3.11.2. Transitive dependencies are not locked. The torch 2.14.0 wheel for macOS needs macOS 14 or later.
 
-## Inference, Stage 0, and Stage 1 data dependencies
+Most CUDA launchers (`train_*`, `benchmark_pointer.sh`, `mmlu_retention.sh`, …) assume Linux. On the Mac, use the Python CLIs with `--device cpu` or `--device mps`. A device is never chosen for you, and requesting an unavailable one is an error.
 
-The initial target is [Qwen/Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct).
+## Desktop: WSL2 + CUDA (RTX 5070 Ti, 16 GB VRAM)
 
-| Package | Purpose |
+Run Ubuntu (24.04) under WSL2, keep the clone on the Linux filesystem (for example `~/src/loopformer`, not `/mnt/c`), and install the Windows NVIDIA driver only. Do not install a Linux display driver or a CUDA toolkit. Then run:
+
+```bash
+sudo apt install -y git curl ca-certificates tmux build-essential   # GCC is required: Triton compiles a Qwen RoPE kernel
+nvidia-smi
+curl -LsSf https://astral.sh/uv/install.sh | sh && source "$HOME/.local/bin/env"
+uv python install 3.11.8 && uv venv --python 3.11.8 --seed .venv
+source .venv/bin/activate
+python -m pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cu130
+python -m pip install -r requirements.txt
+python -m pip check
+```
+
+The `+cu130` build satisfies the `torch==2.14.0` pin. Blackwell GPUs need CUDA 13 wheels and a current Windows driver. Launchers that write logs through a PTY need util-linux `script` (installed by default on Ubuntu). `mmlu_retention.sh` and `trace_baselines.sh` also need `flock`.
+
+WSL limits its VM to about half of host RAM, roughly 16 GB on the 32 GB desktop. If you need more, edit `%UserProfile%\.wslconfig` and then run `wsl --shutdown` from PowerShell. Shutdown stops every WSL session, so do not run it during a job.
+
+```ini
+[wsl2]
+memory=24GB
+swap=8GB
+```
+
+Copy checkpoints between machines yourself: `*.pt` files and repeated tokenizer payloads under `models/` are gitignored. Regenerate `data/` with `python -m scripts.dataset` (see [usage](usage.md#dataset)). Results from CPU, MPS and CUDA are not bitwise identical.
+
+## Optional requirement files
+
+Install each one with `--constraint requirements.txt` so the research pins are kept:
+
+| File | Contents | Needed for |
+| --- | --- | --- |
+| [requirements-mmlu.txt](../requirements-mmlu.txt) | lm_eval 0.4.13, datasets 5.1.0 | `scripts.eval.mmlu`, `mmlu_analysis` |
+| [requirements-demo.txt](../requirements-demo.txt) | gradio 6.30.0, gradio-client 2.7.2, fastapi 0.143.0, uvicorn 0.54.0 | demo proxy and verification, `tests/test_demo_proxy.py` |
+| [demo/requirements-inference.txt](../demo/requirements-inference.txt) | the research inference pins | published model repo (`requirements.txt` there) |
+| [demo/hf_space/requirements.txt](../demo/hf_space/requirements.txt) | **torch 2.13.0** (the ZeroGPU limit), plus gradio, `spaces`, websockets | Hugging Face Space (Python 3.12) |
+
+The v2 headroom probe uses its own environment, `.venv-probe` (gitignored), not the research one, because EvalPlus and LiveCodeBench pin their own torch/vLLM stacks. Install steps are at the top of [requirements-probe.txt](../requirements-probe.txt). Pin exact versions there on first install.
+
+## Model files
+
+The base is `Qwen/Qwen2.5-0.5B-Instruct` at revision `7ae557604adf67be50417f59c2c2f167def9a775`. The model is public, so no login is needed. Download it once:
+
+```sh
+hf download Qwen/Qwen2.5-0.5B-Instruct --revision 7ae557604adf67be50417f59c2c2f167def9a775
+python scripts/smoke_test_qwen.py --local-files-only --revision 7ae557604adf67be50417f59c2c2f167def9a775   # optional generation check
+```
+
+Research CLIs load with `local_files_only=True` and fail if files are missing. Pass `--download` explicitly where a CLI supports it (`train_pointer`, `validate_stage0`, `loop_test`, `scripts.demo`). The dataset CLI, MMLU and controller tools are always local-only. Files are cached in `~/.cache/huggingface/hub`, or under `HF_HOME` if set.
+
+## Determinism and environment variables
+
+| Setting | Where |
 | --- | --- |
-| `torch` | Tensor operations and model execution on CPU or Apple Silicon MPS |
-| `transformers` | Qwen model classes, tokenizer, and generation |
-| `tokenizers` | Explicitly pinned to 0.23.2 to reproduce the verified pointer dataset's tokenization |
-| `huggingface-hub` | Model/tokenizer downloads and explicit Hub access |
-| `peft` | LoRA injection into the shared recurrent layers |
-| `rich` | Readable terminal configuration, measurements, and pass/fail tables |
-| `pytest` | Focused architecture and metric contract tests |
-
-Transformers uses tokenizers; its version is now explicitly pinned in requirements rather than left to transitive resolution. Safetensors remains transitive. PEFT installs Accelerate transitively; model placement remains explicit and does not use `device_map="auto"`.
-
-## Download and inference
-
-After activating the environment and installing requirements, run:
-
-```sh
-python scripts/smoke_test_qwen.py
-```
-
-The [smoke test](../scripts/smoke_test_qwen.py) downloads any missing model/tokenizer files through `from_pretrained`, loads the instruct-tuned checkpoint, and asks “What color is the sky on a clear day?” using the tokenizer's chat template. It prints the model, requested revision, device, dtype, prompt, and generated answer. Expect a short answer describing a blue sky; exact wording is not asserted.
-
-The default is CPU with float32 weights. Generation uses evaluation mode, disabled gradients, greedy decoding, at most 32 new tokens, and `use_cache=False`. It fails if no visible answer is generated. This is a basic inference check, not recurrent equivalence or a research accuracy result.
-
-To select Apple Silicon MPS explicitly, or change the prompt:
-
-```sh
-python scripts/smoke_test_qwen.py --device mps
-python scripts/smoke_test_qwen.py --prompt "What is 2 + 2?" --max-new-tokens 16
-```
-
-The script reports an error if MPS is requested but unavailable; it does not select another device automatically. See [architecture](architecture.md) for subsequent recurrent work.
-
-You can download the checkpoint separately using the [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/guides/cli):
-
-```sh
-hf download Qwen/Qwen2.5-0.5B-Instruct
-python scripts/smoke_test_qwen.py --local-files-only
-```
-
-The model is public and ungated, so credentials are optional. If you want authenticated downloads, run `hf auth login`. Files are cached under `~/.cache/huggingface/hub` by default (environment overrides such as `HF_HOME` can change this); model weights do not belong in Git. The script reuses cached files, and `--local-files-only` prevents model/tokenizer downloads and fails if required files are missing.
-
-The default revision is `main`, which can change. For repeatable runs, pass the same model commit hash to `hf download Qwen/Qwen2.5-0.5B-Instruct --revision COMMIT_HASH` and the script's `--revision COMMIT_HASH` option. Record resolved package versions as well.
-
-## Version and validation status
-
-The [WSL desktop report](experiments/wsl_cuda_baseline.md) records the new Python 3.11.8 / Torch 2.14.0+cu130 environment, successful GPU computation and 1,000-example baseline, exact dataset reproduction, and the one desktop training-resume precision test failure. The original environment audit below describes the Mac environment. On WSL, install Ubuntu `build-essential` for Triton compilation as described in the CUDA guide.
-
-Direct dependencies are pinned to give collaborators a common starting point. This is not a full environment lock: transitive dependencies can vary. Record the resolved package versions and model revision for experiments.
-
-Stage 1 data reproduction also pins `tokenizers==0.23.2`, the version already installed when seed 17 was generated and verified. All seven requirement pins match the local Python 3.11.8 environment and `pip check` passes; adding this pin requires no local package changes. See the [README reproduction instructions](../README.md#original-pointer-dataset-preview-and-reproduce).
-
-Package versions and Python requirements were checked against PyPI metadata for [PyTorch](https://pypi.org/project/torch/2.14.0/), [Transformers](https://pypi.org/project/transformers/5.17.0/), and [Hugging Face Hub](https://pypi.org/project/huggingface-hub/1.31.0/). The pinned PyTorch release provides a Python 3.11 Apple Silicon wheel requiring macOS 14 or later.
-
-Environment audit on 2026-09-10 confirmed `.venv` uses Python 3.11.8 with torch 2.14.0, transformers 5.17.0, and huggingface-hub 1.31.0, matching the direct pins. Running `.venv/bin/python -m pip check` returned `No broken requirements found.` The virtual environment is ignored and contains no Git-tracked files.
-
-The script's Python syntax, CLI help, and invalid-argument handling were checked previously. The [README](../README.md#setup) now includes CPU generation output showing model loading and a nonempty answer. This is recorded output, not an independently repeated inference run during this audit; the transcript does not capture an immutable model revision or complete environment. It also contains a warning about ignored generation settings, which remains undiagnosed. Treat the answer as a loading/generation example, not a factual-accuracy benchmark.
-
-Stage 0 added peft 0.20.0, rich 15.0.0, and pytest 9.1.1 to this venv and the direct pins. Installation from `requirements.txt` succeeds and `pip check` passes. The recurrent suite has 36 passing tests. Pretrained Stage 0 validation now passes on CPU and MPS; the ordinary generation smoke test itself was not rerun. See the [Stage 0 report](experiments/stage0_validation.md) for exact evidence, including the MPS deterministic-readout fix.
-
-## Recurrent surgery and validation
-
-From the repository root with the venv active:
-
-```sh
-python -m pytest -q
-python -m scripts.validate_stage0 --device cpu --output artifacts/stage0/cpu.json
-python -m scripts.validate_stage0 --device mps --output artifacts/stage0/mps.json
-```
-
-`tests/test_demo_proxy.py` needs the demo web stack. Install it with `python -m pip install -r requirements-demo.txt --constraint requirements.txt`; without it, test collection fails on `fastapi`.
-
-The [CLI](../scripts/validate_stage0.py) composes the implementation in `scripts/recurrent_qwen/`. It creates the configurable P/R/C split, freezes original parameters, attaches recurrent LoRA, and verifies the architecture. It prints Rich tables and saves JSON with exact inputs, all package versions, source hashes, model revision, gradient evidence, timing, and peak process RSS.
-
-Unlike the older smoke test, this command defaults to **local files only** at model revision `7ae557604adf67be50417f59c2c2f167def9a775`. Add `--download` explicitly when files are missing. No model was downloaded during the recorded Stage 0 validation. MPS may be hidden by an execution sandbox; the recorded MPS checks ran outside it. Device fallback is never automatic.
-
-See [Stage 0](architecture.md) for options, contracts, and the stop boundary before pointer data and training.
+| `CUBLAS_WORKSPACE_CONFIG=:4096:8` | Exported by the launchers. `scripts.demo` and the Space set it with `setdefault`. It is required for deterministic CUDA matmuls when `torch.use_deterministic_algorithms(True)` is active. |
+| `torch.use_deterministic_algorithms(config.deterministic)` | `train_pointer`. `executor_r.json` sets `deterministic: false` for BF16/SDPA speed. |
+| `torch.use_deterministic_algorithms(True)` | `frozen_pointer_benchmark`, `scripts.demo`, the Space |
+| TF32 disabled (`allow_tf32 = False`) | `scripts.demo`, `verify_checkpoint`, `mmlu`, `paper_baseline`, the Space |
+| `TOKENIZERS_PARALLELISM=false`, `OMP_NUM_THREADS=4` | `trace_baselines.sh` |
+| `MPLCONFIGDIR` | `analyze_pointer.sh` (`$TMPDIR/loopformer-paper-mpl`) |
+| `WANDB_MODE`, `WANDB_PROJECT`, `WANDB_ENTITY`, `WANDB_NAME` | Launchers default `WANDB_MODE=online` and the CLIs default to `disabled`. Use `WANDB_MODE=disabled bash scripts/launch/…` to run offline. |
+| `EXECUTOR_CONFIG`, `EXECUTOR_RUN` | `train_executor.sh` overrides |
+| `LOOPFORMER_MODEL_ID`, `LOOPFORMER_MODEL_REVISION`, `LOOPFORMER_MAX_STEPS`, `LOOPFORMER_PROXY_TOKEN` | Space runtime (set by `scripts.demo.deploy`, except the proxy token) |

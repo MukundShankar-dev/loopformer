@@ -1,6 +1,7 @@
 """Scientific contracts for the no-update audit, using synthetic saved features."""
 from dataclasses import replace
 import csv
+from launchers import stage_launcher
 import json
 from pathlib import Path
 import shutil
@@ -191,13 +192,13 @@ def test_dry_run_needs_no_artifacts_and_writes_nothing(tmp_path):
 
 @pytest.mark.parametrize('dry,code', [(True, 0), (False, 0), (False, 7)])
 def test_launcher_logs_and_propagates_failure(tmp_path, dry, code):
-    shutil.copy(Path(__file__).resolve().parents[1] / 'audit_controller.sh', tmp_path)
+    stage_launcher('audit_controller.sh', tmp_path)
     (tmp_path / '.venv/bin').mkdir(parents=True)
     (tmp_path / '.venv/bin/activate').write_text('export PATH="' + str(tmp_path / 'bin') + ':$PATH"\n')
     (tmp_path / 'bin').mkdir()
     (tmp_path / 'bin/python').write_text(f'#!/bin/sh\necho audit-stub\nexit {code}\n')
     (tmp_path / 'bin/python').chmod(0o755)
-    result = subprocess.run(['bash', str(tmp_path / 'audit_controller.sh')] + (['--dry-run'] if dry else []), capture_output=True, text=True)
+    result = subprocess.run(['bash', str(tmp_path / 'scripts/launch/audit_controller.sh')] + (['--dry-run'] if dry else []), capture_output=True, text=True)
     assert result.returncode == code
     logs = list(tmp_path.glob('eval/pointer_diagnostics/*.log'))
     assert len(logs) == (0 if dry else 1)

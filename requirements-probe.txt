@@ -1,0 +1,9 @@
+# Headroom probe tools, in their own environment (.venv-probe): both pin their
+# own torch/vLLM stacks, which must not change the research .venv.
+#   python3.11 -m venv .venv-probe && .venv-probe/bin/pip install -r requirements-probe.txt
+#   git clone https://github.com/LiveCodeBench/LiveCodeBench ~/src/LiveCodeBench && .venv-probe/bin/pip install -e ~/src/LiveCodeBench
+# Pin exact versions here (pip freeze) on first install, before any result is kept.
+evalplus
+huggingface-hub
+rich
+numpy

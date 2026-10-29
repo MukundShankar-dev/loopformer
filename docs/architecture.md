@@ -1,523 +1,175 @@
-# Architecture and implementation boundaries
+# Architecture
 
-## General-capability readout at one loop — 2026-10-12
+The code is the source of truth. This page describes what `scripts/recurrent_qwen/` and `scripts/training/` implement. Commands are in [usage](usage.md); history and results are in [history](history.md); research design is in [plan](plan.md).
 
-The user-authorized [MMLU comparison](experiments/mmlu_retention_20261012.md)
-loads the actual final checkpoint and forces exactly one pass through shared R.
-Because MMLU lacks the pointer Steps field, its evaluation caller bypasses the
-input router and timer in memory. The bridge remains loaded but is unused on
-loop one. No checkpoint weights or native pointer interfaces change.
+## Base model and task
 
-[`last_logits`](../scripts/eval/single_token.py) uses the normal full-vocabulary
-coda readout `[B,V]` at the last valid token; the independent ordinary-model arm
-projects the same position. Inputs are left-padded `[B,S]` with an explicit mask.
-The external harness owns MMLU prompting and metrics. A narrow likelihood
-adapter rejects targets that are not exactly one token. This measures the
-trained executor's general-language one-pass behavior, not learned stopping
-or task-independent recurrence. The untrained wrapper's checked full-vocabulary
-logits matched ordinary Qwen exactly on the desktop preflight.
+- Base: `Qwen/Qwen2.5-0.5B-Instruct` at revision `7ae557604adf67be50417f59c2c2f167def9a775` ([symbols.py](../scripts/dataset/symbols.py)). There are 24 full-attention decoder layers, hidden size H=896, 14 query heads and 2 KV heads (head dim 64), vocabulary 151,936 and tied embeddings. Only full attention and default RoPE are accepted (`RecurrentQwen.__init__`).
+- Prompt ([pointer.py](../scripts/dataset/pointer.py) `render_prompt`): raw text, no chat template, no special tokens:
+  `Rules: ( A, C) ( B, D) ...\nStart: X\nSteps: N\nAnswer:`
+- Each `' A'`..`' Z'` is one unique token in rule, start and answer contexts (`validate_symbols`). The readout position is the final `:` token.
+- Targets: `intermediate_states` = the states after transitions 1..N. Loop t is supervised with the state after t transitions. `EncodedExample.targets` holds class indices into `SYMBOLS` (0..25), not tokenizer IDs ([data.py](../scripts/training/data.py)).
 
-## Public inference observations — 2026-10-11
+## P / R / C split
 
-`RecurrentQwen.forward` accepts an optional inference-only `loop_callback`.
-It observes one-based loop, detached cloned C logits `[1,A]`, optional stop
-logits `[1]` and optional direct-R logits `[1,26]`, including the stopping loop.
-Callbacks cannot select a stop or mutate inference tensors through their copies;
-the ordinary forward and learned completion logic remain the shared path.
-The [demo service](demo.md) streams these observations through a cancellable
-worker, with reference scoring outside the model. Native CUDA checks preserve
-all predictions and stop probabilities on a bounded 280-loop panel. Hosted
-PyTorch 2.13 also passed the same bounded decoded/stop comparison; no
-full-population or cross-runtime bitwise equivalence is claimed.
+`RecurrentQwen(base, recurrent_start=6, recurrent_end=18, recurrence_mode=...)` ([model.py](../scripts/recurrent_qwen/model.py)):
 
-For technical and plain-language accounts of the earlier models and why they
-changed, see [model evolution](pointer_model_evolution.md). This guide retains
-historical mechanics alongside the current isolated executor contracts.
+| Block | Layers | Calls per forward |
+| --- | --- | --- |
+| P `prelude` | 0–5 | 1 |
+| R `recurrent` | 6–17 (12 layers) | T (`num_loops`) |
+| C `coda` | 18–23, then final `norm` and `lm_head` | T (once per loop; the output is never fed back) |
 
-Status: Stage 0, pointer data, Stage 1 training, and saved-checkpoint full-loop evaluation implemented. Pretrained CUDA training and final-answer/full-loop runs are audited in [status](status.md). Absorbing-terminal overscaling evaluation is implemented but pretrained execution is deferred. See the [validation report](experiments/stage0_validation.md) for architecture evidence and limits, and [data report](experiments/stage1_data_validation.md) for pointer validation. The research specification is [the project plan](project_plan.md).
+`DecoderBlock` wraps the base model's own layer objects, so there are no copies, and R uses one parameter set for every loop. Construction freezes the base in place (`requires_grad_(False)`) and sets `use_cache=False`. Every decoder layer call passes `past_key_values=None, use_cache=False`. There is no KV cache across forwards or generated tokens.
 
-The [inference smoke test](../scripts/smoke_test_qwen.py) exercises ordinary Qwen. The [Stage 0 entry point](../scripts/validate_stage0.py) loads the checkpoint, constructs the recurrent model, attaches LoRA, and validates the architecture. Stage 0 defaults to cached files at an immutable revision. Usage is in [setup](setup.md).
+### Forward pass (`RecurrentQwen.forward`)
 
-## Recurrent computation
+Inputs: `input_ids`/`attention_mask` [B,S]; `position_ids` [1,S] or [B,S] (default `arange(S)`); `answer_positions` [B] (default: last unmasked token). Per call:
 
-The [ordinary trace SFT baseline](trace_baselines.md) is a separate standard
-24-layer Qwen model. The user requested **all 494 million parameters** be adapted,
-including embeddings and the tied LM head. It emits successive states as tokens
-with EOS, using a KV cache at inference; it has no recurrent wrapper, re-entry
-bridge or controller. Its teacher-forced response-token supervision and trainable
-capacity differ from R. Existing recurrent mechanics and checkpoints below are
-unchanged.
+1. If a `PromptRouter` is attached (isolated executor), first compute `controller_prompt_state` from the **raw** prompt. Then route the inputs (see below).
+2. `hidden = P(embed(ids))`. Keep the answer-position vector `bridge_initial` [B,H].
+3. For `fixed_prompt`, create `PromptMemory` objects for R and C, with `write_mask` [B,S,1] true only at the answer position.
+4. For each loop t = 1..T:
+   - If t>1 and a bridge exists, replace the working position with `bridge(h_working, bridge_initial)`.
+   - `hidden = R(hidden)`; `working = hidden[b, answer_pos]` [B,H].
+   - Controller/completion head → stop logit [B]; `state_head(working)` → [B,26].
+   - `scores = lm_head(norm(C(hidden)))` at the answer position: [B,V], or [B,26] when `readout_token_ids` is given (a row-sliced `lm_head`). `logits_mode="all"` gives [B,S,V].
+   - Optional `loop_callback`, margins and stopping (below).
+5. Return `RecurrentOutput` ([outputs.py](../scripts/recurrent_qwen/outputs.py)): `loop_logits` (tuple of T; index t-1 is loop t), `hidden_states` (T × [B,S,H], if requested), `initial_hidden_state` (P output), `margins` [B,T], `state_logits` [B,T,26], `stop_logits` [B,T].
 
-The following full-sequence recurrence remains the historical default. The new `fixed_prompt` mode is an explicit checkpoint/configuration choice, described below; loading an old checkpoint never changes its recurrence.
+C stays in the autograd graph even when frozen, so readout losses reach R.
 
-Inspection of Transformers 5.17.0 confirmed `Qwen2ForCausalLM`, `Qwen2Model`, and tensor-returning `Qwen2DecoderLayer.forward`. The Qwen2.5-0.5B-Instruct checkpoint has 24 layers, hidden size 896, 14 attention heads, two KV heads, full attention, default RoPE, and tied embedding/head weights.
+### Recurrence modes
 
-The configurable default split is layers 0–5 for P, 6–17 for shared R, and 18–23 for C:
+- `full_sequence` (legacy): every position is rewritten by R on every loop. h_t = R(h_{t-1}) over the whole sequence.
+- `fixed_prompt` (all executor checkpoints): only the final unmasked position is writable. `PromptMemory` ([memory.py](../scripts/recurrent_qwen/memory.py)) stores every layer input and the block output on pass 1. On later passes, `torch.where(write_mask, new, stored)` restores all non-working positions. The prompt therefore keeps its first-pass representation, and only the working state evolves. The stored tensors are not detached, so later losses reach parameters through the first-pass prompt. The memory lives for one forward only. `answer_positions` must equal the last unmasked token.
+- `prefix_reuse` (executor option; [prefix.py](../scripts/recurrent_qwen/prefix.py) `fixed_prefix_layer`): this is the compute-saving form of `fixed_prompt`. Pass 1 runs densely and records each layer's rotary K/V. Later passes compute only the working query [B,1,H] and splice its K/V into the recorded prefix K/V. It needs zero attention dropout. `validate_executor` checks it against the dense path at 1e-4. This is reuse within a forward, not a KV cache.
+- `gradient_checkpointing`: non-reentrant `torch.utils.checkpoint` per layer, only when grad is enabled.
 
-```text
-tokens -> embeddings -> P -> h_0
-h_0 -> R -> h_1 -> R -> h_2 -> ... -> h_T
-             each h_t -> C -> final norm -> LM head -> logits_t
-```
+### Executor interfaces (`configure_executor`)
 
-`RecurrentQwen` groups the original decoder objects into `prelude`, `recurrent`, and `coda` (`DecoderBlock` modules), without copying weights or retaining duplicate registered paths. Embeddings, RoPE, final RMSNorm, and the LM head are reused; tied weights remain tied. Construction freezes and clears gradients on the supplied base **in place**. Adapter injection subsequently mutates its shared middle layers, so compute unadapted reference logits first or load a separate reference.
+`configure_executor(tokenizer, train_scope, bridge, direct_readout, controller_size, isolated, prefix_reuse, gradient_checkpointing, controller_kind)` requires `fixed_prompt`. Legacy checkpoints never call it.
 
-The next iteration consumes the recurrent state, never the coda output or a decoded token. P runs once; intermediate C reads expose predictions without modifying the recurrent trajectory. Stage 0 had no bridge: direct middle-to-middle recurrence passes Stage 0 (the later executor adds the opt-in re-entry bridge below). This does not establish useful recurrent task execution or imply that `h_0` decodes to a start symbol.
+- `PromptRouter` ([interfaces.py](../scripts/recurrent_qwen/interfaces.py)), attached when `isolated=True`. It decodes the valid tokens, requires the exact regex `Rules: …\nStart: [A-Z]\nSteps: [1-9][0-9]*\nAnswer:`, deletes the `\nSteps: N` line (the value is never parsed) and re-encodes. The routed tokens are left-aligned. The final token stays at the original answer index, the gap is masked, and `position_ids = cumsum(mask)-1`, so RoPE positions are contiguous. R and C therefore never see the count digits or their token length. Tokenization is cached by `lru_cache(4096)`.
+- `ReentryBridge(H)`: `projection(gain * state/rms(state) * rms(initial))`, with the projection initialized to identity. It applies only for t>1, so T=1 is unchanged.
+- `state_head = Linear(H, 26)` when `direct_readout=True`: a direct readout of R's working state. It is never fed back and does not feed C.
+- Controller: `controller_head(H, controller_size, controller_kind)` is stored as `model.completion_head`. Its inputs are always detached, so no stop gradient reaches the executor.
 
-### Fixed prompt memory (2026-10-04)
+### Controllers
 
-`RecurrentQwen(..., recurrence_mode="fixed_prompt")` keeps the final unmasked prompt position writable and holds all other positions to their layer-specific first-pass context. [PromptMemory](../scripts/recurrent_qwen/memory.py) stores differentiable inputs and outputs separately for R and C within one forward call. Every R loop and C readout reuses those values; only the answer-position R output feeds the next R pass. No loop/depth scalar, generated token, reference symbol, new prompt or extra positional coordinate enters that update. The final unmasked answer position is enforced at the API boundary.
+| Class | `kind` | Initial memory | Per-loop update | Reads executor state? |
+| --- | --- | --- | --- | --- |
+| `CompletionHead` ([completion.py](../scripts/recurrent_qwen/completion.py)) | legacy, non-isolated | none | `MLP(LN(working))` → stop logit | yes, with gradient into R |
+| `RecurrentController` | `gru` | `tanh(Linear(LN(P(raw prompt)[answer])))` (128-d) | `GRUCell(tanh(Linear(LN(working.detach()))), m)` → `Linear` | yes (detached) |
+| `AffineSuffixController` | `affine_suffix` | `Linear` over the last 8 raw-prompt token embeddings flattened (8·H) → scalar | `m ← a·m + b` (initialized a=1, b=0); stop = `readout(m.detach())` | **no** |
+| `SharedNumberController` | `shared_number` | `SharedNumberReader`: frozen embeddings of the Steps digit tokens (≤8, left-aligned, plus a validity channel), composed as `s ← gain·s + w·e_i + c` in float64 | same affine cell | **no** |
 
-Memory tensors remain in the autograd graph, so later losses reach adapters that formed the context as well as earlier working states. They are discarded after the forward and recomputed with current parameters for the next batch. This reference implementation still executes dense sequence layers and restores fixed context at each layer; it does not implement a KV cache or claim an inference/training speedup. Returned `[B,S,H]` states contain a fixed first-pass prefix and the evolving working position. Full-state norm summaries therefore have different semantics from the old full-sequence recurrence.
+The final checkpoint (`controller-shared-number-precision-seed83`) uses `SharedNumberController`. It reads only the count tokens' frozen embeddings and runs a learned scalar countdown. It ignores the executor state (`advance` calls `observation` only to keep hooks working). Stopping does not depend on the pointer's identity or correctness. `number_token_ids` ([number_reader.py](../scripts/recurrent_qwen/number_reader.py)) extracts the Steps token span by regex. It checks one token per decimal character, but it never converts the text to an integer. Stopping uses the first loop where `sigmoid(stop) >= threshold`. The benchmarks and the demo use a threshold of 0.5.
 
-One-pass equivalence, prefix invariance, parameter sharing, and the loss gradient path pass tiny-model tests. An independent recomputation reference matches both logits and adapter gradients. The pretrained startup gate is still required. New checkpoints use `loopformer-stage1-fixed-prompt-v1` with explicit `recurrence_mode: fixed_prompt`; the loader and adapter restore reject conflicting modes. Historical formats retain their old behavior. See [design, supervision and commands](learned_loop_completion.md#fixed-prompt-memory-and-recurrent-working-state).
+### Stopping and observation (inference only)
 
-`completion_threshold` activates the checkpoint's hidden-state head during eval/no-grad, batch 1. It stops on the first threshold crossing under `num_loops` as a safety cap, without receiving task depth. It cannot be combined with the older numeric-feature `stop_policy`. Intermediate C readouts are retained on this correctness path; timing includes their overhead. The CLI uses `--stop-policy completion` to select this distinct path.
+All three of these require eval mode, `no_grad`, batch 1, no labels and `logits_mode="answer"`:
 
-### Literature cross-check (2026-09-30)
+- `completion_threshold`: break after the first loop with stop probability ≥ the threshold. `num_loops` is the safety cap (272 in the benchmarks and the demo).
+- `stop_policy(t, hidden, scores) -> bool`: heuristic policies from [scripts/eval/adaptive_policy.py](../scripts/eval/adaptive_policy.py).
+- `loop_callback(t, scores[1,A], stop[1]|None, state[1,26]|None)`: receives detached clones after each readout, including the stopping loop. Its return value is ignored. The demo uses it to stream output ([scripts/demo/inference.py](../scripts/demo/inference.py)).
 
-The computation is a valid **depth-recurrent, weight-tied middle-block transformer**, not an exact reproduction of every published looped transformer. The [Universal Transformer](https://arxiv.org/html/1807.03819) repeatedly updates the entire sequence representation with shared self-attention; our `h_t = R(h_{t-1})` has that basic depth-recurrence property. Its paper also adds an explicit recurrent-time coordinate and optionally adaptive per-position halting. We currently have neither. Reusing Qwen's same RoPE positions each pass preserves each token's sequence position but does **not** give R an explicit loop index.
+`answer_margin` gives the correct raw logit minus the best other allowed logit. Labels are token IDs [B,T].
 
-The [ICLR 2024 looped-transformer study](https://proceedings.iclr.cc/paper_files/paper/2024/file/b8402301e7f06bdc97a31bfaa653dc32-Paper-Conference.pdf) compares the plain weight-tied update `Y_(t+1)=M(Y_t)` with **input injection** `Y_(t+1)=M(Y_t+P)` and reports deterioration beyond trained iterations without injection on its in-context regression setting. Our P output initializes recurrence once; it is not explicitly re-injected every loop. This is a plausible mechanism to investigate, not proof that missing injection causes the pointer failures. [Kapl et al. (2026)](https://proceedings.mlr.press/v306/kapl26a.html) explicitly study unique encoding/decoding blocks around a repeated middle block, which is closer to our P/R/C split; their positive results likewise do not validate our chosen 6/12/6 partition or imply one pointer transition per loop.
+### Historical partitioned path
 
-The code audit confirms the intended data flow: token embeddings pass through six frozen P layers once; a single shared 12-layer R object with q/v LoRA updates the full `[batch, sequence, hidden]` state at each loop; six frozen C layers, final norm, and the LM head read the answer position at every loop. C's output is discarded for recurrence. The same causal mask and position embeddings are reused, with no KV cache, new text tokens, external decoded state, learned time embedding, or injected P state. T=1 equivalence, shared-object identity, gradient-scope, and earlier-loop gradient tests establish implementation contracts, but do not establish that the trained hidden state encodes the current pointer correctly at every loop.
+[partitioned.py](../scripts/recurrent_qwen/partitioned.py) `partitioned_forward` is an inference-only factorization for historical count-dependent models. It computes a shared prompt prefix once and runs count-specific suffixes separately. It rejects models with a router, bridge or state head.
 
-In evaluation, `h_0` and `h_t` are optional tensors exposed by the wrapper. The small probe saves **decoded A–Z readouts after C**, their target ranks/margins/entropy, and scalar RMS/update/cosine summaries of R's answer-position and whole-sequence states. It does not decode every token position as a symbolic pointer, save complete hidden vectors, or inspect layer-level attention. A correct readout after C is evidence of the observable output at that depth, not a direct measurement of the internal pointer representation or a proof that R alone performed exactly one transition. The [diagnostic guide](diagnostics_and_performance.md#frozen-rule-edit-probe) defines the next targeted measurement.
+## Gradient scope (`train_scope`)
 
-Mask construction uses the installed `create_causal_mask`. Every decoder receives `attention_mask`, `position_ids`, `position_embeddings`, `past_key_values=None`, and `use_cache=False`. The mask and RoPE are prepared once and reused across loops. Position IDs default to `arange(sequence_length)` as in ordinary Qwen forward, including padding; callers can supply explicit positions. Only full attention and default RoPE are accepted in Stage 0. The validation CLI selects eager attention and float32 explicitly; tiny tests also cover SDPA. Compatibility with other Transformers versions is not promised.
+| Scope | Trainable | Frozen |
+| --- | --- | --- |
+| `lora` | PEFT LoRA on R's `q_proj`/`v_proj` (rank 8, α 16, no dropout, zero-init B; [lora_utils.py](../scripts/recurrent_qwen/lora_utils.py)): 12×2×2 = 48 tensors | all base weights |
+| `recurrent` (`executor_r.json`) | every weight of layers 6–17 | P, C, embeddings/`lm_head`, final norm |
+| `full` | all base parameters | — |
 
-## Trainability and autograd
+Bridge, `state_head` and controller parameters are trainable in every scope. Isolation guarantees, checked by `validate_executor`:
 
-All 494,032,768 original parameters are frozen: embeddings, P, original R weights, C, final norm, and LM head. `attach_recurrent_lora(model)` uses PEFT in-place injection on `model.recurrent` only. Defaults are q/v projections, rank 8, alpha 16, dropout 0, bias `none`, and standard random-A/zero-B initialization. This adds 270,336 trainable parameters in 48 tensors. Rank, alpha, and projection targets are configurable in the library; the CLI fixes q/v targets.
+- Pointer and state losses do not reach the controller.
+- The stop loss does not reach any non-controller parameter: `initialize` and `advance` detach their inputs, and `controller_prompt_state` runs under `no_grad`.
+- `clip_training_gradients` ([runner.py](../scripts/training/runner.py)) clips the executor group and the controller group separately to `max_grad_norm`.
 
-Trainable names have the form `recurrent.layers.<relative-index>.self_attn.<projection>.lora_[A|B].default.weight`. Add `recurrent_start` to that relative layer index to recover the original Qwen layer number.
+## Training objective ([objective.py](../scripts/training/objective.py), [runner.py](../scripts/training/runner.py) `train`)
 
-Frozen operations remain differentiable. Gradients pass through C to the adapters and through earlier R iterations. There is no internal `no_grad` around those paths. Zero A gradients on the first backward are expected when B is zero; focused tests verify both factors after a diagnostic tiny-model update. No optimizer step is taken on the pretrained model during validation.
+The forward pass runs `num_loops = max target depth in the microbatch` through `forward_symbols` (26-row readout, scores [B,T,26]). With `target_mask` [B,T], loops past an example's depth contribute zero loss.
 
-Stage 1 uses differentiable unrolls with masked intermediate 26-symbol CE in `scripts/training/objective.py`. Later losses retain gradients through earlier recurrent states. Future Stage 3 detached rollouts and asymmetric objectives remain unimplemented.
+- Pointer: `step_loss`, cross-entropy over the 26 symbols at every loop t ≤ depth (per-loop intermediate supervision).
+  - `example_mean` (default): mean over the example's valid loops, then mean over examples.
+  - `loop_mean`: weighted sum with `loop_loss_weights`, w_t = N/(D·N_t), computed from the whole training set's depth counts.
+- Direct state: `+ state_loss_weight × step_loss(state_logits)` with the same targets. The weight is 0.25 in `executor_r.json`.
+- Stop: `+ completion_loss_weight × completion_loss(stop_logits, mask)`. This is BCE with continue labels at 1..d-1 and a stop label at d. The two classes are averaged per example (only the stop class when d=1). The weight is 0.1 in `executor_r.json`.
+- Microbatch losses are scaled by `len(items)/len(group)` for accumulation.
+- AdamW (`foreach=False`), linear warmup, optional cosine schedule to `min_lr_ratio` over `schedule_steps`.
+- BF16 autocast is CUDA-only. Parameters and optimizer state stay FP32 ([precision.py](../scripts/training/precision.py)).
+- `bucket_by_depth` shuffles depth-homogeneous update groups.
+- Checkpoint selection (`training_selection_loss`) uses validation pointer CE on trained depths only. Stop and state losses are logged but are not used for selection.
 
-The optional `loss_reduction=loop_mean` weights each nominal CE by N/(D*N_t), based on the entire selected training dataset. Per-example weighted sums and existing effective-batch accumulation estimate the dataset's equal-loop mean loss without microbatch-dependent denominators. Default `example_mean` is unchanged. Logs distinguish optimized loss from legacy example-mean CE; loop-balanced checkpoint selection averages loop means on trained-depth validation tasks only. The recurrent forward pass and evaluator's historical loss semantics are unchanged. See [objective and commands](training_pointer.md#loop-balanced-loss-experiment).
+Controller-only training ([train_controller.py](../scripts/training/train_controller.py), [controller.py](../scripts/training/controller.py), [controller_remaining.py](../scripts/training/controller_remaining.py)) runs on a cached, frozen executor:
 
-Batching changes only execution grouping: an optimizer update uses `batch_size * gradient_accumulation` examples, each with equal total nominal-loss weight. Mixed-depth microbatches unroll to their deepest task and mask later labels for shorter tasks. Explicit `--resume --allow-batch-change` permits repartitioning the same update group while retaining optimizer/RNG/cursor state; all other resume identities remain strict. Floating-point results need not be identical. Run metadata records the change; see [batching and resume](training_pointer.md#resume-with-larger-microbatches).
+- **Cache.** `extract_features` stores `context` [N,C], `working` [N,T,H] and predictions. `replay` re-runs the head over the cache and must match the live logits.
+- **Losses.** `completion_loss`, or `prefix_losses` (stop BCE plus countdown MSE through min(N, `training_loops`)). Optionally added: `remaining_loss` (MSE on (N−t)/scale for t=0..N) and `initialization_loss` (loop-0 MSE).
+- **Affine heads.** The initializer is fitted in closed form by `fit_suffix_initializer` ([controller_cache.py](../scripts/training/controller_cache.py)) and then frozen. The cell gain uses `affine_gain_lr_ratio`. The remaining-work readout is fixed at weight 1/scale, so the scalar memory itself is the predicted remaining count.
+- **Selection.** Trained-count development exact-stop rate, with ties broken by BCE.
+- **Final controller.** Two steps follow this training:
+  1. `fit_number_reader` (least squares on training count labels only; [training/number_reader.py](../scripts/training/number_reader.py)) replaces the affine initializer with the shared reader.
+  2. `refine_countdown` (float64 L-BFGS on the same labels, float32 deployment) refits only the two cell parameters.
 
-The training startup gate compares ordinary-Qwen and fresh-adapter T=1 logits over the full vocabulary at the answer position. Its reference uses `logits_to_keep` to project only that position, matching the wrapper's compact LM-head readout instead of projecting the whole prompt and slicing afterward. This removes a matrix-shape difference from the numerical comparison; `atol=rtol=1e-5` remains unchanged. Full-sequence equivalence remains covered separately by Stage 0. The change does not alter recurrent forward behavior, the training objective, or saved-checkpoint evaluation.
+  Each step exports through `export_checkpoint`. Executor tensors stay bitwise identical, and the script asserts this.
 
-## Implemented forward interface
+## Startup gates
 
-`model(input_ids, attention_mask=None, *, num_loops=1, position_ids=None, answer_positions=None, labels=None, allowed_token_ids=None, return_hidden_states=False, logits_mode="answer", stop_policy=None)` returns `RecurrentOutput`.
+[train_pointer.py](../scripts/training/train_pointer.py) runs these checks in order before any update:
 
-- Inputs are long `[B,S]` token IDs and a binary `[B,S]` mask. Each row needs an unmasked token. Positions are long `[1,S]` or `[B,S]`; loops do not append token positions.
-- Answer positions are long `[B]`, defaulting to the last unmasked token for either padding side. They select a next-token prediction location, not a token to insert into the prompt. Padding positions are rejected. Integer slices implement this readout because advanced indexing and gather backward fail under strict MPS determinism; indices synchronize to a Python list once per forward. This is appropriate for the intended tiny batches.
-- `loop_logits` is a tuple of length T for fixed-depth calls (or the executed prefix when stopping), with tensors `[B,V]` by default or `[B,S,V]` in `"all"` mode. `.logits` returns the final item. Every loop reads C; no final-only supervision is imposed.
-- With hidden capture enabled, `initial_hidden_state` is `h_0`, and `hidden_states[t-1]` is `h_t`, each `[B,S,H]`. Otherwise both fields are `None`; autograd can still retain the activations required for backward.
-- Optional labels are long `[B,T]` **token IDs**, with an explicit unique allowed set `[A]` of at least two tokens. `margins[B,T]` uses the target raw logit minus the largest other allowed logit. Labels can differ by loop. Repeating a final label is an explicit caller choice. This interface neither computes CE nor shifts labels.
-- Outputs retain gradients when autograd is enabled. Use caller-side `torch.no_grad()` for evaluation. Stage 0 implemented no bridge; the executor's opt-in bridge is described below. No KV cache, generation API, or detached-rollout training is implemented. Adapter save/load is provided separately by `scripts/recurrent_qwen/checkpoint.py`.
+1. `initialize` ([gates.py](../scripts/training/gates.py)) on the **bare** `RecurrentQwen` after the scope is set and before `configure_executor`:
+   - T=1 logits match ordinary Qwen at the answer position (atol/rtol 1e-5).
+   - A forward hook shows two R calls with identical parameter IDs.
+   - In `fixed_prompt`, prefix positions are bitwise equal across loops.
+   - A last-loop CE reaches both loop states.
+   - No frozen parameter gets a gradient, and LoRA scope trains only `recurrent.*lora_*`.
+2. `executor_view_equivalence` ([executor_gates.py](../scripts/training/executor_gates.py)) after `configure_executor`: the T=1 26-symbol logits match ordinary Qwen run on the **routed**, contiguous token sequence (1e-5). Routing changes R's input, so step 1 alone is not enough.
+3. `validate_executor`:
+   - Prefix-reuse and dense two-loop logits agree within 1e-4.
+   - Loop-2 CE reaches every working state.
+   - No pointer-loss gradient reaches the controller, and the bridge does receive gradient.
+   - Controller BCE stays inside `completion_head.*`.
+4. `validate_completion_gradients` (non-isolated completion head only) and `validate_compute_batch` (BF16, at the deepest training microbatch).
 
-The wrapper inherits model device/dtype without conversion or downloads. Stage 0 measures short inputs and small loop counts; its resource results do not establish a training budget for longer sequences or unrolls.
+`python -m scripts.validate_stage0` ([validation.py](../scripts/recurrent_qwen/validation.py)) is the standalone pretrained gate. It checks all-position T=1 logits with and without fresh LoRA, the call counts of P, R and C, depth configurability, and a two-loop backward pass.
 
-## Module ownership
+## Checkpoints ([checkpoint.py](../scripts/recurrent_qwen/checkpoint.py))
 
-Only current-stage modules exist; future locations below are not scaffolded requirements.
+A checkpoint directory (`step-XXXXXX/` or an exported `best/`) contains:
 
-| Location | Responsibility |
+- `adapter_model.pt`: every `requires_grad` tensor by module name. For the `recurrent` scope this means the full R layer weights plus bridge, `state_head` and `completion_head.*`, not only adapters.
+- `recurrent_config.json`: the spec, including `format`, `base_model`, `revision`, the R range, LoRA settings, `symbols`/`token_ids`, `prompt_format: dataset_raw`, `loss_vocabulary: symbols`, `train_depths`, the `executor` options, `completion_head`, and `controller_training` provenance on exports.
+- `training_state.pt`: optimizer, RNG, data cursor and resume identity. On controller exports it is provenance only and cannot be resumed.
+- Tokenizer files.
+
+| `format` | Mode |
 | --- | --- |
-| `scripts/recurrent_qwen/model.py` | Model partition, shared recurrence, per-loop readout |
-| `scripts/recurrent_qwen/lora_utils.py` | Adapter placement and freezing configuration |
-| `scripts/recurrent_qwen/outputs.py` | Output shapes, loop conventions, allowed-answer margins |
-| `scripts/recurrent_qwen/validation.py` | Stage 0 architecture checks and measurements |
-| `scripts/validate_stage0.py` | Loading, CLI configuration, Rich presentation, JSON evidence |
-| `tests/` | Focused scientific and implementation contracts |
-| `scripts/dataset/pointer.py` | Pointer records, random tables, exact reference execution, decoded-symbol checking |
-| `scripts/dataset/symbols.py` | Pinned tokenizer identity and context-validated single-token vocabulary |
-| `scripts/dataset/dataset.py` | Seeded splits, JSONL/manifest persistence, independent verification |
-| `scripts/dataset/cli.py` | Cached tokenizer loading, dataset CLI, Rich dry run and summaries |
-| `scripts/eval/naive_test.py` | Ordinary-model final-answer evaluation CLI, progress, CSV/JSON artifacts |
-| `scripts/eval/pointer_task.py` and `loading.py` | Exact final-answer scoring, generation batches, and ordinary-model loading |
-| `scripts/training/config.py`, `data.py`, `objective.py` | Explicit configuration, validated subsets/batches, masked per-loop loss and metrics |
-| `scripts/training/gates.py`, `runner.py`, `evaluation.py` | Startup checks, optimizer/accumulation/resume, fixed per-loop validation |
-| `scripts/training/train_pointer.py` | Composing training CLI and compact Rich dashboard |
-| `scripts/recurrent_qwen/checkpoint.py` | Adapter/tokenizer/optimizer persistence and recurrent model reconstruction |
-| `scripts/eval/recurrent_pointer.py` | Saved recurrent final-answer readout through the naive-test CLI |
-| `scripts/eval/loop_test.py`, `loop_metrics.py` | Fixed-depth checkpoint CLI, per-example first-error diagnostics, and depth-by-loop CSV export; optional adaptive routing |
-| `scripts/eval/adaptive_*.py` | Offline oracle/heuristic analysis, causal stopping, latency summaries, and gated head fitting; see [one adaptive guide](adaptive_compute.md) |
-| `scripts/dataset/terminal.py` | Deterministic, evaluation-only terminal-rule transform with unchanged nominal targets |
-| `scripts/eval/overscaling_test.py`, `overscaling_metrics.py` | Terminal sweep through the shared loop CLI, conditional dynamics and censored survival |
-| Future evaluation extensions | Knowledge retention, transfer, hidden-state diagnostics, and plots |
-
-Scripts compose library functions. Task generation must remain separate from training, and loss functions must not own loading or artifact writing. See [Stage 0](architecture.md) for commands and [decisions](decisions.md) for remaining research semantics.
-
-## Stage 1 data boundary
-
-Pointer generation has no dependency on the recurrent wrapper and loads no model. Logical state targets and actual answer-token IDs are saved together. The trainer revalidates raw prompts with its tokenizer, derives class indices `[B,T]` from exact logical intermediate states, and selects the validated symbol-token logits. Right-padded batches mask nominal labels at `t > d`; CE is averaged within each example and then across examples. Saved answer positions apply to unpadded raw prompts; batching must account for padding. Only nominal steps 1..d are labeled, with no h_0 or post-completion supervision. The [Stage 1 guide](training_pointer.md) owns the data format and reproduction commands.
-
-The [ordinary-model evaluator](evaluation.md) loads `AutoModelForCausalLM` directly and does not use `RecurrentQwen`. It renders the shared `prompts/pointer_task.txt` instructions, tokenizes with the evaluated model's tokenizer, and scores generated final answers. Its chat-wrapped autoregressive output is distinct from frozen-coda readouts after recurrent loops; the CLI separately recognizes recurrent checkpoint directories and routes them to allowed-symbol readout at the requested depth. Training validation also records per-loop trajectories. See [training usage](training_pointer.md) for the checkpoint format and runtime boundaries.
-
-The [full-loop CLI](evaluation.md) restores the same saved model/tokenizer and uses training's `encode_tasks` and `evaluate` under `no_grad`. Each example runs the full requested sweep; nominal masking and loss reduction are shared with training. CSV rows additionally expose intermediate CE and intermediate margins, without changing training objectives or forward behavior. Diagnostic aggregation reads those rows to locate first errors and decoded repeats; it does not introduce hidden-state probes or post-completion targets.
-
-
-The deferred terminal experiment composes that same inference path via `overscaling_test.py`. Before encoding, `terminal.py` returns new task records with only the final outgoing edge changed to a self-loop. `tasks.jsonl` and its hash preserve the exact changed inputs. Nominal CE remains masked after d; post-nominal fixed-final scoring lives exclusively in `overscaling_metrics.py` and never enters the optimizer. No hidden states, model internals, or gradient behavior are changed. Conditional counts and survival are validated independently of model inference; see [usage and semantics](evaluation.md).
-
-
-Depth-stage initialization is separate from resume: `scripts/training/initialization.py` validates the saved adapter interpretation and training-exposure metadata, while the training CLI restores only adapter tensors before creating a new optimizer. Checkpoint lineage survives subsequent resume. `scripts/eval/depth_generalization.py` composes matched `loop_test` sweeps; `depth_comparison.py` checks pairing/provenance and reports absolute and relative depth. No recurrent forward or gradient semantics change. See [depth-6 setup](training_pointer.md).
-
-## Adaptive-compute boundary
-
-[Adaptive inference compute](adaptive_compute.md) owns the implemented opt-in stopping interface and its remaining research gates. `RecurrentQwen.forward(stop_policy=...)` accepts a causal callback in eval/no-grad batch-1 mode, reads the shared recurrent state after each loop, and returns the executed prefix. The default fixed-depth forward and training gradients remain unchanged. A separate lightweight head may consume target-free confidence/history features; no pretrained head or adaptive benefit has been established.
-
-## Explicit-step learned completion ablation
-
-The separate [completion training path](learned_loop_completion.md) adds an optional LayerNorm → Linear → GELU → Linear head to `RecurrentQwen`. At each loop it reads only `h_t` at the answer position and returns `stop_logits[B,T]` alongside the unchanged coda logits. It does not receive the loop index or parsed requested depth. The trainer jointly optimizes the existing intermediate 26-symbol CE and a weighted binary continue/stop objective; the latter is supervised only through each example's nominal depth and backpropagates through R. No predicted or reference symbol is inserted into recurrence. Fixed-depth outputs of a head-equipped checkpoint still use the same R/C readout; the self-stopped inference path is not yet implemented. The head and adapters use a versioned checkpoint, while historical adapter-only checkpoints remain loadable. Tiny-model checks passed; pretrained training has not run.
-
----
-
-## Stage 0 validation protocol (completed)
-
-This section retains the implementation contract and validation commands. Current evidence is in [status](status.md) and the [Stage 0 report](experiments/stage0_validation.md).
-
-Status: implemented. The gate outcome and device-specific evidence are in the [validation report](experiments/stage0_validation.md). Source: project plan sections 2–4 and 32.
-
-### Purpose and scope
-
-Prove that model surgery preserves one-pass behavior and repeated passes use the intended trainable parameters. No pointer data, research training, bridge, or asymmetric objectives are included.
-
-### Implementation
-
-- [Model mechanics](../scripts/recurrent_qwen/model.py): original Qwen decoder objects grouped into P (0–5), shared R (6–17), and C (18–23), with configurable half-open split boundaries. Preserve embeddings, masks, positions, RoPE, final norm, and tied LM head; freeze original weights and disable caches.
-- [LoRA](../scripts/recurrent_qwen/lora_utils.py): PEFT injection into R only, q/v projections, rank 8, alpha 16, no dropout or bias training. A single shared set adds 270,336 trainable parameters to the frozen 494,032,768-parameter model.
-- [Outputs](../scripts/recurrent_qwen/outputs.py): per-loop logits, optional `h_0` and `h_1...h_T`, and allowed-token margins with explicit per-loop labels. [Architecture](architecture.md#implemented-forward-interface) defines shapes and indexing.
-- [Validation](../scripts/recurrent_qwen/validation.py): ordinary references captured before mutation, equivalence before/after adapter attachment, module/parameter identity hooks, recurrent input identity, observability, and a two-loop backward without an optimizer step.
-- [CLI](../scripts/validate_stage0.py): explicit checkpoint loading, Rich results, and JSON evidence. Imports never load models. Default is local-only, fixed-revision CPU float32 with eager attention and strict deterministic algorithms.
-
-The wrapper shares and freezes the supplied base in place. Compute reference outputs before LoRA attachment; a base sharing adapted layers is no longer an independent unadapted reference.
-
-The [integrated mechanism diagnostic](diagnostics_and_performance.md#integrated-frozen-mechanism-diagnostic) uses scoped eval-only hooks to record `h_t` at Answer after R, normalized Answer vectors after frozen C, and selected eager-attention weights from Answer to the 26 rule source/destination tokens. It also reads frozen C(`h_0`) once before recurrence, with the same mask and RoPE, to audit what P+C can already decode; that extra readout never feeds the model. Adapter ablation temporarily disables recurrent LoRA in memory and restores it even on errors. These probes do not alter `RecurrentQwen.forward`, training gradients, checkpoint files, or what is fed into the next loop. Rule tokens precede Start/Answer under the causal mask, so their representations cannot attend backward to the answer-position state; the answer position can attend to the rule table. Saved attention ranks and linear decodability are observations, not causal proof of which computation R performs.
-
-### Run validation
-
-From the repository root:
-
-```sh
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-python -m pip check
-python -m pytest -q
-python -m scripts.validate_stage0 --device cpu --output artifacts/stage0/cpu.json
-```
-
-If the pinned checkpoint is not cached, explicitly add `--download`. `--revision` accepts another commit; the report records the resolved revision. The default is `7ae557604adf67be50417f59c2c2f167def9a775`. Run without Python's `-O` flag because gate checks use assertions.
-
-Use `--recurrent-start`, `--recurrent-end`, `--rank`, `--alpha`, `--loops`, `--seed`, and `--threads` for explicit variations. Default loop counts are 1, 2, and 4. Positive loop counts have no architectural upper bound, but resource limits still apply. `--device mps` requests Apple Silicon execution and fails if unavailable, without falling back to CPU. Omitting `--output` creates timestamped JSON under ignored `artifacts/stage0/`.
-
-### Validation and gate
-
-| Check | Evidence |
-| --- | --- |
-| T=1 equivalence | Every token's full-vocabulary logits match ordinary Qwen with `atol=rtol=1e-5`, before and after initial LoRA; pretrained cases include no padding and both padding sides |
-| Shared weights | Original layer identities retained; every loop invokes the same R object, decoder objects, and parameter IDs; P runs once and C once per loop |
-| Recurrent flow | Next R input is the previous R output object; tiny-model tests also check causality |
-| Gradient scope | Every original parameter stays frozen and gradient-free; only R's A/B tensors are trainable, all gradients are finite, and all initial B gradients are nonzero |
-| Gradient connectivity | Final-loop CE reaches both recurrent hidden states through frozen C and earlier recurrence; a tiny-model diagnostic update additionally verifies nonzero A gradients |
-| Observability/depth | Correct logits, hidden-state, and margin shapes at multiple depths; independent margin arithmetic and readout-selection tests |
-
-Focused tests use tiny random Qwen models for split extremes, explicit/default positions, padding, eager/SDPA equivalence, causality, gradients, ties, and invalid boundaries. They are separate from validation of the actual pretrained checkpoint. Exact commands, measurements, and limitations are in the [report](experiments/stage0_validation.md).
-
-The hard gate is passing equivalence, sharing, and gradient scope. An unavailable or failed device is not a pass on that device. Stage 0 establishes implementation correctness on tested inputs, not useful recurrence, pointer execution, repair, or overscaling damage.
-
-### Stop boundary
-
-Stage 0 ends here. Next is the [symbol vocabulary and pointer-data generator](training_pointer.md), including tests, followed by another stop before training. Completion semantics, cycles, and task-specific readout remain decisions for that milestone.
-
-## Performance investigation boundary
-
-The [diagnostics and performance proposal](diagnostics_and_performance.md) records inspected overhead in symbolic projection, metric synchronization, batching and execution settings. No fast-path model change has been implemented. Preserve full-vocabulary one-loop equivalence, intermediate readouts and gradients, frozen base weights, and shared recurrence while measuring candidates.
-
-The initial profiler uses temporary module hooks and opt-in evaluation ranges to attribute existing computation, without changing recurrent tensors or gradient paths. The separate small probe uses the existing hidden-state capture interface one example at a time. Disposable profile updates use the production objective/backward with fresh optimizer state and restore the source adapter values in memory; source checkpoint files are never rewritten. See [implemented diagnostics](diagnostics_and_performance.md#implemented-diagnostic-commands).
-
-The opt-in [controlled probes](diagnostics_and_performance.md#controlled-restart-and-rule-context-experiments) use scoped evaluation hooks in `pointer_probes.py`: capture P's rule-prefix output, then substitute that prefix at R input only after the configured boundary. Remaining sequence positions stay recurrent; C/readout and weights remain unchanged. An identical-copy control checks output equality. This is an inference intervention, not a trained architecture or an extension to the production forward API. The hooks require eval/no-grad and are removed after each forward, including exceptions.
-
-## Depth-12 execution settings
-
-The broader-depth recipe retains the fixed-prompt model, shared LoRA, completion head and exact per-loop labels. Optional `attention: sdpa` selects PyTorch SDPA through Qwen's existing attention interface. Optional `precision: bf16` uses CUDA autocast only during forward computation; original/trainable parameter storage, AdamW state, pointer CE and completion BCE stay float32. No tensors are detached from the training recurrence. The startup one-pass equivalence gate remains float32, and BF16 launches additionally check a full deepest-depth backward pass for finite gradients and frozen base parameters. CUDA support is required explicitly. Defaults remain float32/eager/deterministic for old configs. SDPA output/adapter-gradient agreement is tested locally on a tiny CPU model; CUDA BF16 validation is deferred to the desktop probe/smoke run. Fixed prompt memory still uses dense layers; no projected-memory cache was added.
-
-## Isolated executor interfaces — 2026-10-04
-
-The user-authorized [pipeline upgrade](pipeline_upgrade.md) adds opt-in interfaces
-while preserving the legacy full-sequence and fixed-prompt models.
-
-```text
-raw Rules/Start/Steps prompt
-  ├─ remove Steps line → P → R → [bridge → same R] … → C → symbolic logits
-  └─ full prompt → P (no gradient) → controller initial memory
-                                  ↑ detached R working state after each loop
-                                  GRU → stop logit
-```
-
-Routing is deterministic token/text plumbing, not a learned lookup or a numeric
-counter. It requires the raw dataset format. The executor's count line is removed;
-masked gaps preserve the public answer index and compact RoPE indices remove
-count-token-length leakage. The controller reads the full prompt representation,
-has its own GRU memory, and never receives t, d, remaining depth or reference
-states as numerical features. Its output cannot enter R. BCE gradients and
-clipping cannot rescale executor updates. Full-model training may change the
-shared P weights through pointer loss, so controller prompt features can still
-change between optimizer updates.
-
-The bridge acts only before loops 2..T. It normalizes the returned working vector
-by RMS, restores the initial executor-state RMS scale, and applies a learned gain
-and identity-initialized linear projection. It does not freeze states or enforce
-contraction. A direct learned linear A–Z head on R adds optional local CE;
-C's symbolic output remains the primary answer path. Neither decoded output is
-fed back. T=1 equivalence is with ordinary Qwen on the **executor view**, not with
-ordinary Qwen on the unmodified full prompt.
-
-`train_scope` supports LoRA, all recurrent-block weights, or all model weights.
-Full R is the default new experiment; full model is a separate config. The new
-`loopformer-executor-v2` checkpoint stores all trainable tensors in the historical
-`adapter_model.pt` filename and records the architecture explicitly. That filename
-no longer implies LoRA-only contents. The shared loader reconstructs the correct
-trainability and interfaces; naive/full-loop/learned-stop evaluation reuse it.
-Legacy checkpoint interpretation is unchanged.
-
-Differentiable prefix reuse computes full R/C layers on pass one, retaining
-prefix K/V and outputs within that forward. Later loops compute only the writable
-query and replace its K/V; prefix tensors are **not detached**. This is separate
-from Hugging Face's generation cache, which remains disabled. Non-reentrant
-checkpointing recomputes layer activations during backward. Reuse requires zero
-attention dropout. Selected-row LM projection computes the same 26 answer logits
-without materializing the whole vocabulary; full-vocabulary output remains
-available for legacy callers and equivalence tests.
-
-Tiny-model tests compare dense/reused outputs and all parameter gradients for
-LoRA/full R/full model under eager and SDPA, including checkpointing and different
-prompt lengths (the dense/reuse pair shares one graph and differs only in its
-Steps line). Other tests cover count invariance, separate gradients, that the
-bridge leaves T=1 unchanged and rewrites only the working state from loop 2 on,
-save/reload with every trainable tensor perturbed (so a dropped tensor fails),
-and complete training/evaluation wiring. Training also gates T=1 of the
-configured executor against ordinary Qwen on the routed prompt
-(`executor_view_equivalence`), after `configure_executor`; the earlier
-`initialize` gate checks only the bare model. These prove
-implementation contracts to numerical tolerance, not pretrained learnability or
-unbounded algorithmic correctness. Pretrained CUDA startup checks remain required.
-
-
-## Frozen controller diagnosis
-
-The [controller diagnostic](diagnostics_and_performance.md#controller-diagnostic--current-desktop-command)
-uses scoped read-only hooks on the existing `RecurrentController` modules. It
-captures the input/output of `context`, the input of `observation`, and the GRU
-output. The normal model forward and recurrent executor are unchanged. Cached
-observations have shape `[questions, loops, hidden_width]`; controller memories
-are `[questions, loops, controller_width]`. Prompt context has no loop axis.
-
-Replay initializes the controller once and advances its own memory through every
-cached R state. The existing stop loss constructs labels from requested depth;
-neither these labels nor probe predictions enter the controller's forward. The
-source model and original controller stay frozen; tiny-set fits update copies.
-Diagnostic classifiers are separate measurement tools and are never installed in
-the inference model. The only new binaries are ignored caches and controller
-copies in the diagnostic output directory; no checkpoint format changes.
-
-
-## Controller-only training and portable export
-
-The [separate controller run](training_pointer.md#separate-controller-training--current-desktop-run)
-freezes the selected executor and caches normal FP32 forward observations. Only
-a copy of its `RecurrentController` enters the optimizer. The controller consumes
-cached full-prompt context and R vectors, carries its own differentiable memory,
-and receives no numeric time/depth feature. Per-loop continue/stop labels remain
-supervision only. Cache replay is checked against the original live controller.
-
-The portable `best/` checkpoint uses the existing `loopformer-executor-v2` format.
-Export copies the original saved tensor dictionary and replaces exactly the
-`completion_head.*` keys after name, shape and finiteness validation. It does not
-use `requires_grad` to infer the export payload, which would omit the frozen
-trained R. Source tensors/tokenizer/config remain untouched; metadata records
-controller-only optimization and the source hash. The joint trainer must not use
-this export as an optimizer-resume checkpoint.
-
-
-## Controller remaining-work supervision — 2026-10-05
-
-The [matched comparison](training_pointer.md#remaining-work-comparison--current-desktop-run)
-adds a training-only `Linear(controller_width, 1)` readout without changing
-`RecurrentController.initialize` or `advance`. `replay` returns initial memory
-`[B,M]` and subsequent memory `[B,T,M]`; concatenating them gives `[B,T+1,M]`.
-The shared linear readout, multiplied by fixed scale 12, predicts `[B,T+1]`
-remaining work. Only the objective constructs targets N−t for t=0..N. There is
-no teacher forcing, numerical feedback, clock input, hard-coded state update or
-readout-dependent stopping. Full controller BPTT remains intact; input features
-are detached at the existing prompt/observation interfaces.
-
-The stop-only arm detaches memory before numerical regression. Its readout has a
-separate optimizer and gradient clipping, so measurement does not alter controller
-updates. The auxiliary arm lets regression gradients train memory. Export still
-replaces exactly `completion_head.*`; the numerical readout is saved separately
-with the matching selection step/scale and discarded for ordinary inference.
-A scalar regression loss encourages an interpretable numerical representation;
-it does not prove a counting algorithm or remove the bounded GRU's possible
-extrapolation limitations. Count interpolation and longer-depth results remain
-separate empirical questions.
-
-
-## Read-only controller training audit
-
-The [training audit](diagnostics_and_performance.md#controller-training-audit--current-desktop-command)
-reuses cached `[B,H]` context and `[B,T,H]` executor observations and the existing
-`replay`/`evaluate_controller` functions. It loads only saved controller and
-numerical-readout weights. Forward inputs, initialization and recurrent memory
-updates are unchanged; no target, decoded number or external counter enters them.
-
-`controller_audit_metrics.loss_components` decomposes the existing scalar objective
-into stop, initial (t=0), interior (0<t<N) and terminal (t=N) terms, retaining
-original normalization. `torch.autograd.grad` observes each component's parameter
-gradients without populating `.grad`, clipping tensors or creating an optimizer.
-Controller states stay differentiable through the full rollout; frozen feature
-inputs retain their existing detach boundaries. Weight-zero controls additionally
-measure explicitly counterfactual auxiliary gradients, which are excluded from
-the recorded actual controller objective. No numerical readout replaces stopping.
-
-Best/final selection is an inspection label, not checkpoint promotion. Full-panel
-fit and gradient diagnostics remain development evidence. Parameter tensors and
-input hashes are checked unchanged after the audit, and no new weights are saved.
-
-## Independent initialization supervision — 2026-10-08
-
-The [repair intervention](controller_repair.md) adds an independently weighted
-loop-zero regression objective to the same controller and numerical readout.
-Its direct gradient reaches context initialization and the training-only readout;
-it does not directly supervise recurrent updates or stop logits. Existing
-trajectory and stop losses still train those paths through full BPTT. No forward
-input, recurrence, export tensor name or inference policy changes. A zero default
-weight preserves historical objectives. Generalization remains unverified.
-
-## Broader-count short-prefix supervision — 2026-10-08
-
-`controller_prompt_state` exposes the same frozen full-prompt P representation
-used by native initialization. Cache preparation runs this path without R/C and
-pairs it with existing count-free R prefixes by rule table and Start. It verifies
-old count invariance, graph-disjoint validation, source/data identities and bounded
-native agreement before saving a new cache. Forward input remains token IDs and
-mask only; the helper does not parse requested count.
-
-The [prefix pilot](controller_repair.md#broader-count-exposure-with-short-prefixes)
-retains free-running GRU memory and full BPTT. For N>T, every observed stop target
-is continue; no terminal is invented at T. Numeric supervision covers t=0..min(N,T).
-Requests seen only through a short prefix are distinct from supervised terminal
-loop lengths. Selection excludes larger and held-out requests. The GRU architecture
-and portable export remain unchanged; the completed pilot failed to repair timing.
-
-## Learned affine suffix controller — 2026-10-08
-
-The later [shared number-reader repair](number_reader_repair.md) replaces only
-the initializer with `SharedNumberReader`: frozen routed Steps-token embeddings
-and validity masks `[B,8*(H+1)]` feed a shared token projection and learned
-left-to-right accumulation gain. No numeric conversion, digit-value lookup,
-requested-count tensor or elapsed-loop feature enters inference. Gain/projection
-are fitted from the same training count labels; the learned cell and stop readout
-are copied unchanged. Checkpoints mark `controller_kind=shared_number` and load
-through the common factory. This is a task-specific compositional number reader,
-with an eight-character input bound and finite numerical precision, not a generic
-confidence-based stopping mechanism. The old suffix controller remains supported.
-
-The precision follow-up preserves this reader and the stop readout but tightens
-only the two cell parameters with float64 L-BFGS on the same free-running,
-nominal 12-loop numerical loss. N−t is a target, never a cell input. Exported
-inference stays float32. This addresses accumulated optimization residuals; it
-does not install an identity gain/decrement or expose longer training rollouts.
-
-The [repair protocol](controller_repair.md#suffix-initializer-and-learned-affine-memory)
-specifies the new optional controller. Frozen final-eight embeddings `[B,8H]`
-feed a supervised learned linear initializer `[B,1]`; a shared affine cell evolves
-this unbounded memory once per R transition. Identity initialization contains no
-programmed decrement. Numeric N−t labels train free-running memory through the
-12-loop prefix; stop BCE trains a separate affine readout on detached memory.
-Initializer fitting uses only training counts, then freezes those weights. No
-numeric label, parsed count, loop index or decoded state is a forward input.
-R/C/P pointer computation and re-entry remain unchanged. This is a task-specific
-counting bias, not a generic adaptive controller. Checkpoints explicitly set
-`executor.controller_kind=affine_suffix` and memory width one; exports replace
-only controller tensors, and the common loader/scorer remain the inference path.
-
-
-The completed affine-controller experiment passes finite development timing gates
-across three optimizer seeds; see [the report](experiments/controller_affine_seed61.md).
-For Qwen's H=896, the initializer learns 7,169 weights/biases by training-only
-least squares, then freezes them. AdamW learns four scalars: recurrence gain/offset
-and stop slope/intercept. No loop counter is supplied to the cell, but remaining-work
-labels provide explicit counting supervision. This route ignores R observations;
-its only runtime inputs after initialization are its own memory and the invocation
-once per executor loop. It is a timer rather than a learned correctness evaluator.
-
-
-The [frozen benchmark](pointer_benchmark.md) now evaluates this architecture without
-training. Count-free executor trajectories may be reused across requested counts
-only for the isolated executor with an affine controller that ignores R input.
-The benchmark verifies suffix input invariance across seed/mode representatives
-and checks a declared native stopped panel before accepting reused quality scores.
-This optimization is not an adaptive latency measurement.
-
-
-The completed [larger benchmark](experiments/pointer_frozen_benchmark.md) exposes
-an initializer limitation: separate token-position weights do not enforce shared
-digit values/place-value composition. At 70 an unseen tens-role digit gives an
-initial estimate near 49.26; three-digit layouts introduce further unseen slot
-tokens. The observed early stops occur despite strong forced executor trajectories.
-This architecture remains frozen; no new reader is implemented from the result.
-
-## Frozen architecture comparison verification
-
-The [architecture-history reconstruction](experiments/pointer_architecture_history.md)
-also includes the original CE-only full-sequence model, joint hidden-state head,
-fixed-prompt depth-6 model and its depth-12 training variant. The CE checkpoint has
-no stopping head; external forced-depth execution remains an executor baseline,
-and autonomous stopping metrics are explicitly not applicable. Earlier stored
-architectures are reconstructed without changing their model mechanics.
-
-The [paired diagnostic](experiments/pointer_checkpoint_comparison.md) changes no
-model mechanics. Its controlled controller comparison verifies exact identity
-of every non-controller tensor, tokenizer, recurrent implementation and executor
-specification before reusing count-free trajectories. GRU replay receives actual
-R working vectors and context recomputed for every full raw prompt; scalar
-controllers may ignore observations only because their native implementation
-does so. Legacy coupled R is evaluated separately for each displayed count.
-Native stopped calls and independent raw-table auditing guard all comparisons.
-
-## Inference-only causal partitioning for historical population evaluation
-
-[`partitioned.py`](../scripts/recurrent_qwen/partitioned.py) accelerates the older
-count-dependent models without changing their recurrent inputs. It computes
-identical causal prompt prefixes once per graph while keeping an independent
-continuous suffix state for every requested count. Full-sequence prefixes still
-evolve at every loop; fixed-prompt layers retain first-pass K/V and replace only
-the working position. R outputs return to R, and C outputs remain readouts.
-
-This is local attention algebra within one frozen evaluation, not generation KV
-cache or a persistent cache across examples/updates. The original model remains
-the batch-one reference. Focused multi-loop tests cover both recurrence modes,
-LoRA, padding, eager/SDPA and completion logits. Every historical arm must also
-pass predeclared real-checkpoint native comparisons with exact decoded/first-stop
-agreement; numerical FP32 kernel differences are recorded. The CE arm's largest
-observed logit difference was 0.0000496 over 54 checks. Full-panel inference is
-pending. The scheduler may discard a query after its requested readout and first
-stop have both been recorded; that horizon is never an input to R or its head.
-Training and ordinary model mechanics are unchanged.
-
-## Population inference indexing optimization — 2026-10-09
-
-The inference-only partitioned evaluator discovers surviving query rows once
-per loop with `need.nonzero()`, then uses those ordered indices with
-`index_select` for all working states, masks and K/V memories. This replaces
-repeated CUDA boolean indexing/shape discovery. It changes no FP32 model
-arithmetic, readout, counter input, stopping rule, or training path. Rows still
-remain active until both the requested observation horizon and first stop have
-been observed; a missing stop retains the row to the safety cap.
-
-Full-horizon four-graph tests at every request 1–256 preserved logits and stop
-scores bit for bit for CE and fixed-memory checkpoints. Observed chunk time
-changed 44.60→43.81 seconds for CE and 29.51→26.66 for fixed memory. These are
-single-batch measurements, not guaranteed full-run speedups. The explicit
-[resume migration](../scripts/eval/migrate_paper_indexing.py) accepts only this
-AST substitution, preserves the old freeze/source/chunk hashes and refuses
-other source, checkpoint, data, precision or batch changes. Native fidelity,
-reference scoring and strict ordinary resume checks remain in place.
+| `loopformer-stage1-v1` | full_sequence LoRA (the only format `--init-from` accepts) |
+| `loopformer-stage1-completion-v1` | full_sequence plus a `CompletionHead` |
+| `loopformer-stage1-fixed-prompt-v1` | fixed_prompt LoRA |
+| `loopformer-executor-v2` | fixed_prompt plus the `executor` block (required) |
+
+`load_recurrent_checkpoint(path, device, dtype, download=False)`:
+
+1. Validates the format against the mode and the symbol IDs against the saved tokenizer.
+2. Loads the base with `local_files_only=not download` at the spec revision, using `attn_implementation="eager"`. Evaluation and demo callers then set `model.config._attn_implementation = "sdpa"`.
+3. Rebuilds the model: LoRA if the scope is `lora`, then `configure_executor(**spec["executor"])`, then the completion head.
+4. `restore_adapters` requires an exact name-set match, equal shapes and finite values.
+
+Restored tensors are bitwise exact. CPU-loaded base weights may be memory-unaligned, which changes CPU matmul rounding by about 1 ulp; `tests/test_executor_upgrade.py` uses 1e-6 for this reason. GPU loading is not affected.
+
+## Known limitations visible in code
+
+- Isolated models require the exact raw prompt regex and support only `logits_mode="answer"`. MMLU evaluation therefore sets `model.router = None` and `model.completion_head = None` and runs T=1 ([scripts/eval/mmlu.py](../scripts/eval/mmlu.py)).
+- Stopping, `stop_policy` and `loop_callback` run at batch size 1 only. `loop_test` additionally requires FP32 for stopped runs.
+- Readout indexing (`_answer_readout`) uses Python integer slices, which sync once per forward. This avoids MPS's nondeterministic scatter backward.
+- Count digits are limited to 8 characters for `shared_number`. The affine countdown is an unbounded scalar, so precision beyond the trained range depends on the fitted gain and offset.
+- `controller_kind` in `ControllerConfig` accepts only `gru` and `affine_suffix`. `shared_number` is produced only by `repair_number_reader`.

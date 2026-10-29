@@ -102,7 +102,7 @@ class TrainingConfig:
             if value is not None and (type(value) is not int or value < 1):
                 raise ValueError(f"{name} must be null or a positive integer")
         if not 1 <= self.train_max_depth <= self.validation_max_depth <= 256:
-            raise ValueError("Require 1 <= train_max_depth <= validation_max_depth <= 2566")
+            raise ValueError("Require 1 <= train_max_depth <= validation_max_depth <= 256")
         if not 0 <= self.recurrent_start < self.recurrent_end:
             raise ValueError("Invalid recurrent layer range")
         if type(self.seed) is not int or not 0 <= self.seed < 2**63 or type(self.warmup_steps) is not int or self.warmup_steps < 0:

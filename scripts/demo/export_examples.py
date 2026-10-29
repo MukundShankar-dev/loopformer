@@ -54,7 +54,7 @@ def main() -> None:
                          "request": request.payload(), "threshold": .5, "safety_cap": 272,
                          "trace": rows, "summary": summary,
                          "provenance": {"example_id": key,
-                                        "report": "docs/experiments/pointer_final_benchmark.md",
+                                        "report": "docs/history.md",
                                         "trajectory_sha256": hashlib.sha256((source / "native/trajectories.csv").read_bytes()).hexdigest()}})
     target = ROOT / "demo/web/examples.json"
     target.write_text(json.dumps(examples, separators=(",", ":"), allow_nan=False) + "\n")

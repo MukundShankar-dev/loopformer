@@ -51,7 +51,7 @@ def main() -> None:
                 shutil.copy2(args.checkpoint / name, model_dir / name)
         copy_runtime(model_dir)
         shutil.copy2(ROOT / "demo/requirements-inference.txt", model_dir / "requirements.txt")
-        card = (ROOT / "docs/demo_model_card.md").read_text().replace("MODEL_REPO_ID", args.model_id)
+        card = (ROOT / "demo/hf_model_card.md").read_text().replace("MODEL_REPO_ID", args.model_id)
         (model_dir / "README.md").write_text(card)
         api.create_repo(args.model_id, repo_type="model", private=False, exist_ok=True)
         commit = api.upload_folder(repo_id=args.model_id, folder_path=model_dir,

@@ -1,6 +1,7 @@
 """Frozen executor fidelity, selection discipline and controller-training handoff."""
 from dataclasses import replace
 import json
+from launchers import stage_launcher
 import os
 from pathlib import Path
 import shutil
@@ -105,9 +106,9 @@ def test_controller_cli_cache_training_export_and_native_eval(setup):
 @pytest.mark.parametrize('fail_call', [None, 1, 3])
 def test_eval_controller_launcher_uses_export_and_stops_on_failure(launcher_repo, fail_call):
     root, run = launcher_repo
-    shutil.copy(Path(__file__).resolve().parents[1] / 'eval_controller.sh', root)
+    stage_launcher('eval_controller.sh', root)
     env = {**os.environ, **({'FAIL_CALL': str(fail_call)} if fail_call else {})}
-    result = subprocess.run(['bash', 'eval_controller.sh', str(run)], cwd=root, env=env, capture_output=True, text=True)
+    result = subprocess.run(['bash', 'scripts/launch/eval_controller.sh', str(run)], cwd=root, env=env, capture_output=True, text=True)
     assert result.returncode == (7 if fail_call else 0), result.stderr
     calls = [json.loads(l) for l in (root / 'calls.jsonl').read_text().splitlines()]
     assert len(calls) == (fail_call or 3)
@@ -119,11 +120,11 @@ def test_eval_controller_launcher_uses_export_and_stops_on_failure(launcher_repo
 @pytest.mark.parametrize('dry,fail', [(True, False), (False, False), (False, True)])
 def test_train_launcher_dry_run_and_failure_logging(launcher_repo, dry, fail):
     root, _ = launcher_repo
-    shutil.copy(Path(__file__).resolve().parents[1] / 'train_controller.sh', root)
+    stage_launcher('train_controller.sh', root)
     stub = root / 'bin/python'
     stub.write_text(stub.read_text().replace("if 'scripts.training.train_pointer' in args:",
         "if 'scripts.training.train_pointer' in args or 'scripts.training.train_controller' in args:"))
-    args = ['bash', 'train_controller.sh'] + (['--dry-run'] if dry else [])
+    args = ['bash', 'scripts/launch/train_controller.sh'] + (['--dry-run'] if dry else [])
     result = subprocess.run(args, cwd=root, env={**os.environ, 'FAIL_TRAIN': '9' if fail else '0'}, capture_output=True, text=True)
     assert result.returncode == (9 if fail else 0)
     call = json.loads((root / 'calls.jsonl').read_text().splitlines()[0])

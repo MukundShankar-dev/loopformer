@@ -1,6 +1,7 @@
 """Controller diagnostics preserve execution and separate probe/train/eval labels."""
 from copy import deepcopy
 import csv
+from launchers import stage_launcher
 import json
 from pathlib import Path
 import shutil
@@ -141,9 +142,9 @@ def test_cli_extract_fit_cache_reuse_and_source_fidelity(setup):
 def test_launcher_records_stderr_and_propagates_failure(launcher_repo, fail):
     import os
     root, run = launcher_repo
-    shutil.copy(Path(__file__).resolve().parents[1] / 'diagnose_controller.sh', root)
+    stage_launcher('diagnose_controller.sh', root)
     env = {**os.environ, **({'FAIL_CALL': '1'} if fail else {})}
-    result = subprocess.run(['bash', 'diagnose_controller.sh', str(run)], cwd=root, env=env, capture_output=True, text=True)
+    result = subprocess.run(['bash', 'scripts/launch/diagnose_controller.sh', str(run)], cwd=root, env=env, capture_output=True, text=True)
     assert result.returncode == (7 if fail else 0), result.stdout + result.stderr
     call = json.loads((root / 'calls.jsonl').read_text().splitlines()[0])
     assert call[2] == 'scripts.eval.controller_diagnostic'

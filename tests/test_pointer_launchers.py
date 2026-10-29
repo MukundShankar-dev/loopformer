@@ -1,6 +1,7 @@
 """Desktop launchers preserve logs, select the intended artifact and fail fast."""
 
 import json
+from launchers import stage_launcher
 import os
 from pathlib import Path
 import shlex
@@ -15,7 +16,7 @@ import pytest
 def launcher_repo(tmp_path):
     root = Path(__file__).resolve().parents[1]
     for name in ('train_fixed_prompt.sh', 'eval_ckpts.sh'):
-        shutil.copy(root / name, tmp_path / name)
+        stage_launcher(name, tmp_path)
     bin_dir = tmp_path / 'bin'
     bin_dir.mkdir()
     activation = tmp_path / '.venv/bin'
@@ -84,7 +85,7 @@ sys.exit(result.returncode)
 def test_eval_launcher_uses_selected_checkpoint_and_stops_on_failure(launcher_repo, fail_call):
     root, run = launcher_repo
     env = {**os.environ, **({'FAIL_CALL': str(fail_call)} if fail_call else {})}
-    result = subprocess.run(['bash', 'eval_ckpts.sh'], cwd=root, env=env, capture_output=True, text=True)
+    result = subprocess.run(['bash', 'scripts/launch/eval_ckpts.sh'], cwd=root, env=env, capture_output=True, text=True)
     assert result.returncode == (7 if fail_call else 0), result.stderr
     calls = [json.loads(line) for line in (root / 'calls.jsonl').read_text().splitlines()]
     assert len(calls) == (fail_call or 4)
@@ -101,25 +102,25 @@ def test_eval_launcher_uses_selected_checkpoint_and_stops_on_failure(launcher_re
 def test_training_launcher_preview_logs_and_no_overwrite(launcher_repo):
     root, run = launcher_repo
     shutil.rmtree(run)
-    preview = subprocess.run(['bash', 'train_fixed_prompt.sh', '--dry-run'], cwd=root, capture_output=True, text=True)
+    preview = subprocess.run(['bash', 'scripts/launch/train_fixed_prompt.sh', '--dry-run'], cwd=root, capture_output=True, text=True)
     assert preview.returncode == 0 and not run.exists()
     assert not list(run.parent.glob('*launch*'))
-    result = subprocess.run(['bash', 'train_fixed_prompt.sh'], cwd=root,
+    result = subprocess.run(['bash', 'scripts/launch/train_fixed_prompt.sh'], cwd=root,
                             env={**os.environ, 'FAIL_TRAIN': '9'}, capture_output=True, text=True)
     assert result.returncode == 9
     logs = list(run.parent.glob('*launch*.log'))
     assert len(logs) == 1 and 'training stderr' in logs[0].read_text()
     before = (root / 'calls.jsonl').read_text()
-    repeated = subprocess.run(['bash', 'train_fixed_prompt.sh'], cwd=root, capture_output=True, text=True)
+    repeated = subprocess.run(['bash', 'scripts/launch/train_fixed_prompt.sh'], cwd=root, capture_output=True, text=True)
     assert repeated.returncode != 0 and 'already exists' in repeated.stderr
     assert (root / 'calls.jsonl').read_text() == before
 
 
 def test_depth12_smoke_is_separate_and_propagates_failure(launcher_repo):
     root, _ = launcher_repo
-    shutil.copy(Path(__file__).resolve().parents[1] / 'train_depth12.sh', root)
+    stage_launcher('train_depth12.sh', root)
     target=root/'models/stage1_pointer/depth12-fixed-prompt-seed47-gaps'
-    result=subprocess.run(['bash','train_depth12.sh','--smoke-test'],cwd=root,
+    result=subprocess.run(['bash','scripts/launch/train_depth12.sh','--smoke-test'],cwd=root,
                           env={**os.environ,'FAIL_TRAIN':'9'},capture_output=True,text=True)
     assert result.returncode==9 and not target.exists()
     calls=[json.loads(x) for x in (root/'calls.jsonl').read_text().splitlines()]
@@ -131,11 +132,11 @@ def test_depth12_smoke_is_separate_and_propagates_failure(launcher_repo):
 @pytest.mark.parametrize('fail_call', [None, 1, 2])
 def test_depth12_probe_matches_checkpoints_and_preserves_failure(launcher_repo, fail_call):
     root, old = launcher_repo
-    shutil.copy(Path(__file__).resolve().parents[1] / 'probe_depth12.sh', root)
+    stage_launcher('probe_depth12.sh', root)
     run = root / 'models/stage1_pointer/depth12-fixed-prompt-seed47-gaps'
     for step in ('005000', '007500'):
         shutil.copytree(old / 'step-003250', run / f'step-{step}')
-    result = subprocess.run(['bash', 'probe_depth12.sh'], cwd=root,
+    result = subprocess.run(['bash', 'scripts/launch/probe_depth12.sh'], cwd=root,
                             env={**os.environ, **({'FAIL_CALL': str(fail_call)} if fail_call else {})},
                             capture_output=True, text=True)
     assert result.returncode == (7 if fail_call else 0)

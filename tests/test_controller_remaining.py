@@ -1,6 +1,7 @@
 """Countdown labels remain supervision; paired controls preserve native inference."""
 from dataclasses import replace
 import json
+from launchers import stage_launcher
 import os
 from pathlib import Path
 import subprocess
@@ -203,7 +204,7 @@ def test_suite_orchestration_and_failure_propagation(tmp_path, monkeypatch, fail
 def test_comparison_shell_logs_and_preserves_exit_code(tmp_path, dry, fail):
     import shutil
     import shlex
-    shutil.copy(Path(__file__).resolve().parents[1] / 'train_controller_remaining.sh', tmp_path)
+    stage_launcher('train_controller_remaining.sh', tmp_path)
     bin_dir = tmp_path / '.venv/bin';bin_dir.mkdir(parents=True)
     (bin_dir / 'activate').write_text(f'export PATH={shlex.quote(str(bin_dir))}:"$PATH"\n')
     stub = bin_dir / 'python'
@@ -211,7 +212,7 @@ def test_comparison_shell_logs_and_preserves_exit_code(tmp_path, dry, fail):
                     "Path('call.json').write_text(json.dumps(sys.argv[1:]))\n"
                     "print('suite stderr',file=sys.stderr)\n" + f'sys.exit({7 if fail else 0})\n')
     stub.chmod(0o755)
-    result = subprocess.run(['bash', 'train_controller_remaining.sh'] + (['--dry-run'] if dry else []),
+    result = subprocess.run(['bash', 'scripts/launch/train_controller_remaining.sh'] + (['--dry-run'] if dry else []),
                             cwd=tmp_path, capture_output=True, text=True)
     assert result.returncode == (7 if fail else 0)
     assert 'scripts.training.compare_controllers' in json.loads((tmp_path / 'call.json').read_text())

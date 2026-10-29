@@ -63,7 +63,7 @@ def main() -> None:
     if args.dry_run:return
     if c['device']=='cuda' and not torch.cuda.is_available():raise ValueError('CUDA required by this explicit config')
     if c['device']=='cuda' and c['deterministic'] and os.environ.get('CUBLAS_WORKSPACE_CONFIG') not in (':4096:8',':16:8'):
-        raise ValueError('Set CUBLAS_WORKSPACE_CONFIG=:4096:8 for deterministic CUDA, or use trace_baselines.sh')
+        raise ValueError('Set CUBLAS_WORKSPACE_CONFIG=:4096:8 for deterministic CUDA, or use scripts/launch/trace_baselines.sh')
     torch.manual_seed(c['seed']);torch.set_num_threads(c['threads'])
     torch.use_deterministic_algorithms(c['deterministic'])
     model,tokenizer,loaded=load_model(str(args.resume) if args.resume else c['model'],base_model=None,tokenizer_source=None,

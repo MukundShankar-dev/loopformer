@@ -3,10 +3,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from rich.console import Console
 
 from scripts.eval import paper_status
-from scripts.eval.paper_watch import dashboard, fetch_status
 
 
 def panel(tmp_path, monkeypatch):
@@ -66,34 +64,6 @@ def test_overlapping_chunks_cannot_inflate_progress(tmp_path, monkeypatch):
     chunk(root, 'ce_full', 'graphs-0001-0003.npz', [1, 2])
     with pytest.raises(ValueError, match='Duplicate'):
         paper_status.suite_status(root)
-
-
-def test_remote_status_is_read_only_and_shell_quotes_paths(monkeypatch):
-    import subprocess
-    calls = []
-    def run(args, **kwargs):
-        calls.append(args)
-        return subprocess.CompletedProcess(args, 0, '{"status":"paused","models":[]}', '')
-    monkeypatch.setattr(subprocess, 'run', run)
-    assert fetch_status(Path('eval/a b'), 'desktop', '/home/a b')['status'] == 'paused'
-    assert "cd '/home/a b'" in calls[0][-1]
-    assert "--input 'eval/a b' --json" in calls[0][-1]
-    assert 'paper_status' in calls[0][-1] and 'analyze_pointer.sh' not in calls[0][-1]
-    with pytest.raises(ValueError):
-        fetch_status(Path('eval'), '-oProxyCommand=bad', '/home')
-
-
-def test_dashboard_labels_partial_coverage_and_eta_scope(tmp_path, monkeypatch):
-    root = panel(tmp_path, monkeypatch)
-    chunk(root, 'ce_full', 'graphs-0000-0002.npz', [0, 1], 20)
-    result = paper_status.suite_status(root)
-    console = Console(width=120, record=True)
-    console.print(dashboard(result, 'desktop', '12:34:56', 'SSH unavailable'))
-    output = console.export_text()
-    assert '50.0%' in output and '2/4' in output
-    assert 'last successful update' in output
-    assert 'subsequent models and reporting are excluded' in output
-    assert 'Ctrl+C exits this monitor only' in output
 
 
 def test_ordinary_baseline_uses_query_progress_and_requires_its_own_audit(tmp_path, monkeypatch):

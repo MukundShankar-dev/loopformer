@@ -70,7 +70,7 @@ def main() -> None:
     metadata = {'status': 'running', 'kind': 'controller_training_audit', 'command': [sys.executable, '-m', 'scripts.eval.controller_training_audit', *sys.argv[1:]],
         'device': args.device, 'dtype': 'float32', 'batch_size': args.batch_size, 'gradient_batch_size': args.gradient_batch_size,
         'gradient_graphs': args.gradient_graphs, 'gradient_seed': args.seed, 'checkpoints': args.checkpoints,
-        **provenance, 'source_sha256': {str(p): sha256_file(p) for pattern in ('scripts/eval/controller*.py', 'scripts/training/controller*.py', 'scripts/training/objective.py', 'scripts/recurrent_qwen/interfaces.py', 'scripts/eval/pointer_task.py', 'scripts/eval/tracking.py', 'audit_controller.sh') for p in Path('.').glob(pattern)},
+        **provenance, 'source_sha256': {str(p): sha256_file(p) for pattern in ('scripts/eval/controller*.py', 'scripts/training/controller*.py', 'scripts/training/objective.py', 'scripts/recurrent_qwen/interfaces.py', 'scripts/eval/pointer_task.py', 'scripts/eval/tracking.py', 'scripts/launch/audit_controller.sh') for p in Path('.').glob(pattern)},
         'target_semantics': 'N-t only through N; initialization t=0; exact stopping requires first stop at N',
         'limitations': ['Raw gradients, not Adam updates; no optimizer moments applied.',
             'Held-out-count gradients are retrospective diagnostics, never training or checkpoint selection.',

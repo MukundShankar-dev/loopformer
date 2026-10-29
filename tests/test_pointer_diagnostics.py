@@ -1,6 +1,7 @@
 """Risk-set, paired-intervention, and profiling contracts on tiny local models."""
 
 import csv
+from launchers import stage_launcher
 import json
 from pathlib import Path
 import subprocess
@@ -490,7 +491,7 @@ def test_rule_boundary_includes_merged_closing_parenthesis_and_newline():
 def test_control_shell_logs_and_stops_on_failure(tmp_path):
     import os
     import shutil
-    shutil.copy(ROOT/'probe_controls.sh',tmp_path/'probe_controls.sh')
+    stage_launcher('probe_controls.sh', tmp_path)
     (tmp_path/'.venv/bin').mkdir(parents=True)
     (tmp_path/'.venv/bin/activate').write_text('')
     checkpoint=tmp_path/'models/stage1_pointer/depth6-fresh30k-seed37-batch4/step-002500'
@@ -501,9 +502,9 @@ def test_control_shell_logs_and_stops_on_failure(tmp_path):
     stub.write_text('#!/usr/bin/env bash\necho "stub call $*"\necho "stub stderr" >&2\nexit "${PROBE_TEST_EXIT:-0}"\n')
     stub.chmod(0o755)
     env={**os.environ,'PATH':str(stub.parent)+os.pathsep+os.environ['PATH']}
-    success=subprocess.run(['bash','probe_controls.sh'],cwd=tmp_path,env=env,capture_output=True,text=True)
+    success=subprocess.run(['bash','scripts/launch/probe_controls.sh'],cwd=tmp_path,env=env,capture_output=True,text=True)
     assert success.returncode==0 and success.stdout.count('stub call')==2
-    failure=subprocess.run(['bash','probe_controls.sh'],cwd=tmp_path,env={**env,'PROBE_TEST_EXIT':'7'},capture_output=True,text=True)
+    failure=subprocess.run(['bash','scripts/launch/probe_controls.sh'],cwd=tmp_path,env={**env,'PROBE_TEST_EXIT':'7'},capture_output=True,text=True)
     assert failure.returncode==7 and failure.stdout.count('stub call')==1
     logs=list((tmp_path/'eval/pointer_probes').glob('*/run.log'))
     assert len(logs)==2 and all('stub stderr' in p.read_text() for p in logs)

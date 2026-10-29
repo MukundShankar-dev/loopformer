@@ -3,6 +3,7 @@
 # Local Python virtual environments and bytecode
 .venv/
 venv/
+.venv-probe/
 __pycache__/
 *.py[cod]
 .pytest_cache/
