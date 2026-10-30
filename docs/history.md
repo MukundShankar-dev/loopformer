@@ -385,7 +385,7 @@ were added. (Corrected the same day: the bool-vs-int cases among them were
 removed when the agreement check below showed EvalPlus counts `1 == True` as
 a match; the float-tolerance case still catches the mutation.) Throughput on 60 trivial stdio cases (one warmup grade excluded, wall time of `grade`): 65.7 ms per case with 1 worker, 18.4 ms with 4.
 
-**2026-10-30 – MBPP+ baseline, pinned Qwen2.5-Coder-0.5B-Instruct** (COMMIT).
+**2026-10-30 – MBPP+ baseline, pinned Qwen2.5-Coder-0.5B-Instruct** (`848673a`).
 `scripts/launch/mbpp_baseline.sh`: official EvalPlus 0.3.1 codegen with vLLM
 0.32 (GPU share 0.3), then official evaluation inside the sandbox. The first
 sampled evaluation was OOM-killed at 8 GB with 4 workers, because EvalPlus
@@ -398,7 +398,7 @@ HumanEval+ and LiveCodeBench are not run. An earlier EvalPlus HF-backend
 attempt was abandoned at about 3 problems per minute (CPU-bound).
 `eval/codeprobe/mbpp-coder-0.5b-20261030/`.
 
-**2026-10-30 – MBPP+ in our grader** (COMMIT). `scripts.codetasks.mbppplus`
+**2026-10-30 – MBPP+ in our grader** (`848673a`). `scripts.codetasks.mbppplus`
 converts 365 of 378 tasks (39,539 hidden cases). Excluded: 12 special-oracle
 tasks and Mbpp/255, whose reference was OOM-killed at 2 GB
 (`data/agent/mbppplus-v0.2.0.excluded.json`). Values cross the sandbox as
@@ -410,7 +410,7 @@ for expected `True`) showed EvalPlus uses Python `==`. The grader now does
 too: numbers compare by value, and tagged tuples still differ from lists.
 `eval/codeprobe/mbpp-coder-0.5b-20261030/greedy/agreement/`.
 
-**2026-10-30 – Agent tool loop** (COMMIT). [scripts/agent/](../scripts/agent/):
+**2026-10-30 – Agent tool loop** (`848673a`). [scripts/agent/](../scripts/agent/):
 xgrammar-constrained turns (thought line, then `run_python`, `run_public_tests`
 or `submit`; only `submit` on the last turn), one KV cache per episode, FLOPs
 counted per processed token, and observations tokenized with special tokens
