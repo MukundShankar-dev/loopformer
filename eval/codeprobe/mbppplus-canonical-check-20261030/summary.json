@@ -1,0 +1,8 @@
+{
+  "samples": 365,
+  "skipped_excluded_tasks": 13,
+  "ours_pass_rate": 1.0,
+  "outcomes": {
+    "pass": 365
+  }
+}

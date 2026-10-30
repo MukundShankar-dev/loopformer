@@ -56,13 +56,14 @@ class Limits:
     cpu_seconds: int = 10  # per process; SIGXCPU at the limit, SIGKILL one second later
     memory_bytes: int = 512 << 20  # whole scope, including tmpfs pages; swap is disabled
     processes: int = 64  # tasks (processes and threads) in the scope
+    cpus: int = 1  # CPU quota of the whole scope, in cores
     file_bytes: int = 16 << 20  # largest file any process may write, stdout and stderr included
     tmpfs_bytes: int = 64 << 20  # each of /work, /tmp and /dev/shm
     open_files: int = 256
     output_bytes: int = 64 << 10  # stdout and stderr returned to the caller, each
 
     def __post_init__(self) -> None:
-        if self.wall_seconds <= 0 or self.cpu_seconds < 1 or self.processes < 2:
+        if self.wall_seconds <= 0 or self.cpu_seconds < 1 or self.processes < 2 or self.cpus < 1:
             raise ValueError(f"Limits too small to run anything: {self}")
 
 
@@ -176,7 +177,7 @@ def run(files: Mapping[str, str], entry: str = "main.py", stdin: str = "", limit
             argv = [
                 "systemd-run", "--user", "--scope", "--quiet", f"--unit={unit}",
                 "-p", f"MemoryMax={limits.memory_bytes}", "-p", "MemorySwapMax=0",
-                "-p", f"TasksMax={limits.processes}", "-p", "CPUQuota=100%",
+                "-p", f"TasksMax={limits.processes}", "-p", f"CPUQuota={100 * limits.cpus}%",
                 # Backstop if this process dies before it can enforce the wall limit.
                 "-p", f"RuntimeMaxSec={int(limits.wall_seconds) + 5}",
                 "prlimit", f"--cpu={limits.cpu_seconds}:{limits.cpu_seconds + 1}",

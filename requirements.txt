@@ -11,6 +11,8 @@ numpy==2.4.6
 rich==15.0.0
 pytest==9.1.1
 wandb==0.30.0
+# v2 agent: grammar-constrained decoding of tool calls.
+xgrammar==0.2.8
 
 # Standalone scientific figure exports for the frozen evaluation suite.
 matplotlib==3.11.2

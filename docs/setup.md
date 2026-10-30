@@ -56,7 +56,7 @@ Install each one with `--constraint requirements.txt` so the research pins are k
 | [demo/requirements-inference.txt](../demo/requirements-inference.txt) | the research inference pins | published model repo (`requirements.txt` there) |
 | [demo/hf_space/requirements.txt](../demo/hf_space/requirements.txt) | **torch 2.13.0** (the ZeroGPU limit), plus gradio, `spaces`, websockets | Hugging Face Space (Python 3.12) |
 
-The v2 headroom probe uses its own environment, `.venv-probe` (gitignored), not the research one, because EvalPlus and LiveCodeBench pin their own torch/vLLM stacks. Install steps are at the top of [requirements-probe.txt](../requirements-probe.txt). Pin exact versions there on first install.
+The v2 headroom probe uses its own environment, `.venv-probe` (gitignored), because vLLM pins its own torch (2.13.0+cu130, which supports the 5070 Ti). Install steps and pins are in [requirements-probe.txt](../requirements-probe.txt). On the desktop, vLLM needs `VLLM_USE_FLASHINFER_SAMPLER=0`, because FlashInfer's JIT wants `nvcc`. EvalPlus's HF backend works, but it is CPU-bound by per-token stop-string decoding, at about 3 MBPP problems per minute. The v2 agent's constrained decoding needs `xgrammar` in the research environment (pinned in `requirements.txt`).
 
 ## Model files
 

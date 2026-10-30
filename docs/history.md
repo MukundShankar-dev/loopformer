@@ -380,9 +380,48 @@ success, exiting early, always-equal objects, patching the harness's encoder,
 writing to the result channel, crash-inducing JSON, and searching memory,
 files and `/proc` for the expected value (a control with the value given as
 input finds it). Seven naive-grader mutations are each caught; grading with
-Python `==` was missed at first, so cases where `==` gives the wrong verdict
-were added. Throughput on 60 trivial stdio cases (one warmup grade excluded, wall time of `grade`): 65.7 ms per case with 1 worker, 18.4 ms with 4. Tool loop not yet
-written.
+Python `==` was missed at first, so cases where `==` gives a different verdict
+were added. (Corrected the same day: the bool-vs-int cases among them were
+removed when the agreement check below showed EvalPlus counts `1 == True` as
+a match; the float-tolerance case still catches the mutation.) Throughput on 60 trivial stdio cases (one warmup grade excluded, wall time of `grade`): 65.7 ms per case with 1 worker, 18.4 ms with 4.
+
+**2026-10-30 – MBPP+ baseline, pinned Qwen2.5-Coder-0.5B-Instruct** (COMMIT).
+`scripts/launch/mbpp_baseline.sh`: official EvalPlus 0.3.1 codegen with vLLM
+0.32 (GPU share 0.3), then official evaluation inside the sandbox. The first
+sampled evaluation was OOM-killed at 8 GB with 4 workers, because EvalPlus
+lets each sample use 4 GB. It was rerun with 2 workers and 10 GB (the setting
+now in the launcher); greedy used 4 workers. Greedy MBPP 51.3%, MBPP+ 43.4%
+(378 tasks), against 52.4 / 43.7 in the Qwen2.5-Coder report (Table 16). n=16
+at T=0.8 on MBPP+: pass@1 41.1%, pass@16 68.0%; always / sometimes / never
+solved 15.3 / 52.6 / 32.0%. That clears the M0a thresholds on MBPP+ only;
+HumanEval+ and LiveCodeBench are not run. An earlier EvalPlus HF-backend
+attempt was abandoned at about 3 problems per minute (CPU-bound).
+`eval/codeprobe/mbpp-coder-0.5b-20261030/`.
+
+**2026-10-30 – MBPP+ in our grader** (COMMIT). `scripts.codetasks.mbppplus`
+converts 365 of 378 tasks (39,539 hidden cases). Excluded: 12 special-oracle
+tasks and Mbpp/255, whose reference was OOM-killed at 2 GB
+(`data/agent/mbppplus-v0.2.0.excluded.json`). Values cross the sandbox as
+tagged JSON, so tuples, sets and complex numbers survive. All 365 canonical
+solutions pass every hidden case (`eval/codeprobe/mbppplus-canonical-check-20261030/`).
+Our grader against EvalPlus on the 365 greedy samples: 365/365 verdicts agree (160 pass, 205 fail). The first
+pass gave 364/365; the one disagreement (Mbpp/167, a sample returning `1`
+for expected `True`) showed EvalPlus uses Python `==`. The grader now does
+too: numbers compare by value, and tagged tuples still differ from lists.
+`eval/codeprobe/mbpp-coder-0.5b-20261030/greedy/agreement/`.
+
+**2026-10-30 – Agent tool loop** (COMMIT). [scripts/agent/](../scripts/agent/):
+xgrammar-constrained turns (thought line, then `run_python`, `run_public_tests`
+or `submit`; only `submit` on the last turn), one KV cache per episode, FLOPs
+counted per processed token, and observations tokenized with special tokens
+split. A 5-problem smoke run found two format problems, both fixed. A 300-char
+thought cap cut sentences, after which the model wrote prose into code. The
+grammar banned the fence-plus-newline token, so the model emitted mangled
+fences and ran to the token cap. Greedy on the first 20 problems, fp32, before
+the grader's `==` fix: single-turn 7/20 solved, 0.26 TFLOPs per episode;
+interaction (4 turns) 7/20 solved, 0.63 TFLOPs, 13 submitted, 6 forced, 1
+truncated (a repetition loop). Twenty problems cannot separate the conditions.
+`eval/agent/smoke-mbppplus20-20261030/`.
 
 ## Artifacts and where things live
 

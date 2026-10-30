@@ -14,7 +14,9 @@ Two kinds of tests:
   whitespace-separated tokens, with numeric tokens compared as decimals
   (modelled on LiveCodeBench's checker).
 - `call`: input is a JSON array of arguments to `function`; expected is the
-  JSON return value, compared structurally, with floats within `atol`.
+  return value. Both use the tagged JSON of scripts/sandbox/values.py, so
+  tuples and sets survive. Values are compared structurally, with floats
+  within `atol` or a relative 1e-7 (as EvalPlus does).
 """
 import dataclasses
 import json
@@ -29,6 +31,8 @@ from typing import Literal
 from scripts.sandbox.runner import Limits, RunResult, run
 
 HARNESS = (Path(__file__).parent / "call_harness.py").read_text()
+VALUES = (Path(__file__).parent / "values.py").read_text()
+FLOAT_RELATIVE_TOLERANCE = 1e-7
 SYNTAX_CHECK = """\
 import sys
 try:
@@ -140,13 +144,13 @@ def same_stdout(expected: str, actual: str) -> bool:
 
 
 def same_value(expected, actual, atol: float) -> bool:
-    """Structural equality that recurses along `expected`, so the depth of an
-    adversarial `actual` cannot exhaust the host's stack."""
-    if isinstance(expected, bool) or isinstance(actual, bool):
-        return type(expected) is type(actual) and expected == actual
-    if isinstance(expected, (int, float)) and isinstance(actual, (int, float)):
+    """Python `==` on encoded values (as EvalPlus checks), with float tolerance.
+    Numbers compare by value, so `True == 1` as in Python; tagged tuples and
+    lists differ, as they do under `==`. Recurses along `expected`, so the depth
+    of an adversarial `actual` cannot exhaust the host's stack."""
+    if isinstance(expected, (bool, int, float)) and isinstance(actual, (bool, int, float)):
         if isinstance(expected, float) or isinstance(actual, float):
-            return math.isclose(expected, actual, rel_tol=0.0, abs_tol=atol) or expected == actual
+            return math.isclose(expected, actual, rel_tol=FLOAT_RELATIVE_TOLERANCE, abs_tol=atol) or expected == actual
         return expected == actual
     if isinstance(expected, list):
         return (isinstance(actual, list) and len(expected) == len(actual)
@@ -177,7 +181,8 @@ def run_case(solution: str, tests: Tests, case: TestCase, limits: Limits) -> Tes
         result = run({"solution.py": solution}, entry="solution.py", stdin=case.input, limits=limits)
     else:
         request = json.dumps({"function": tests.function, "arguments": json.loads(case.input)})
-        result = run({"solution.py": solution, "harness.py": HARNESS}, entry="harness.py", stdin=request, limits=limits)
+        files = {"solution.py": solution, "harness.py": HARNESS, "values.py": VALUES}
+        result = run(files, entry="harness.py", stdin=request, limits=limits)
     outcome = failure(result)
     if outcome is None:
         if result.stdout_truncated:

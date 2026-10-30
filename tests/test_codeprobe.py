@@ -66,19 +66,22 @@ def test_cli_writes_summary_and_refuses_overwrite(tmp_path):
     assert again.returncode != 0 and "Output exists" in again.stderr
 
 
-def test_probe_commands_sandbox_execution_and_refuse_unsafe_runs(tmp_path):
+def test_probe_commands_execute_samples_only_in_the_sandbox(tmp_path):
     from scripts.codeprobe.commands import build_commands, load_config
     config = load_config(Path('configs/probe_headroom.json'))
-    steps = build_commands({**config, 'sandbox_prefix': ['sandbox']})
-    assert all(not s['sandbox'] for s in steps if s['argv'][0] == 'hf')
-    assert all(s['sandbox'] for s in steps if s['argv'][0] != 'hf')
+    steps = build_commands(config)
+    assert {s['kind'] for s in steps if 'evaluate' in ' '.join(s['argv'])} == {'sandbox'}
+    assert all(s['argv'][2] == 'scripts.codeprobe.evaluate_sandboxed' for s in steps if s['kind'] == 'sandbox')
+    assert not any('--evaluate' in s['argv'] for s in steps)  # LiveCodeBench's in-process evaluation
+    assert all(m['revision'] in ' '.join(s['argv']) for m in config['models'] for s in steps
+               if s['kind'] == 'gpu' and m['name'] in s['name'])
     assert sum('--greedy' in s['argv'] for s in steps) == len(config['models']) * len(config['evalplus_datasets'])
     path = tmp_path / 'probe.json'
-    for change, message in (({}, 'Pin model revisions'),
-                            ({'models': [{'name': 'm', 'id': 'org/m', 'revision': 'abc'}]}, 'Set sandbox_prefix')):
+    for change, message in (({'models': [{'name': 'm', 'id': 'org/m', 'revision': None}]}, 'Pin model revisions'),
+                            ({'output': str(tmp_path)}, 'exists')):
         path.write_text(json.dumps({**config, **change}))
         result = subprocess.run([sys.executable, '-m', 'scripts.codeprobe.commands', '--config', str(path), '--run'],
                                 capture_output=True, text=True)
         assert result.returncode != 0 and message in result.stderr
     dry = subprocess.run([sys.executable, '-m', 'scripts.codeprobe.commands'], capture_output=True, text=True, check=True)
-    assert 'lcb_runner.runner.main' in dry.stdout and 'evalplus.evaluate' in dry.stdout
+    assert 'lcb_runner.runner.main' in dry.stdout and 'evaluate_sandboxed' in dry.stdout

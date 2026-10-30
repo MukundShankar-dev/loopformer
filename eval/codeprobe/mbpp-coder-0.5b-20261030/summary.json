@@ -1,0 +1,23 @@
+{
+  "since": null,
+  "benchmarks": {
+    "coder-0.5b/mbpp-greedy": {
+      "problems": 378,
+      "samples_per_problem": 1,
+      "always_solved": 0.43386243386243384,
+      "sometimes_solved": 0.0,
+      "never_solved": 0.5661375661375662,
+      "pass@1": 0.43386243386243384
+    },
+    "coder-0.5b/mbpp-n16-t0.8": {
+      "problems": 378,
+      "samples_per_problem": 16,
+      "always_solved": 0.15343915343915343,
+      "sometimes_solved": 0.5264550264550265,
+      "never_solved": 0.3201058201058201,
+      "pass@1": 0.41087962962962965,
+      "pass@4": 0.5704241525670097,
+      "pass@16": 0.6798941798941799
+    }
+  }
+}

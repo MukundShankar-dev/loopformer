@@ -170,8 +170,9 @@ are used for analysis, not reward shaping, unless an ablation justifies it.
 Help text and standard-library source are available inside `run_python`.
 Library documentation is mounted read-only if a task needs it.
 
-**Format:** each turn is an optional short diagnosis line, capped in tokens
-and counted in FLOPs, followed by exactly one tool call.
+**Format:** each turn is an optional short diagnosis line, capped in length
+and counted in FLOPs, followed by exactly one tool call. On the last turn only
+`submit` is allowed, so every untruncated episode ends with a submission.
 
 **Constrained decoding:** generation is restricted to this grammar, so an
 invalid tool call is impossible rather than unlikely. This removes the need

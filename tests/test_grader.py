@@ -11,6 +11,7 @@ from sandbox_marks import needs_sandbox
 from scripts.sandbox.grader import (
     TestCase, Tests, exception_type, failure, grade, parse_value, same_stdout, same_value)
 from scripts.sandbox.runner import Limits, RunResult
+from scripts.sandbox.values import decode, encode
 
 
 def stdio(*pairs: tuple[str, str]) -> Tests:
@@ -18,7 +19,8 @@ def stdio(*pairs: tuple[str, str]) -> Tests:
 
 
 def call(function: str, *pairs: tuple[list, object], atol: float = 0.0) -> Tests:
-    return Tests("call", tuple(TestCase(json.dumps(a), json.dumps(e)) for a, e in pairs), function=function, atol=atol)
+    cases = tuple(TestCase(json.dumps(encode(a)), json.dumps(encode(e))) for a, e in pairs)
+    return Tests("call", cases, function=function, atol=atol)
 
 
 def observed(exit_code: int = 0, stderr: str = "", timed_out: bool = False, oom_killed: bool = False) -> RunResult:
@@ -39,12 +41,22 @@ def test_stdout_comparison_ignores_spacing_and_numeric_formatting_only():
     assert not same_stdout("NaN\n", "nan\n") and not same_stdout("1\n", "")
 
 
+def test_tagged_values_round_trip_and_keep_types_distinct():
+    for value in [(1, [2, (3,)]), {3, 1, 2}, {"a": (1,), (1, 2): {4}}, {"__tuple__": 1}, 1 + 2j, [], (), 1.5, None, "x"]:
+        assert decode(encode(value)) == value and type(decode(encode(value))) is type(value)
+    assert encode((1, 2)) != encode([1, 2]) and encode({1, "a"}) == encode({"a", 1})
+    with pytest.raises(TypeError, match="object"):
+        encode(object())
+
+
 def test_value_comparison_is_strict_about_types_and_tolerant_only_for_floats():
     assert same_value([1, [2, {"a": None}]], [1, [2, {"a": None}]], 0.0)
-    assert not same_value(1, True, 0.0) and not same_value(True, 1, 0.0)
+    assert same_value(1, True, 0.0) and same_value([True], [1], 0.0)  # Python ==, which EvalPlus uses
+    assert not same_value(2, True, 0.0)
     assert not same_value("1", 1, 0.0) and not same_value([1], [1, 1], 0.0)
     assert not same_value({"a": 1}, {"a": 1, "b": 2}, 0.0)
-    assert same_value(0.3, 0.1 + 0.2, 1e-9) and not same_value(0.3, 0.1 + 0.2, 0.0)
+    assert same_value(0.3, 0.1 + 0.2, 0.0)  # within EvalPlus's relative 1e-7
+    assert same_value(1.0, 1.0 + 1e-3, 1e-2) and not same_value(1.0, 1.0 + 1e-3, 0.0)
     assert same_value(2, 2.0, 0.0)
 
 
@@ -99,13 +111,13 @@ def test_call_grading_function_and_solution_class_styles():
     assert grade("def add(a, b):\n    print('debug output')\n    return a + b", SUM).outcome == "pass"
     leetcode = "class Solution:\n    def add(self, a, b):\n        return a + b"
     assert grade(leetcode, SUM).outcome == "pass"
-    shapes = call("f", (["tuple"], [1, 2]), (["set"], [1, 2, 3]))
-    solution = "def f(kind):\n    return (1, 2) if kind == 'tuple' else {3, 1, 2}"
-    assert grade(solution, shapes).outcome == "pass"  # tuples and sets arrive as lists
-    # Where Python's == would give the wrong verdict:
-    assert grade("def f(): return 1", call("f", ([], True))).outcome == "wrong_answer"
-    assert grade("def f(): return True", call("f", ([], 1))).outcome == "wrong_answer"
-    assert grade("def f(): return 0.1 + 0.2", call("f", ([], 0.3), atol=1e-9)).outcome == "pass"
+    shapes = call("f", (["tuple"], (1, 2)), (["set"], {1, 2, 3}), (["dict"], {(1, 2): "a"}), ([(5, 6)], [5, 6]))
+    solution = "def f(kind):\n    return {'tuple': (1, 2), 'set': {3, 1, 2}, 'dict': {(1, 2): 'a'}}.get(kind) or list(kind)"
+    assert grade(solution, shapes).outcome == "pass"  # tuple arguments and results survive the boundary
+    assert grade("def f(kind): return [1, 2]", call("f", (["tuple"], (1, 2)))).outcome == "wrong_answer"
+    # Where Python's == would give a different verdict: floats within tolerance.
+    assert grade("def f(): return 1.001", call("f", ([], 1.0), atol=1e-2)).outcome == "pass"
+    assert grade("def f(): return 1.001", call("f", ([], 1.0))).outcome == "wrong_answer"
 
 
 @needs_sandbox

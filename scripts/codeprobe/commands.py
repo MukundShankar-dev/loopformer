@@ -1,12 +1,13 @@
 """Build, print or run the headroom-probe commands from configs/probe_headroom.json.
 
-Generation and grading use the official EvalPlus and LiveCodeBench tools, so
-base-model numbers are comparable with published ones. Model weights are
-downloaded first; tool runs then use HF_HUB_OFFLINE=1 inside `sandbox_prefix`
-(for example a no-network container), because both tools execute model code.
-
-The tool flags follow their documentation as of writing and are unverified
-here; check `--dry-run` output against the installed versions before `--run`.
+Generation uses the official tools on the host (it executes no model code):
+EvalPlus codegen through scripts/codeprobe/codegen.py, which caps vLLM's GPU
+share, and LiveCodeBench's runner without `--evaluate`. EvalPlus evaluation,
+which executes the samples, runs inside the sandbox
+(scripts/codeprobe/evaluate_sandboxed.py). LiveCodeBench evaluation also
+executes code and has no sandboxed wrapper yet, so it is not among the steps.
+Models load from pinned local snapshots. The LiveCodeBench flags follow its
+documentation and are unverified here; check the printed commands first.
 """
 import argparse
 import json
@@ -17,7 +18,7 @@ from pathlib import Path
 
 def load_config(path: Path) -> dict:
     config = json.loads(path.read_text())
-    for key in ("output", "models", "samples", "temperature", "evalplus_datasets", "livecodebench", "sandbox_prefix", "threads"):
+    for key in ("output", "models", "samples", "temperature", "evalplus_datasets", "livecodebench", "threads"):
         if key not in config:
             raise ValueError(f"{path}: missing {key}")
     if config["samples"] < 16:
@@ -25,25 +26,45 @@ def load_config(path: Path) -> dict:
     return config
 
 
+def snapshot(model: dict) -> Path:
+    org, name = model["id"].split("/")
+    return Path.home() / ".cache/huggingface/hub" / f"models--{org}--{name}" / "snapshots" / str(model["revision"])
+
+
 def build_commands(config: dict) -> list[dict]:
-    """Ordered steps: download (network), then sampled and greedy runs (sandboxed)."""
+    """Ordered steps; `network` steps download, `gpu` steps generate, the rest execute samples in the sandbox."""
     out, n, t = Path(config["output"]), str(config["samples"]), str(config["temperature"])
-    lcb = config["livecodebench"]
     steps = []
     for model in config["models"]:
         revision = ["--revision", model["revision"]] if model["revision"] else []
-        steps.append({"name": f"download {model['name']}", "sandbox": False,
+        steps.append({"name": f"download {model['name']}", "kind": "network",
                       "argv": ["hf", "download", model["id"], *revision]})
+        path = str(snapshot(model))
         for dataset in config["evalplus_datasets"]:
-            root = str(out / "evalplus" / model["name"])
-            base = ["evalplus.evaluate", "--model", model["id"], "--dataset", dataset, "--backend", "hf", "--root", root]
-            steps.append({"name": f"evalplus {dataset} greedy {model['name']}", "sandbox": True, "argv": [*base, "--greedy"]})
-            steps.append({"name": f"evalplus {dataset} n={n} {model['name']}", "sandbox": True,
-                          "argv": [*base, "--n_samples", n, "--temperature", t]})
-        steps.append({"name": f"livecodebench n={n} {model['name']}", "sandbox": True,
-                      "argv": ["python", "-m", "lcb_runner.runner.main", "--model", model["id"], "--scenario", "codegeneration",
-                               "--evaluate", "--release_version", lcb["release_version"], "--n", n, "--temperature", t]})
+            for label, flags in [("greedy", ["--greedy"]), (f"n{n}", ["--n_samples", n, "--temperature", t, "--bs", n])]:
+                root = out / "evalplus" / model["name"] / dataset / label
+                steps.append({"name": f"evalplus codegen {dataset} {label} {model['name']}", "kind": "gpu",
+                              "argv": ["python", "-m", "scripts.codeprobe.codegen", "--model", path, "--dataset", dataset,
+                                       "--backend", "vllm", *flags, "--root", str(root)]})
+                steps.append({"name": f"evalplus evaluate {dataset} {label} {model['name']}", "kind": "sandbox",
+                              "argv": ["python", "-m", "scripts.codeprobe.evaluate_sandboxed", "--dataset", dataset,
+                                       "--samples", f"{root}/{dataset}/*_temp_*[0-9].jsonl",
+                                       "--output", str(root / "eval_results.json"), "--parallel", "2", "--memory-gb", "10"]})
+        steps.append({"name": f"livecodebench codegen n={n} {model['name']}", "kind": "gpu",
+                      "argv": ["python", "-m", "lcb_runner.runner.main", "--model", model["id"], "--local_model_path", path,
+                               "--scenario", "codegeneration", "--release_version", config["livecodebench"]["release_version"],
+                               "--n", n, "--temperature", t]})
     return steps
+
+
+def resolve(argument: str) -> str:
+    """Expand the samples glob, which names codegen's output file, once that file exists."""
+    if "*" not in argument:
+        return argument
+    matches = sorted(Path("/").glob(argument.lstrip("/")) if argument.startswith("/") else Path().glob(argument))
+    if len(matches) != 1:
+        raise FileNotFoundError(f"expected one file matching {argument}, found {len(matches)}")
+    return str(matches[0])
 
 
 def main() -> None:
@@ -57,16 +78,16 @@ def main() -> None:
         unpinned = [m["id"] for m in config["models"] if not m["revision"]]
         if unpinned:
             parser.error(f"Pin model revisions in {args.config} before running: {unpinned}")
-        if not config["sandbox_prefix"]:
-            parser.error("Set sandbox_prefix: both tools execute model-generated code")
         if Path(config["output"]).exists():
             parser.error(f"{config['output']} exists; choose a new output")
-    env = {**os.environ, "OMP_NUM_THREADS": str(config["threads"]), "MKL_NUM_THREADS": str(config["threads"])}
+    threads = str(config["threads"])
+    environment = {**os.environ, "OMP_NUM_THREADS": threads, "MKL_NUM_THREADS": threads,
+                   "VLLM_USE_FLASHINFER_SAMPLER": "0"}  # its JIT needs nvcc, which the desktop lacks
     for step in steps:
-        argv = [*config["sandbox_prefix"], *step["argv"]] if step["sandbox"] else step["argv"]
-        print(f"# {step['name']}\n{' '.join(argv)}")
+        print(f"# {step['name']} [{step['kind']}]\n{' '.join(step['argv'])}")
         if args.run:
-            subprocess.run(argv, check=True, env={**env, **({"HF_HUB_OFFLINE": "1"} if step["sandbox"] else {})})
+            offline = {} if step["kind"] == "network" else {"HF_HUB_OFFLINE": "1"}
+            subprocess.run([resolve(argument) for argument in step["argv"]], check=True, env={**environment, **offline})
 
 
 if __name__ == "__main__":

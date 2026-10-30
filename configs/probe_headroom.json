@@ -1,14 +1,31 @@
 {
   "output": "eval/codeprobe/headroom-v1",
   "models": [
-    {"name": "coder-0.5b", "id": "Qwen/Qwen2.5-Coder-0.5B-Instruct", "revision": null},
-    {"name": "coder-1.5b", "id": "Qwen/Qwen2.5-Coder-1.5B-Instruct", "revision": null},
-    {"name": "qwen-0.5b", "id": "Qwen/Qwen2.5-0.5B-Instruct", "revision": "7ae557604adf67be50417f59c2c2f167def9a775"}
+    {
+      "name": "coder-0.5b",
+      "id": "Qwen/Qwen2.5-Coder-0.5B-Instruct",
+      "revision": "ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+    },
+    {
+      "name": "coder-1.5b",
+      "id": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+      "revision": "2e1fd397ee46e1388853d2af2c993145b0f1098a"
+    },
+    {
+      "name": "qwen-0.5b",
+      "id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "revision": "7ae557604adf67be50417f59c2c2f167def9a775"
+    }
   ],
   "samples": 16,
   "temperature": 0.8,
-  "evalplus_datasets": ["humaneval", "mbpp"],
-  "livecodebench": {"release_version": "release_v6", "since": "2025-01-01"},
-  "sandbox_prefix": [],
+  "evalplus_datasets": [
+    "humaneval",
+    "mbpp"
+  ],
+  "livecodebench": {
+    "release_version": "release_v6",
+    "since": "2025-01-01"
+  },
   "threads": 2
 }

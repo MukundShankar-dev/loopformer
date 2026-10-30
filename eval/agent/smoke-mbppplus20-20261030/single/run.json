@@ -1,0 +1,16 @@
+{
+  "model": "/home/mukund/.cache/huggingface/hub/models--Qwen--Qwen2.5-Coder-0.5B-Instruct/snapshots/ea3f2471cf1b1f0db85067f1ef93848e38e88c25",
+  "problems": "data/agent/mbppplus-v0.2.0.jsonl",
+  "condition": "single",
+  "max_turns": 1,
+  "temperature": 0.0,
+  "top_p": 1.0,
+  "max_turn_tokens": 1024,
+  "seeds": [
+    0
+  ],
+  "limit": 20,
+  "dtype": "float32",
+  "device": "cuda",
+  "output": "/tmp/lfagent/single/episodes.jsonl"
+}

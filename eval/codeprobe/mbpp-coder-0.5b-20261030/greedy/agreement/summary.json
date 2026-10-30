@@ -1,0 +1,25 @@
+{
+  "samples": 365,
+  "skipped_excluded_tasks": 13,
+  "ours_pass_rate": 0.4383561643835616,
+  "outcomes": {
+    "wrong_answer": 161,
+    "pass": 160,
+    "runtime_error:TypeError": 13,
+    "runtime_error:AttributeError": 7,
+    "runtime_error:ZeroDivisionError": 1,
+    "runtime_error:AssertionError": 3,
+    "runtime_error:IndexError": 7,
+    "runtime_error:NameError": 6,
+    "timeout": 2,
+    "runtime_error:ValueError": 4,
+    "runtime_error:RecursionError": 1
+  },
+  "evalplus_pass_rate": 0.4383561643835616,
+  "agreement": 1.0,
+  "both_pass": 160,
+  "both_fail": 205,
+  "ours_only": 0,
+  "evalplus_only": 0,
+  "disagreements": []
+}

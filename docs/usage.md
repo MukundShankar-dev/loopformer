@@ -141,19 +141,31 @@ python -m scripts.demo --model HF_REPO_ID [--revision REV] --request request.jso
 
 `deploy` refuses any weights whose hash differs from the final hash. It uploads the checkpoint, `scripts/recurrent_qwen`, `scripts/dataset`, the runtime parts of `scripts/demo`, `demo/requirements-inference.txt` and [the model card](../demo/hf_model_card.md). The Space runs `demo/hf_space/app.py`. The static client is `demo/web/` (`config.json` names the Space and the proxy).
 
-## Code headroom probe (v2 M0a, prepared, not run)
+## Code headroom probe (v2 M0a)
 
-See [plan milestones](plan.md#milestones-and-gates) (M0a) for the gate, and check the `--dry-run` flags against the installed tool versions before running.
+Run with the probe environment ([setup](setup.md)). Generation runs on the host GPU, and EvalPlus evaluation runs inside the sandbox.
 
 ```sh
-python -m scripts.codeprobe.commands                  # print every step from configs/probe_headroom.json
+scripts/launch/mbpp_baseline.sh                      # MBPP+ greedy and n=16 for pinned Coder-0.5B, then the summary
+python -m scripts.codeprobe.commands                 # print every step of the full probe (configs/probe_headroom.json)
 .venv-probe/bin/python -m scripts.codeprobe.commands --run
-python -m scripts.codeprobe.headroom --since 2025-01-01 \
-  --evalplus coder-0.5b/humaneval=<eval_results.json> \
-  --livecodebench coder-0.5b=<eval_all.json> --output eval/codeprobe/headroom-v1/summary.json
+python -m scripts.codeprobe.headroom --evalplus NAME=<eval_results.json> --output <summary.json>
 ```
 
-`--run` refuses unpinned model revisions, an empty `sandbox_prefix` and an existing output directory. The summary reports, per benchmark, the always/sometimes/never-solved fractions and unbiased pass@1/4/16.
+`--run` refuses unpinned model revisions and an existing output directory. LiveCodeBench steps generate only: its evaluation executes code and has no sandboxed wrapper yet. The summary reports, per benchmark, the always/sometimes/never-solved fractions and unbiased pass@1/4/16.
+
+## Agent problems, grader agreement and episodes (v2 M0b)
+
+```sh
+.venv-probe/bin/python -m scripts.codetasks.mbppplus --output data/agent/mbppplus-v0.2.0.jsonl
+.venv-probe/bin/python -m scripts.codeprobe.agreement --problems data/agent/mbppplus-v0.2.0.jsonl \
+  --samples <codegen .jsonl> [--evalplus <eval_results.json>] --output <dir>
+python -m scripts.agent.run --model <pinned snapshot dir> --problems data/agent/mbppplus-v0.2.0.jsonl \
+  --condition single --max-turns 1 --output eval/agent/<run>/episodes.jsonl
+python -m scripts.agent.run ... --condition interaction --max-turns 4 ...
+```
+
+The converter writes the excluded tasks and reasons to `*.excluded.json` next to its output. `agreement` grades samples with our grader and, given EvalPlus results for the same samples, lists every disagreement. `scripts.agent.run` writes one JSON line per episode (turns with text, tools, outcomes and timings; FLOPs; hidden outcome) plus `run.json`.
 
 ## Tests
 
@@ -166,6 +178,7 @@ python -m pytest -q
 - Several tests read tracked `eval/` and `models/` metadata.
 - `test_depth12_compute.py` skips without CUDA.
 - `tests/test_sandbox.py` is the sandbox's adversarial suite. Most of it skips off Linux. Run it on any machine before that machine executes model-written code: `python -m pytest -q tests/test_sandbox.py tests/test_grader.py` (about 24 s). `tests/test_grader.py` covers the grader, including cheats that would beat a naive grader.
+- `tests/test_agent.py` needs the pinned Coder tokenizer in the Hugging Face cache (`hf download Qwen/Qwen2.5-Coder-0.5B-Instruct tokenizer.json tokenizer_config.json vocab.json merges.txt config.json --revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25`); its scripted-episode test also needs the sandbox.
 - Most architecture tests use a tiny random `Qwen2Config` ([tests/conftest.py](../tests/conftest.py)).
 
 ## Historical launchers
