@@ -358,7 +358,7 @@ for the executor view, trainable-tensor round-trip tests, and trace cohort delta
 [architecture](architecture.md), [usage](usage.md), [setup](setup.md) and
 [plan](plan.md). Root launchers moved to `scripts/launch/`.
 
-**2026-10-30 – v2 sandbox** (uncommitted). [scripts/sandbox/](../scripts/sandbox/):
+**2026-10-30 – v2 sandbox** (`58d0dff`). [scripts/sandbox/](../scripts/sandbox/):
 systemd user scope (memory without swap, tasks, CPU quota) → `prlimit` → bwrap
 (all namespaces, no nested user namespaces, seccomp denylist and socket-family
 allowlist, everything read-only except capped tmpfs `/work`, `/tmp`, `/dev/shm`).
