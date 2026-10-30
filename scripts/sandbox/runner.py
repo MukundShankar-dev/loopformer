@@ -69,7 +69,8 @@ class Limits:
 @dataclass(frozen=True)
 class RunResult:
     """What the host observed. `exit_code` follows bwrap: 128 + N when the
-    program was killed by signal N."""
+    program was killed by signal N. `stdout` keeps the head of the output and
+    `stderr` the tail, where a traceback ends. Both are untrusted text."""
 
     exit_code: int
     timed_out: bool
@@ -138,10 +139,12 @@ def write_files(directory: Path, files: Mapping[str, str]) -> None:
         (directory / name).write_text(text)
 
 
-def read_capped(path: Path, limit: int) -> tuple[str, bool]:
+def read_capped(path: Path, limit: int, tail: bool = False) -> tuple[str, bool]:
+    size = path.stat().st_size
     with path.open("rb") as handle:
-        data = handle.read(limit + 1)
-    return data[:limit].decode("utf-8", errors="replace"), len(data) > limit
+        handle.seek(max(0, size - limit) if tail else 0)
+        data = handle.read(limit)
+    return data.decode("utf-8", errors="replace"), size > limit
 
 
 def scope_result(unit: str) -> str:
@@ -191,7 +194,7 @@ def run(files: Mapping[str, str], entry: str = "main.py", stdin: str = "", limit
             feeder.join()
             wall = time.perf_counter() - start
         stdout, stdout_truncated = read_capped(scratch / "stdout", limits.output_bytes)
-        stderr, stderr_truncated = read_capped(scratch / "stderr", limits.output_bytes)
+        stderr, stderr_truncated = read_capped(scratch / "stderr", limits.output_bytes, tail=True)
     return RunResult(
         exit_code=os.waitstatus_to_exitcode(status), timed_out=timed_out, oom_killed=scope_result(unit) == "oom-kill",
         wall_seconds=wall, cpu_seconds=usage.ru_utime + usage.ru_stime, stdout=stdout, stderr=stderr,

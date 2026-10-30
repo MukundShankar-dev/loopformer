@@ -8,10 +8,8 @@ run that succeeds, so a pass is not "everything fails".
 """
 import errno
 import json
-import os
 import platform
 import re
-import shutil
 import socket
 import struct
 import subprocess
@@ -24,13 +22,10 @@ from pathlib import Path
 import pytest
 
 from scripts.sandbox.runner import HIDDEN_UNDER_USR, Limits, RunResult, run, validate_mounts
+from sandbox_marks import needs_sandbox
 from scripts.sandbox.seccomp import DENIED_SYSCALLS, build_filter
 
 UNISTD = Path("/usr/include/x86_64-linux-gnu/asm/unistd_64.h")
-needs_sandbox = pytest.mark.skipif(
-    platform.system() != "Linux" or platform.machine() != "x86_64" or shutil.which("bwrap") is None
-    or "DBUS_SESSION_BUS_ADDRESS" not in os.environ,
-    reason="needs Linux x86_64 with bubblewrap and a systemd user session")
 FAST = Limits(wall_seconds=5, cpu_seconds=5)
 
 

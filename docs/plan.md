@@ -206,7 +206,7 @@ for a teacher to teach the format.
 | --- | --- | --- |
 | Confirmation | LiveCodeBench problems after the cutoff (hashed ID list) | Public examples plus hidden tests; opened once per final checkpoint |
 | Development | LiveCodeBench problems before the cutoff; HumanEval+ and MBPP+ (1–2 tests made public, the rest hidden) | Tune anything here |
-| Training | Older LiveCodeBench problems, plus easy tiers of KodCode, TACO and APPS | Needs at least 3 hidden tests per problem and a reference solution that passes in our sandbox; deduplicated against every eval set |
+| Training | Older LiveCodeBench problems, plus easy tiers of KodCode, TACO and APPS | Needs at least 3 hidden tests per problem and a reference solution that passes in our sandbox; deduplicated against every eval set. Tests must be input/expected pairs (stdin/stdout or call arguments/return value), because expected values never enter the sandbox; KodCode's pytest asserts embed them and need converting first |
 | Diagnostic | CRUXEval | Not trained on |
 
 ## Training

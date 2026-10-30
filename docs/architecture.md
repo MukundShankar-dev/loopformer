@@ -168,7 +168,9 @@ Restored tensors are bitwise exact. CPU-loaded base weights may be memory-unalig
 
 ## Sandbox ([scripts/sandbox/](../scripts/sandbox/))
 
-`run(files, entry, stdin, limits, mounts)` runs `python3 -I /code/<entry>` and returns exit code (128 + N for signal N), timeout and OOM flags, wall and CPU time, and truncated stdout/stderr. CPU time counts only processes that were reaped, so it undercounts after a timeout. The layers and what the program can see are in the [runner.py](../scripts/sandbox/runner.py) docstring. Runs share nothing: each gets fresh `/work` and `/tmp`, and tools pass the full program every call. Python's `/dev/shm` is bwrap's private one, bounded by the memory limit.
+`run(files, entry, stdin, limits, mounts)` runs `python3 -I /code/<entry>` and returns exit code (128 + N for signal N), timeout and OOM flags, wall and CPU time, and truncated stdout (head) and stderr (tail). CPU time counts only processes that were reaped, so it undercounts after a timeout. The layers and what the program can see are in the [runner.py](../scripts/sandbox/runner.py) docstring. Runs share nothing: each gets fresh `/work` and `/tmp`, and tools pass the full program every call. Python's `/dev/shm` is bwrap's private one, bounded by the memory limit.
+
+`grade(solution, tests, limits, workers)` in [grader.py](../scripts/sandbox/grader.py) first compiles the solution inside the sandbox, then runs each test case as its own sandbox run given only that case's input. `stdio` cases feed stdin and compare stdout by tokens, with numbers compared as decimals. `call` cases send JSON arguments to [call_harness.py](../scripts/sandbox/call_harness.py), which returns the solution's JSON value; it is compared structurally, with bools distinct from ints and floats within `atol`. The host makes the comparison; expected values never enter the sandbox. Each case allows output up to twice the expected size. The grade is `pass` or the first failing case's class, plus the pass fraction. Failure classes are parsed from program-controlled stderr, so they are diagnostics only.
 
 ## Known limitations visible in code
 

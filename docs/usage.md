@@ -165,7 +165,7 @@ python -m pytest -q
 - `tests/test_paper_baseline.py` reads the gitignored `data/pointer/benchmark-seeds307-311-313/graphs.jsonl`. Regenerate it with the full benchmark.
 - Several tests read tracked `eval/` and `models/` metadata.
 - `test_depth12_compute.py` skips without CUDA.
-- `tests/test_sandbox.py` is the sandbox's adversarial suite. Most of it skips off Linux. Run it on any machine before that machine executes model-written code: `python -m pytest -q tests/test_sandbox.py` (about 12 s).
+- `tests/test_sandbox.py` is the sandbox's adversarial suite. Most of it skips off Linux. Run it on any machine before that machine executes model-written code: `python -m pytest -q tests/test_sandbox.py tests/test_grader.py` (about 24 s). `tests/test_grader.py` covers the grader, including cheats that would beat a naive grader.
 - Most architecture tests use a tiny random `Qwen2Config` ([tests/conftest.py](../tests/conftest.py)).
 
 ## Historical launchers

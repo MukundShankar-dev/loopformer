@@ -370,7 +370,19 @@ only Unix and IP sockets; bwrap's root and `/dev` were writable and uncapped;
 stdin was a host file the program could reopen for writing (now a pipe); WSL's
 Windows driver store (9p) was visible read-only under `/usr/lib/wsl` (now
 covered). Not covered: a kernel exploit through an allowed syscall, since bwrap
-shares the WSL kernel. Grader and tool loop not yet written.
+shares the WSL kernel.
+
+**2026-10-30 – v2 grader** (uncommitted). [grader.py](../scripts/sandbox/grader.py):
+one sandbox run per test case, comparison on the host, expected values never
+in the sandbox. `python -m pytest -q tests/test_grader.py tests/test_sandbox.py`
+on the desktop: 44 passed in 23.5 s. The cheats tested all fail: claiming
+success, exiting early, always-equal objects, patching the harness's encoder,
+writing to the result channel, crash-inducing JSON, and searching memory,
+files and `/proc` for the expected value (a control with the value given as
+input finds it). Seven naive-grader mutations are each caught; grading with
+Python `==` was missed at first, so cases where `==` gives the wrong verdict
+were added. Throughput on 60 trivial stdio cases (one warmup grade excluded, wall time of `grade`): 65.7 ms per case with 1 worker, 18.4 ms with 4. Tool loop not yet
+written.
 
 ## Artifacts and where things live
 
