@@ -372,7 +372,7 @@ Windows driver store (9p) was visible read-only under `/usr/lib/wsl` (now
 covered). Not covered: a kernel exploit through an allowed syscall, since bwrap
 shares the WSL kernel.
 
-**2026-10-30 – v2 grader** (uncommitted). [grader.py](../scripts/sandbox/grader.py):
+**2026-10-30 – v2 grader** (`7b6e1b6`). [grader.py](../scripts/sandbox/grader.py):
 one sandbox run per test case, comparison on the host, expected values never
 in the sandbox. `python -m pytest -q tests/test_grader.py tests/test_sandbox.py`
 on the desktop: 44 passed in 23.5 s. The cheats tested all fail: claiming
