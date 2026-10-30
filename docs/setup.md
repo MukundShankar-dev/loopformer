@@ -31,6 +31,8 @@ python -m pip install -r requirements.txt
 python -m pip check
 ```
 
+The v2 sandbox ([scripts/sandbox/runner.py](../scripts/sandbox/runner.py)) needs `sudo apt install bubblewrap` (0.9.0 installed; WSL interop must stay without the `F` binfmt flag, as it is by default) and a systemd user session for its cgroup limits. Over SSH that session ends at logout unless `loginctl enable-linger` is set, so long sandboxed jobs need linger or an open session.
+
 The `+cu130` build satisfies the `torch==2.14.0` pin. Blackwell GPUs need CUDA 13 wheels and a current Windows driver. Launchers that write logs through a PTY need util-linux `script` (installed by default on Ubuntu). `mmlu_retention.sh` and `trace_baselines.sh` also need `flock`.
 
 WSL limits its VM to about half of host RAM, roughly 16 GB on the 32 GB desktop. If you need more, edit `%UserProfile%\.wslconfig` and then run `wsl --shutdown` from PowerShell. Shutdown stops every WSL session, so do not run it during a job.

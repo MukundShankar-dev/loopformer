@@ -358,6 +358,20 @@ for the executor view, trainable-tensor round-trip tests, and trace cohort delta
 [architecture](architecture.md), [usage](usage.md), [setup](setup.md) and
 [plan](plan.md). Root launchers moved to `scripts/launch/`.
 
+**2026-10-30 – v2 sandbox** (uncommitted). [scripts/sandbox/](../scripts/sandbox/):
+systemd user scope (memory without swap, tasks, CPU quota) → `prlimit` → bwrap
+(all namespaces, no nested user namespaces, seccomp denylist and socket-family
+allowlist, everything read-only except capped tmpfs `/work`, `/tmp`, `/dev/shm`).
+`python -m pytest -q tests/test_sandbox.py` on the desktop: 30 passed in 12.1 s.
+Removing any one of 19 protections in a scratch copy made the matching test fail.
+Found and fixed while testing: AF_VSOCK reached a service on the Windows host
+(CID 2, port 50000) from inside the network namespace, so seccomp now allows
+only Unix and IP sockets; bwrap's root and `/dev` were writable and uncapped;
+stdin was a host file the program could reopen for writing (now a pipe); WSL's
+Windows driver store (9p) was visible read-only under `/usr/lib/wsl` (now
+covered). Not covered: a kernel exploit through an allowed syscall, since bwrap
+shares the WSL kernel. Grader and tool loop not yet written.
+
 ## Artifacts and where things live
 
 | What | Path |

@@ -186,14 +186,19 @@ for a teacher to teach the format.
   tests.
 - Limits: syscall filter, no-new-privileges, CPU time, wall time, memory,
   process count, output size. Cgroup limits via `systemd-run --user`.
-- **Grader:** a separate sandbox run on a fresh copy of the submission, with
-  the hidden tests. GPU processes never execute model code.
+- **Grader:** a separate sandbox run on a fresh copy of the submission, given
+  hidden-test inputs only. Expected outputs never enter any sandbox; the
+  verdict is computed on the host from the program's output, so a program
+  cannot pass by exiting early, patching the harness or printing "pass". GPU
+  processes never execute model code.
+- **Sandbox output is untrusted text on the host:** never `eval`ed, executed,
+  passed to a shell or parsed as Rich markup, and stripped of terminal control
+  sequences before printing.
 - **Adversarial test suite, required to pass before any model code runs:**
   fork bomb, memory hog, infinite loop, network access, writes outside the
   workspace, reads of `/mnt/c` and hidden tests, attempts to launch Windows
   executables.
-- The user installs bubblewrap with `sudo apt install bubblewrap`.
-  A separate throwaway WSL distro remains an optional extra layer.
+- A separate throwaway WSL distro remains an optional extra layer.
 
 ## Data
 

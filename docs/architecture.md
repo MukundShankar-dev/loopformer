@@ -166,6 +166,10 @@ A checkpoint directory (`step-XXXXXX/` or an exported `best/`) contains:
 
 Restored tensors are bitwise exact. CPU-loaded base weights may be memory-unaligned, which changes CPU matmul rounding by about 1 ulp; `tests/test_executor_upgrade.py` uses 1e-6 for this reason. GPU loading is not affected.
 
+## Sandbox ([scripts/sandbox/](../scripts/sandbox/))
+
+`run(files, entry, stdin, limits, mounts)` runs `python3 -I /code/<entry>` and returns exit code (128 + N for signal N), timeout and OOM flags, wall and CPU time, and truncated stdout/stderr. CPU time counts only processes that were reaped, so it undercounts after a timeout. The layers and what the program can see are in the [runner.py](../scripts/sandbox/runner.py) docstring. Runs share nothing: each gets fresh `/work` and `/tmp`, and tools pass the full program every call. Python's `/dev/shm` is bwrap's private one, bounded by the memory limit.
+
 ## Known limitations visible in code
 
 - Isolated models require the exact raw prompt regex and support only `logits_mode="answer"`. MMLU evaluation therefore sets `model.router = None` and `model.completion_head = None` and runs T=1 ([scripts/eval/mmlu.py](../scripts/eval/mmlu.py)).
