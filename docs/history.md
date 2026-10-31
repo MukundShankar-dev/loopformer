@@ -527,7 +527,7 @@ grading (`--first-failure`) stops hidden grading at the first failing chunk.
 `eval/agent/throughput-coder-1.5b-20261030/` (batch 1), `eval/agent/throughput-coder-1.5b-batched-20261030/`,
 `eval/agent/engine-checks-20261030/` (desktop).
 
-**2026-10-31 – M0d: repair condition; single-turn harness check against M0a** (commit pending).
+**2026-10-31 – M0d: repair condition; single-turn harness check against M0a** (commit b877fe3).
 Added the repair condition (`--condition repair`: only `submit`; each submission
 before the last turn is graded on the public tests and, on a failure, the
 results come back for a revision). Then checked that our harness costs the
