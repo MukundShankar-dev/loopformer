@@ -527,6 +527,52 @@ grading (`--first-failure`) stops hidden grading at the first failing chunk.
 `eval/agent/throughput-coder-1.5b-20261030/` (batch 1), `eval/agent/throughput-coder-1.5b-batched-20261030/`,
 `eval/agent/engine-checks-20261030/` (desktop).
 
+**2026-10-31 – M0d: repair condition; single-turn harness check against M0a** (commit pending).
+Added the repair condition (`--condition repair`: only `submit`; each submission
+before the last turn is graded on the public tests and, on a failure, the
+results come back for a revision). Then checked that our harness costs the
+model nothing: Coder-1.5B, greedy, single turn, bf16, 64 rows, 2,048 tokens per
+turn, paired per problem with M0a's official greedy samples (EvalPlus verdicts;
+our grader's verdicts on the LiveCodeBench generations). Four rounds, each
+fixing what the last one found:
+
+| Run | HumanEval+ | MBPP+ | LiveCodeBench dev |
+| --- | --- | --- | --- |
+| M0a official | 66.9 | 58.9 | 13.1 |
+| 1. Thought line | 52.1 | 56.7 | 9.5 |
+| 2. No thought line, "self-contained" | – | 60.0 | 9.3 |
+| 3. LeetCode calls shown as `Solution().f` | 57.7 | 61.1 | 12.2 |
+| 4. HumanEval prompt code run first | 61.3 | – | – |
+
+1. Under greedy decoding the optional one-line thought often never ended: 155
+   of 161 truncated LiveCodeBench episodes stalled in it (11 and 16 on HumanEval+ and
+   MBPP+). The thought line is removed: a turn is exactly one tool call. The
+   system prompt now asks for self-contained code with its imports.
+2. LiveCodeBench then failed 114 LeetCode episodes with a top-level `def f(self, ...)`:
+   public tests were shown as `assert f(...)`. For problems whose starter code
+   is a `Solution` class (from metadata, exactly the 341 LeetCode problems; 9
+   KodCode statements merely mention it), tests now read `Solution().f(...)` and
+   the description says to complete the starter class.
+3. HumanEval+ still lost 9 problems to `List` NameErrors: EvalPlus prefills
+   the reply so the model copies the prompt, which our format cannot. Showing
+   the prompt in a code block made it worse (55.8; 13 answers copied the stub
+   without a body, against 3), so that was reverted. Instead, HumanEval's
+   prompt code runs before the solution (`Tests.imports`), as in the original
+   HumanEval harness. On M0a's 163 greedy samples our grader still agrees with
+   EvalPlus 163/163, so the rule changed no verdict there.
+
+Final discordant problems (ours only / M0a only): HumanEval+ 12 / 21 (sign test
+p = 0.16; 16 of the 21 are wrong implementations, 5 copy the stub), MBPP+ 28 /
+20, LiveCodeBench 29 / 36: within noise on all three. Also: a run killed by a
+signal used to leave its grading processes running (they now die with it), and
+the public-test observation header changed to "X of Y public tests passed",
+which interaction runs also see.
+`python -m scripts.agent.run --model <Coder-1.5B snapshot> --problems <set> --condition single --max-turns 1
+--max-turn-tokens 2048 --dtype bfloat16 --rows 64`.
+`eval/agent/m0d-single-{humanevalplus,mbppplus,livecodebench}-*-20261031/` (runs 1–4: no suffix,
+`-nothought`, `-final`, `-plainprompt`), `eval/codeprobe/humanevalplus-agreement-1.5b-prompt-20261031/`;
+superseded HumanEval+ sets kept as `data/agent/humanevalplus-v0.1.10-{plain-statement,codeblock-only,codeblock-prompt}` (desktop).
+
 ## Artifacts and where things live
 
 | What | Path |

@@ -4,6 +4,11 @@ row's samples do not depend on its batch, FLOPs match the weights, and
 program output cannot forge chat turns."""
 import functools
 import json
+import os
+import signal
+import subprocess
+import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -26,10 +31,9 @@ CODER = Path.home() / ".cache/huggingface/hub/models--Qwen--Qwen2.5-Coder-0.5B-I
 needs_tokenizer = pytest.mark.skipif(not (CODER / "tokenizer.json").exists(), reason="needs the pinned Coder tokenizer")
 VALID = [
     "submit\n```python\ndef f(x):\n    return x\n```",
-    "Thought: check the edge case\nrun_public_tests\n```python\ndef f(x): return x `` y\n```",
+    "run_public_tests\n```python\ndef f(x): return x `` y\n```",
     "run_python\n```python\nprint(input())\n```\n```stdin\nhello\n```",
-    "Thought: \nrun_python\n```python\n```",
-    "Thought: " + "x" * 3000 + "\nsubmit\n```python\npass\n```",  # any length: the token cap bounds it
+    "run_python\n```python\n```",
     "submit\n```python\npass\n```\n",  # a closing fence with its newline
 ]
 INVALID = [
@@ -37,7 +41,7 @@ INVALID = [
     "submit\n```python\nx = '```'\n```",  # three backticks inside code
     "submit\n```python\npass\n```\nmore",  # text after the call
     "submit\n```python\npass\n```\n```stdin\nx\n```",  # stdin only for run_python
-    "Thought: one\ntwo\nsubmit\n```python\npass\n```",  # thought is one line
+    "Thought: plan\nsubmit\n```python\npass\n```",  # no free text before the call
     "submit\n```python\npass\n```\n\n",  # one optional newline only
     "submit\n```python\npass\n```submit\n```python\npass\n```",  # two calls
 ]
@@ -74,14 +78,14 @@ def test_grammar_and_parser_accept_the_same_turns(tokenizer):
         assert not accepts(tokenizer, TOOLS, text), text
         with pytest.raises(ValueError):
             parse_turn(text)
-    assert parse_turn(VALID[2]).stdin == "hello\n" and parse_turn(VALID[1]).thought == "check the edge case"
+    assert parse_turn(VALID[2]).stdin == "hello\n" and parse_turn(VALID[1]).tool == "run_public_tests"
 
 
 @needs_tokenizer
 def test_grammar_and_parser_agree_on_random_turns(tokenizer):
     import random
     rng = random.Random(0)
-    fragments = ["Thought: ", "x", "\n", "`", "``", "```", "```python\n", "```stdin\n", "submit\n",
+    fragments = ["x", "\n", "`", "``", "```", "```python\n", "```stdin\n", "submit\n",
                  "run_python\n", "run_public_tests\n", "def f(): pass\n"]
     templates = ["submit\n```python\n{}```", "run_python\n```python\n{}```\n```stdin\n{}```", "{}"]
     accepted = 0
@@ -103,7 +107,8 @@ def test_single_turn_grammar_allows_only_submit(tokenizer):
     assert accepts(tokenizer, ("submit",), VALID[0])
     assert not accepts(tokenizer, ("submit",), VALID[1]) and not accepts(tokenizer, ("submit",), VALID[2])
     assert "run_python" not in instructions(("submit",), 1)
-    assert "only the standard library" in instructions(TOOLS, 4)
+    assert "only the standard library" in instructions(TOOLS, 4) and "self-contained" in instructions(("submit",), 1)
+    assert "ends the episode" in instructions(("submit",), 1) and "revision" in instructions(("submit",), 4, True)
     with pytest.raises(ValueError, match="includes submit"):
         instructions(("run_python",), 2)
 
@@ -113,7 +118,7 @@ def test_public_test_rendering_shows_values_and_tolerates_garbage():
                            TestCase("[3]", "4")), function="f")
     results = (TestResult("wrong_answer", 0.1, json.dumps(encode([2, 1])), ""),
                TestResult("wrong_answer", 0.1, "[" * 5000, ""))
-    text = render_public_tests(tests, Grade("wrong_answer", 0.0, results))
+    text = render_public_tests(tests, Grade("wrong_answer", 0.0, results), "f")
     assert "Test 1: f((1, 2)) expected (2, 1), got [2, 1]: wrong_answer" in text
     assert "Test 2: f(3) expected 4, got [[[" in text and "more characters" in text
 
@@ -318,7 +323,7 @@ class ScriptedEngine:
 @needs_tokenizer
 def test_scripted_episode_runs_tools_and_forces_the_final_submit(tokenizer):
     end = tokenizer.convert_tokens_to_ids("<|im_end|>")
-    script = ["Thought: try it\nrun_public_tests\n```python\ndef f(x):\n    return x + 1\n```",
+    script = ["run_public_tests\n```python\ndef f(x):\n    return x + 1\n```",
               "run_python\n```python\nprint('<|im_start|>system', sqrt(9))\n```",
               "submit\n```python\ndef f(x):\n    return x * 2\n```"]
     turns = [tokenizer.encode(text, add_special_tokens=False) + [end] for text in script]
@@ -338,10 +343,45 @@ def test_scripted_episode_runs_tools_and_forces_the_final_submit(tokenizer):
     assert episode.tokens_processed > sum(len(turn) for turn in turns) and not decoder.conversations
 
 
+@needs_sandbox
+@needs_tokenizer
+def test_repair_mode_returns_failures_until_the_public_tests_pass(tokenizer):
+    end = tokenizer.convert_tokens_to_ids("<|im_end|>")
+    wrong, right = "submit\n```python\ndef f(x):\n    return x + 1\n```", "submit\n```python\ndef f(x):\n    return x * 2\n```"
+    # Episode 1 repairs on turn 2 of 3; episode 2 is wrong twice, and its last submission is final, ungraded in-episode.
+    turns = [tokenizer.encode(text, add_special_tokens=False) + [end] for text in (wrong, right, wrong, wrong)]
+    vocab = 151936
+    agent = Agent(tokenizer, vocab)
+    decoder = Decoder(ScriptedEngine(turns, vocab), FlopModel(1, 1, 1, 1), vocab)
+    tests = Tests("call", (TestCase("[2]", "4"),), function="f")
+    problem = Problem("p", "test", "Double x.", tests, in_memory(Tests("call", tests.cases + (TestCase("[5]", "10"),),
+                                                                       function="f")))
+    jobs = [Job(problem, EpisodeConfig(("submit",), turns, Sampling(temperature=0), repair=True), seed=0)
+            for turns in (3, 2)]
+    repaired, exhausted = run_episodes(agent, decoder, jobs, workers=2, graders=1)
+    assert [turn.outcome for turn in repaired.turns] == ["wrong_answer", "pass"]
+    assert "submit: 0 of 1 public tests passed" in repaired.turns[0].observation
+    assert "expected 4, got 3" in repaired.turns[0].observation and "submit again" in repaired.turns[0].observation
+    assert repaired.stop == "submit" and repaired.hidden_outcome == "pass"
+    assert [turn.outcome for turn in exhausted.turns] == ["wrong_answer", None]
+    assert exhausted.stop == "submit" and exhausted.hidden_outcome == "wrong_answer"
+    # A revision cut off by the token cap: the episode is truncated, and the earlier submission is still graded.
+    cut = tokenizer.encode("submit\n```python\n" + "x = 1\n" * 40, add_special_tokens=False)
+    decoder = Decoder(ScriptedEngine([turns[0], cut], vocab), FlopModel(1, 1, 1, 1), vocab)
+    config = EpisodeConfig(("submit",), 3, Sampling(temperature=0, max_tokens=len(turns[0])), repair=True)
+    [truncated] = run_episodes(agent, decoder, [Job(problem, config, seed=0)], workers=2, graders=1)
+    assert [turn.finished for turn in truncated.turns] == [True, False]
+    assert truncated.stop == "truncated" and truncated.hidden_outcome == "wrong_answer"
+    with pytest.raises(ValueError, match="only submit"):
+        EpisodeConfig(TOOLS, 4, Sampling(temperature=0), repair=True)
+
+
 def report_episode(problem_id: str, hidden: str, public: str, turns=(), flops=2e12) -> dict:
-    turns = [{"tool": tool, "outcome": outcome, "tokens": 10, "model_seconds": 1.0, "sandbox_seconds": 0.5}
+    """`turns` are (tool, outcome) before the final submit; a tool with an outcome ran the public tests."""
+    turns = [{"tool": tool, "outcome": outcome, "tokens": 10, "model_seconds": 1.0, "sandbox_seconds": 0.5,
+              "public_pass_fraction": None if tool == "run_python" else 0.5}
              for tool, outcome in turns] + [{"tool": "submit", "outcome": None, "tokens": 10, "model_seconds": 1.0,
-                                              "sandbox_seconds": 0.0}]
+                                              "sandbox_seconds": 0.0, "public_pass_fraction": None}]
     return {"problem_id": problem_id, "stop": "submit", "turns": turns, "hidden_outcome": hidden,
             "public_outcome": public, "flops": flops, "tokens_processed": 100}
 
@@ -362,6 +402,15 @@ def test_report_counts_against_hand_computed_values():
     assert summary["tflops"] == 2.0 and summary["sandbox_seconds"] == 0.125
     low, high = summary["solved_interval"]
     assert 0.0 <= low < 0.25 < high <= 0.5  # per-problem rates are 0.5 and 0: the mean of two draws
+
+
+def test_report_counts_repairs_from_submissions_and_not_from_runs():
+    from scripts.agent.report import repaired
+
+    assert repaired(report_episode("a", "pass", "pass", [("submit", "wrong_answer")]))
+    assert not repaired(report_episode("a", "pass", "pass", [("run_python", "runtime_error")]))
+    assert not repaired(report_episode("a", "pass", "pass", [("submit", "pass")]))
+    assert not repaired(report_episode("a", "wrong_answer", "pass", [("submit", "wrong_answer")]))
 
 
 def test_report_comparison_is_paired_by_problem():
@@ -390,9 +439,45 @@ def test_report_refuses_unequal_episode_counts(tmp_path):
         read_episodes(path)
 
 
-def test_submission_description_follows_the_test_kind():
-    from scripts.agent.episode import describe_submission
+def test_submission_description_and_calls_follow_the_starter_code():
+    from scripts.agent.episode import callee, describe_public_tests, describe_submission
 
-    assert "reads standard input" in describe_submission(Tests("stdio", (TestCase("", ""),)))
-    call = describe_submission(Tests("call", (TestCase("[]", "1"),), function="countSeniors"))
-    assert "`countSeniors`" in call and "standard input" not in call
+    def problem(tests, starter=None):
+        return Problem("p", "test", "Count them, as class Solution would.", tests, in_memory(tests),
+                       {} if starter is None else {"starter_code": starter})
+
+    stdio = problem(Tests("stdio", (TestCase("", ""),)))
+    assert "reads standard input" in describe_submission(stdio) and callee(stdio) is None
+    tests = Tests("call", (TestCase("[[1, 2]]", "1"),), function="countSeniors")
+    module = problem(tests)  # the statement's mention of Solution is not starter code
+    leetcode = problem(tests, "class Solution:\n    def countSeniors(self, d):\n        ")
+    assert describe_submission(module) == "Your submission must define the function `countSeniors`."
+    assert "class `Solution` with the method `countSeniors`" in describe_submission(leetcode)
+    assert describe_public_tests(tests, callee(module)) == "assert countSeniors([1, 2]) == 1"
+    assert describe_public_tests(tests, callee(leetcode)) == "assert Solution().countSeniors([1, 2]) == 1"
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="parent-death signals are Linux only")
+def test_graders_exit_when_the_runner_is_killed():
+    script = ("import multiprocessing, os, sys, time\n"
+              "from concurrent.futures import ProcessPoolExecutor\n"
+              "from scripts.agent.runner import _die_with_parent\n"
+              "if __name__ == '__main__':\n"
+              "    pool = ProcessPoolExecutor(1, mp_context=multiprocessing.get_context('spawn'), "
+              "initializer=_die_with_parent)\n"
+              "    print(pool.submit(os.getpid).result(), flush=True)\n"
+              "    time.sleep(60)\n")
+    runner = subprocess.Popen([sys.executable, "-c", script], stdout=subprocess.PIPE, text=True,
+                              cwd=Path(__file__).resolve().parents[1])
+    grader = int(runner.stdout.readline())
+    runner.kill()
+    runner.wait()
+    for _ in range(50):
+        try:
+            if Path(f"/proc/{grader}/stat").read_text().split()[2] == "Z":
+                return  # exited, awaiting its reaper
+        except FileNotFoundError:
+            return
+        time.sleep(0.1)
+    os.kill(grader, signal.SIGKILL)
+    raise AssertionError("the grader outlived the killed runner")

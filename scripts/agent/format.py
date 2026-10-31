@@ -1,8 +1,7 @@
 """The agent's turn format: instructions, grammar, parsing and observations.
 
-A turn is an optional one-line thought followed by exactly one tool call:
+A turn is exactly one tool call:
 
-    Thought: <one line>
     run_python
     ```python
     <code>
@@ -13,8 +12,11 @@ A turn is an optional one-line thought followed by exactly one tool call:
 
 The other tools are `run_public_tests` and `submit`, each with one python
 block. `grammar(tools)` is the EBNF that constrained decoding enforces, so a
-generated turn always parses; the single-turn condition uses the same format
-with only `submit` allowed. Observations are rendered as user messages.
+generated turn always parses; the single-turn and repair conditions use the
+same format with only `submit` allowed. Observations are rendered as user messages.
+
+There is no free-text field: with one, the base model under greedy decoding
+often never ended it and so never submitted (docs/history.md, M0d).
 """
 import json
 import re
@@ -28,8 +30,7 @@ TOOLS = ("run_python", "run_public_tests", "submit")
 OBSERVATION_CHARACTERS = 2000  # of stdout and of stderr, each, shown to the agent
 # Mirrors `grammar` rule for rule; tests/test_agent.py checks that both accept the same turns.
 BODY = r"(?:[^`]|`[^`]|``[^`])*"
-TURN = re.compile(rf"\A(?:Thought: (?P<thought>[^\n]*)\n)?"
-                  rf"(?:(?P<tool>run_python)\n```python\n(?P<code>{BODY})```(?:\n```stdin\n(?P<stdin>{BODY})```)?"
+TURN = re.compile(rf"\A(?:(?P<tool>run_python)\n```python\n(?P<code>{BODY})```(?:\n```stdin\n(?P<stdin>{BODY})```)?"
                   rf"|(?P<other>run_public_tests|submit)\n```python\n(?P<other_code>{BODY})```)\n?\Z")
 
 TOOL_HELP = {
@@ -38,26 +39,29 @@ TOOL_HELP = {
     "run_public_tests": "run_public_tests: runs your code against the public tests. You see each test's result.",
     "submit": "submit: submits your code as the final answer. This ends the episode.",
 }
+REPAIR_SUBMIT_HELP = ("submit: submits your code. It is run against the public tests; if one fails, you see each "
+                      "test's result and submit a revision. The episode ends when the public tests pass or turns "
+                      "run out, and your last submission is the final answer.")
 
 
 @dataclass(frozen=True)
 class Turn:
-    thought: str | None
     tool: str
     code: str
     stdin: str | None
 
 
-def instructions(tools: tuple[str, ...], max_turns: int) -> str:
+def instructions(tools: tuple[str, ...], max_turns: int, repair: bool = False) -> str:
     """System prompt for the allowed tools; identical across conditions except for the tool list."""
     if not tools or any(tool not in TOOLS for tool in tools) or "submit" not in tools:
         raise ValueError(f"tools must be a subset of {TOOLS} that includes submit")
     stdin_line = "```stdin\n<optional input>\n```\n" if "run_python" in tools else ""
     return (
-        "You are a Python programming agent. Solve the problem in Python using only the standard library.\n"
-        f"Each turn, you may write one short line starting with 'Thought:', then exactly one tool call. "
-        f"You have at most {max_turns} turns.\n\nTools:\n" + "\n".join(f"- {TOOL_HELP[tool]}" for tool in tools)
-        + "\n\nFormat:\nThought: <one line>\n<tool name>\n```python\n<complete code>\n```\n" + stdin_line
+        "You are a Python programming agent. Solve the problem in Python using only the standard library. "
+        "Code you run or submit must be complete and self-contained, including every import it needs.\n"
+        f"Each turn, write exactly one tool call. You have at most {max_turns} turns.\n\nTools:\n"
+        + "\n".join(f"- {REPAIR_SUBMIT_HELP if repair else TOOL_HELP[tool]}" for tool in tools)
+        + "\n\nFormat:\n<tool name>\n```python\n<complete code>\n```\n" + stdin_line
     )
 
 
@@ -72,9 +76,7 @@ def grammar(tools: tuple[str, ...]) -> str:
         calls.append('"submit\\n" code')
     return "\n".join([
         # The optional final newline lets the model close a block with its usual fence-and-newline token.
-        # The thought is one line of any length (the per-turn token cap bounds it): a bounded repetition such as
-        # [^\\n]{0,1000} makes every mask in the thought cost ~0.5 ms per row, against microseconds unbounded.
-        f'root ::= ("Thought: " [^\\n]* "\\n")? ({" | ".join(calls)}) "\\n"?',
+        f'root ::= ({" | ".join(calls)}) "\\n"?',
         'code ::= "```python\\n" body "```"',
         # Any text without three consecutive backticks.
         'body ::= ([^`] | "`" [^`] | "``" [^`])*',
@@ -86,8 +88,8 @@ def parse_turn(text: str) -> Turn:
     if match is None:
         raise ValueError(f"turn does not match the format: {text[:200]!r}")
     if match["tool"]:
-        return Turn(match["thought"], match["tool"], match["code"], match["stdin"])
-    return Turn(match["thought"], match["other"], match["other_code"], None)
+        return Turn(match["tool"], match["code"], match["stdin"])
+    return Turn(match["other"], match["other_code"], None)
 
 
 def _clip(text: str) -> str:
@@ -114,12 +116,14 @@ def _shown_value(encoded: str) -> str:
         return encoded
 
 
-def render_public_tests(tests: Tests, grade: Grade) -> str:
-    lines = [f"run_public_tests: {sum(r.outcome == 'pass' for r in grade.results)} of {len(grade.results)} passed."]
+def render_public_tests(tests: Tests, grade: Grade, callee: str | None, tool: str = "run_public_tests") -> str:
+    """`callee` is how call tests invoke the function (`f` or `Solution().f`); None for stdio tests."""
+    passed = sum(result.outcome == "pass" for result in grade.results)
+    lines = [f"{tool}: {passed} of {len(grade.results)} public tests passed."]
     for number, (case, result) in enumerate(zip(tests.cases, grade.results), start=1):
         if tests.kind == "call":
             arguments = ", ".join(repr(argument) for argument in decode(json.loads(case.input)))
-            call = f"{tests.function}({arguments})"
+            call = f"{callee}({arguments})"
             got = _shown_value(result.stdout) if result.outcome == "pass" or result.outcome == "wrong_answer" else None
             line = f"Test {number}: {call} expected {_shown_value(case.expected)}"
         else:

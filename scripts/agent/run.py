@@ -4,7 +4,9 @@
         --condition interaction --max-turns 4 --seeds 0 --limit 20 --output eval/agent/<run>/episodes.jsonl
 
 Conditions share one format: `single` allows only `submit` in one turn;
-`interaction` allows every tool for up to --max-turns turns. Up to --rows
+`interaction` allows every tool for up to --max-turns turns; `repair` allows
+only `submit`, and the harness returns failing public tests for a revision
+(scripts/agent/episode.py). Up to --rows
 episodes decode together (scripts/agent/runner.py); episodes are written as
 they finish, not in problem order. run.json records the arguments and, at the
 end, throughput.
@@ -31,7 +33,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--model", type=Path, required=True, help="local snapshot directory of a pinned revision")
     parser.add_argument("--problems", type=Path, required=True, help="problem-set directory")
-    parser.add_argument("--condition", choices=["single", "interaction"], required=True)
+    parser.add_argument("--condition", choices=["single", "interaction", "repair"], required=True)
     parser.add_argument("--max-turns", type=int, default=4)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--top-p", type=float, default=1.0)
@@ -56,14 +58,17 @@ def main() -> None:
         parser.error(f"{args.output} exists; choose a new path")
     if args.condition == "single" and args.max_turns != 1:
         parser.error("the single condition has exactly one turn; pass --max-turns 1")
+    if args.condition == "repair" and args.max_turns < 2:
+        parser.error("the repair condition needs --max-turns 2 or more")
     tokenizer = AutoTokenizer.from_pretrained(args.model)
     model = AutoModelForCausalLM.from_pretrained(args.model, dtype=getattr(torch, args.dtype)).to(args.device).eval()
     engine = Engine(model, args.rows, args.capacity, graphs=args.cuda_graphs and args.device.startswith("cuda"))
     decoder = Decoder(engine, qwen2_flops(model.config), model.config.vocab_size)
     agent = Agent(tokenizer, model.config.vocab_size)
-    tools = ("submit",) if args.condition == "single" else TOOLS
+    tools = TOOLS if args.condition == "interaction" else ("submit",)
     config = EpisodeConfig(tools, args.max_turns, Sampling(args.temperature, args.top_p, args.max_turn_tokens),
-                           grading_workers=args.grading_workers, first_failure=args.first_failure)
+                           grading_workers=args.grading_workers, first_failure=args.first_failure,
+                           repair=args.condition == "repair")
     problems = read_problems(args.problems)[: args.limit]
     jobs = [Job(problem, config, seed) for seed in args.seeds for problem in problems]
     args.output.parent.mkdir(parents=True, exist_ok=True)

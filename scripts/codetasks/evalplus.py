@@ -10,7 +10,14 @@ copy of each input. The public test is the input of the statement's first
 example call (an MBPP `assert` or a HumanEval `>>>` doctest), or the first
 original input if no example can be matched; hidden tests are every base and
 plus input. The statement is MBPP's description, or HumanEval's prompt
-(signature and docstring).
+(imports, signature and docstring). HumanEval's prompt code also runs before
+the solution (the tests' `imports`), as in the original HumanEval harness,
+which executes prompt + completion: EvalPlus instead prefills the reply so the
+model copies the prompt, which our turn format cannot do, and without it the
+model drops the prompt's imports (`List`) and helpers. Showing the prompt in a
+code block does not help: the model then often copies the stub without a body
+(docs/history.md, M0d). EvalPlus requires self-contained code, so this is more
+lenient than EvalPlus exactly for solutions that use a name the prompt defines.
 
 Matching EvalPlus's checker: absolute tolerance 1e-6 when a task's expected
 values are floats and it sets none, with relative 1e-7 applied by the grader.
@@ -84,10 +91,13 @@ def convert(task: dict, dataset: str) -> Problem:
                   for arguments, output in zip(inputs, outputs))
     example = statement_example(task["prompt"], function, inputs)
     public = cases[example if example is not None else 0]
-    text = task["prompt"].strip().strip('"').strip() if dataset == "mbpp" else task["prompt"].strip()
+    if dataset == "mbpp":
+        text, imports = task["prompt"].strip().strip('"').strip(), ""
+    else:
+        text, imports = task["prompt"].strip(), task["prompt"]
     return Problem(id=task["task_id"], source=SOURCES[dataset], statement=text,
-                   public=Tests("call", (public,), function=function, atol=atol),
-                   hidden=in_memory(Tests("call", cases, function=function, atol=atol)))
+                   public=Tests("call", (public,), function=function, atol=atol, imports=imports),
+                   hidden=in_memory(Tests("call", cases, function=function, atol=atol, imports=imports)))
 
 
 def main() -> None:

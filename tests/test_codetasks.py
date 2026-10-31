@@ -145,3 +145,20 @@ def test_reference_outputs_ignore_prints_and_catch_nondeterminism():
     with pytest.raises(ReferenceFailed, match="nondeterministic"):
         reference_outputs("import random\ndef f(x):\n    return random.random()", "f", [[1]], repeats=2)
     assert reference_outputs("def f(x):\n    return 1 // x", "f", [[0]]) == [{"__error__": "ZeroDivisionError"}]
+
+
+@needs_sandbox
+def test_humaneval_prompt_code_runs_before_the_solution_and_mbpp_gets_none():
+    from scripts.codetasks.evalplus import convert
+    from scripts.sandbox.grader import grade
+
+    prompt = 'from typing import List\n\n\ndef total(xs: List[int]) -> int:\n    """Sum.\n    >>> total([1, 2])\n    3\n    """\n'
+    task = {"task_id": "HumanEval/0", "entry_point": "total", "prompt": prompt, "canonical_solution": "    return sum(xs)\n",
+            "base_input": [[[1, 2]]], "plus_input": [[[5]]], "atol": 0}
+    humaneval = convert(task, "humaneval")
+    assert humaneval.statement == prompt.strip() and humaneval.hidden().imports == prompt
+    uses_list = "def total(xs: List[int]) -> int:\n    return sum(xs)\n"
+    assert grade(uses_list, humaneval.hidden()).outcome == "pass"
+    mbpp = convert({**task, "task_id": "Mbpp/1", "prompt": '"""Sum a list.\nassert total([1, 2]) == 3\n"""\n',
+                    "canonical_solution": "def total(xs):\n    return sum(xs)\n"}, "mbpp")
+    assert mbpp.hidden().imports == "" and grade(uses_list, mbpp.hidden()).outcome == "runtime_error:NameError"

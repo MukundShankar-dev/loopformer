@@ -7,12 +7,14 @@ the sandbox, the others keep decoding. Grading is in processes because it is
 the heaviest Python work and, on threads, it starves the decoding thread of
 the interpreter lock: every release costs up to a switch interval to regain.
 A row is freed when its episode's last turn ends, before grading, and the next
-job takes it; the lowest free row is used first, which
-keeps decode batches short. Episodes are yielded as their grading finishes,
-so not in job order.
+job takes it; the lowest free row is used first, which keeps decode batches
+short. Episodes are yielded as their grading finishes, so not in job order.
 """
+import ctypes
 import heapq
 import multiprocessing
+import signal
+import sys
 import time
 from collections.abc import Generator, Iterable, Iterator
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
@@ -21,6 +23,16 @@ from dataclasses import dataclass
 from scripts.agent.decoding import Decoder, Generation
 from scripts.agent.episode import Agent, Episode, EpisodeConfig, Request, grade_submission
 from scripts.codetasks.problems import Problem
+
+
+PR_SET_PDEATHSIG = 1  # linux/prctl.h
+
+
+def _die_with_parent() -> None:
+    """Grader initializer: a run that is killed would otherwise leave its graders running, orphaned."""
+    if sys.platform == "linux":
+        if ctypes.CDLL(None, use_errno=True).prctl(PR_SET_PDEATHSIG, signal.SIGTERM) != 0:
+            raise OSError(ctypes.get_errno(), "prctl(PR_SET_PDEATHSIG) failed")
 
 
 @dataclass(frozen=True)
@@ -40,7 +52,8 @@ def run_episodes(agent: Agent, decoder: Decoder, jobs: Iterable[Job], workers: i
     grading: set[Future] = set()
     exhausted = False
     spawn = multiprocessing.get_context("spawn")
-    with ThreadPoolExecutor(workers) as pool, ProcessPoolExecutor(graders, mp_context=spawn) as grading_pool:
+    with (ThreadPoolExecutor(workers) as pool,
+          ProcessPoolExecutor(graders, mp_context=spawn, initializer=_die_with_parent) as grading_pool):
         while not exhausted or active or grading:
             while free and not exhausted:
                 job = next(jobs, None)

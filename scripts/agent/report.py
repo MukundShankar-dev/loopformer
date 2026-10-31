@@ -11,7 +11,8 @@ problems, then each value of each `--by` metadata key) reports:
 - public_pass_hidden_fail: of submissions that pass the public tests, the
   fraction failing hidden tests (overfitting to the examples);
 - stops, hidden outcome classes, tool calls per episode, and repairs
-  (solved episodes with an earlier failing `run_public_tests`);
+  (solved episodes with an earlier turn failing the public tests: a
+  `run_public_tests` call or a repair-mode submission);
 - compute per episode: FLOPs, tokens processed and generated, model and
   sandbox seconds.
 With `--baseline`, the paired difference in per-problem solve rate (this run
@@ -55,7 +56,8 @@ def solved(episode: dict) -> bool:
 
 
 def repaired(episode: dict) -> bool:
-    return solved(episode) and any(turn["tool"] == "run_public_tests" and turn["outcome"] != "pass"
+    """Solved after some turn failed the public tests (run_public_tests, or a repair submission)."""
+    return solved(episode) and any(turn["public_pass_fraction"] is not None and turn["outcome"] != "pass"
                                    for turn in episode["turns"])
 
 

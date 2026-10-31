@@ -187,6 +187,7 @@ python -m scripts.agent.run --model <pinned snapshot dir> --problems data/agent/
   --condition single --max-turns 1 --output eval/agent/<run>/episodes.jsonl
 python -m scripts.agent.run ... --condition interaction --max-turns 4 --seeds 0 1 2 3 --temperature 0.8 \
   --dtype bfloat16 --rows 64 [--first-failure]
+python -m scripts.agent.run ... --condition repair --max-turns 4
 python -m scripts.agent.report --episodes eval/agent/<run>/episodes.jsonl --problems <problem set> \
   [--by difficulty platform] [--baseline eval/agent/<other>/episodes.jsonl]
 ```

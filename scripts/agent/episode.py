@@ -2,12 +2,19 @@
 
 An episode is a generator that yields a `Request` for each turn and receives
 the `Generation`, so a runner can decode many episodes in one batch
-(scripts/agent/runner.py); tools run inside the generator. The agent sees the instructions, the statement and the public tests. Each
-turn is sampled under the format grammar and its tool is executed in the
-sandbox (`run_python` runs with the problem's `imports`, as grading does);
-the observation becomes the next user message. On the last turn the
-grammar allows only `submit`, so every episode that is not cut off by the
-per-turn token cap ends with a submission (`forced_submit` marks those).
+(scripts/agent/runner.py); tools run inside the generator. The agent sees
+the instructions, the statement and the public tests. Each turn is sampled
+under the format grammar and its tool is executed in the sandbox
+(`run_python` runs with the problem's `imports`, as grading does); the
+observation becomes the next user message. On the last turn the grammar
+allows only `submit`, so every episode that is not cut off by the per-turn
+token cap ends with a submission (`forced_submit` marks those).
+
+In repair mode the only tool is `submit`, and the harness grades each
+submission before the last turn on the public tests: if one fails, the
+results are shown and the model submits again; if all pass, it is final.
+A revision cut off by the token cap stops the episode as "truncated" with the
+previous submission still final.
 `grade_submission` grades the submission on the hidden tests, whose results
 are recorded and never shown to the agent.
 
@@ -38,18 +45,23 @@ class EpisodeConfig:
     sampling: Sampling
     grading_workers: int = 4
     first_failure: bool = False  # hidden grading stops at the first failing chunk (training rewards only)
+    repair: bool = False  # submissions failing public tests are shown their results and revised
+
+    def __post_init__(self) -> None:
+        if self.repair and self.tools != ("submit",):
+            raise ValueError(f"repair mode allows only submit, not {self.tools}")
 
 
 @dataclass
 class TurnRecord:
     tool: str | None
-    thought: str | None
     code_characters: int
     tokens: int
     finished: bool
     model_seconds: float  # the Generation's wall time, shared with the rest of the batch
     sandbox_seconds: float = 0.0
-    outcome: str | None = None  # run_python: failure class or "ok"; run_public_tests: the grade's outcome
+    outcome: str | None = None  # run_python: failure class or "ok"; public tests (run_public_tests, or a repair
+    # submission before the last turn): the grade's outcome
     public_pass_fraction: float | None = None
     observation: str | None = None
     text: str = ""  # the generated turn, without its stop token
@@ -80,20 +92,33 @@ class Request:
     sampling: Sampling
 
 
-def describe_submission(tests: Tests) -> str:
+def callee(problem: Problem) -> str | None:
+    """How call tests invoke the function, as shown to the agent: a method when the problem's starter code (shown in
+    its statement) is a `Solution` class, as on LeetCode, else a module function; None for stdio. The grader accepts
+    either."""
+    if problem.public.kind == "stdio":
+        return None
+    method = problem.metadata.get("starter_code", "").lstrip().startswith("class Solution")
+    return f"Solution().{problem.public.function}" if method else problem.public.function
+
+
+def describe_submission(problem: Problem) -> str:
     """What the submitted code must be, which differs between problems, not conditions."""
-    if tests.kind == "stdio":
+    function = problem.public.function
+    if problem.public.kind == "stdio":
         return "Your submission must be a program that reads standard input and writes standard output."
-    return (f"Your submission must define `{tests.function}`: a function, or a method of class `Solution` if the "
-            "starter code uses one.")
+    if callee(problem) != function:
+        return (f"Your submission must complete the starter code: class `Solution` with the method `{function}`, "
+                "which the tests call as shown below.")
+    return f"Your submission must define the function `{function}`."
 
 
-def describe_public_tests(tests: Tests) -> str:
+def describe_public_tests(tests: Tests, callee: str | None) -> str:
     if tests.kind == "call":
         lines = []
         for case in tests.cases:
             arguments = ", ".join(repr(argument) for argument in decode(json.loads(case.input)))
-            lines.append(f"assert {tests.function}({arguments}) == {decode(json.loads(case.expected))!r}")
+            lines.append(f"assert {callee}({arguments}) == {decode(json.loads(case.expected))!r}")
         return "\n".join(lines)
     return "\n\n".join(f"Input:\n{case.input}\nExpected output:\n{case.expected}" for case in tests.cases)
 
@@ -125,10 +150,10 @@ class Agent:
     def episode(self, problem: Problem, config: EpisodeConfig, seed: int) -> Generator[Request, Generation, Episode]:
         """Yields each turn's Request and receives its Generation; returns the episode, not yet graded. The runner
         fills in compute (`flops`, `tokens_processed`)."""
-        messages = [{"role": "system", "content": instructions(config.tools, config.max_turns)},
+        messages = [{"role": "system", "content": instructions(config.tools, config.max_turns, config.repair)},
                     {"role": "user", "content": f"Problem:\n{problem.statement}\n\n"
-                                                f"{describe_submission(problem.public)}\n\nPublic tests:\n"
-                                                f"{describe_public_tests(problem.public)}"}]
+                                                f"{describe_submission(problem)}\n\nPublic tests:\n"
+                                                f"{describe_public_tests(problem.public, callee(problem))}"}]
         with self.tokenizer_lock:
             prompt = self.tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=True,
                                                         return_dict=False)
@@ -139,16 +164,18 @@ class Agent:
             generation = yield Request(prompt, tools, config.sampling)
             with self.tokenizer_lock:
                 text = self.tokenizer.decode(generation.tokens[:-1] if generation.finished else generation.tokens)
-            record = TurnRecord(None, None, 0, len(generation.tokens), generation.finished, generation.seconds, text=text)
+            record = TurnRecord(None, 0, len(generation.tokens), generation.finished, generation.seconds, text=text)
             episode.turns.append(record)
             if not generation.finished:
+                episode.stop = "truncated"
                 break
             turn = parse_turn(text)
-            record.tool, record.thought, record.code_characters = turn.tool, turn.thought, len(turn.code)
+            record.tool, record.code_characters = turn.tool, len(turn.code)
             if turn.tool == "submit":
                 episode.final_code = turn.code
                 episode.stop = "forced_submit" if tools != config.tools else "submit"
-                break
+                if not config.repair or last:
+                    break
             if turn.tool == "run_python":
                 files, entry = with_imports({"main.py": turn.code}, "main.py", problem.public.imports)
                 result = run(files, entry=entry, stdin=turn.stdin or "", limits=RUN_LIMITS)
@@ -158,7 +185,11 @@ class Agent:
                 public = grade(turn.code, problem.public, workers=config.grading_workers)
                 record.sandbox_seconds = sum(result.wall_seconds for result in public.results)
                 record.outcome, record.public_pass_fraction = public.outcome, public.pass_fraction
-                record.observation = render_public_tests(problem.public, public)
+                record.observation = render_public_tests(problem.public, public, callee(problem), turn.tool)
+                if turn.tool == "submit":
+                    if public.outcome == "pass":
+                        break
+                    record.observation += "\nRevise your code and submit again."
             prompt = self.observation_tokens(record.observation)
         return episode
 
