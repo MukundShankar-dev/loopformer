@@ -17,6 +17,11 @@ Two kinds of tests:
   return value. Both use the tagged JSON of scripts/sandbox/values.py, so
   tuples and sets survive. Values are compared structurally, with floats
   within `atol` or a relative 1e-7 (as EvalPlus does).
+
+`imports` is code run in the solution's namespace before it, as
+LiveCodeBench does with its fixed import block; the solution file itself is
+unchanged, so tracebacks keep its line numbers. `seconds`, when set, is the
+per-test time limit (wall and CPU) in place of the caller's.
 """
 import dataclasses
 import json
@@ -40,6 +45,13 @@ try:
 except (SyntaxError, ValueError) as error:
     sys.exit(f'{type(error).__name__}: {error}')
 """
+IMPORTS_LAUNCHER = """\
+import runpy
+namespace = {}
+exec(compile(open('/code/imports.py', encoding='utf-8').read(), 'imports.py', 'exec'), namespace)
+namespace.pop('__builtins__', None)
+runpy.run_path('/code/ENTRY', init_globals=namespace, run_name='__main__')
+"""
 TEST_LIMITS = Limits(wall_seconds=4, cpu_seconds=4)
 EXCEPTION_LINE = re.compile(r"^([A-Za-z_][A-Za-z0-9_.]{0,63})(?::|$)")
 DETAIL_CHARACTERS = 2000
@@ -60,6 +72,8 @@ class Tests:
     cases: tuple[TestCase, ...]
     function: str | None = None  # call only
     atol: float = 0.0  # call only: absolute tolerance for floats
+    imports: str = ""  # run in the solution's namespace first
+    seconds: float | None = None  # per-test time limit; None keeps the caller's limits
 
     def __post_init__(self) -> None:
         if self.kind not in ("stdio", "call"):
@@ -169,18 +183,31 @@ def parse_value(text: str) -> tuple[bool, object]:
         return False, None
 
 
-def case_limits(limits: Limits, case: TestCase) -> Limits:
-    """Room for an output twice the expected size, so long correct outputs are never truncated."""
+def case_limits(limits: Limits, tests: Tests, case: TestCase) -> Limits:
+    """The tests' own time limit, if any, and room for an output twice the expected size, so long correct outputs
+    are never truncated."""
+    if tests.seconds is not None:
+        limits = dataclasses.replace(limits, wall_seconds=tests.seconds, cpu_seconds=tests.seconds)
     output = max(limits.output_bytes, 2 * len(case.expected.encode()) + 1024)
     return dataclasses.replace(limits, output_bytes=output, file_bytes=max(limits.file_bytes, 2 * output))
 
 
+def with_imports(files: dict[str, str], entry: str, imports: str) -> tuple[dict[str, str], str]:
+    """Files and entry point that run `imports` in `entry`'s namespace before `entry`."""
+    if not imports:
+        return files, entry
+    launcher = IMPORTS_LAUNCHER.replace("ENTRY", entry)
+    return {**files, "imports.py": imports, "launch_with_imports.py": launcher}, "launch_with_imports.py"
+
+
 def run_case(solution: str, tests: Tests, case: TestCase, limits: Limits) -> TestResult:
-    limits = case_limits(limits, case)
+    limits = case_limits(limits, tests, case)
     if tests.kind == "stdio":
-        result = run({"solution.py": solution}, entry="solution.py", stdin=case.input, limits=limits)
+        files, entry = with_imports({"solution.py": solution}, "solution.py", tests.imports)
+        result = run(files, entry=entry, stdin=case.input, limits=limits)
     else:
-        request = json.dumps({"function": tests.function, "arguments": json.loads(case.input)})
+        request = json.dumps({"function": tests.function, "arguments": json.loads(case.input),
+                              "imports": tests.imports})
         files = {"solution.py": solution, "harness.py": HARNESS, "values.py": VALUES}
         result = run(files, entry="harness.py", stdin=request, limits=limits)
     outcome = failure(result)

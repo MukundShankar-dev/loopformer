@@ -423,6 +423,85 @@ interaction (4 turns) 7/20 solved, 0.63 TFLOPs, 13 submitted, 6 forced, 1
 truncated (a repetition loop). Twenty problems cannot separate the conditions.
 `eval/agent/smoke-mbppplus20-20261030/`.
 
+**2026-10-30 – LiveCodeBench split: dev before 2024-11-12, confirmation after**
+(commit pending). Confirmation = release_v6 (the newest release) problems on or
+after 2024-11-12, Coder-0.5B's public release and after the other two models':
+266 problems (67 easy / 83 medium / 116 hard; 163 AtCoder, 103 LeetCode;
+2024-11-16 to 2025-04-06), IDs frozen with sha256 `7522600f…abf2`. Dev = the 789
+problems before the cutoff. Their private tests are pickled; `livecodebench_data`
+decodes them with an unpickler that refuses every class, and only for dev
+problems, so confirmation tests have never been decoded. LiveCodeBench's own
+loader (remote code plus plain unpickling) is never run.
+`python -m scripts.codetasks.confirmation --raw ~/src/lcb-data --dataset-revision 0fe84c3 --cutoff 2024-11-12
+--output configs/confirmation_livecodebench.json`.
+
+**2026-10-30 – M0a probe complete; the base model is Coder-1.5B** (commit
+pending). Official EvalPlus 0.3.1 and LiveCodeBench (28fef95) generation with
+vLLM, evaluation inside the sandbox, three models.
+`.venv-probe/bin/python -m scripts.codeprobe.commands --run`, then `--run --resume` after LiveCodeBench
+problem 3411's greedy sample was OOM-killed in its 8 GB sandbox and stopped the
+first attempt (evaluation now retries such problems one sample per run and
+fails only that sample). Greedy, ours vs published (Qwen2.5-Coder report, Table 16):
+
+| Model | HumanEval / + | MBPP / + | LiveCodeBench 2407–2409 |
+| --- | --- | --- | --- |
+| Coder-0.5B | 60.4 / 56.1 (61.6 / 57.3) | – / 43.4 (52.4 / 43.7) | 1.3 (2.0) |
+| Coder-1.5B | 71.3 / 66.5 (70.7 / 66.5) | 68.3 / 58.5 (69.2 / 59.4) | 5.8 (6.1) |
+| Qwen2.5-0.5B | 38.4 / 34.1 | 49.7 / 41.8 | 1.3 |
+
+Headroom at T=0.8, n=16 (pass@1 / pass@16, sometimes-solved), on all 789 dev
+problems for LiveCodeBench:
+
+| Model | HumanEval+ | MBPP+ | LiveCodeBench (easy / medium / hard sometimes-solved) |
+| --- | --- | --- | --- |
+| Coder-0.5B | 46.5 / 78.0, 61.6% | 41.1 / 68.0, 52.6% | 3.2 / 12.5, 12.4% (34.1 / 3.3 / 0.4%) |
+| Coder-1.5B | 62.0 / 87.8, 58.5% | 56.5 / 77.8, 57.4% | 11.4 / 28.5, 27.4% (63.1 / 16.7 / 2.1%) |
+| Qwen2.5-0.5B | 28.4 / 58.5, 50.6% | 35.2 / 65.3, 56.9% | 2.7 / 11.4, 11.4% (32.2 / 2.7 / 0%) |
+
+Coder-0.5B fails the LiveCodeBench headroom gate (12.4% sometimes-solved, 9.3-point
+gap); Coder-1.5B passes it (27.4%, 17.1 points) and matches its published
+numbers, so the user chose Coder-1.5B as v2's base. Hard problems give no
+signal at either size. On the 156-problem published window alone, 1.5B's
+sometimes-solved is 14.1%; the gate is read on all dev problems.
+`eval/codeprobe/headroom-v1/` (`summary.json`, `summary-livecodebench-published-window.json`).
+
+**2026-10-30 – Evaluation sets in our grader** (commit pending). A problem
+set is now a directory with hidden tests per problem, loaded on demand. HumanEval+:
+163 of 164 tasks (`find_zero`, a special oracle, excluded); all 163 canonical
+solutions pass, and our grader agrees with EvalPlus on all 163 Coder-0.5B
+greedy samples (92 both pass, 71 both fail). Two tasks have results beyond
+Python's 4,300-digit limit, so integers from 10^4000 up cross the sandbox as
+digit strings. LiveCodeBench dev: 788 of 789 problems (`abc350_c` has no public
+example). Against LiveCodeBench's verdicts on the 788 Coder-1.5B greedy samples,
+the first agreement was 95.4%: all 36 disagreements were LeetCode samples that
+LiveCodeBench passed and we failed with `NameError` on `List`, because its
+evaluator runs a fixed import block before every solution. With that block
+added (also given to the agent's `run_python`), 99.9%; the last disagreement was
+a slow solution over our 4 s limit and inside LiveCodeBench's 6 s. LiveCodeBench
+problems now carry its import block and 6 s limit, which is fairer to the model.
+Final: 788/788 verdicts agree (103 both pass, 685 both fail).
+`eval/codeprobe/humanevalplus-checks-20261030/`, `eval/codeprobe/livecodebench-agreement-20261030/`
+(earlier runs in `-no-imports` and `-4s`).
+
+**2026-10-30 – Training pool: 20k problems** (commit pending). Deduplicated
+against every eval statement, including confirmation: word 8-gram containment of
+the eval statement in the training statement, threshold 0.3. Calibrated on
+43,688 candidates: the one true duplicate (a KodCode rewording of MBPP/119)
+scored 0.53, and the 0.3–0.5 band was generic phrasing. The filter removed 144
+of 225,336 KodCode candidates and none of 23,688 DeepCoder ones. KodCode-V1
+(97d81f0, CC-BY-NC-4.0): 15,000 easy/medium function-style problems (11,108 /
+3,892); call inputs are the literal calls inside its pytest asserts, and
+expected values come from running its reference solution twice in the sandbox.
+Exclusions among those tried: under 3 literal inputs 5,992; reference
+nondeterministic, failed or OOM 38; reference raised on an assert input 12;
+unencodable input (bytes) 1.
+Hidden cases min/median/max 3 / 7 / 38, so its tests are weak. DeepCoder
+(177913a) TACO and PrimeIntellect: 5,000 stdin problems (1,691 / 3,309) of 6,500
+tried, kept when one of the first 3 reference solutions passes every test in our
+grader (832 failed that; 650 function-call and 28 non-string problems skipped);
+hidden cases 5 / 102 / 1,226. Commands in [usage](usage.md).
+`data/agent/train-kodcode-v1-15k/`, `data/agent/train-deepcoder-5k/` (desktop).
+
 ## Artifacts and where things live
 
 | What | Path |

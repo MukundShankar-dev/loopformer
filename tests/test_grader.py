@@ -1,5 +1,6 @@
 """Grader contracts: comparison and classification on the host, and cheats that
 would beat a naive grader but must fail here."""
+import dataclasses
 import hashlib
 import json
 import textwrap
@@ -11,7 +12,7 @@ from sandbox_marks import needs_sandbox
 from scripts.sandbox.grader import (
     TestCase, Tests, exception_type, failure, grade, parse_value, same_stdout, same_value)
 from scripts.sandbox.runner import Limits, RunResult
-from scripts.sandbox.values import decode, encode
+from scripts.sandbox.values import BIG_INT, decode, encode
 
 
 def stdio(*pairs: tuple[str, str]) -> Tests:
@@ -45,8 +46,34 @@ def test_tagged_values_round_trip_and_keep_types_distinct():
     for value in [(1, [2, (3,)]), {3, 1, 2}, {"a": (1,), (1, 2): {4}}, {"__tuple__": 1}, 1 + 2j, [], (), 1.5, None, "x"]:
         assert decode(encode(value)) == value and type(decode(encode(value))) is type(value)
     assert encode((1, 2)) != encode([1, 2]) and encode({1, "a"}) == encode({"a", 1})
+    nested = {frozenset({1, 2}), frozenset()}
+    assert decode(encode(nested)) == nested and decode(encode({(frozenset({3}),): 1})) == {(frozenset({3}),): 1}
     with pytest.raises(TypeError, match="object"):
         encode(object())
+
+
+def test_huge_integers_cross_as_decimal_strings():
+    import sys
+    limit = sys.get_int_max_str_digits()
+    sys.set_int_max_str_digits(0)
+    try:
+        for value in [10 ** 5000, -(10 ** 5000) - 7, [BIG_INT, BIG_INT - 1]]:
+            assert decode(encode(value)) == value
+        assert encode(BIG_INT - 1) == BIG_INT - 1 and encode(True) is True
+        assert same_value(encode(10 ** 5000), encode(10 ** 5000), 0.0)
+        assert not same_value(encode(10 ** 5000), encode(10 ** 5000 + 1), 0.0)
+        assert not same_value(encode(10 ** 5000), 1e308, 0.0)
+        text = json.dumps(encode([10 ** 5000]))
+    finally:
+        sys.set_int_max_str_digits(limit)
+    assert parse_value(text)[0]  # the host parses the encoded form under the default limit
+
+
+@needs_sandbox
+def test_huge_integer_results_grade_by_value():
+    tests = Tests("call", (TestCase("[5000]", json.dumps({"__int__": "1" + "0" * 5000})),), function="power")
+    assert grade("def power(n):\n    return 10 ** n", tests).outcome == "pass"
+    assert grade("def power(n):\n    return 10 ** n + 1", tests).outcome == "wrong_answer"
 
 
 def test_value_comparison_is_strict_about_types_and_tolerant_only_for_floats():
@@ -135,6 +162,33 @@ def test_failure_outcomes_of_real_programs():
         result = grade(solution, SUM, workers=3)
         assert result.outcome == outcome and result.pass_fraction == 0.0, (solution, result.outcome)
     assert len(grade("def add(a, b) return a", SUM).results) == len(SUM.cases)
+
+
+@needs_sandbox
+def test_imports_run_in_the_solution_namespace():
+    leetcode = "class Solution:\n    def total(self, xs: List[int]) -> int:\n        return sum(xs)\n"
+    tests = call("total", ([[1, 2]], 3))
+    assert grade(leetcode, tests).outcome == "runtime_error:NameError"
+    assert grade(leetcode, dataclasses.replace(tests, imports="from typing import *\n")).outcome == "pass"
+    script = "if __name__ == '__main__':\n    print(sqrt(int(input())))\n"
+    tests = stdio(("4\n", "2.0\n"))
+    assert grade(script, tests).outcome == "runtime_error:NameError"
+    assert grade(script, dataclasses.replace(tests, imports="from math import *\n")).outcome == "pass"
+
+
+@needs_sandbox
+def test_imports_keep_the_solution_line_numbers():
+    tests = Tests("stdio", (TestCase("", ""),), imports="import math\n" * 5)
+    result = grade("x = 1\nraise ValueError('here')\n", tests)
+    assert result.outcome == "runtime_error:ValueError" and 'solution.py", line 2' in result.results[0].stderr
+
+
+@needs_sandbox
+def test_tests_time_limit_replaces_the_callers():
+    tests = stdio(("", "done\n"))
+    slow = "import time\ntime.sleep(2)\nprint('done')\n"
+    assert grade(slow, tests, limits=Limits(wall_seconds=1, cpu_seconds=1)).outcome == "timeout"
+    assert grade(slow, dataclasses.replace(tests, seconds=4), limits=Limits(wall_seconds=1, cpu_seconds=1)).outcome == "pass"
 
 
 @needs_sandbox

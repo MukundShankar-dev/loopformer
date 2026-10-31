@@ -13,9 +13,12 @@ A small model can spend extra inference compute in three ways:
 | **Breadth** | Draw k independent attempts and pick one | Diversity |
 | **Interaction** | Run its code, read the result, revise, over several turns | New information from execution |
 
-We build a looped coding agent on Qwen2.5-Coder-0.5B-Instruct. Its
-architecture is identical to v1's base (Qwen2, 24 layers, hidden 896, GQA
-14/2, tied embeddings), so v1's looping code applies. We then ask:
+We build a looped coding agent on Qwen2.5-Coder-1.5B-Instruct, chosen in M0a
+because Coder-0.5B has too little headroom on LiveCodeBench (see
+[history](history.md)). It is the same Qwen2 architecture as v1's base with
+more of it (28 layers, hidden 1536, GQA 12/2, tied embeddings), so v1's
+looping code applies; the looped block's layer range is chosen anew. We then
+ask:
 
 - **RQ1:** At matched compute, which axis gives the most correct solutions on
   held-out problems?
@@ -205,9 +208,9 @@ for a teacher to teach the format.
 
 | Use | Source | Notes |
 | --- | --- | --- |
-| Confirmation | LiveCodeBench problems after the cutoff (hashed ID list) | Public examples plus hidden tests; opened once per final checkpoint |
-| Development | LiveCodeBench problems before the cutoff; HumanEval+ and MBPP+ (1–2 tests made public, the rest hidden) | Tune anything here |
-| Training | Older LiveCodeBench problems, plus easy tiers of KodCode, TACO and APPS | Needs at least 3 hidden tests per problem and a reference solution that passes in our sandbox; deduplicated against every eval set. Tests must be input/expected pairs (stdin/stdout or call arguments/return value), because expected values never enter the sandbox; KodCode's pytest asserts embed them and need converting first |
+| Confirmation | LiveCodeBench release_v6 problems on or after 2024-11-12, Coder-0.5B's public release (its Hub repository dates from 2024-11-06; Coder-1.5B and Qwen2.5-0.5B from September 2024): 266 problems, IDs and hash in `configs/confirmation_livecodebench.json` | Public examples plus hidden tests; opened once per final checkpoint. release_v6 is the newest LiveCodeBench release |
+| Development | LiveCodeBench problems before 2024-11-12; HumanEval+ and MBPP+ (1–2 tests made public, the rest hidden) | Tune anything here |
+| Training | About 20k problems: KodCode-V1 easy and medium (function style; CC-BY-NC-4.0, so non-commercial use only) and DeepCoder's verified TACO and PrimeIntellect subsets (stdin style; its LiveCodeBench subset is not used). No LiveCodeBench: all of it before 2024-11-12 is development data | Needs at least 3 hidden tests per problem and a reference solution that passes in our sandbox; deduplicated against every eval set. Tests must be input/expected pairs (stdin/stdout or call arguments/return value), because expected values never enter the sandbox; KodCode's pytest asserts give the call inputs, and its reference solution gives the expected values |
 | Diagnostic | CRUXEval | Not trained on |
 
 ## Training
@@ -232,7 +235,7 @@ model.
    4. Repeat for one or two rounds as the success rate rises.
    - Ablate the training scope here: R only, LoRA on R, or the full model.
    - If successes are too rare, go easier problems first, then more attempts
-     per problem during collection only, then Coder-1.5B.
+     per problem during collection only.
 3. **RL.** A minimal multi-turn GRPO-style loop in this repo. vLLM-based
    rollout engines cannot run the looped model; reuse their loss definitions.
    Log-probabilities come from the same T-loop forward pass, and gradients
@@ -263,7 +266,7 @@ user changes scope.
 
 | Milestone | Content | Gate |
 | --- | --- | --- |
-| **M0a — Official-tool probe (ready, not run)** | Base Coder-0.5B, Coder-1.5B and Qwen2.5-0.5B on EvalPlus and LiveCodeBench: greedy plus 16 samples. Prepared: `configs/probe_headroom.json`, `scripts/codeprobe/`, `requirements-probe.txt`. | Greedy HumanEval+/MBPP+ within a few points of published numbers. Headroom: sometimes-solved ≥ 20% and pass@16 − pass@1 ≥ 10 points on the dev pool. |
+| **M0a — Official-tool probe** | Base Coder-0.5B, Coder-1.5B and Qwen2.5-0.5B on EvalPlus and LiveCodeBench (only problems before 2024-11-12, so the confirmation pool stays closed): greedy plus 16 samples, official generation and evaluation, evaluation in the sandbox. `configs/probe_headroom.json`, `scripts/codeprobe/`. | Greedy HumanEval+/MBPP+, and LiveCodeBench on the published 2407–2409 window, within a few points of published numbers. Headroom: sometimes-solved ≥ 20% and pass@16 − pass@1 ≥ 10 points on the dev pool. |
 | **M0b — Sandbox and harness** | bubblewrap wrapper, grader, tool loop with constrained decoding, outcome classes, FLOP logging. Base model at T=1 runs the breadth and interaction grid. | The adversarial suite passes. Harness single-turn results match M0a. Interaction headroom is measured. The base success rate in the scaffold on the training pool is high enough for expert iteration; otherwise apply the fallbacks in Training step 2. |
 | **M1 — KV cache** | One cache per loop for R (exact). Variants: last-loop-only cache, and variable depth per token. | Greedy cached output is token-identical to uncached for T ∈ {1, 2, 4} on at least 50 prompts. At T=1 it matches HF `generate`. |
 | **M2 — Generation API and speed** | Batched generation; self-speculative decoding (draft with T_d < T, verify with T); remove host syncs; CUDA graphs. | Speculative output is identical to plain decoding. Speedups are synchronized and warmup is excluded. |
@@ -278,7 +281,8 @@ user changes scope.
    dependence). Only needed if that arm runs.
 2. **The three FLOP budgets.** Proposed: chosen after M0b's cost
    measurements, before any training.
-3. **Fallback to Coder-1.5B** if 0.5B fails the M0 headroom gate.
-4. **Confirmation-set cutoff date and size,** set from the minimum detectable
-   effect.
-5. Whether v2 stays in this repo.
+3. **Claims scoped to the minimum detectable effect** of the fixed
+   confirmation set (computed in M3). If it is too small, the only way to
+   grow it is problems newer than LiveCodeBench release_v6, which would
+   have to be collected.
+4. Whether v2 stays in this repo.

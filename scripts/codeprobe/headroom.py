@@ -6,8 +6,7 @@ module reads per-sample pass/fail from EvalPlus and LiveCodeBench result files
 and reports, per benchmark, the always/sometimes/never-solved fractions and
 unbiased pass@k (Chen et al., 2021).
 
-The two readers assume the result layouts documented in the v2 plan. They have
-not yet been checked against real output; they fail loudly on a mismatch.
+The readers fail loudly if a result file does not have the expected layout.
 """
 import argparse
 import json
@@ -76,12 +75,12 @@ def read_evalplus(path: Path, tests: str = "plus") -> dict[str, list[bool]]:
     return results
 
 
-def read_livecodebench(path: Path, since: str | None = None) -> dict[str, dict[str, list[bool]]]:
-    """LiveCodeBench `*_eval_all.json`: a list of problems with `graded_list`.
+def read_livecodebench(path: Path, dates: tuple[str, str] | None = None) -> dict[str, dict[str, list[bool]]]:
+    """LiveCodeBench `eval_all` list: problems with `graded_list`.
 
-    Returns problems grouped by difficulty plus "all". `since` (YYYY-MM-DD)
-    keeps problems whose contest_date is on or after it, for contamination
-    control against the base model's release date.
+    Returns problems grouped by difficulty plus "all". `dates` (two
+    YYYY-MM-DD, inclusive) keeps problems whose contest_date is in that window,
+    for comparison with numbers published on a window.
     """
     data = json.loads(path.read_text())
     if not isinstance(data, list):
@@ -91,13 +90,13 @@ def read_livecodebench(path: Path, since: str | None = None) -> dict[str, dict[s
         missing = {"question_id", "graded_list", "difficulty", "contest_date"} - set(problem)
         if missing:
             raise ValueError(f"{path}: problem lacks {sorted(missing)}")
-        if since is not None and str(problem["contest_date"])[:10] < since:
+        if dates is not None and not dates[0] <= str(problem["contest_date"])[:10] <= dates[1]:
             continue
         passes = [bool(x) for x in problem["graded_list"]]
         groups["all"][problem["question_id"]] = passes
         groups[problem["difficulty"]][problem["question_id"]] = passes
     if not groups:
-        raise ValueError(f"{path}: no problems on or after {since}")
+        raise ValueError(f"{path}: no problems in {dates}")
     return dict(groups)
 
 
@@ -107,23 +106,26 @@ def main() -> None:
                         help="NAME=PATH to an EvalPlus eval_results.json; repeatable")
     parser.add_argument("--livecodebench", type=Path, action="append", default=[],
                         help="NAME=PATH to a LiveCodeBench eval_all.json; repeatable")
-    parser.add_argument("--since", help="LiveCodeBench contest-date cutoff, YYYY-MM-DD")
+    parser.add_argument("--dates", help="LiveCodeBench contest-date window START:END (YYYY-MM-DD, inclusive)")
     parser.add_argument("--output", type=Path, required=True, help="summary JSON to write")
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Output exists; choose a new path")
+    dates = tuple(args.dates.split(":")) if args.dates else None
+    if dates is not None and len(dates) != 2:
+        parser.error("--dates takes START:END")
     summary = {}
     for spec in args.evalplus:
         name, path = str(spec).split("=", 1)
         summary[name] = summarize(read_evalplus(Path(path)))
     for spec in args.livecodebench:
         name, path = str(spec).split("=", 1)
-        for group, results in read_livecodebench(Path(path), args.since).items():
+        for group, results in read_livecodebench(Path(path), dates).items():
             summary[f"{name}/{group}"] = summarize(results)
     if not summary:
         parser.error("Give at least one --evalplus or --livecodebench result")
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps({"since": args.since, "benchmarks": summary}, indent=2) + "\n")
+    args.output.write_text(json.dumps({"livecodebench_dates": dates, "benchmarks": summary}, indent=2) + "\n")
     table = Table(title="Headroom (fractions of problems)")
     for column in ("benchmark", "n", "problems", "always", "sometimes", "never", "pass@1", "pass@16"):
         table.add_column(column)

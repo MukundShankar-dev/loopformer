@@ -2,7 +2,7 @@
 
 The agent sees the instructions, the statement and the public tests. Each
 turn is sampled under the format grammar and its tool is executed in the
-sandbox; the observation becomes the next user message. On the last turn the
+sandbox (`run_python` runs with the problem's `imports`, as grading does); the observation becomes the next user message. On the last turn the
 grammar allows only `submit`, so every episode that is not cut off by the
 per-turn token cap ends with a submission (`forced_submit` marks those).
 The submission is graded on the hidden tests, whose results are recorded
@@ -21,7 +21,7 @@ from scripts.agent.decoding import Conversation, Sampling
 from scripts.agent.flops import FlopModel
 from scripts.agent.format import grammar, instructions, parse_turn, render_public_tests, render_run
 from scripts.codetasks.problems import Problem
-from scripts.sandbox.grader import Tests, failure, grade
+from scripts.sandbox.grader import Tests, failure, grade, with_imports
 from scripts.sandbox.runner import Limits, run
 from scripts.sandbox.values import decode
 
@@ -127,7 +127,8 @@ class Agent:
                 episode.stop = "forced_submit" if tools != config.tools else "submit"
                 break
             if turn.tool == "run_python":
-                result = run({"main.py": turn.code}, stdin=turn.stdin or "", limits=RUN_LIMITS)
+                files, entry = with_imports({"main.py": turn.code}, "main.py", problem.public.imports)
+                result = run(files, entry=entry, stdin=turn.stdin or "", limits=RUN_LIMITS)
                 record.sandbox_seconds, record.outcome = result.wall_seconds, failure(result) or "ok"
                 record.observation = render_run(result)
             else:
@@ -138,7 +139,7 @@ class Agent:
             prompt = self.observation_tokens(record.observation)
         episode.flops, episode.tokens_processed = conversation.flops, conversation.length
         if episode.final_code is not None:
-            hidden = grade(episode.final_code, problem.hidden, workers=config.grading_workers)
+            hidden = grade(episode.final_code, problem.hidden(), workers=config.grading_workers)
             public = grade(episode.final_code, problem.public, workers=config.grading_workers)
             episode.hidden_outcome, episode.hidden_pass_fraction = hidden.outcome, hidden.pass_fraction
             episode.public_outcome = public.outcome

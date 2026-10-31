@@ -143,29 +143,52 @@ python -m scripts.demo --model HF_REPO_ID [--revision REV] --request request.jso
 
 ## Code headroom probe (v2 M0a)
 
-Run with the probe environment ([setup](setup.md)). Generation runs on the host GPU, and EvalPlus evaluation runs inside the sandbox.
+Run with the probe environment ([setup](setup.md)). Generation runs on the host GPU; EvalPlus and LiveCodeBench evaluation run inside the sandbox.
 
 ```sh
 scripts/launch/mbpp_baseline.sh                      # MBPP+ greedy and n=16 for pinned Coder-0.5B, then the summary
 python -m scripts.codeprobe.commands                 # print every step of the full probe (configs/probe_headroom.json)
 .venv-probe/bin/python -m scripts.codeprobe.commands --run
-python -m scripts.codeprobe.headroom --evalplus NAME=<eval_results.json> --output <summary.json>
+python -m scripts.codeprobe.headroom --evalplus NAME=<eval_results.json> --livecodebench NAME=<eval_all.json> \
+  [--dates START:END] --output <summary.json>
 ```
 
-`--run` refuses unpinned model revisions and an existing output directory. LiveCodeBench steps generate only: its evaluation executes code and has no sandboxed wrapper yet. The summary reports, per benchmark, the always/sometimes/never-solved fractions and unbiased pass@1/4/16.
+`--run` refuses unpinned model revisions, an existing output directory and a LiveCodeBench checkout at another commit; it skips the problem-preparation step if its output exists. The summary reports, per benchmark (and per LiveCodeBench difficulty), the always/sometimes/never-solved fractions and unbiased pass@1/4/16. A second summary restricts LiveCodeBench to the window of the published numbers.
+
+The LiveCodeBench steps, individually:
+
+```sh
+.venv-probe/bin/python -m scripts.codeprobe.livecodebench_data --raw ~/src/lcb-data --before 2024-11-12 --output <problems dir>
+.venv-probe/bin/python -m scripts.codeprobe.livecodebench_codegen --lcb ~/src/LiveCodeBench --problems <problems dir> \
+  --output <run>/generations.json -- --model <hub id> --local_model_path <snapshot> --n 16 --temperature 0.8
+.venv-probe/bin/python -m scripts.codeprobe.evaluate_livecodebench --lcb ~/src/LiveCodeBench --problems <problems dir> \
+  --generations <run>/generations.json --output <run>/eval_all.json
+```
+
+`livecodebench_data` writes only problems dated before `--before`, so later problems (the confirmation pool) are never decoded. Arguments after `--` go to LiveCodeBench's own runner; its `--evaluate` is refused because it would execute samples on the host.
 
 ## Agent problems, grader agreement and episodes (v2 M0b)
 
 ```sh
-.venv-probe/bin/python -m scripts.codetasks.mbppplus --output data/agent/mbppplus-v0.2.0.jsonl
-.venv-probe/bin/python -m scripts.codeprobe.agreement --problems data/agent/mbppplus-v0.2.0.jsonl \
+.venv-probe/bin/python -m scripts.codetasks.evalplus --dataset mbpp --output data/agent/mbppplus-v0.2.0
+.venv-probe/bin/python -m scripts.codetasks.evalplus --dataset humaneval --output data/agent/humanevalplus-v0.1.10
+.venv-probe/bin/python -m scripts.codetasks.livecodebench --problems <livecodebench_data output> --output <dir>
+.venv-probe/bin/python -m scripts.codetasks.confirmation --raw ~/src/lcb-data --dataset-revision <rev> \
+  --cutoff 2024-11-12 --output configs/confirmation_livecodebench.json   # once; refuses to overwrite
+E="data/agent/humanevalplus-v0.1.10 data/agent/mbppplus-v0.2.0 data/agent/livecodebench-release_v6-0fe84c3-before-2024-11-12"
+.venv-probe/bin/python -m scripts.codetasks.kodcode --data ~/src/training-data/kodcode-v1 --count 15000 \
+  --eval-sets $E --livecodebench-raw ~/src/lcb-data --workers 2 --output data/agent/train-kodcode-v1-15k
+.venv-probe/bin/python -m scripts.codetasks.deepcoder --data ~/src/training-data/deepcoder --count 5000 \
+  --eval-sets $E --livecodebench-raw ~/src/lcb-data --output data/agent/train-deepcoder-5k
+.venv-probe/bin/python -m scripts.codeprobe.agreement --problems <problem set> --livecodebench <eval_all.json> --output <dir>
+.venv-probe/bin/python -m scripts.codeprobe.agreement --problems data/agent/mbppplus-v0.2.0 \
   --samples <codegen .jsonl> [--evalplus <eval_results.json>] --output <dir>
-python -m scripts.agent.run --model <pinned snapshot dir> --problems data/agent/mbppplus-v0.2.0.jsonl \
+python -m scripts.agent.run --model <pinned snapshot dir> --problems data/agent/mbppplus-v0.2.0 \
   --condition single --max-turns 1 --output eval/agent/<run>/episodes.jsonl
 python -m scripts.agent.run ... --condition interaction --max-turns 4 ...
 ```
 
-The converter writes the excluded tasks and reasons to `*.excluded.json` next to its output. `agreement` grades samples with our grader and, given EvalPlus results for the same samples, lists every disagreement. `scripts.agent.run` writes one JSON line per episode (turns with text, tools, outcomes and timings; FLOPs; hidden outcome) plus `run.json`.
+A problem set is a directory ([format](../scripts/codetasks/problems.py)); each converter also writes the excluded problems and reasons to `excluded.json` in it. `agreement` grades samples with our grader and, given EvalPlus results for the same samples, lists every disagreement. `scripts.agent.run` writes one JSON line per episode (turns with text, tools, outcomes and timings; FLOPs; hidden outcome) plus `run.json`.
 
 ## Tests
 

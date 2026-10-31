@@ -1,6 +1,6 @@
 """Run agent episodes of a Hugging Face model on a problem file; one JSON line per episode.
 
-    python -m scripts.agent.run --model <snapshot dir> --problems data/agent/mbppplus-v0.2.0.jsonl \\
+    python -m scripts.agent.run --model <snapshot dir> --problems data/agent/mbppplus-v0.2.0 \\
         --condition interaction --max-turns 4 --seeds 0 --limit 20 --output eval/agent/<run>/episodes.jsonl
 
 Conditions share one format: `single` allows only `submit` in one turn;
@@ -24,7 +24,7 @@ from scripts.codetasks.problems import read_problems
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--model", type=Path, required=True, help="local snapshot directory of a pinned revision")
-    parser.add_argument("--problems", type=Path, required=True)
+    parser.add_argument("--problems", type=Path, required=True, help="problem-set directory")
     parser.add_argument("--condition", choices=["single", "interaction"], required=True)
     parser.add_argument("--max-turns", type=int, default=4)
     parser.add_argument("--temperature", type=float, default=0.0)

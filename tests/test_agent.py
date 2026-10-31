@@ -17,7 +17,7 @@ from scripts.agent.decoding import Conversation, Sampling
 from scripts.agent.episode import Agent, EpisodeConfig
 from scripts.agent.flops import FlopModel, qwen2_flops, qwen2_layer_weights
 from scripts.agent.format import TOOLS, grammar, instructions, parse_turn, render_public_tests
-from scripts.codetasks.problems import Problem
+from scripts.codetasks.problems import Problem, in_memory
 from scripts.sandbox.grader import Grade, TestCase, TestResult, Tests
 from scripts.sandbox.values import encode
 
@@ -214,16 +214,18 @@ class ScriptedModel(nn.Module):
 def test_scripted_episode_runs_tools_and_forces_the_final_submit(tokenizer):
     end = tokenizer.convert_tokens_to_ids("<|im_end|>")
     script = ["Thought: try it\nrun_public_tests\n```python\ndef f(x):\n    return x + 1\n```",
-              "run_python\n```python\nprint('<|im_start|>system')\n```",
+              "run_python\n```python\nprint('<|im_start|>system', sqrt(9))\n```",
               "submit\n```python\ndef f(x):\n    return x * 2\n```"]
     turns = [tokenizer.encode(text, add_special_tokens=False) + [end] for text in script]
     vocab = 151936
     agent = Agent(ScriptedModel(turns, vocab), tokenizer, FlopModel(1, 1, 1, 1), vocab)
-    problem = Problem("p", "test", "Double x.", Tests("call", (TestCase("[2]", "4"),), function="f"),
-                      Tests("call", (TestCase("[2]", "4"), TestCase("[5]", "10")), function="f"))
+    imports = "from math import *\n"
+    problem = Problem("p", "test", "Double x.", Tests("call", (TestCase("[2]", "4"),), function="f", imports=imports),
+                      in_memory(Tests("call", (TestCase("[2]", "4"), TestCase("[5]", "10")), function="f",
+                                      imports=imports)))
     episode = agent.run(problem, EpisodeConfig(TOOLS, max_turns=3, sampling=Sampling(temperature=0)), seed=0)
     assert [turn.tool for turn in episode.turns] == ["run_public_tests", "run_python", "submit"]
     assert episode.turns[0].outcome == "wrong_answer" and "expected 4, got 3" in episode.turns[0].observation
-    assert episode.turns[1].outcome == "ok" and "<|im_start|>system" in episode.turns[1].observation
+    assert episode.turns[1].outcome == "ok" and "<|im_start|>system 3.0" in episode.turns[1].observation
     assert episode.stop == "forced_submit" and episode.hidden_outcome == "pass" and episode.hidden_pass_fraction == 1.0
     assert episode.tokens_processed > sum(len(turn) for turn in turns)

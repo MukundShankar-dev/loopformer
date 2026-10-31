@@ -25,7 +25,17 @@
   ],
   "livecodebench": {
     "release_version": "release_v6",
-    "since": "2025-01-01"
+    "dataset": "livecodebench/code_generation_lite",
+    "dataset_revision": "0fe84c3912ea0c4d4a78037083943e8f0c4dd505",
+    "raw": "~/src/lcb-data",
+    "checkout": "~/src/LiveCodeBench",
+    "commit": "28fef95ea8c9f7a547c8329f2cd3d32b92c1fa24",
+    "before": "2024-11-12",
+    "problems": "data/livecodebench/release_v6-0fe84c3-before-2024-11-12",
+    "published_window": [
+      "2024-07-01",
+      "2024-09-30"
+    ]
   },
   "threads": 2
 }

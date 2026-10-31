@@ -1,7 +1,7 @@
 """Runs inside the sandbox for call-style tests; copied in as /code/harness.py.
 
-Reads `{"function": name, "arguments": [...]}` from stdin, loads
-/code/solution.py, calls `name` (a module function, or a method of `Solution()`
+Reads `{"function": name, "arguments": [...], "imports": code}` from stdin,
+loads /code/solution.py after running `imports` in its namespace, calls `name` (a module function, or a method of `Solution()`
 in LeetCode style) and writes the return value to the original stdout.
 Arguments and result use the tagged JSON of /code/values.py
 (scripts/sandbox/values.py). The solution's own prints go to stderr.
@@ -16,20 +16,22 @@ import os
 import sys
 
 
-def load(name: str):
+def load(name: str, imports: str = ""):
     spec = importlib.util.spec_from_file_location(name, f"/code/{name}.py")
     module = importlib.util.module_from_spec(spec)
+    exec(compile(imports, "imports.py", "exec"), module.__dict__)
     spec.loader.exec_module(module)
     return module
 
 
 def main() -> None:
+    sys.set_int_max_str_digits(0)  # values.py encodes huge integers as decimal strings
     values = load("values")
     request = json.loads(sys.stdin.read())
     arguments = values.decode(request["arguments"])
     result = os.fdopen(os.dup(1), "w")
     os.dup2(2, 1)  # anything the solution prints goes to stderr
-    module = load("solution")
+    module = load("solution", request["imports"])
     name = request["function"]
     target = getattr(module, name, None)
     if target is None and hasattr(module, "Solution"):
