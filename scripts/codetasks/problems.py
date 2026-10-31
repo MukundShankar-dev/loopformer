@@ -27,8 +27,12 @@ class Problem:
     metadata: dict = field(default_factory=dict)  # e.g. contest date, difficulty, platform
 
 
+def _same(tests: Tests) -> Tests:
+    return tests
+
+
 def in_memory(tests: Tests) -> Callable[[], Tests]:
-    return lambda: tests
+    return partial(_same, tests)  # picklable, so problems can go to grading processes
 
 
 def _header(tests: Tests) -> dict:

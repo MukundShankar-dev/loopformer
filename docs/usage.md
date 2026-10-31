@@ -185,10 +185,13 @@ E="data/agent/humanevalplus-v0.1.10 data/agent/mbppplus-v0.2.0 data/agent/liveco
   --samples <codegen .jsonl> [--evalplus <eval_results.json>] --output <dir>
 python -m scripts.agent.run --model <pinned snapshot dir> --problems data/agent/mbppplus-v0.2.0 \
   --condition single --max-turns 1 --output eval/agent/<run>/episodes.jsonl
-python -m scripts.agent.run ... --condition interaction --max-turns 4 ...
+python -m scripts.agent.run ... --condition interaction --max-turns 4 --seeds 0 1 2 3 --temperature 0.8 \
+  --dtype bfloat16 --rows 64 [--first-failure]
+python -m scripts.agent.report --episodes eval/agent/<run>/episodes.jsonl --problems <problem set> \
+  [--by difficulty platform] [--baseline eval/agent/<other>/episodes.jsonl]
 ```
 
-A problem set is a directory ([format](../scripts/codetasks/problems.py)); each converter also writes the excluded problems and reasons to `excluded.json` in it. `agreement` grades samples with our grader and, given EvalPlus results for the same samples, lists every disagreement. `scripts.agent.run` writes one JSON line per episode (turns with text, tools, outcomes and timings; FLOPs; hidden outcome) plus `run.json`.
+A problem set is a directory ([format](../scripts/codetasks/problems.py)); each converter also writes the excluded problems and reasons to `excluded.json` in it. `agreement` grades samples with our grader and, given EvalPlus results for the same samples, lists every disagreement. `scripts.agent.run` writes one JSON line per episode, in completion order (turns with text, tools, outcomes and timings; FLOPs; hidden outcome), plus `run.json` with the arguments and, at the end, throughput and where decoding time went. `--rows` episodes decode together (KV cache memory grows with rows × `--capacity`); `--first-failure` is for training rewards only, since it makes hidden pass fractions lower bounds. `scripts.agent.report` writes `report.md` and `report.json` next to the episodes.
 
 ## Tests
 

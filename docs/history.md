@@ -501,6 +501,32 @@ grader (832 failed that; 650 function-call and 28 non-string problems skipped);
 hidden cases 5 / 102 / 1,226. Commands in [usage](usage.md).
 `data/agent/train-kodcode-v1-15k/`, `data/agent/train-deepcoder-5k/` (desktop).
 
+**2026-10-30 – M0c: batched engine** (commit pending). At batch 1 the agent
+loop ran Coder-1.5B at ~50 generated tokens/s (6.8 s per single-turn and 14 s
+per 4-turn episode on LiveCodeBench dev), so one expert-iteration round (20k
+problems × 8 interaction attempts) would take ~26 days. Replaced with our own
+engine (scripts/agent/engine.py: static per-row KV cache over a layer schedule,
+CUDA-graph decode), a batched decoder and a runner that refills rows as episodes
+end. Profiling the live run found three costs, fixed in turn: grading on threads
+starved the decoding thread of the interpreter lock (now in spawned processes);
+the thought line's bounded repetition `[^\n]{0,1000}` made each grammar mask
+~0.5 ms per row (any bound costs the same, so the thought line is now unbounded,
+limited only by the per-turn token cap: a change to what every condition may
+emit); and a mask buffer was allocated each step (now one pinned buffer, filled
+while the GPU runs the forward). Throughput, 4-turn interaction at T=0.8, 256
+episodes: LiveCodeBench dev 54 episodes/min (578 tokens/s) at 32 rows before
+the fixes, 123/min (1,474 tokens/s) at 64 rows after; DeepCoder with
+first-failure grading 94/min with the decoder never idle, solving 3 of 256. A
+round fits in about a day. Batch invariance, greedy single-turn on 64 problems,
+batch 1 vs batch 64: fp32 64/64 identical texts; bf16 29/64 identical and 52/64
+same verdict (8 vs 9 solved), from bf16 kernels rounding differently by batch
+size, so compared conditions must share dtype and batch settings. Training-mode
+grading (`--first-failure`) stops hidden grading at the first failing chunk.
+`python -m scripts.agent.run --model <Coder-1.5B snapshot> --problems <set> --condition interaction --max-turns 4
+--limit 64 --seeds 0 1 2 3 --temperature 0.8 --dtype bfloat16 --rows 64`.
+`eval/agent/throughput-coder-1.5b-20261030/` (batch 1), `eval/agent/throughput-coder-1.5b-batched-20261030/`,
+`eval/agent/engine-checks-20261030/` (desktop).
+
 ## Artifacts and where things live
 
 | What | Path |

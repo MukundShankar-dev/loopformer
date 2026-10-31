@@ -192,6 +192,18 @@ def test_tests_time_limit_replaces_the_callers():
 
 
 @needs_sandbox
+def test_first_failure_stops_early_and_agrees_on_the_verdict():
+    tests = stdio(*[(f"{n}\n", f"{2 * n}\n") for n in range(8)])
+    wrong = "n = int(input())\nprint(2 * n if n > 0 else -1)\n"  # fails only the first case
+    full, early = grade(wrong, tests, workers=2), grade(wrong, tests, workers=2, first_failure=True)
+    assert full.outcome == early.outcome == "wrong_answer" and full.pass_fraction == 7 / 8
+    assert len(early.results) == 2 and early.pass_fraction == 1 / 8  # one chunk run; unrun cases count as failed
+    right = "print(2 * int(input()))\n"
+    passing = grade(right, tests, workers=2, first_failure=True)
+    assert passing.outcome == "pass" and passing.pass_fraction == 1.0 and len(passing.results) == 8
+
+
+@needs_sandbox
 def test_long_correct_output_is_not_truncated():
     expected = "\n".join(str(i) for i in range(50_000)) + "\n"  # about 290 kB, over the default output cap
     assert grade("for i in range(50_000): print(i)", stdio(("", expected))).outcome == "pass"

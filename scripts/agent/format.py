@@ -25,11 +25,10 @@ from scripts.sandbox.runner import RunResult
 from scripts.sandbox.values import decode
 
 TOOLS = ("run_python", "run_public_tests", "submit")
-THOUGHT_CHARACTERS = 1000
 OBSERVATION_CHARACTERS = 2000  # of stdout and of stderr, each, shown to the agent
 # Mirrors `grammar` rule for rule; tests/test_agent.py checks that both accept the same turns.
 BODY = r"(?:[^`]|`[^`]|``[^`])*"
-TURN = re.compile(rf"\A(?:Thought: (?P<thought>[^\n]{{0,{THOUGHT_CHARACTERS}}})\n)?"
+TURN = re.compile(rf"\A(?:Thought: (?P<thought>[^\n]*)\n)?"
                   rf"(?:(?P<tool>run_python)\n```python\n(?P<code>{BODY})```(?:\n```stdin\n(?P<stdin>{BODY})```)?"
                   rf"|(?P<other>run_public_tests|submit)\n```python\n(?P<other_code>{BODY})```)\n?\Z")
 
@@ -55,7 +54,7 @@ def instructions(tools: tuple[str, ...], max_turns: int) -> str:
         raise ValueError(f"tools must be a subset of {TOOLS} that includes submit")
     stdin_line = "```stdin\n<optional input>\n```\n" if "run_python" in tools else ""
     return (
-        "You are a Python programming agent. Solve the problem by writing a Python function.\n"
+        "You are a Python programming agent. Solve the problem in Python using only the standard library.\n"
         f"Each turn, you may write one short line starting with 'Thought:', then exactly one tool call. "
         f"You have at most {max_turns} turns.\n\nTools:\n" + "\n".join(f"- {TOOL_HELP[tool]}" for tool in tools)
         + "\n\nFormat:\nThought: <one line>\n<tool name>\n```python\n<complete code>\n```\n" + stdin_line
@@ -73,7 +72,9 @@ def grammar(tools: tuple[str, ...]) -> str:
         calls.append('"submit\\n" code')
     return "\n".join([
         # The optional final newline lets the model close a block with its usual fence-and-newline token.
-        f'root ::= ("Thought: " [^\\n]{{0,{THOUGHT_CHARACTERS}}} "\\n")? ({" | ".join(calls)}) "\\n"?',
+        # The thought is one line of any length (the per-turn token cap bounds it): a bounded repetition such as
+        # [^\\n]{0,1000} makes every mask in the thought cost ~0.5 ms per row, against microseconds unbounded.
+        f'root ::= ("Thought: " [^\\n]* "\\n")? ({" | ".join(calls)}) "\\n"?',
         'code ::= "```python\\n" body "```"',
         # Any text without three consecutive backticks.
         'body ::= ([^`] | "`" [^`] | "``" [^`])*',

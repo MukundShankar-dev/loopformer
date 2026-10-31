@@ -56,7 +56,14 @@ Inference uses a full grid on the same trained checkpoint:
 
 - T ∈ {1, 2, 4} loops;
 - k ∈ {1, 4, 16} attempts;
-- turns ∈ {1, 2, 4} (one turn means no execution feedback).
+- turns ∈ {1, 2, 4} (one turn means no execution feedback), in two
+  interaction modes:
+  - **tools:** the model chooses `run_python`, `run_public_tests` or
+    `submit` each turn;
+  - **repair:** the model only submits; the harness runs the public tests
+    and, on a failure, shows the failing tests and asks for a revision, until
+    they pass or turns run out (the self-repair baseline). It separates the
+    value of execution feedback from the skill of choosing tools.
 
 Training conditions are fewer, because each costs a run (see Training).
 
@@ -68,6 +75,9 @@ Training conditions are fewer, because each costs a run (see Training).
   - Each condition's FLOPs are logged, not estimated afterwards.
 - **Secondary:** end-to-end wall-clock time on the desktop, split into model
   time and sandbox time, with synchronized timing and warmup excluded.
+- **Numerics:** compared conditions run with the same dtype, engine and
+  batch settings. In bf16, a row's tokens depend on the batch size (batched
+  kernels round differently), so a difference in settings is a confound.
 - **Comparison method:**
   - Each condition is a point (FLOPs, success rate). Each axis traces a curve.
   - Comparisons are made at three FLOP budgets fixed before results, chosen
@@ -267,9 +277,11 @@ user changes scope.
 | Milestone | Content | Gate |
 | --- | --- | --- |
 | **M0a — Official-tool probe** | Base Coder-0.5B, Coder-1.5B and Qwen2.5-0.5B on EvalPlus and LiveCodeBench (only problems before 2024-11-12, so the confirmation pool stays closed): greedy plus 16 samples, official generation and evaluation, evaluation in the sandbox. `configs/probe_headroom.json`, `scripts/codeprobe/`. | Greedy HumanEval+/MBPP+, and LiveCodeBench on the published 2407–2409 window, within a few points of published numbers. Headroom: sometimes-solved ≥ 20% and pass@16 − pass@1 ≥ 10 points on the dev pool. |
-| **M0b — Sandbox and harness** | bubblewrap wrapper, grader, tool loop with constrained decoding, outcome classes, FLOP logging. Base model at T=1 runs the breadth and interaction grid. | The adversarial suite passes. Harness single-turn results match M0a. Interaction headroom is measured. The base success rate in the scaffold on the training pool is high enough for expert iteration; otherwise apply the fallbacks in Training step 2. |
+| **M0b — Sandbox and harness** | bubblewrap wrapper, grader, tool loop with constrained decoding, outcome classes, FLOP logging, episode report. | The adversarial suite passes. The grader agrees with EvalPlus and LiveCodeBench verdicts on the M0a samples. |
+| **M0c — Batched engine** | Batched decoding for the T=1 base model in our own stack (the looped model cannot run on vLLM, so every condition shares this engine): episodes join and leave the batch independently, a static KV cache laid out so M1's per-loop caches fit, batched grammar masks, sandbox work off the GPU's critical path. Training-mode grading stops at the first failing test, on its own worker pool. | Batched greedy output equals batch-1 output in fp32 (bf16 divergence rate measured and reported). One expert-iteration round (20k problems × 8 interaction attempts) fits in a day on the shared desktop. |
+| **M0d — Base-model grid** | Base model at T=1 runs the breadth and interaction grid on dev, and attempts the training pool. | Harness single-turn results match M0a. Interaction headroom is measured. The base success rate in the scaffold on the training pool is high enough for expert iteration; otherwise apply the fallbacks in Training step 2. |
 | **M1 — KV cache** | One cache per loop for R (exact). Variants: last-loop-only cache, and variable depth per token. | Greedy cached output is token-identical to uncached for T ∈ {1, 2, 4} on at least 50 prompts. At T=1 it matches HF `generate`. |
-| **M2 — Generation API and speed** | Batched generation; self-speculative decoding (draft with T_d < T, verify with T); remove host syncs; CUDA graphs. | Speculative output is identical to plain decoding. Speedups are synchronized and warmup is excluded. |
+| **M2 — Speed** | Self-speculative decoding (draft with T_d < T, verify with T); remove host syncs; CUDA graphs. | Speculative output is identical to plain decoding. Speedups are synchronized and warmup is excluded. |
 | **M3 — Pre-registration** | Freeze budgets, primary comparisons, confirmation IDs and minimum detectable effect from M0 data. | Committed and hashed. |
 | **M4 — Expert-iteration SFT** | Teacher-free self-training, as above. | Multi-turn ≥ single-turn on dev. pass@1 at T>1 ≥ at T=1 (otherwise depth is inert; report it). T=1 retention margin holds. Three seeds. |
 | **M5 — RL** | Stages A–C. | Primary comparisons on confirmation, with three seeds. Negative results are reported. |
@@ -279,7 +291,7 @@ user changes scope.
 1. **Teacher for the optional hybrid ablation:** a local model (free,
    reproducible) or an API model (stronger repairs, external version
    dependence). Only needed if that arm runs.
-2. **The three FLOP budgets.** Proposed: chosen after M0b's cost
+2. **The three FLOP budgets.** Proposed: chosen after M0d's cost
    measurements, before any training.
 3. **Claims scoped to the minimum detectable effect** of the fixed
    confirmation set (computed in M3). If it is too small, the only way to

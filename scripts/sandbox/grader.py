@@ -104,8 +104,8 @@ class TestResult:
 @dataclass(frozen=True)
 class Grade:
     outcome: str  # pass if every test passed, else the first failing test's outcome
-    pass_fraction: float
-    results: tuple[TestResult, ...]
+    pass_fraction: float  # of all cases; cases not run (after `first_failure` stopped) count as failed
+    results: tuple[TestResult, ...]  # of the cases run, in order
 
 
 def exception_type(stderr: str) -> str | None:
@@ -223,14 +223,23 @@ def run_case(solution: str, tests: Tests, case: TestCase, limits: Limits) -> Tes
     return TestResult(outcome, result.wall_seconds, result.stdout[:DETAIL_CHARACTERS], result.stderr[-DETAIL_CHARACTERS:])
 
 
-def grade(solution: str, tests: Tests, limits: Limits = TEST_LIMITS, workers: int = 1) -> Grade:
-    """Compile-check once, then run every case; `workers` sandbox runs at a time."""
+def grade(solution: str, tests: Tests, limits: Limits = TEST_LIMITS, workers: int = 1,
+          first_failure: bool = False) -> Grade:
+    """Compile-check once, then run the cases, `workers` sandbox runs at a time. With `first_failure`, cases run in
+    chunks of `workers` and grading stops after a chunk with a failure: enough for a pass/fail reward, much cheaper
+    on the many submissions that fail early."""
     check = run({"solution.py": solution, "check.py": SYNTAX_CHECK}, entry="check.py", limits=limits)
     if check.exit_code != 0:
         outcome = failure(check) if check.timed_out or check.oom_killed else "syntax_error"
         detail = TestResult(outcome, check.wall_seconds, "", check.stderr[-DETAIL_CHARACTERS:])
         return Grade(outcome, 0.0, (detail,) * len(tests.cases))
+    chunk = workers if first_failure else len(tests.cases)
+    results: list[TestResult] = []
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        results = tuple(pool.map(lambda case: run_case(solution, tests, case, limits), tests.cases))
+        for start in range(0, len(tests.cases), chunk):
+            results += pool.map(lambda case: run_case(solution, tests, case, limits), tests.cases[start:start + chunk])
+            if first_failure and any(result.outcome != "pass" for result in results):
+                break
     failed = [result.outcome for result in results if result.outcome != "pass"]
-    return Grade(failed[0] if failed else "pass", 1 - len(failed) / len(results), results)
+    passed = len(results) - len(failed)
+    return Grade(failed[0] if failed else "pass", passed / len(tests.cases), tuple(results))
