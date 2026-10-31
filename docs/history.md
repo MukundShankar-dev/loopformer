@@ -424,7 +424,7 @@ truncated (a repetition loop). Twenty problems cannot separate the conditions.
 `eval/agent/smoke-mbppplus20-20261030/`.
 
 **2026-10-30 – LiveCodeBench split: dev before 2024-11-12, confirmation after**
-(commit pending). Confirmation = release_v6 (the newest release) problems on or
+(`7320c7c`). Confirmation = release_v6 (the newest release) problems on or
 after 2024-11-12, Coder-0.5B's public release and after the other two models':
 266 problems (67 easy / 83 medium / 116 hard; 163 AtCoder, 103 LeetCode;
 2024-11-16 to 2025-04-06), IDs frozen with sha256 `7522600f…abf2`. Dev = the 789
@@ -435,8 +435,7 @@ loader (remote code plus plain unpickling) is never run.
 `python -m scripts.codetasks.confirmation --raw ~/src/lcb-data --dataset-revision 0fe84c3 --cutoff 2024-11-12
 --output configs/confirmation_livecodebench.json`.
 
-**2026-10-30 – M0a probe complete; the base model is Coder-1.5B** (commit
-pending). Official EvalPlus 0.3.1 and LiveCodeBench (28fef95) generation with
+**2026-10-30 – M0a probe complete; the base model is Coder-1.5B** (`7320c7c`). Official EvalPlus 0.3.1 and LiveCodeBench (28fef95) generation with
 vLLM, evaluation inside the sandbox, three models.
 `.venv-probe/bin/python -m scripts.codeprobe.commands --run`, then `--run --resume` after LiveCodeBench
 problem 3411's greedy sample was OOM-killed in its 8 GB sandbox and stopped the
@@ -465,7 +464,7 @@ signal at either size. On the 156-problem published window alone, 1.5B's
 sometimes-solved is 14.1%; the gate is read on all dev problems.
 `eval/codeprobe/headroom-v1/` (`summary.json`, `summary-livecodebench-published-window.json`).
 
-**2026-10-30 – Evaluation sets in our grader** (commit pending). A problem
+**2026-10-30 – Evaluation sets in our grader** (`7320c7c`). A problem
 set is now a directory with hidden tests per problem, loaded on demand. HumanEval+:
 163 of 164 tasks (`find_zero`, a special oracle, excluded); all 163 canonical
 solutions pass, and our grader agrees with EvalPlus on all 163 Coder-0.5B
@@ -483,7 +482,7 @@ Final: 788/788 verdicts agree (103 both pass, 685 both fail).
 `eval/codeprobe/humanevalplus-checks-20261030/`, `eval/codeprobe/livecodebench-agreement-20261030/`
 (earlier runs in `-no-imports` and `-4s`).
 
-**2026-10-30 – Training pool: 20k problems** (commit pending). Deduplicated
+**2026-10-30 – Training pool: 20k problems** (`7320c7c`). Deduplicated
 against every eval statement, including confirmation: word 8-gram containment of
 the eval statement in the training statement, threshold 0.3. Calibrated on
 43,688 candidates: the one true duplicate (a KodCode rewording of MBPP/119)
