@@ -501,7 +501,7 @@ grader (832 failed that; 650 function-call and 28 non-string problems skipped);
 hidden cases 5 / 102 / 1,226. Commands in [usage](usage.md).
 `data/agent/train-kodcode-v1-15k/`, `data/agent/train-deepcoder-5k/` (desktop).
 
-**2026-10-30 – M0c: batched engine** (commit pending). At batch 1 the agent
+**2026-10-30 – M0c: batched engine** (commit c137f05). At batch 1 the agent
 loop ran Coder-1.5B at ~50 generated tokens/s (6.8 s per single-turn and 14 s
 per 4-turn episode on LiveCodeBench dev), so one expert-iteration round (20k
 problems × 8 interaction attempts) would take ~26 days. Replaced with our own
