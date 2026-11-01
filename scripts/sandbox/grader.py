@@ -1,10 +1,19 @@
 """Grade a submitted program against tests, deciding pass or fail on the host.
 
-Each test case is a separate sandbox run on a fresh copy of the submission,
-given only that case's input. Expected outputs stay on the host, so a
-submission cannot pass by exiting early, tampering with the harness, printing
-"pass" or reading the answers: whatever it emits is compared here against a
-value it never saw.
+Each stdio test case is a separate sandbox run on a fresh copy of the
+submission, given only that case's input. Call tests run in batches: one
+sandbox run loads the submission once and calls it on up to BATCH_CASES
+inputs in turn, as EvalPlus and LiveCodeBench run all of a solution's tests in
+one process. Only a value a call returned is decided from a batch; every other
+case (an exception, a crash, output that is malformed or out of order, or
+cases left when the batch hit its limits) is re-run alone, and so is every
+passing case of a batch that did not exit cleanly, since alone such a case
+fails after returning (a thread that never ends, a crashing exit handler). A
+whole batch gets one case's time limit; as in those harnesses, state a case
+warms (a cache) carries to later cases in its batch.
+Expected outputs stay on the host, so a submission cannot pass by exiting
+early, tampering with the harness, printing "pass" or reading the answers:
+whatever it emits is compared here against a value it never saw.
 
 Failure classes are parsed from the program's stderr, which the program
 controls. They are diagnostics, never evidence of a pass.
@@ -15,8 +24,8 @@ Two kinds of tests:
   (modelled on LiveCodeBench's checker).
 - `call`: input is a JSON array of arguments to `function`; expected is the
   return value. Both use the tagged JSON of scripts/sandbox/values.py, so
-  tuples and sets survive. Values are compared structurally, with floats
-  within `atol` or a relative 1e-7 (as EvalPlus does).
+  tuples and sets survive. Values are compared structurally, with two floats
+  equal within `atol` or a relative 1e-7 (as EvalPlus does).
 
 `imports` is code run in the solution's namespace before it, as
 LiveCodeBench does with its fixed import block; the solution file itself is
@@ -53,6 +62,8 @@ namespace.pop('__builtins__', None)
 runpy.run_path('/code/ENTRY', init_globals=namespace, run_name='__main__')
 """
 TEST_LIMITS = Limits(wall_seconds=4, cpu_seconds=4)
+BATCH_CASES = 64
+BATCH_INPUT_BYTES = 1 << 20  # of JSON arguments per batch
 EXCEPTION_LINE = re.compile(r"^([A-Za-z_][A-Za-z0-9_.]{0,63})(?::|$)")
 DETAIL_CHARACTERS = 2000
 SIGNAL_CPU = 24
@@ -160,11 +171,14 @@ def same_stdout(expected: str, actual: str) -> bool:
 def same_value(expected, actual, atol: float) -> bool:
     """Python `==` on encoded values (as EvalPlus checks), with float tolerance.
     Numbers compare by value, so `True == 1` as in Python; tagged tuples and
-    lists differ, as they do under `==`. Recurses along `expected`, so the depth
-    of an adversarial `actual` cannot exhaust the host's stack."""
+    lists differ, as they do under `==`. Tolerance applies only between two
+    floats: EvalPlus requires matching types when values are not `==`, so an
+    int is not close to a float (an exact int against a reference's rounded
+    float fails there too). Recurses along `expected`, so the depth of an
+    adversarial `actual` cannot exhaust the host's stack."""
+    if type(expected) is float and type(actual) is float:
+        return math.isclose(expected, actual, rel_tol=FLOAT_RELATIVE_TOLERANCE, abs_tol=atol) or expected == actual
     if isinstance(expected, (bool, int, float)) and isinstance(actual, (bool, int, float)):
-        if isinstance(expected, float) or isinstance(actual, float):
-            return math.isclose(expected, actual, rel_tol=FLOAT_RELATIVE_TOLERANCE, abs_tol=atol) or expected == actual
         return expected == actual
     if isinstance(expected, list):
         return (isinstance(actual, list) and len(expected) == len(actual)
@@ -200,6 +214,50 @@ def with_imports(files: dict[str, str], entry: str, imports: str) -> tuple[dict[
     return {**files, "imports.py": imports, "launch_with_imports.py": launcher}, "launch_with_imports.py"
 
 
+def call_outcome(tests: Tests, case: TestCase, value) -> str:
+    return "pass" if same_value(json.loads(case.expected), value, tests.atol) else "wrong_answer"
+
+
+def batches(cases: tuple[TestCase, ...]) -> list[tuple[TestCase, ...]]:
+    """Consecutive runs of at most BATCH_CASES cases and BATCH_INPUT_BYTES of input (a larger case goes alone)."""
+    groups, current, size = [], [], 0
+    for case in cases:
+        if current and (len(current) == BATCH_CASES or size + len(case.input) > BATCH_INPUT_BYTES):
+            groups.append(tuple(current))
+            current, size = [], 0
+        current.append(case)
+        size += len(case.input)
+    return groups + [tuple(current)]
+
+
+def run_batch(solution: str, tests: Tests, cases: tuple[TestCase, ...], limits: Limits) -> list[TestResult | None]:
+    """One sandbox run calling the solution on each case; a result for each case that returned a value in order,
+    None for the rest. Output past a case's own output limit fails it, as it would alone. Each decided case carries
+    the batch's stderr, which no single case owns."""
+    alone = [case_limits(limits, tests, case) for case in cases]
+    output = sum(case.output_bytes + 64 for case in alone)
+    limits = dataclasses.replace(alone[0], output_bytes=output, file_bytes=max(limits.file_bytes, 2 * output))
+    request = json.dumps({"function": tests.function, "batch": [json.loads(case.input) for case in cases],
+                          "imports": tests.imports})
+    result = run({"solution.py": solution, "harness.py": HARNESS, "values.py": VALUES}, entry="harness.py",
+                 stdin=request, limits=limits)
+    decided: list[TestResult | None] = [None] * len(cases)
+    for number, line in enumerate(result.stdout.split("\n")[:-1][:len(cases)]):  # complete lines only
+        parsed, frame = parse_value(line)
+        if not (parsed and isinstance(frame, dict) and type(frame.get("case")) is int and frame["case"] == number):
+            break  # malformed or forged: this and later cases are re-run alone
+        if frame.keys() != {"case", "value"}:
+            continue  # the call raised
+        text = json.dumps(frame["value"])
+        too_long = len(text.encode()) > alone[number].output_bytes
+        outcome = "wrong_answer" if too_long else call_outcome(tests, cases[number], frame["value"])
+        decided[number] = TestResult(outcome, result.wall_seconds / len(cases), text[:DETAIL_CHARACTERS],
+                                     result.stderr[-DETAIL_CHARACTERS:])
+    if failure(result) is not None or result.stdout_truncated:
+        decided = [r if r is not None and r.outcome != "pass" else None for r in decided]
+    return decided
+
+
 def run_case(solution: str, tests: Tests, case: TestCase, limits: Limits) -> TestResult:
     limits = case_limits(limits, tests, case)
     if tests.kind == "stdio":
@@ -218,26 +276,43 @@ def run_case(solution: str, tests: Tests, case: TestCase, limits: Limits) -> Tes
             outcome = "pass" if same_stdout(case.expected, result.stdout) else "wrong_answer"
         else:
             parsed, value = parse_value(result.stdout)
-            matched = parsed and same_value(json.loads(case.expected), value, tests.atol)
-            outcome = "pass" if matched else "wrong_answer"
+            outcome = call_outcome(tests, case, value) if parsed else "wrong_answer"
     return TestResult(outcome, result.wall_seconds, result.stdout[:DETAIL_CHARACTERS], result.stderr[-DETAIL_CHARACTERS:])
+
+
+def run_group(solution: str, tests: Tests, cases: tuple[TestCase, ...], limits: Limits,
+              first_failure: bool) -> list[TestResult]:
+    """A batch of call cases, then each undecided case alone; with `first_failure`, stops at the first failure."""
+    decided = run_batch(solution, tests, cases, limits) if len(cases) > 1 else [None]
+    results = []
+    for case, result in zip(cases, decided):
+        results.append(result or run_case(solution, tests, case, limits))
+        if first_failure and results[-1].outcome != "pass":
+            break
+    return results
 
 
 def grade(solution: str, tests: Tests, limits: Limits = TEST_LIMITS, workers: int = 1,
           first_failure: bool = False) -> Grade:
-    """Compile-check once, then run the cases, `workers` sandbox runs at a time. With `first_failure`, cases run in
-    chunks of `workers` and grading stops after a chunk with a failure: enough for a pass/fail reward, much cheaper
-    on the many submissions that fail early."""
+    """Compile-check once, then run the cases (call tests in batches), `workers` sandbox runs at a time. With
+    `first_failure`, grading stops after a round of `workers` runs with a failure: enough for a pass/fail reward,
+    much cheaper on the many submissions that fail early."""
     check = run({"solution.py": solution, "check.py": SYNTAX_CHECK}, entry="check.py", limits=limits)
     if check.exit_code != 0:
         outcome = failure(check) if check.timed_out or check.oom_killed else "syntax_error"
         detail = TestResult(outcome, check.wall_seconds, "", check.stderr[-DETAIL_CHARACTERS:])
         return Grade(outcome, 0.0, (detail,) * len(tests.cases))
-    chunk = workers if first_failure else len(tests.cases)
+    groups = batches(tests.cases) if tests.kind == "call" else [(case,) for case in tests.cases]
+    chunk = workers if first_failure else len(groups)
     results: list[TestResult] = []
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        for start in range(0, len(tests.cases), chunk):
-            results += pool.map(lambda case: run_case(solution, tests, case, limits), tests.cases[start:start + chunk])
+        for start in range(0, len(groups), chunk):
+            round_groups = groups[start:start + chunk]
+            for cases, group in zip(round_groups, pool.map(
+                    lambda cases: run_group(solution, tests, cases, limits, first_failure), round_groups)):
+                results += group
+                if len(group) < len(cases):
+                    break  # stopped at a failure: later groups' results would leave a gap in `results`
             if first_failure and any(result.outcome != "pass" for result in results):
                 break
     failed = [result.outcome for result in results if result.outcome != "pass"]

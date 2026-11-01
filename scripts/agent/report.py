@@ -8,6 +8,9 @@ problems, then each value of each `--by` metadata key) reports:
 - solved: the fraction of episodes whose submission passes the hidden tests,
   with a 95% bootstrap interval over problems (episodes of one problem are
   correlated, so problems are the resampling unit), and pass@k;
+- selected@k: the breadth baseline, which submits the first of k attempts
+  that passes the public tests (the first attempt if none does); the exact
+  expectation over k-subsets of each problem's attempts in seed order;
 - public_pass_hidden_fail: of submissions that pass the public tests, the
   fraction failing hidden tests (overfitting to the examples);
 - stops, hidden outcome classes, tool calls per episode, and repairs
@@ -21,6 +24,7 @@ minus baseline) with its bootstrap interval, and problem wins and losses.
 import argparse
 import json
 from collections import Counter, defaultdict
+from math import comb
 from pathlib import Path
 
 import numpy as np
@@ -61,6 +65,22 @@ def repaired(episode: dict) -> bool:
                                    for turn in episode["turns"])
 
 
+def selected_at_k(group: list[dict], k: int) -> float:
+    """Expected hidden-test success of the breadth baseline on a random k-subset of `group`, attempts in seed order.
+    A public-passing attempt is chosen when no earlier public-passing attempt is in the subset; a failing one when
+    no public-passing attempt is in the subset and it is the subset's first."""
+    attempts = sorted(group, key=lambda episode: episode["seed"])
+    public = [episode["public_outcome"] == "pass" for episode in attempts]
+    n, total = len(attempts), 0
+    for index, episode in enumerate(attempts):
+        if public[index]:
+            subsets = comb(n - 1 - sum(public[:index]), k - 1)
+        else:  # the other k - 1 are all later failing attempts
+            subsets = comb(sum(not passed for passed in public[index + 1:]), k - 1)
+        total += subsets * solved(episode)
+    return total / comb(n, k)
+
+
 def group_summary(episodes: dict[str, list[dict]]) -> dict:
     flat = [episode for group in episodes.values() for episode in group]
     per_problem = np.array([np.mean([solved(e) for e in group]) for group in episodes.values()])
@@ -72,6 +92,8 @@ def group_summary(episodes: dict[str, list[dict]]) -> dict:
         "solved_interval": bootstrap_mean(per_problem),
         **{key: value for key, value in summarize({p: [solved(e) for e in g] for p, g in episodes.items()},
                                                   ks=PASS_KS).items() if key != "pass@1"},
+        **{f"selected@{k}": float(np.mean([selected_at_k(group, k) for group in episodes.values()]))
+           for k in PASS_KS if k <= min(len(group) for group in episodes.values())},
         "public_pass": len(public_pass) / len(flat),
         "public_pass_hidden_fail": mean([not solved(e) for e in public_pass]) if public_pass else None,
         "stops": {key: count / len(flat) for key, count in Counter(e["stop"] for e in flat).most_common()},
@@ -126,9 +148,10 @@ def markdown(report: dict) -> str:
                      f"| {percent(group['repaired'])} | {group['turns']:.2f} | {group['tflops']:.2f} "
                      f"| {group['model_seconds']:.1f} | {group['sandbox_seconds']:.1f} |")
     every = report["groups"]["all"]
-    passes = {key: value for key, value in every.items() if key.startswith("pass@")}
-    if passes:
-        lines += ["", "pass@k (all): " + ", ".join(f"{key} {percent(value)}%" for key, value in passes.items())]
+    for prefix, name in (("pass@", "pass@k, oracle"), ("selected@", "selected@k, by public tests")):
+        values = {key: value for key, value in every.items() if key.startswith(prefix)}
+        if values:
+            lines += ["", f"{name} (all): " + ", ".join(f"{key} {percent(value)}%" for key, value in values.items())]
     for title, key in (("Stops", "stops"), ("Hidden outcomes", "hidden_outcomes"), ("Tool calls per episode", "tool_calls")):
         values = every[key]
         shown = (f"{name} {value:.2f}" if key == "tool_calls" else f"{name} {percent(value)}%"

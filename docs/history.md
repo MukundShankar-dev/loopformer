@@ -573,6 +573,56 @@ which interaction runs also see.
 `-nothought`, `-final`, `-plainprompt`), `eval/codeprobe/humanevalplus-agreement-1.5b-prompt-20261031/`;
 superseded HumanEval+ sets kept as `data/agent/humanevalplus-v0.1.10-{plain-statement,codeblock-only,codeblock-prompt}` (desktop).
 
+**2026-10-31 – Batched call grading; EvalPlus type rule** (commit pending). At
+per-case grading the M0d grid would take about 120 h, nearly all in the grader
+(84% of HumanEval+ and 97% of LiveCodeBench samples are unique, so dedup does not
+help). Call cases now run in batches of up to 64 per sandbox run; only returned
+values are decided from a batch, and every other case, and every passing case of
+a batch that did not exit cleanly, is re-run alone (scripts/sandbox/grader.py).
+A red-team review found that failures after returning (an endless thread, a
+failing exit handler) passed in a batch; fixed by the unclean-exit rule, with
+both programs in the tests. It also noted, unfixed, that RLIMIT_FSIZE lets a
+program infer the length of an expected output over about 4 MB. The MBPP+
+check exposed a host crash, also reachable per case: an int beyond float range
+against a float expected value raised OverflowError in `same_value` (fixed;
+test fails without it). It also showed EvalPlus fails an exact int against a
+reference's rounded float (Mbpp/287), as it requires matching types when values
+are not `==`; tolerance now applies only between two floats.
+Agreement on Coder-1.5B greedy samples (`python -m scripts.codeprobe.agreement`):
+HumanEval+ 163/163 in 399 s (about 35 min per case before); LiveCodeBench
+788/788 in 2,982 s; MBPP+ 364/365 in 736 s. The remaining MBPP+ disagreement,
+Mbpp/123, takes 2.5 s on an input where EvalPlus allows 4x the reference time:
+our fixed 4 s limit is more lenient for slow correct solutions. v2 tests on the
+desktop: 102 passed. The selected@k metric (scripts/agent/report.py) and the
+grid launcher (scripts/launch/m0d_grid.sh) were added alongside.
+`eval/codeprobe/agreement-batched-{humaneval,livecodebench}-1.5b-20261031/`,
+`eval/codeprobe/agreement-typed-{mbpp,humaneval}-1.5b-20261031/`.
+
+**2026-11-01 – M0d grid: base Coder-1.5B, breadth vs repair vs tools** (commit pending).
+`bash scripts/launch/m0d_grid.sh` (16 seeds, T=0.8, 1,024 tokens per turn, bf16, 48 rows, 6,144 cache,
+first-failure grading); 15 runs in 7.6 h. Solved % (95% CI over problems), then TFLOPs per episode:
+
+| Condition | MBPP+ (365) | HumanEval+ (163) | LiveCodeBench (788) |
+| --- | --- | --- | --- |
+| single 1 | 55.2 (51.0–59.4), 0.65 | 49.6 (44.5–54.7), 1.18 | 8.8 (7.4–10.2), 2.33 |
+| repair 2 | 56.7, 0.91 | 49.7, 1.54 | 9.4, 3.63 |
+| repair 4 | 57.3 (53.1–61.5), 1.18 | 49.2, 1.98 | 9.4, 6.04 |
+| tools 2 | 47.9, 1.05 | 23.3, 1.95 | 5.9, 3.06 |
+| tools 4 | 38.8 (35.6–42.1), 1.55 | 20.4 (17.4–23.3), 2.63 | 5.3, 4.34 |
+| single: selected@2 / @16 | 61.6 / 69.0 | 57.9 / 66.9 | 12.8 / 23.5 |
+| single: pass@16 (oracle) | 77.5 | 90.2 | 26.8 |
+
+At matched or lower compute, breadth beats depth: single-turn selected@2 (two samples, the first passing
+the public tests) costs 1.30 / 2.36 / 4.66 TFLOPs and beats repair at 4 turns on every set. Repair rarely
+succeeds (repaired 2.2 / 1.8 / 0.9% of episodes at 4 turns). The tools condition hurts: the model calls
+`run_python` first in 88–94% of episodes, but on MBPP+ and HumanEval+ only 2–4% of those calls print
+anything, and 59–73% of episodes submit the run code unchanged; on HumanEval+ 27–32% of final submissions
+are docstring-only stubs (5.1% single-turn). The base model does not use execution feedback, so tool use
+must be learned before the three-way comparison can mean anything. Public tests are a weak verifier: of
+public-passing submissions, 18.5 / 30.7 / 28.8% fail hidden tests (single turn), and selected@16 stays far
+below pass@16. LiveCodeBench hard is near zero in every condition (0.3% single turn; selected@16 1.3%).
+`eval/agent/m0d-grid-20261031/<set>-<condition>-<turns>/report.md` (desktop).
+
 ## Artifacts and where things live
 
 | What | Path |

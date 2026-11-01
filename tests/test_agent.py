@@ -382,7 +382,7 @@ def report_episode(problem_id: str, hidden: str, public: str, turns=(), flops=2e
               "public_pass_fraction": None if tool == "run_python" else 0.5}
              for tool, outcome in turns] + [{"tool": "submit", "outcome": None, "tokens": 10, "model_seconds": 1.0,
                                               "sandbox_seconds": 0.0, "public_pass_fraction": None}]
-    return {"problem_id": problem_id, "stop": "submit", "turns": turns, "hidden_outcome": hidden,
+    return {"problem_id": problem_id, "seed": 0, "stop": "submit", "turns": turns, "hidden_outcome": hidden,
             "public_outcome": public, "flops": flops, "tokens_processed": 100}
 
 
@@ -481,3 +481,27 @@ def test_graders_exit_when_the_runner_is_killed():
         time.sleep(0.1)
     os.kill(grader, signal.SIGKILL)
     raise AssertionError("the grader outlived the killed runner")
+
+
+def test_selected_at_k_matches_enumerating_every_subset():
+    import itertools
+    import random
+
+    from scripts.agent.report import selected_at_k
+
+    generator = random.Random(0)
+    for _ in range(20):
+        n = generator.randint(1, 8)
+        group = [{**report_episode("a", generator.choice(["pass", "wrong_answer"]),
+                                   generator.choice(["pass", "wrong_answer", None])), "seed": seed}
+                 for seed in generator.sample(range(100), n)]
+        ordered = sorted(group, key=lambda episode: episode["seed"])
+        for k in range(1, n + 1):
+            picks = []
+            for subset in itertools.combinations(ordered, k):
+                passing = [episode for episode in subset if episode["public_outcome"] == "pass"]
+                picks.append((passing or subset)[0]["hidden_outcome"] == "pass")
+            assert selected_at_k(group, k) == pytest.approx(sum(picks) / len(picks))
+    # Two attempts: only the second passes public and hidden tests. k=1 picks either; k=2 always picks the second.
+    two = [{**report_episode("a", "wrong_answer", "wrong_answer"), "seed": 0}, {**report_episode("a", "pass", "pass"), "seed": 1}]
+    assert selected_at_k(two, 1) == 0.5 and selected_at_k(two, 2) == 1.0

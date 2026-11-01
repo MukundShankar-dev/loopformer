@@ -85,6 +85,9 @@ def test_value_comparison_is_strict_about_types_and_tolerant_only_for_floats():
     assert same_value(0.3, 0.1 + 0.2, 0.0)  # within EvalPlus's relative 1e-7
     assert same_value(1.0, 1.0 + 1e-3, 1e-2) and not same_value(1.0, 1.0 + 1e-3, 0.0)
     assert same_value(2, 2.0, 0.0)
+    # An int is never within tolerance of a float, as in EvalPlus (Mbpp/287: exact int, reference float).
+    assert not same_value(1.333335333334e18, 1333335333334000000, 1e-6)
+    assert not same_value(1, 1.0 + 1e-9, 1e-6) and same_value(1.0, 1.0 + 1e-9, 1e-6)
 
 
 def test_adversarial_program_output_cannot_crash_the_host():
@@ -94,6 +97,8 @@ def test_adversarial_program_output_cannot_crash_the_host():
     assert parse_value('"ok" "again"') == (False, None)
     parsed, value = parse_value("[" * 500 + "]" * 500)
     assert parsed and not same_value(1, value, 0.0)  # recursion follows the expected value, not the program's
+    huge = 10 ** 400  # an int beyond float range against a float, either way round
+    assert not same_value(1.5, huge, 0.0) and not same_value(huge, 1.5, 1e-6) and same_value(huge, huge, 0.0)
 
 
 def test_failure_classes():
@@ -300,3 +305,62 @@ def test_cases_cannot_see_each_other():
         print(len(seen) + 1)
     """)
     assert grade(solution, tests, workers=1).outcome == "pass"
+
+
+# Batched call grading must decide every case exactly as running it alone does.
+
+BATCHED = call("half", *[([n], n // 2) for n in range(12)])
+BATCH_PROGRAMS = {
+    "right": "def half(n): return n // 2",
+    "wrong on odd": "def half(n): return n / 2",
+    "raises on some": "def half(n):\n    if n % 5 == 3: raise ValueError(n)\n    return n // 2",
+    "exits partway": "def half(n):\n    if n == 4: exit(0)\n    return n // 2",
+    "dies partway": "import os\ndef half(n):\n    if n == 7: os._exit(0)\n    return n // 2",
+    "slow case": "def half(n):\n    if n == 9:\n        while True: pass\n    return n // 2",
+    "a method": "class Solution:\n    def half(self, n): return n // 2",
+    # Fail only after returning, which alone fails each case: a thread that never ends, a crashing exit handler.
+    "endless thread": "import threading\nthreading.Thread(target=lambda: [0 for _ in iter(int, 1)]).start()\n"
+                      "def half(n): return n // 2",
+    "exit handler fails": "import atexit, os\natexit.register(lambda: os._exit(1))\ndef half(n): return n // 2",
+    "garbage on the result stream": "import os\nos.write(3, b'{\"case\": true, \"value\": 0}\\nnot json\\n')\ndef half(n): return n // 2",
+}
+
+
+@needs_sandbox
+@pytest.mark.parametrize("name", sorted(BATCH_PROGRAMS))
+def test_batched_call_grading_matches_each_case_alone(name, monkeypatch):
+    import scripts.sandbox.grader as grader
+
+    solution = BATCH_PROGRAMS[name]
+    batched = grade(solution, BATCHED, limits=Limits(wall_seconds=2, cpu_seconds=2))
+    monkeypatch.setattr(grader, "BATCH_CASES", 1)
+    alone = grade(solution, BATCHED, limits=Limits(wall_seconds=2, cpu_seconds=2))
+    assert [r.outcome for r in batched.results] == [r.outcome for r in alone.results]
+    assert (batched.outcome, batched.pass_fraction) == (alone.outcome, alone.pass_fraction)
+
+
+@needs_sandbox
+def test_forged_result_frames_earn_only_the_values_they_get_right():
+    # Writes frames claiming 0 for every case into the harness's result stream (fd 3), then returns wrong values.
+    # Alone, a program can equally write a value to that stream and exit: either way the value is the program's own
+    # output, and the expected values never enter the sandbox. n // 2 == 0 only for n = 0 and 1.
+    forged = ("import os, json\nfor i in range(12): os.write(3, (json.dumps({'case': i, 'value': 0}) + '\\n').encode())\n"
+              "def half(n): return -1")
+    result = grade(forged, BATCHED)
+    assert result.outcome == "wrong_answer" and result.pass_fraction == 2 / 12
+    assert [r.outcome for r in result.results[:3]] == ["pass", "pass", "wrong_answer"]
+
+
+@needs_sandbox
+def test_batches_share_one_process_and_first_failure_keeps_a_prefix():
+    in_order = "seen = []\ndef half(n):\n    seen.append(n)\n    return n // 2 if len(seen) == n + 1 else -1"
+    assert grade(in_order, BATCHED).outcome == "pass"  # state carries across a batch, as in EvalPlus and LiveCodeBench
+    wrong_late = "def half(n): return n // 2 if n != 10 else 0"
+    early = grade(wrong_late, BATCHED, first_failure=True)
+    assert early.outcome == "wrong_answer" and len(early.results) == 11 and early.pass_fraction == 10 / 12
+    assert grader_batches([TestCase("[1]", "1")] * 130) == [64, 64, 2]
+
+
+def grader_batches(cases):
+    from scripts.sandbox.grader import batches
+    return [len(group) for group in batches(tuple(cases))]

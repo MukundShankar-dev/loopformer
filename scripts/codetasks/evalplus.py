@@ -25,9 +25,12 @@ Excluded, and listed in the run's output: the tasks EvalPlus checks with
 special oracles (set equality, "not None", or a custom function), which
 input/expected equality cannot express, and tasks whose reference solution
 fails or exceeds REFERENCE_LIMITS in the sandbox.
-Remaining differences: one process per case instead of one per sample, a
-fixed per-case time limit instead of 4x the reference time, and the system
-Python rather than EvalPlus's.
+Remaining differences: call cases run in batches of up to 64 per process
+(scripts/sandbox/grader.py) instead of one process per sample, a fixed
+per-case time limit instead of 4x the reference time (at least 1 s), so a
+slow but correct solution can pass here and time out there, tolerance
+applied per element of nested values instead of to the whole value, and
+the system Python rather than EvalPlus's.
 """
 import argparse
 import ast
