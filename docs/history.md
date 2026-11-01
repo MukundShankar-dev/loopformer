@@ -573,7 +573,7 @@ which interaction runs also see.
 `-nothought`, `-final`, `-plainprompt`), `eval/codeprobe/humanevalplus-agreement-1.5b-prompt-20261031/`;
 superseded HumanEval+ sets kept as `data/agent/humanevalplus-v0.1.10-{plain-statement,codeblock-only,codeblock-prompt}` (desktop).
 
-**2026-10-31 – Batched call grading; EvalPlus type rule** (commit pending). At
+**2026-10-31 – Batched call grading; EvalPlus type rule** (188d266). At
 per-case grading the M0d grid would take about 120 h, nearly all in the grader
 (84% of HumanEval+ and 97% of LiveCodeBench samples are unique, so dedup does not
 help). Call cases now run in batches of up to 64 per sandbox run; only returned
@@ -598,7 +598,7 @@ grid launcher (scripts/launch/m0d_grid.sh) were added alongside.
 `eval/codeprobe/agreement-batched-{humaneval,livecodebench}-1.5b-20261031/`,
 `eval/codeprobe/agreement-typed-{mbpp,humaneval}-1.5b-20261031/`.
 
-**2026-11-01 – M0d grid: base Coder-1.5B, breadth vs repair vs tools** (commit pending).
+**2026-11-01 – M0d grid: base Coder-1.5B, breadth vs repair vs tools** (188d266).
 `bash scripts/launch/m0d_grid.sh` (16 seeds, T=0.8, 1,024 tokens per turn, bf16, 48 rows, 6,144 cache,
 first-failure grading); 15 runs in 7.6 h. Solved % (95% CI over problems), then TFLOPs per episode:
 
